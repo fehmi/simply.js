@@ -1,0 +1,71 @@
+<template>
+  <div class="hello" onclick="asd()">
+    { data.age * (2) }
+    <p>Hello, world! My name is <slot></slot>.</p>
+    <if self.count==0>
+      <h1>hahahha {name}</h1>
+      <h1>joker misin mübarek {name}</h1>
+
+      <else>
+        asdasdasd
+    </if>
+    <if data.name=="deneme">
+      <h1>hahahha {data.name} ddd</h1>
+      <h1>joker misin mübarek {data.name} ddd</h1>
+    </if>
+  </div>
+  <if data.name=="fehmi">
+    <h1>hahahha {data.name}</h1>
+    <h1>joker misin mübarek {data.name}</h1>
+  </if>
+  <each data.personalities as personality, key (index)>
+    <each data.personalities as p, key (index)>
+      <if p=="Calm">
+        <h1>hay yaşa calm</h1>
+      </if>
+      {p}
+      {data.name}
+      <each data.hobbies as hobby, key (index)>
+        <each data.hobbies as hobbie, key (index)>
+          <li>{key}:{hobbie}:{index}</li>
+        </each>
+        <li>{hobby}{key}{index}</li>
+      </each>
+    </each>
+    {key}{index}
+  </each>
+
+</template>
+<style>
+  p {
+    background: aquamarine;
+    border-radius: 30px;
+    padding: 20px;
+    font-size: 20px;
+    text-align: center;
+    width: 300px;
+    margin: 0 auto;
+    color: aquamarine;
+    color: "{data.color}";
+  }
+</style>
+<script>
+  class {
+    data = {
+      name: "fehmi",
+      age: 37,
+      personalities: ["Calm", "Creative", "Passionate"],
+      hobbies: {
+        "Music Producing": "Kırk yılda bir",
+        Gaming: "Aydı yılda bir",
+        Sports: "Meeeh",
+      },
+      color: "blue"
+    };
+    methods = {
+      asd() {
+        alert("asd function called");
+      },
+    };
+  }
+</script>
