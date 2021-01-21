@@ -51,7 +51,7 @@ If you decide to use `key` and `index` when you define `each` loop. You can reac
 All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
 
 ```html
-  <each data.hobbies as hobbie, key (index)>
+  <each data.hobbies as hobbie, key (index)> 
     <li>{key}:{hobbie}:{index}</li>
   </each>
 ```
