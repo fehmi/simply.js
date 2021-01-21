@@ -1,7 +1,7 @@
 <template>
-  <div class="hello" onclick="asd()">
+  <div class="hello" onclick="bcd()">
     { data.age * (2) }
-    <p>Hello, world! My name is <slot></slot>.</p>
+    <p onclick="asd(); event.stopPropagation();">Hello, world! My name is <slot></slot>.</p>
     <if self.count==0>
       <h1>hahahha {name}</h1>
       <h1>joker misin mübarek {name}</h1>
@@ -63,9 +63,13 @@
       color: "blue"
     };
     methods = {
-      asd() {
+      asd(e) {
         alert("asd function called");
+        console.log(event);
       },
+      bcd() {
+        alert("bcd")
+      }
     };
   }
 </script>

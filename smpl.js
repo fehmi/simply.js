@@ -3,14 +3,14 @@
 if (componentString.indexOf("style scoped") > -1) {
 
     var scopedStyles = Array.prototype.map.call(componentHtml.querySelector("style").sheet.cssRules,
-        function css_text(x) { return "[simple-id=f" + id + "] " + x.cssText; }).join('\n');
+        function css_text(x) { return "[smpl-id=f" + id + "] " + x.cssText; }).join('\n');
     componentHtml.querySelector("style").innerHTML = scopedStyles;
 }
 */
 
 utils();
 
-window.simple = {
+window.smpl = {
   components: {},
   // simplate
   parseTemplate: function (template, data) {
@@ -165,7 +165,7 @@ function utils() {
           style,
           script
         });
-        //console.log(simple.importCompleted[name]);
+        //console.log(smpl.importCompleted[name]);
       } else {
         console.log("Component import error: We reached our target server, but it returned an error");
       }
@@ -222,7 +222,7 @@ function utils() {
           this.data.color = "green";
         }, 1000);
 
-        simple.components[this.id] = this;
+        smpl.components[this.id] = this;
 
         // console.log(this.methods);
 
@@ -252,23 +252,23 @@ function utils() {
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
             }
-            if (m[2].indexOf("simple.components") == -1) {
-              template = template.replace(m[2], "simple.components[`"+this.id+"`].methods."+m[2]);
+            if (m[2].indexOf("smpl.components") == -1) {
+              template = template.replace(m[2], "smpl.components[`"+this.id+"`].methods."+m[2]);
             }
             
         }        
         if (!this.rendered) {
           this.shadow = this.attachShadow({ mode: 'open' });
           //this.shadow.appendChild(style.cloneNode(true));
-          let parsedTemplate = simple.parseTemplate(template, this.data);
-          let parsedStyle = simple.parseStyle(style, this.data);
+          let parsedTemplate = smpl.parseTemplate(template, this.data);
+          let parsedStyle = smpl.parseStyle(style, this.data);
           this.shadow.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
         }
         else {
           var newDom = document.createElement("div");
-          let parsedTemplate = simple.parseTemplate(template, this.data);
+          let parsedTemplate = smpl.parseTemplate(template, this.data);
           
-          let parsedStyle = simple.parseStyle(style, this.data);
+          let parsedStyle = smpl.parseStyle(style, this.data);
           newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
 
           morphdom(this.shadow, newDom, {

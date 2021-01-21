@@ -90,12 +90,16 @@ All variables you define on the data section of your component automaticaly will
 </script>
 ```
 
-## Expressions
-
-All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
+?> You can write any if statement that you can write with Vanilla JS.
 
 ```html
-  <each data.hobbies as hobbie, key (index)>
-    <li>{key}:{hobbie}:{index}</li>
-  </each>
+
+  <if data.who == "Red Bird" && data.age == 3>
+    ...
+  </if>  
+
+  <if (data.a + 1) > 5 || data.a < 12>
+    ...
+  </if>      
+
 ```
