@@ -1,0 +1,44 @@
+<template>
+  <p onclick="asd()">{data.props.filter}</p>
+  <child-component who="{data.color}"></child-component>
+</template>
+<style>
+  p {
+    background: aquamarine;
+    border-radius: 30px;
+    padding: 20px;
+    font-size: 20px;
+    text-align: center;
+    width: 300px;
+    margin: 0 auto;
+    color: aquamarine;
+    color: "{data.color}";
+  }
+</style>
+<script>
+  importComponent("child-component", 'child.html');
+  class {
+    data = {
+      name: "fehmi",
+      age: 37,
+      personalities: ["Calm", "Creative", "Passionate"],
+      hobbies: {
+        "Music Producing": "Kırk yılda bir",
+        Gaming: "Aydı yılda bir",
+        Sports: "Meeeh",
+      },
+      color: "blue"
+    };
+    methods = {
+      asd(e) {
+        console.log(data);
+        data.color = "purple";
+        console.log(data);
+        //alert("asd function called");
+      },
+      bcd() {
+        alert("bcd")
+      }
+    };
+  }
+</script>

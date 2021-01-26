@@ -12,6 +12,7 @@
   - [Conditionals](conditionals.md)
   - [Each Loops](loops.md)
   - [DOM Events](dom-events.md)
+  - [Component Communication](lifecycvle.md)   
   - [Lifecycle](lifecycvle.md)  
   - [Reactivity](reactivity.md)
 
