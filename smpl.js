@@ -77,7 +77,7 @@ window.smpl = {
             logic = "\
                     for (var ii in "+ logic[3] + ") { \
                       if (ii == '__o_') { continue; }\
-                      let " + logic[12] + "= Object.keys(" + logic[3] + ").indexOf(ii); \
+                      let " + key + "= Object.keys(" + logic[3] + ").indexOf(ii); \
                       let " + logic[8] + "= ii; \
                       let " + logic[4] + "=" + logic[3] + "[ii];";
           }
@@ -94,7 +94,7 @@ window.smpl = {
         let logicLine = capturedLogics[capturedLogics.length - 1];
         let staticText = processedLetters.replace(logicLine, "");
         let replaceThis = staticText + logicLine;
-        var withThis = "ht+='" + staticText.trim().replace(/\n/g, "") + "';" + logic;
+        var withThis = "ht+=`" + staticText.trim().replace(/\n/g, "") + "`;" + logic;
         bucket = bucket.replace(replaceThis, withThis);
         processedLetters = "";
       }
@@ -102,10 +102,11 @@ window.smpl = {
     // for the last non-logical text
     if (processedLetters.trim() !== "") {
       processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+='" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "';")
+      bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
     }
     // console.log(bucket);
     var ht = "";
+    // console.log(bucket);
     eval(bucket + "//@ sourceURL=foo.js");
     return ht;
   },
@@ -118,6 +119,7 @@ window.smpl = {
       }
       style = style.split(m[0]).join(eval(m[4]));
     }
+    
     return style;
   }
 }
@@ -154,10 +156,18 @@ function utils() {
       if (this.status >= 200 && this.status < 400) {
         // Success!
         var doc = this.response;
-        const template = doc.split('<template>').pop().split('</template>')[0];
-        const style = doc.split('<style>').pop().split('</style>')[0];
-        const script = doc.split('<script>').pop().split('</script>')[0];
-
+        var style = "";
+        var template = "";
+        var script = "";
+        if (doc.indexOf("<template>") > -1) {
+          template = doc.split('<template>').pop().split('</template>')[0];
+        }        
+        if (doc.indexOf("<style>") > -1) {
+          style = doc.split('<style>').pop().split('</style>')[0];
+        }
+        if (doc.indexOf("<script>") > -1) {
+          script = doc.split('<script>').pop().split('</script>')[0];
+        }          
         callback({
           name,
           template,
@@ -203,47 +213,54 @@ function utils() {
     //});
   }
   registerComponent = function ({ template, style, name, listeners, script, settings }) {
-    class UnityComponent extends HTMLElement {
-      static get observedAttributes() { return ["filter", "who"]; }
+    class UnityComponent extends HTMLElement {    
       constructor() {
         // Always call super first in constructor
         super();
         this.uid = '_' + Math.random().toString(36).substr(2, 9);
-        self = this;
+        var component = this;
         // import satırlarını alıp çalıştıralım
         var m;
-        var importRegex = /importComponent\(.*\)\;/gm;
+        var importRegex = /importComponent\(.*\)\;/m;
+
         while ((m = importRegex.exec(script)) !== null) {
-          // This is necessary to avoid infinite loops with zero-width matches
-          if (m.index === importRegex.lastIndex) {
-            importRegex.lastIndex++;
-          }
-          // The result can be accessed through the `m`-variable.
           m.forEach(function () {
             script = script.replace(m[0], "");
             eval(m[0]);
           });
         }
 
-        this.componentClass = eval("new " + script + "");
+        this.componentClass = eval("//"+name+"\n\nnew " + script + "");
         var data = this.componentClass.data;
+        var haydar = "deneme";
         data.props = {};
         this.methods = this.componentClass.methods;
-        this.self = this;
+        this.lifecycle = this.componentClass.lifecycle;
+        this.watch = this.componentClass.watch;
+        this.component = this;
+
+        this.parent = this.getRootNode().host;
 
         setTimeout(() => {
           data.name = "deneme";
           data.color = "green";
+          data.props.subject = ["a", "b", "c"];
+          data.props.subject[1] = true;
         }, 1000);
 
-        smpl.components[this.uid] = this;
-
+        // smpl.components[this.uid] = this;
+        
         for (var i = 0; i < this.attributes.length; i++) {
           var attrib = this.attributes[i];
           // array ya da obj ise stringify
-          data.props[attrib.name] = attrib.value;
+          try {
+            data.props[attrib.name] = JSON.parse(attrib.value);
+          } catch (e) {
+            data.props[attrib.name] = attrib.value;
+          }
         }
         this.data = data;
+        
         // console.log(this.methods);
 
         // Object.keys(this.componentClass).forEach(function(key) {
@@ -253,15 +270,58 @@ function utils() {
       }
       // invoked each time the custom element is appended
       // into a document-connected element
+      observeAttrChange(el, callback) {
+        var observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            if (mutation.type === 'attributes') {
+              var newVal = mutation.target.getAttribute(mutation.attributeName);
+              callback(mutation.attributeName, newVal);
+            }
+          });
+        });
+        observer.observe(el, {
+          attributes: true,
+          childList: false,
+          characterData: false,
+          subtree: false,
+          attributeOldValue: true,
+          characterDataOldValue: false
+        });
+        return observer;
+      }      
       connectedCallback() {
-
+        this.observeAttrChange(this, function(name,newValue) {
+          try {
+            newValue = JSON.parse(newValue);
+          } catch (e) {
+            newValue = newValue;
+          }
+          if (newValue !== self.data.props[name]) {
+            self.data.props[name] = newValue;
+          }
+        });
+        
         let self = this;
         this.render();
 
-        obaa(this.data, function (name, value, old, parents) {
+        obaa(this.data, function (name, value, old, parents) {        
           self.render();
-          console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+          //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+          
+          if (self.props) {
+            if (parents == "#-props") {
+              self.setAttribute(name, JSON.stringify(self.data.props[name]));
+            }
+            else {
+              name = parents.split("-")[2];
+              self.setAttribute(name, JSON.stringify(self.data.props[name]));
+            }
+          }
+          if (typeof self.watch !== "undefined") {
+              self.watch(name, value, old, parents);
+          }                 
         });
+
         this._attachListeners();
       }
 
@@ -284,18 +344,25 @@ function utils() {
           let parsedTemplate = smpl.parseTemplate(template, this.data);
           let parsedStyle = smpl.parseStyle(style, this.data);
           this.shadow.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
+
+          if (typeof this.lifecycle !== "undefined") {
+            if (typeof this.lifecycle.connectedCallback !== "undefined") {
+              this.lifecycle.connectedCallback();
+            }
+          }
         }
         else {
           var newDom = document.createElement("div");
           let parsedTemplate = smpl.parseTemplate(template, this.data);
           let parsedStyle = smpl.parseStyle(style, this.data);
+
           newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
-          console.log(parsedTemplate);
+
           //console.log(this.shadow, newDom);
           morphdom(this.shadow, newDom, {
             childrenOnly: true,
             onBeforeElChildrenUpdated: function (fromEl) {
-              console.log(fromEl.tagName);
+              // console.log(fromEl.tagName);
               if (fromEl.tagName == "CHILD-COMPONENT") {
                 console.log("dont again");
               }
@@ -312,7 +379,8 @@ function utils() {
       // invoked when one of the custom element's attributes
       // is added, removed, or changed.
       attributeChangedCallback(name, oldValue, newValue) {
-        this.data.props[name] = newValue;
+        // if data.
+
       }
       adoptedCallback() { }
 

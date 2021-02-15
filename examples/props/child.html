@@ -1,5 +1,8 @@
 <template>
-  <p>hello this is child {data.props.who}</p>
+  <p onclick="asd()">hello this is child {data.props.who}</p>
+  <each data.props.subject as subjectt>
+    <li>{subjectt}</li>
+  </each>
 </template>
 <style>
 
@@ -7,6 +10,14 @@
 <script>
   class {
     data = {
+    };
+    methods = {
+      asd(e) {
+        data.props.subject = "purple";
+        console.log(parent.data);
+        parent.data.color = "goncagül";
+        //alert("asd function called");
+      },
     }
   }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <p onclick="asd()">{data.props.filter}</p>
-  <child-component who="{data.color}"></child-component>
+  <child-component who="{data.color}" subject="{data.subject}"></child-component>
 </template>
 <style>
   p {
@@ -27,13 +27,13 @@
         Gaming: "Aydı yılda bir",
         Sports: "Meeeh",
       },
+      subject: "weeee",
       color: "blue"
     };
     methods = {
       asd(e) {
         console.log(data);
         data.color = "purple";
-        console.log(data);
         //alert("asd function called");
       },
       bcd() {
