@@ -1,4 +1,17 @@
-## Simple form of variables
+## Lifecycle Events
+
+| Event   |      Description      |
+|:----------|:-------------|
+| **beforeConstruct** |  The user clicks an HTML element |
+| **afterConstruct** |    The user moves the mouse over an HTML element   |
+| **afterAttributeChange** | The user moves the mouse away from an HTML element |
+| **whenDataChange** | The user pushes a keyboard key |
+| **beforeFirstRender** | The user pushes a keyboard key |
+| **afterFirstRender** | The user pushes a keyboard key |
+| **beforeRerender** | The user pushes a keyboard key |
+| **afterRerender** | The user pushes a keyboard key |
+| **disconnected** | The user pushes a keyboard key |
+
 
 You can define your variables on the data section in your component like this.
 

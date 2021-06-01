@@ -1,4 +1,3 @@
-
 /*
 if (componentString.indexOf("style scoped") > -1) {
 
@@ -232,7 +231,6 @@ function utils() {
 
         this.componentClass = eval("//"+name+"\n\nnew " + script + "");
         var data = this.componentClass.data;
-        var haydar = "deneme";
         data.props = {};
         this.methods = this.componentClass.methods;
         this.lifecycle = this.componentClass.lifecycle;
@@ -240,13 +238,6 @@ function utils() {
         this.component = this;
 
         this.parent = this.getRootNode().host;
-
-        setTimeout(() => {
-          data.name = "deneme";
-          data.color = "green";
-          data.props.subject = ["a", "b", "c"];
-          data.props.subject[1] = true;
-        }, 1000);
 
         // smpl.components[this.uid] = this;
         

@@ -1,4 +1,10 @@
-## Simple form of variables
+## Parent to Child
+  prop
+  direct
+  methods/data
+## Parent to Grand Childs
+## Child to Parent
+## Child to Grand Parent
 
 You can define your variables on the data section in your component like this.
 
