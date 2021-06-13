@@ -42,7 +42,7 @@ Save it anywhere you want as `hello-world.html`
       <hello-world></hello-world>
       <script src="smpl.js"></script>
       <script>
-        importComponent("hello-world", "hello-world.html");
+        get("hello-world", "hello-world.html");
       </script>
     </body>
   </html>

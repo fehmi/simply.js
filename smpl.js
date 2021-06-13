@@ -118,7 +118,7 @@ window.smpl = {
       }
       style = style.split(m[0]).join(eval(m[4]));
     }
-    
+
     return style;
   }
 }
@@ -139,7 +139,7 @@ function utils() {
   fromClass = document.getElementsByClassName.bind(document);
   fromTag = document.getElementsByTagName.bind(document);
 
-  importComponent = function (name, path) {
+  get = function (name, path) {
     loadAndParseComponent(name, path, function (component) {
       getSettings(component, function (settings) {
         registerComponent(settings);
@@ -160,13 +160,13 @@ function utils() {
         var script = "";
         if (doc.indexOf("<template>") > -1) {
           template = doc.split('<template>').pop().split('</template>')[0];
-        }        
+        }
         if (doc.indexOf("<style>") > -1) {
           style = doc.split('<style>').pop().split('</style>')[0];
         }
         if (doc.indexOf("<script>") > -1) {
           script = doc.split('<script>').pop().split('</script>')[0];
-        }          
+        }
         callback({
           name,
           template,
@@ -212,15 +212,16 @@ function utils() {
     //});
   }
   registerComponent = function ({ template, style, name, listeners, script, settings }) {
-    class UnityComponent extends HTMLElement {    
+    class UnityComponent extends HTMLElement {
       constructor() {
+
+
         // Always call super first in constructor
         super();
-        this.uid = '_' + Math.random().toString(36).substr(2, 9);
-        var component = this;
+
         // import satırlarını alıp çalıştıralım
         var m;
-        var importRegex = /importComponent\(.*\)\;/m;
+        var importRegex = /get\(.*\)\;/m;
 
         while ((m = importRegex.exec(script)) !== null) {
           m.forEach(function () {
@@ -229,18 +230,29 @@ function utils() {
           });
         }
 
-        this.componentClass = eval("//"+name+"\n\nnew " + script + "");
+        this.componentClass = eval("//" + name + "\n\nnew " + script + "");
+
+        this.lifecycle = this.componentClass.lifecycle;
+        if (typeof this.lifecycle !== "undefined") {
+          if (typeof this.lifecycle.beforeConstruct !== "undefined") {
+            this.lifecycle.beforeConstruct();
+          }
+        }
+
+        this.uid = '_' + Math.random().toString(36).substr(2, 9);
+        var component = this;
+
         var data = this.componentClass.data;
         data.props = {};
         this.methods = this.componentClass.methods;
-        this.lifecycle = this.componentClass.lifecycle;
+
         this.watch = this.componentClass.watch;
         this.component = this;
 
         this.parent = this.getRootNode().host;
 
         // smpl.components[this.uid] = this;
-        
+
         for (var i = 0; i < this.attributes.length; i++) {
           var attrib = this.attributes[i];
           // array ya da obj ise stringify
@@ -251,7 +263,13 @@ function utils() {
           }
         }
         this.data = data;
-        
+
+        if (typeof this.lifecycle !== "undefined") {
+          if (typeof this.lifecycle.afterConstruct !== "undefined") {
+            this.lifecycle.afterConstruct();
+          }
+        }
+
         // console.log(this.methods);
 
         // Object.keys(this.componentClass).forEach(function(key) {
@@ -279,9 +297,9 @@ function utils() {
           characterDataOldValue: false
         });
         return observer;
-      }      
+      }
       connectedCallback() {
-        this.observeAttrChange(this, function(name,newValue) {
+        this.observeAttrChange(this, function (name, newValue) {
           try {
             newValue = JSON.parse(newValue);
           } catch (e) {
@@ -289,16 +307,26 @@ function utils() {
           }
           if (newValue !== self.data.props[name]) {
             self.data.props[name] = newValue;
+            if (typeof self.lifecycle !== "undefined") {
+              if (typeof self.lifecycle.whenPropChange !== "undefined") {
+                self.lifecycle.whenPropChange(name, self.data.props[name], newValue);
+              }
+            }
           }
         });
-        
+
         let self = this;
         this.render();
 
-        obaa(this.data, function (name, value, old, parents) {        
+        obaa(this.data, function (name, value, old, parents) {
+          if (typeof self.lifecycle !== "undefined") {
+            if (typeof self.lifecycle.whenDataChange !== "undefined") {
+              self.lifecycle.whenDataChange(name, value, old, parents);
+            }
+          }
+
           self.render();
           //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-          
           if (self.props) {
             if (parents == "#-props") {
               self.setAttribute(name, JSON.stringify(self.data.props[name]));
@@ -309,10 +337,9 @@ function utils() {
             }
           }
           if (typeof self.watch !== "undefined") {
-              self.watch(name, value, old, parents);
-          }                 
+            self.watch(name, value, old, parents);
+          }
         });
-
         this._attachListeners();
       }
 
@@ -330,6 +357,11 @@ function utils() {
 
         }
         if (!this.rendered) {
+          if (typeof this.lifecycle !== "undefined") {
+            if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
+              this.lifecycle.beforeFirstRender();
+            }
+          }
           this.shadow = this.attachShadow({ mode: 'open' });
           //this.shadow.appendChild(style.cloneNode(true));
           let parsedTemplate = smpl.parseTemplate(template, this.data);
@@ -337,12 +369,17 @@ function utils() {
           this.shadow.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
 
           if (typeof this.lifecycle !== "undefined") {
-            if (typeof this.lifecycle.connectedCallback !== "undefined") {
-              this.lifecycle.connectedCallback();
+            if (typeof this.lifecycle.afterFirstRender !== "undefined") {
+              this.lifecycle.afterFirstRender();
             }
           }
         }
         else {
+          if (typeof this.lifecycle !== "undefined") {
+            if (typeof this.lifecycle.beforeRerender !== "undefined") {
+              this.lifecycle.beforeRerender();
+            }
+          }
           var newDom = document.createElement("div");
           let parsedTemplate = smpl.parseTemplate(template, this.data);
           let parsedStyle = smpl.parseStyle(style, this.data);
@@ -361,12 +398,23 @@ function utils() {
               //console.log(toEl);
             }
           });
+          if (typeof this.lifecycle !== "undefined") {
+            if (typeof this.lifecycle.afterRerender !== "undefined") {
+              this.lifecycle.afterRerender();
+            }
+          }
         }
         this.rendered = true;
       }
       // Invoked each time the custom element is
       // disconnected from the document's DOM.
-      disconnectedCallback() { }
+      disconnectedCallback() {
+        if (typeof this.lifecycle !== "undefined") {
+          if (typeof this.lifecycle.disconnected !== "undefined") {
+            this.lifecycle.disconnected();
+          }
+        }
+      }
       // invoked when one of the custom element's attributes
       // is added, removed, or changed.
       attributeChangedCallback(name, oldValue, newValue) {
