@@ -12,6 +12,7 @@
   - [Nested Components](nested-components.md)   
   - [Component Communication](component-communication.md)   
   - [Lifecycle](lifecycle.md)  
+  - [Watch Event](watch.md)
   - [Reactivity](reactivity.md)
   - [Router](router.md)  
   - [State Management](router.md)    

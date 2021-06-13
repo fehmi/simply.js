@@ -51,3 +51,6 @@ Save it anywhere you want as `hello-world.html`
 ## Preview your site
 
 You can put the files to your server when they are ready. You can use any server tool MAMP, Prepros, Codekit etc.
+
+python -m SimpleHTTPServer 8000
+python3 -m http.server 8080
