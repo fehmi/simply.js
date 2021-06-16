@@ -1,87 +1,77 @@
-## Parent to Child
-  prop
-  direct
-  methods/data
-## Parent to Grand Childs
-## Child to Parent
-## Child to Grand Parent
+## Parent to Childs
 
-You can define your variables on the data section in your component like this.
-
-```bash
-<script>
-  class {
-    data = {
-      "name": "fehmi",
-      "age": 37
-    };
-</script>
+### Props
+```html
+  <child-component message="This is a message from parent"></child-component>
 ```
-
-Then you will be able to use them in your template like this.
+Then you can access it in template section of the child component like this
 
 ```html
 <template>
-  <p>
-    Hello, my name is {data.name}<br>
-    and I am {data.age} years old.
-  </p>
+  {data.props.message}
 </template>
 ```
 
-?> It is necessary to use dot notation with `data` prefix when reaching variables. The only exception is for `each` loop. When you are in a loop, you can directly reach current subjects.
-
-## Variable Expressions
-
-Of couse you can do some simple math with your variables using simple expressions. All of them below is valid.
-
-```js
-{ data.variable }
-{ data.variable.sub }
-{ data.variable + 10 }
-{ data.variable * (10 / 2) }
-```
-
-## Variables in `each` loops
-
-If you decide to use `key` and `index` when you define `each` loop. You can reach them directly without using a dot notation.
+Or you access it from anywhere in the script section of the child component like this.
 
 ```html
-  <each data.hobbies as hobbie, key (index)>
-    <li>{key}:{hobbie}:{index}</li>
-  </each>
-```
-
-## Reactivity of Variables
-
-All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
-
-```html
-  <each data.hobbies as hobbie, key (index)> 
-    <li>{key}:{hobbie}:{index}</li>
-  </each>
-```
-
-## Variables in style tag
-
-You can use your reactive data variables as a property value in style tag.
-
-```html
-<template>
-  <p>This color is blue and reactive!</p>
-</template>
-
-<style>
-  p {
-    color: "{data.color}";
-  }
-</style>
-
 <script>
   class {
-    data = {
-      color: "blue"
+    lifecycle = {
+      afterFirstRender() {
+        alert("The message from parent is " + data.props.message);
+      }
     }
   }
-</script>
+  </script>
+```
+
+### Direct
+
+You can directly change a variable in a child component or call a function from it like this.
+
+```js
+
+// Change a variable in child's data
+component.dom.querySelector("child-component").data.name = "New name";
+
+// Call a method from a child
+component.dom.querySelector("child-component").methods.functionName();
+
+// Change a variable in grand child's data
+var child = component.dom.querySelector("child-component");
+child.querySelector("grand-child").data.name = "New name";
+
+// Call a method from a grand child
+var child = component.dom.querySelector("child-component");
+cchild.querySelector("grand-child").methods.functionName();
+```
+
+## Child to Parent
+
+It is possible to communicate with parent sdirectly.
+
+```js
+// To change a variable in parent's data
+component.parent.data.name = "This changed by a child component";
+
+// To call a method in parent's methods
+component.parent.methods.functionName();
+
+```
+
+## Child to grand parents
+```js
+  // You can use any number of parent.parent.parent ...
+  var grandParent = component.parent.parent;
+  grandParent.data.message = "This changed by a grand child";
+  grandParent.methods.saySomething();
+```
+
+## Child to siblings
+```js
+  // Communicate with grand parents directly
+  var sibling = component.parent.dom.querySelector("sibling-component");
+  sibling.data.message = "This changed by a sibling";
+  sibling.methods.saySomething();
 ```

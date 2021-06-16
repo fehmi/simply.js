@@ -9,8 +9,10 @@ There is nothing special of writing DOM events in SMPL from Vanilla JS.
 
 <script>
   class {
-    sayHello: function() {
-      alert("Hello friend!");
+    methods = {
+      sayHello: function() {
+        alert("Hello friend!");
+      }
     }
 </script>
 ```
@@ -40,12 +42,14 @@ You can use native `stopPropagation()` and `preventDefault()` after your event f
 
 <script>
   class {
-    sayHello: function() {
-      alert("Hello friend!");
-    },
-    sayBye: function() {
-      alert("Bye!");
-    }  
+    methods = {
+      sayHello: function() {
+        alert("Hello friend!");
+      },
+      sayBye: function() {
+        alert("Bye!");
+      }  
+    }
   }  
 </script>
 ```

@@ -101,7 +101,8 @@ window.smpl = {
     // for the last non-logical text
     if (processedLetters.trim() !== "") {
       processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
+      //bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
+      bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.trim() + "`;")
     }
     // console.log(bucket);
     var ht = "";
@@ -362,11 +363,11 @@ function utils() {
               this.lifecycle.beforeFirstRender();
             }
           }
-          this.shadow = this.attachShadow({ mode: 'open' });
-          //this.shadow.appendChild(style.cloneNode(true));
+          this.dom = this.attachShadow({ mode: 'open' });
+          //this.dom.appendChild(style.cloneNode(true));
           let parsedTemplate = smpl.parseTemplate(template, this.data);
           let parsedStyle = smpl.parseStyle(style, this.data);
-          this.shadow.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
+          this.dom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
 
           if (typeof this.lifecycle !== "undefined") {
             if (typeof this.lifecycle.afterFirstRender !== "undefined") {
@@ -386,8 +387,8 @@ function utils() {
 
           newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
 
-          //console.log(this.shadow, newDom);
-          morphdom(this.shadow, newDom, {
+          //console.log(this.dom, newDom);
+          morphdom(this.dom, newDom, {
             childrenOnly: true,
             onBeforeElChildrenUpdated: function (fromEl) {
               // console.log(fromEl.tagName);
@@ -424,7 +425,7 @@ function utils() {
       adoptedCallback() { }
 
       _attachListeners() {
-        //console.log(this.shadow.querySelectorAll("*"));
+        //console.log(this.dom.querySelectorAll("*"));
       }
     }
     return customElements.define(name, UnityComponent);
