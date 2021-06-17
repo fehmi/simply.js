@@ -1,27 +1,38 @@
 <template>
   <div id="editor">
-    <ul id="files">
-      <li class="selected">index.html</li>
+    <ul id="file-tabs">
+      <li class="selected" data-filename="index.html">index.html</li>
+      <li data-filename="test-template.html">test-template.html</li>
     </ul>
-    <textarea oninput="render(event)">
-      <html>
-        <head>
+    <ul id="files">
+      <li data-filename="index.html">
+        <textarea oninput="render(event)">
+          <html>
+            <head>
+              <title>SMPL / REPL</title>
+            </head>
+            
+            <body>
+              testografya
+              <repl-component></rep-component>
+              <script src="https://root/smpl/smpl.js"></script>
+              <script>
+                //get("repl-component", "repl.html");
+              </script>
+            </body>
+            
+            </html>    
+        </textarea>
+      </li>
+      <li data-filename="test-template.html">
+        <textarea>
+          <template>
+            this is a component inside the app.
+          </template>
+        </textarea>
+      </li>
+    </ul>
 
-          
-          <title>SMPL / REPL</title>
-        </head>
-        
-        <body>
-          testografya
-          <repl-component></rep-component>
-          <script src="https://root/smpl/smpl.js"></script>
-          <script>
-            //get("repl-component", "repl.html");
-          </script>
-        </body>
-        
-        </html>    
-    </textarea>
   </div>
   <div id="result">
     <iframe id="preview"></iframe>
@@ -61,18 +72,19 @@
 <script>
   class {
     data = {
-      smplsjs: ""
+      // your data comes here
     }
     methods = {
       render(event) {
-        var content = component.dom.querySelector("textarea").value;
+        //var content = component.dom.querySelector("#files li[data-filename=index\\.html] textarea").value;
         //var blob = new Blob([content], {type: "text/html; charset=utf-8"});
         //component.dom.querySelector("iframe").src = URL.createObjectURL(blob);        
-        component.dom.querySelector("iframe").srcdoc = content;
+        //component.dom.querySelector("iframe").srcdoc = content;
       }
     }
     lifecycle = {
       afterFirstRender() {
+        console.log(component.dom);
         console.log(CodeMirror);
         component.methods.render();
       }

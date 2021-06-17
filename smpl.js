@@ -155,19 +155,22 @@ function utils() {
     request.onload = function () {
       if (this.status >= 200 && this.status < 400) {
         // Success!
-        var doc = this.response;
-        var style = "";
-        var template = "";
-        var script = "";
-        if (doc.indexOf("<template>") > -1) {
-          template = doc.split('<template>').pop().split('</template>')[0];
-        }
-        if (doc.indexOf("<style>") > -1) {
-          style = doc.split('<style>').pop().split('</style>')[0];
-        }
-        if (doc.indexOf("<script>") > -1) {
-          script = doc.split('<script>').pop().split('</script>')[0];
-        }
+        var txt = document.createElement("textarea");
+        var parser = new DOMParser();
+        var dom = parser.parseFromString(this.response, "text/html");
+
+        var template = dom.querySelector("template");
+        txt.innerHTML = template.innerHTML;
+        template = txt.value;
+
+        var style = dom.querySelector("style");
+        txt.innerHTML = style.innerHTML;
+        style = txt.value;
+
+        var script = dom.querySelector("script");
+        txt.innerHTML = script.innerHTML;
+        script = txt.value;        
+
         callback({
           name,
           template,
