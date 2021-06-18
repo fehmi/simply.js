@@ -1,10 +1,10 @@
-## smpl
+## simply
 
 > Simple JavaScript framework for simple apps.
 
 ## What it is
 
-smpl devoloped on top of native web components technology. It provides a single file component concept with a clean syntax. It has built-in template engine coded from scratch. It is plug & play. No need to npm or terminal. Just include the js file to your html and you are ready to go.
+simply devoloped on top of native web components technology. It provides a single file component concept with a clean syntax. It has built-in template engine coded from scratch. It is plug & play. No need to npm or terminal. Just include the js file to your html and you are ready to go.
 
 See the [Quick start](quickstart.md) guide for more details.
 
@@ -19,11 +19,11 @@ See the [Quick start](quickstart.md) guide for more details.
 
 ## Examples
 
-Check out the `examples` folder to see smpl in use.
+Check out the `examples` folder to see simply in use.
 
 ## Donate
 
-Please consider donating if you think smpl is helpful to you. I am happy if you can help me [buy a cup of coffee](https://github.com/fehmi/donate). :heart:
+Please consider donating if you think simply is helpful to you. I am happy if you can help me [buy a cup of coffee](https://github.com/fehmi/donate). :heart:
 
 ## Special Thanks
 

@@ -5,7 +5,7 @@
 You can add simple to your document via `<script>` tag and that's all.
 
 ```bash
-<script src="smpl.js"></script>
+<script src="simply.js"></script>
 ```
 
 ## Create Your First Component
@@ -40,7 +40,7 @@ Save it anywhere you want as `hello-world.html`
     <head></head>
     <body>
       <hello-world></hello-world>
-      <script src="smpl.js"></script>
+      <script src="simply.js"></script>
       <script>
         get("hello-world", "hello-world.html");
       </script>

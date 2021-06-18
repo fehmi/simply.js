@@ -1,6 +1,6 @@
 # DOM Events
 
-There is nothing special of writing DOM events in SMPL from Vanilla JS.
+There is nothing special of writing DOM events in simply from Vanilla JS.
 
 ```html
 <template>

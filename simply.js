@@ -2,14 +2,14 @@
 if (componentString.indexOf("style scoped") > -1) {
 
     var scopedStyles = Array.prototype.map.call(componentHtml.querySelector("style").sheet.cssRules,
-        function css_text(x) { return "[smpl-id=f" + id + "] " + x.cssText; }).join('\n');
+        function css_text(x) { return "[simply-id=f" + id + "] " + x.cssText; }).join('\n');
     componentHtml.querySelector("style").innerHTML = scopedStyles;
 }
 */
 
 utils();
 
-window.smpl = {
+window.simply = {
   components: {},
   // simplate
   parseTemplate: function (template, data) {
@@ -207,7 +207,7 @@ function utils() {
           style,
           script
         });
-        //console.log(smpl.importCompleted[name]);
+        //console.log(simply.importCompleted[name]);
       } else {
         console.log("Component import error: We reached our target server, but it returned an error");
       }
@@ -285,7 +285,7 @@ function utils() {
 
         this.parent = this.getRootNode().host;
 
-        // smpl.components[this.uid] = this;
+        // simply.components[this.uid] = this;
 
         for (var i = 0; i < this.attributes.length; i++) {
           var attrib = this.attributes[i];
@@ -400,8 +400,8 @@ function utils() {
           }
           this.dom = this.attachShadow({ mode: 'open' });
           //this.dom.appendChild(style.cloneNode(true));
-          let parsedTemplate = smpl.parseTemplate(template, this.data);
-          let parsedStyle = smpl.parseStyle(style, this.data);
+          let parsedTemplate = simply.parseTemplate(template, this.data);
+          let parsedStyle = simply.parseStyle(style, this.data);
           this.dom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
 
           if (typeof this.lifecycle !== "undefined") {
@@ -417,8 +417,8 @@ function utils() {
             }
           }
           var newDom = document.createElement("div");
-          let parsedTemplate = smpl.parseTemplate(template, this.data);
-          let parsedStyle = smpl.parseStyle(style, this.data);
+          let parsedTemplate = simply.parseTemplate(template, this.data);
+          let parsedStyle = simply.parseStyle(style, this.data);
 
           newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
 
