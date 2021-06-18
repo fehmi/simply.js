@@ -1,6 +1,6 @@
 ![logo](_media/icon.svg)
 
-# Simple <small>0.1</small>
+# simply <small>0.1alpha</small>
 
 > Simple framework for simple web-apps
 
@@ -10,5 +10,5 @@
 - IE 11+, Edge, Chrome, Firefox, Safari, Opera 
 
 
-[GitHub](https://github.com/fehmi/simple/)
+[GitHub](https://simply.js.org/)
 [Getting Started](#docsify)

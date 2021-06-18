@@ -2,7 +2,7 @@
 
 ## Installation
 
-You can add simple to your document via `<script>` tag and that's all.
+You can add simply to your document via `<script>` tag and that's all.
 
 ```bash
 <script src="simply.js"></script>
