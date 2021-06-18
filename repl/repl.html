@@ -1,18 +1,21 @@
 <template>
   <div id="editor">
     <ul id="file-tabs">
-      <li class="selected" data-filename="index.html">index.html</li>
-      <li data-filename="test-template.html">test-template.html</li>
+      <li data-filename="index.html" class="selected" onclick="changeSelectedFile()">index.html</li>
+      <li data-filename="test-template.html" onclick="changeSelectedFile()">test-template.html</li>
     </ul>
     <ul id="files">
-      <li data-filename="index.html">
-        <textarea oninput="render(event)">
+      <li data-filename="index.html" class="selected">
+        <textarea oninput="render()">
           <html>
             <head>
               <title>SMPL / REPL</title>
             </head>
             
             <body>
+              <template>
+                this is a component inside the app.
+              </template>              
               testografya
               <repl-component></rep-component>
               <script src="https://root/smpl/smpl.js"></script>
@@ -62,12 +65,29 @@
     width: 30%;    
   }
 
+  #files {
+    flex: 1;
+  }
+
+  #files li {
+    width: 100%;
+    display: none;
+  }
+
+  #files li.selected {
+    display: inline-block;
+  }
+  #files li,
+  #files textarea {
+    width: 100%;
+    height: 100%;    
+  }
+
   iframe#preview {
     width: 100%;
     height: 100%;    
   }
 </style>
-
 
 <script>
   class {
@@ -75,17 +95,18 @@
       // your data comes here
     }
     methods = {
-      render(event) {
+      render() {
         //var content = component.dom.querySelector("#files li[data-filename=index\\.html] textarea").value;
         //var blob = new Blob([content], {type: "text/html; charset=utf-8"});
         //component.dom.querySelector("iframe").src = URL.createObjectURL(blob);        
         //component.dom.querySelector("iframe").srcdoc = content;
+      },
+      changeSelectedFile(event) {
+        event.target.classList.add("selected")
       }
     }
     lifecycle = {
       afterFirstRender() {
-        console.log(component.dom);
-        console.log(CodeMirror);
         component.methods.render();
       }
     }

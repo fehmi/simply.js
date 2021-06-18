@@ -154,22 +154,52 @@ function utils() {
 
     request.onload = function () {
       if (this.status >= 200 && this.status < 400) {
-        // Success!
         var txt = document.createElement("textarea");
         var parser = new DOMParser();
         var dom = parser.parseFromString(this.response, "text/html");
 
-        var template = dom.querySelector("template");
-        txt.innerHTML = template.innerHTML;
-        template = txt.value;
+        var template = "";
+        if (this.response.indexOf("<template>") > -1) {
+          var templateOpenTag = /<template(.*)>/g;
+          var templateCloseTag = /<\/template>/g;
+          var bucket = "";
+          var processedLetters = "";
+          var templateCount = 0;
 
-        var style = dom.querySelector("style");
-        txt.innerHTML = style.innerHTML;
-        style = txt.value;
+          for (var i = 0; i < this.response.length; i++) {
+            bucket += this.response[i];
+            if ((logic = templateOpenTag.exec(bucket)) !== null) {
+              templateCount += 1;
+              bucket = "";
+            }
+            else if ((logic = templateCloseTag.exec(bucket)) !== null) {
+              templateCount -= 1;
+              bucket = "";
+              if (templateCount == 0) { // done
+                template = processedLetters.replace(new RegExp("<\/template>" + '$'), '');
+                console.log(template);
+                break;
+              }
+            }
+            if (templateCount > 0) {
+              processedLetters += this.response[i + 1];
+            }
+          }
+        }
 
-        var script = dom.querySelector("script");
-        txt.innerHTML = script.innerHTML;
-        script = txt.value;        
+        var style = "";
+        if (dom.querySelector("style")) {
+          style = dom.querySelector("style");
+          txt.innerHTML = style.innerHTML;
+          style = txt.value;
+        }
+
+        var script = "";
+        if (dom.querySelector("script")) {
+          var script = dom.querySelector("script");
+          txt.innerHTML = script.innerHTML;
+          script = txt.value;
+        }
 
         callback({
           name,
@@ -356,10 +386,12 @@ function utils() {
             regex.lastIndex++;
           }
           if (m[2].indexOf("this.getRootNode().host.methods") == -1) {
-            template = template.replace(m[2], "this.getRootNode().host.methods." + m[2]);
+            //template = template.replace(m[2], "this.getRootNode().host.methods." + m[2]);
+            //template = template.replace(new RegExp(escapeRegExp(m[2]), 'g'), "this.getRootNode().host.methods." + m[2]);
+            template = template.split(m[2]).join("this.getRootNode().host.methods." + m[2])
           }
-
         }
+
         if (!this.rendered) {
           if (typeof this.lifecycle !== "undefined") {
             if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
