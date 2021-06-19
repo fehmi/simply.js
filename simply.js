@@ -177,7 +177,6 @@ function utils() {
               bucket = "";
               if (templateCount == 0) { // done
                 template = processedLetters.replace(new RegExp("<\/template>" + '$'), '');
-                console.log(template);
                 break;
               }
             }
@@ -199,6 +198,10 @@ function utils() {
           var script = dom.querySelector("script");
           txt.innerHTML = script.innerHTML;
           script = txt.value;
+        }
+
+        if (path.indexOf("blob") > -1) {
+
         }
 
         callback({
@@ -248,68 +251,67 @@ function utils() {
   registerComponent = function ({ template, style, name, listeners, script, settings }) {
     class UnityComponent extends HTMLElement {
       constructor() {
-
-
         // Always call super first in constructor
         super();
 
-        // import satırlarını alıp çalıştıralım
-        var m;
-        var importRegex = /get\(.*\)\;/m;
+        if (script !== "") {
+          var m;
+          var importRegex = /get\(.*\)\;/m;
 
-        while ((m = importRegex.exec(script)) !== null) {
-          m.forEach(function () {
-            script = script.replace(m[0], "");
-            eval(m[0]);
-          });
-        }
+          while ((m = importRegex.exec(script)) !== null) {
+            m.forEach(function () {
+              script = script.replace(m[0], "");
+              eval(m[0]);
+            });
+          }
 
-        this.componentClass = eval("//" + name + "\n\nnew " + script + "");
-
-        this.lifecycle = this.componentClass.lifecycle;
-        if (typeof this.lifecycle !== "undefined") {
-          if (typeof this.lifecycle.beforeConstruct !== "undefined") {
-            this.lifecycle.beforeConstruct();
+          var timelateLines = template.split("\n");
+          var styleLines = style.split("\n");
+          var lineBreaks = "\n";
+          for (let index = 0; index < timelateLines.length + 1 + styleLines.length; index++) {
+            lineBreaks += "\n"
+          }
+          
+          if (script.trim().indexOf("class") == 0) {
+            this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "");
+            this.lifecycle = this.componentClass.lifecycle;
+            if (typeof this.lifecycle !== "undefined") {
+              if (typeof this.lifecycle.beforeConstruct !== "undefined") {
+                this.lifecycle.beforeConstruct();
+              }
+            }    
+            this.uid = '_' + Math.random().toString(36).substr(2, 9);
+            var component = this;
+  
+            var data = this.componentClass.data;
+            data.props = {};
+            this.methods = this.componentClass.methods;
+  
+            this.watch = this.componentClass.watch;
+            this.component = this;
+  
+            this.parent = this.getRootNode().host;
+  
+            // simply.components[this.uid] = this;
+  
+            for (var i = 0; i < this.attributes.length; i++) {
+              var attrib = this.attributes[i];
+              // array ya da obj ise stringify
+              try {
+                data.props[attrib.name] = JSON.parse(attrib.value);
+              } catch (e) {
+                data.props[attrib.name] = attrib.value;
+              }
+            }
+            this.data = data;
+  
+            if (typeof this.lifecycle !== "undefined") {
+              if (typeof this.lifecycle.afterConstruct !== "undefined") {
+                this.lifecycle.afterConstruct();
+              }
+            }                    
           }
         }
-
-        this.uid = '_' + Math.random().toString(36).substr(2, 9);
-        var component = this;
-
-        var data = this.componentClass.data;
-        data.props = {};
-        this.methods = this.componentClass.methods;
-
-        this.watch = this.componentClass.watch;
-        this.component = this;
-
-        this.parent = this.getRootNode().host;
-
-        // simply.components[this.uid] = this;
-
-        for (var i = 0; i < this.attributes.length; i++) {
-          var attrib = this.attributes[i];
-          // array ya da obj ise stringify
-          try {
-            data.props[attrib.name] = JSON.parse(attrib.value);
-          } catch (e) {
-            data.props[attrib.name] = attrib.value;
-          }
-        }
-        this.data = data;
-
-        if (typeof this.lifecycle !== "undefined") {
-          if (typeof this.lifecycle.afterConstruct !== "undefined") {
-            this.lifecycle.afterConstruct();
-          }
-        }
-
-        // console.log(this.methods);
-
-        // Object.keys(this.componentClass).forEach(function(key) {
-        //   console.log(this[key]);
-        // });
-        // write element functionality in here
       }
       // invoked each time the custom element is appended
       // into a document-connected element
@@ -352,29 +354,37 @@ function utils() {
         let self = this;
         this.render();
 
-        obaa(this.data, function (name, value, old, parents) {
-          if (typeof self.lifecycle !== "undefined") {
-            if (typeof self.lifecycle.whenDataChange !== "undefined") {
-              self.lifecycle.whenDataChange(name, value, old, parents);
-            }
+        if (script !== "") {
+          try {
+            obaa(this.data, function (name, value, old, parents) {
+              if (typeof self.lifecycle !== "undefined") {
+                if (typeof self.lifecycle.whenDataChange !== "undefined") {
+                  self.lifecycle.whenDataChange(name, value, old, parents);
+                }
+              }
+
+              self.render();
+              //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+              if (self.props) {
+                if (parents == "#-props") {
+                  self.setAttribute(name, JSON.stringify(self.data.props[name]));
+                }
+                else {
+                  name = parents.split("-")[2];
+                  self.setAttribute(name, JSON.stringify(self.data.props[name]));
+                }
+              }
+              if (typeof self.watch !== "undefined") {
+                self.watch(name, value, old, parents);
+              }
+            });
+            //this._attachListeners();            
+          } catch (error) {
+
           }
 
-          self.render();
-          //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-          if (self.props) {
-            if (parents == "#-props") {
-              self.setAttribute(name, JSON.stringify(self.data.props[name]));
-            }
-            else {
-              name = parents.split("-")[2];
-              self.setAttribute(name, JSON.stringify(self.data.props[name]));
-            }
-          }
-          if (typeof self.watch !== "undefined") {
-            self.watch(name, value, old, parents);
-          }
-        });
-        this._attachListeners();
+        }
+
       }
 
       render() {
@@ -401,8 +411,13 @@ function utils() {
           this.dom = this.attachShadow({ mode: 'open' });
           //this.dom.appendChild(style.cloneNode(true));
           let parsedTemplate = simply.parseTemplate(template, this.data);
-          let parsedStyle = simply.parseStyle(style, this.data);
-          this.dom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
+          if (style !== "") {
+            let parsedStyle = simply.parseStyle(style, this.data);
+            this.dom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
+          }
+          else {
+            this.dom.innerHTML = parsedTemplate;
+          }
 
           if (typeof this.lifecycle !== "undefined") {
             if (typeof this.lifecycle.afterFirstRender !== "undefined") {

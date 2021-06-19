@@ -1,8 +1,11 @@
 <template>
   <div id="editor">
     <ul id="file-tabs">
-      <li data-filename="index.html" class="selected" onclick="changeSelectedFile()">index.html</li>
-      <li data-filename="test-template.html" onclick="changeSelectedFile()">test-template.html</li>
+      <li data-filename="index.html" class="selected" onclick="changeSelectedFile(event)">index.html</li>
+      <li data-filename="test-template.html" onclick="changeSelectedFile(event)">test-template.html</li>
+      <li data-filename="huha-template.html" onclick="changeSelectedFile(event)">huha-template.html</li>
+      <li data-filename="nihaha-template.html" onclick="changeSelectedFile(event)">nihaha-template.html</li>
+      <li data-filename="nihaha2-template.html" onclick="changeSelectedFile(event)">nihaha2-template.html</li>
     </ul>
     <ul id="files">
       <li data-filename="index.html" class="selected">
@@ -12,15 +15,12 @@
               <title>simply / REPL</title>
             </head>
             
-            <body>
-              <template>
-                this is a component inside the app.
-              </template>              
+            <body>            
               testografya
-              <repl-component></rep-component>
+              <test-template></test-template>
               <script src="https://root/simply/simply.js"></script>
               <script>
-                //get("repl-component", "repl.html");
+                get("test-template", "test-template.html");
               </script>
             </body>
             
@@ -30,7 +30,38 @@
       <li data-filename="test-template.html">
         <textarea>
           <template>
+            <huha-template></huha-template>
             this is a component inside the app.
+          </template>
+          <script>
+            get("huha-template", "huha-template.html");
+          </script>
+        </textarea>
+      </li>
+      <li data-filename="huha-template.html">
+        <textarea>
+          <template>
+            <nihaha-template></nihaha-template>
+            <nihaha2-template></nihaha2-template>
+            this is a huha component inside another component.
+          </template>
+          <script>
+            get("nihaha-template", "nihaha-template.html");
+            get("nihaha2-template", "nihaha2-template.html");
+          </script>
+        </textarea>
+      </li>
+      <li data-filename="nihaha-template.html">
+        <textarea>
+          <template>
+            this is nihahaha
+          </template>
+        </textarea>
+      </li>
+      <li data-filename="nihaha2-template.html">
+        <textarea>
+          <template>
+            this is nihahaha2
           </template>
         </textarea>
       </li>
@@ -48,7 +79,7 @@
   :host {
     display: flex;
     width: 960px;
-    height: 450px;    
+    height: 450px;
   }
 
   #editor {
@@ -58,7 +89,7 @@
   }
 
   #result {
-    width: 35%;    
+    width: 35%;
   }
 
   #file-tabs,
@@ -70,7 +101,7 @@
   }
 
   #file-tabs li.selected {
-    font-weight: 600;    
+    font-weight: 600;
   }
 
   #files,
@@ -91,24 +122,86 @@
   #files textarea,
   iframe#result {
     width: 100%;
-    height: 100%;    
+    height: 100%;
   }
 </style>
 
 <script>
   class {
     data = {
-      // your data comes here
     }
     methods = {
       render() {
-        //var content = component.dom.querySelector("#files li[data-filename=index\\.html] textarea").value;
-        //var blob = new Blob([content], {type: "text/html; charset=utf-8"});
-        //component.dom.querySelector("iframe").src = URL.createObjectURL(blob);        
-        //component.dom.querySelector("iframe").srcdoc = content;
+        var filesEls = component.dom.querySelectorAll("#files li"), i;
+        var content = filesEls[0].querySelector("textarea").value;
+        var files = component.methods.rewriteGet("index.html", content, 0).reverse();
+        var blobs = [];
+        var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
+
+        for (let index = 0; index < files.length; index++) {
+          const element = files[index];
+          for (const filename in element) {
+            var content = element[filename];
+            let m;
+
+            while ((m = regex.exec(content)) !== null) {
+              // This is necessary to avoid infinite loops with zero-width matches
+              if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+              }
+              content = content.replace(m[3], blobs[m[3]];);
+            }
+
+            var blob = new Blob([content], { type: "text/html; charset=utf-8" });
+            var blobUrl = URL.createObjectURL(blob);
+            blobs[filename] = blobUrl
+            content = content.replace(filename, blobUrl);
+            component.dom.querySelector("iframe").srcdoc = content;
+          }
+        }
+        // debug için script'in başına template ve style kadar \n koysam
+        // satır numarasını tutturabilir miyim?
+        console.log(blobs);
+      },
+      rewriteGet(filename, content, i) {
+        var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
+        var regex2 = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
+        var blobs = "";
+
+        if (!component.files) {
+          component.files = [];
+        }
+
+        if (!component.files[i]) {
+          component.files[i] = {};
+        }
+
+        let m;
+        let mm;
+
+        while ((m = regex.exec(content)) !== null) {
+          // This is necessary to avoid infinite loops with zero-width matches
+          if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+          }
+          var fn = m[3];
+          var nestedComponentContent = component.dom.querySelector("[data-filename=" + fn.replace(/\./g, "\\.") + "] textarea").value;
+
+          while ((mm = regex2.exec(content)) !== null) {
+            var nnestedComponentContent = component.dom.querySelector("[data-filename=" + mm[3].replace(/\./g, "\\.") + "] textarea").value;
+            component.methods.rewriteGet(mm[3], nnestedComponentContent, i + 1);
+          }
+        }
+        component.files[i][filename] = content;
+        return component.files;
       },
       changeSelectedFile(event) {
-        event.target.classList.add("selected")
+        component.dom.querySelector("#file-tabs .selected").classList.remove("selected");
+        component.dom.querySelector("#files .selected").classList.remove("selected");
+        event.target.classList.add("selected");
+
+        var filename = event.target.getAttribute("data-filename").replace(/\./g, "\\.");
+        component.dom.querySelector("#files [data-filename=" + filename + "]").classList.add("selected");
       }
     }
     lifecycle = {
