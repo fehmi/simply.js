@@ -1,67 +1,19 @@
 <template>
+
   <div id="editor">
     <ul id="file-tabs">
-      <li data-filename="index.html" class="selected" onclick="changeSelectedFile(event)">index.html</li>
-      <li data-filename="test-template.html" onclick="changeSelectedFile(event)">test-template.html</li>
-      <li data-filename="huha-template.html" onclick="changeSelectedFile(event)">huha-template.html</li>
-      <li data-filename="nihaha-template.html" onclick="changeSelectedFile(event)">nihaha-template.html</li>
-      <li data-filename="nihaha2-template.html" onclick="changeSelectedFile(event)">nihaha2-template.html</li>
+      <each data.files as file>
+        {file.filename}
+      </each>
+      <!--<li filename="index.html" class="selected" onclick="changeSelectedFile(event)">index.html</li>-->
     </ul>
+    <slot name="files" ref:navslot></slot>
     <ul id="files">
-      <li data-filename="index.html" class="selected">
-        <textarea oninput="render()">
-          <html>
-            <head>
-              <title>simply / REPL</title>
-            </head>
-            
-            <body>            
-              testografya
-              <test-template></test-template>
-              <script src="https://root/simply/simply.js"></script>
-              <script>
-                get("test-template", "test-template.html");
-              </script>
-            </body>
-            
-            </html>    
-        </textarea>
-      </li>
-      <li data-filename="test-template.html">
+
+      <li filename="hello-world.html">
         <textarea>
           <template>
-            <huha-template></huha-template>
-            this is a component inside the app.
-          </template>
-          <script>
-            get("huha-template", "huha-template.html");
-          </script>
-        </textarea>
-      </li>
-      <li data-filename="huha-template.html">
-        <textarea>
-          <template>
-            <nihaha-template></nihaha-template>
-            <nihaha2-template></nihaha2-template>
-            this is a huha component inside another component.
-          </template>
-          <script>
-            get("nihaha-template", "nihaha-template.html");
-            get("nihaha2-template", "nihaha2-template.html");
-          </script>
-        </textarea>
-      </li>
-      <li data-filename="nihaha-template.html">
-        <textarea>
-          <template>
-            this is nihahaha
-          </template>
-        </textarea>
-      </li>
-      <li data-filename="nihaha2-template.html">
-        <textarea>
-          <template>
-            this is nihahaha2
+            hello world
           </template>
         </textarea>
       </li>
@@ -129,41 +81,51 @@
 <script>
   class {
     data = {
+      files: []
     }
     methods = {
       render() {
-        var filesEls = component.dom.querySelectorAll("#files li"), i;
-        var content = filesEls[0].querySelector("textarea").value;
-        var files = component.methods.rewriteGet("index.html", content, 0).reverse();
+        var slot = component.dom.querySelector('slot');
+        var indexContent = slot.assignedNodes()[0].querySelector("textarea").value;
+
+        var files = component.methods.rewriteGet("index.html", indexContent, 0).reverse();
         var blobs = [];
         var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
-
         for (let index = 0; index < files.length; index++) {
           const element = files[index];
           for (const filename in element) {
-            var content = element[filename];
-            let m;
+            if (blobs[filename] == undefined) {
+              var content = element[filename];
+              let m;
 
-            while ((m = regex.exec(content)) !== null) {
-              // This is necessary to avoid infinite loops with zero-width matches
-              if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
+              while ((m = regex.exec(content)) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === regex.lastIndex) {
+                  regex.lastIndex++;
+                }
+                content = content.replace(m[3], blobs[m[3]].blobUrl);
               }
-              content = content.replace(m[3], blobs[m[3]];);
-            }
 
-            var blob = new Blob([content], { type: "text/html; charset=utf-8" });
-            var blobUrl = URL.createObjectURL(blob);
-            blobs[filename] = blobUrl
-            content = content.replace(filename, blobUrl);
-            component.dom.querySelector("iframe").srcdoc = content;
+              var blob = new Blob([content], { type: "text/html; charset=utf-8" });
+              var blobUrl = URL.createObjectURL(blob);
+              //content = content.replace(filename, blobUrl);
+
+              blobs[filename] = {
+                filename: filename,
+                blobUrl: blobUrl,
+                content: content
+              };
+            }
           }
         }
         // debug için script'in başına template ve style kadar \n koysam
         // satır numarasını tutturabilir miyim?
+        component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
         console.log(blobs);
       },
       rewriteGet(filename, content, i) {
+        var slot = component.dom.querySelector('slot');
+        // var indexContent = slot.assignedNodes()[0].querySelector("textarea").value;        
         var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
         var regex2 = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
         var blobs = "";
@@ -185,10 +147,10 @@
             regex.lastIndex++;
           }
           var fn = m[3];
-          var nestedComponentContent = component.dom.querySelector("[data-filename=" + fn.replace(/\./g, "\\.") + "] textarea").value;
+          var nestedComponentContent = slot.assignedNodes()[0].querySelector("textarea[filename=" + fn.replace(/\./g, "\\.") + "] ").value;
 
           while ((mm = regex2.exec(content)) !== null) {
-            var nnestedComponentContent = component.dom.querySelector("[data-filename=" + mm[3].replace(/\./g, "\\.") + "] textarea").value;
+            var nnestedComponentContent = slot.assignedNodes()[0].querySelector("textarea[filename=" + mm[3].replace(/\./g, "\\.") + "] ").value;
             component.methods.rewriteGet(mm[3], nnestedComponentContent, i + 1);
           }
         }
@@ -200,13 +162,33 @@
         component.dom.querySelector("#files .selected").classList.remove("selected");
         event.target.classList.add("selected");
 
-        var filename = event.target.getAttribute("data-filename").replace(/\./g, "\\.");
-        component.dom.querySelector("#files [data-filename=" + filename + "]").classList.add("selected");
+        var filename = event.target.getAttribute("filename").replace(/\./g, "\\.");
+        component.dom.querySelector("#files [filename=" + filename + "]").classList.add("selected");
       }
     }
     lifecycle = {
       afterFirstRender() {
+        var slot = component.dom.querySelector('slot');
+        var files = slot.assignedNodes()[0].querySelectorAll("textarea");
+
+          for (let index = 0; index < files.length; index++) {
+            var fileEl = files[index];
+            var filename = fileEl.getAttribute("filename");
+            var fileContent = fileEl.value;
+            var isFileSelected = fileEl.hasAttribute("selected");
+            data.files.push({
+              filename: filename,
+              content: fileContent,
+              selected: isFileSelected
+            })
+
+          }
+
         component.methods.render();
+      },
+      beforeFirstRender(template) {
+        // burada template'i editleyip
+        // return edebilirim
       }
     }
   }

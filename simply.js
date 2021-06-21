@@ -249,236 +249,240 @@ function utils() {
     //});
   }
   registerComponent = function ({ template, style, name, listeners, script, settings }) {
-    class UnityComponent extends HTMLElement {
-      constructor() {
-        // Always call super first in constructor
-        super();
-
-        if (script !== "") {
-          var m;
-          var importRegex = /get\(.*\)\;/m;
-
-          while ((m = importRegex.exec(script)) !== null) {
-            m.forEach(function () {
-              script = script.replace(m[0], "");
-              eval(m[0]);
-            });
-          }
-
-          var timelateLines = template.split("\n");
-          var styleLines = style.split("\n");
-          var lineBreaks = "\n";
-          for (let index = 0; index < timelateLines.length + 1 + styleLines.length; index++) {
-            lineBreaks += "\n"
-          }
-          
-          if (script.trim().indexOf("class") == 0) {
-            this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "");
-            this.lifecycle = this.componentClass.lifecycle;
-            if (typeof this.lifecycle !== "undefined") {
-              if (typeof this.lifecycle.beforeConstruct !== "undefined") {
-                this.lifecycle.beforeConstruct();
-              }
-            }    
-            this.uid = '_' + Math.random().toString(36).substr(2, 9);
-            var component = this;
+    if (!customElements.get(name)) {
+      class UnityComponent extends HTMLElement {
+        constructor() {
+          // Always call super first in constructor
+          super();
   
-            var data = this.componentClass.data;
-            data.props = {};
-            this.methods = this.componentClass.methods;
+          if (script !== "") {
+            var m;
+            var importRegex = /get\(.*\)\;/m;
   
-            this.watch = this.componentClass.watch;
-            this.component = this;
-  
-            this.parent = this.getRootNode().host;
-  
-            // simply.components[this.uid] = this;
-  
-            for (var i = 0; i < this.attributes.length; i++) {
-              var attrib = this.attributes[i];
-              // array ya da obj ise stringify
-              try {
-                data.props[attrib.name] = JSON.parse(attrib.value);
-              } catch (e) {
-                data.props[attrib.name] = attrib.value;
-              }
+            while ((m = importRegex.exec(script)) !== null) {
+              m.forEach(function () {
+                script = script.replace(m[0], "");
+                eval(m[0]);
+              });
             }
-            this.data = data;
   
-            if (typeof this.lifecycle !== "undefined") {
-              if (typeof this.lifecycle.afterConstruct !== "undefined") {
-                this.lifecycle.afterConstruct();
+            var timelateLines = template.split("\n");
+            var styleLines = style.split("\n");
+            var lineBreaks = "\n";
+            for (let index = 0; index < timelateLines.length + 1 + styleLines.length; index++) {
+              lineBreaks += "\n"
+            }
+            
+            if (script.trim().indexOf("class") == 0) {
+              this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "");
+              this.lifecycle = this.componentClass.lifecycle;
+              if (typeof this.lifecycle !== "undefined") {
+                if (typeof this.lifecycle.beforeConstruct !== "undefined") {
+                  this.lifecycle.beforeConstruct();
+                }
+              }    
+              this.uid = '_' + Math.random().toString(36).substr(2, 9);
+              var component = this;
+    
+              var data = this.componentClass.data;
+              data.props = {};
+              this.methods = this.componentClass.methods;
+    
+              this.watch = this.componentClass.watch;
+              this.component = this;
+    
+              this.parent = this.getRootNode().host;
+    
+              // simply.components[this.uid] = this;
+    
+              for (var i = 0; i < this.attributes.length; i++) {
+                var attrib = this.attributes[i];
+                // array ya da obj ise stringify
+                try {
+                  data.props[attrib.name] = JSON.parse(attrib.value);
+                } catch (e) {
+                  data.props[attrib.name] = attrib.value;
+                }
               }
-            }                    
+              this.data = data;
+    
+              if (typeof this.lifecycle !== "undefined") {
+                if (typeof this.lifecycle.afterConstruct !== "undefined") {
+                  this.lifecycle.afterConstruct();
+                }
+              }                    
+            }
           }
         }
-      }
-      // invoked each time the custom element is appended
-      // into a document-connected element
-      observeAttrChange(el, callback) {
-        var observer = new MutationObserver(function (mutations) {
-          mutations.forEach(function (mutation) {
-            if (mutation.type === 'attributes') {
-              var newVal = mutation.target.getAttribute(mutation.attributeName);
-              callback(mutation.attributeName, newVal);
+        // invoked each time the custom element is appended
+        // into a document-connected element
+        observeAttrChange(el, callback) {
+          var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+              if (mutation.type === 'attributes') {
+                var newVal = mutation.target.getAttribute(mutation.attributeName);
+                callback(mutation.attributeName, newVal);
+              }
+            });
+          });
+          observer.observe(el, {
+            attributes: true,
+            childList: false,
+            characterData: false,
+            subtree: false,
+            attributeOldValue: true,
+            characterDataOldValue: false
+          });
+          return observer;
+        }
+        connectedCallback() {
+          this.observeAttrChange(this, function (name, newValue) {
+            try {
+              newValue = JSON.parse(newValue);
+            } catch (e) {
+              newValue = newValue;
+            }
+            if (newValue !== self.data.props[name]) {
+              self.data.props[name] = newValue;
+              if (typeof self.lifecycle !== "undefined") {
+                if (typeof self.lifecycle.whenPropChange !== "undefined") {
+                  self.lifecycle.whenPropChange(name, self.data.props[name], newValue);
+                }
+              }
             }
           });
-        });
-        observer.observe(el, {
-          attributes: true,
-          childList: false,
-          characterData: false,
-          subtree: false,
-          attributeOldValue: true,
-          characterDataOldValue: false
-        });
-        return observer;
-      }
-      connectedCallback() {
-        this.observeAttrChange(this, function (name, newValue) {
-          try {
-            newValue = JSON.parse(newValue);
-          } catch (e) {
-            newValue = newValue;
+  
+          let self = this;
+          this.render();
+  
+          if (this.data) {
+            
+              obaa(this.data, function (name, value, old, parents) {
+                if (typeof self.lifecycle !== "undefined") {
+                  if (typeof self.lifecycle.whenDataChange !== "undefined") {
+                    self.lifecycle.whenDataChange(name, value, old, parents);
+                  }
+                }
+  
+                self.render();
+                //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+                if (self.props) {
+                  if (parents == "#-props") {
+                    self.setAttribute(name, JSON.stringify(self.data.props[name]));
+                  }
+                  else {
+                    name = parents.split("-")[2];
+                    self.setAttribute(name, JSON.stringify(self.data.props[name]));
+                  }
+                }
+                if (typeof self.watch !== "undefined") {
+                  self.watch(name, value, old, parents);
+                }
+              });
+              //this._attachListeners();            
+
+  
           }
-          if (newValue !== self.data.props[name]) {
-            self.data.props[name] = newValue;
-            if (typeof self.lifecycle !== "undefined") {
-              if (typeof self.lifecycle.whenPropChange !== "undefined") {
-                self.lifecycle.whenPropChange(name, self.data.props[name], newValue);
-              }
+  
+        }
+  
+        render() {
+          let m;
+          let regex = /\s+on[a-z]+\=(\"|\')(.+)(\"|\')/gm;
+          while ((m = regex.exec(template)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+              regex.lastIndex++;
+            }
+            if (m[2].indexOf("this.getRootNode().host.methods") == -1) {
+              //template = template.replace(m[2], "this.getRootNode().host.methods." + m[2]);
+              //template = template.replace(new RegExp(escapeRegExp(m[2]), 'g'), "this.getRootNode().host.methods." + m[2]);
+              template = template.split(m[2]).join("this.getRootNode().host.methods." + m[2])
             }
           }
-        });
-
-        let self = this;
-        this.render();
-
-        if (script !== "") {
-          try {
-            obaa(this.data, function (name, value, old, parents) {
-              if (typeof self.lifecycle !== "undefined") {
-                if (typeof self.lifecycle.whenDataChange !== "undefined") {
-                  self.lifecycle.whenDataChange(name, value, old, parents);
-                }
-              }
-
-              self.render();
-              //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-              if (self.props) {
-                if (parents == "#-props") {
-                  self.setAttribute(name, JSON.stringify(self.data.props[name]));
-                }
-                else {
-                  name = parents.split("-")[2];
-                  self.setAttribute(name, JSON.stringify(self.data.props[name]));
-                }
-              }
-              if (typeof self.watch !== "undefined") {
-                self.watch(name, value, old, parents);
-              }
-            });
-            //this._attachListeners();            
-          } catch (error) {
-
-          }
-
-        }
-
-      }
-
-      render() {
-        let m;
-        let regex = /\s+on[a-z]+\=(\"|\')(.+)(\"|\')/gm;
-        while ((m = regex.exec(template)) !== null) {
-          // This is necessary to avoid infinite loops with zero-width matches
-          if (m.index === regex.lastIndex) {
-            regex.lastIndex++;
-          }
-          if (m[2].indexOf("this.getRootNode().host.methods") == -1) {
-            //template = template.replace(m[2], "this.getRootNode().host.methods." + m[2]);
-            //template = template.replace(new RegExp(escapeRegExp(m[2]), 'g'), "this.getRootNode().host.methods." + m[2]);
-            template = template.split(m[2]).join("this.getRootNode().host.methods." + m[2])
-          }
-        }
-
-        if (!this.rendered) {
-          if (typeof this.lifecycle !== "undefined") {
-            if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
-              this.lifecycle.beforeFirstRender();
+  
+          if (!this.rendered) {
+            let parsedTemplate = simply.parseTemplate(template, this.data);
+            if (style !== "") {
+              let parsedStyle = simply.parseStyle(style, this.data);
+              parsedTemplate = parsedTemplate + "<style>" + parsedStyle + "</style>";
             }
-          }
-          this.dom = this.attachShadow({ mode: 'open' });
-          //this.dom.appendChild(style.cloneNode(true));
-          let parsedTemplate = simply.parseTemplate(template, this.data);
-          if (style !== "") {
-            let parsedStyle = simply.parseStyle(style, this.data);
-            this.dom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
+
+            if (typeof this.lifecycle !== "undefined") {
+              if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
+                if (typeof this.lifecycle.beforeFirstRender(parsedTemplate) !== "undefined")  {
+                  parsedTemplate = this.lifecycle.beforeFirstRender(parsedTemplate);
+                }
+              }
+            }
+            this.dom = this.attachShadow({ mode: 'open' });
+            //this.dom.appendChild(style.cloneNode(true));
+            
+            this.dom.innerHTML = parsedTemplate;
+            
+            setTimeout(() => {
+              if (typeof this.lifecycle !== "undefined") {
+                if (typeof this.lifecycle.afterFirstRender !== "undefined") {
+                  this.lifecycle.afterFirstRender();
+                }
+              }              
+            }, 0);
+
           }
           else {
-            this.dom.innerHTML = parsedTemplate;
-          }
-
-          if (typeof this.lifecycle !== "undefined") {
-            if (typeof this.lifecycle.afterFirstRender !== "undefined") {
-              this.lifecycle.afterFirstRender();
-            }
-          }
-        }
-        else {
-          if (typeof this.lifecycle !== "undefined") {
-            if (typeof this.lifecycle.beforeRerender !== "undefined") {
-              this.lifecycle.beforeRerender();
-            }
-          }
-          var newDom = document.createElement("div");
-          let parsedTemplate = simply.parseTemplate(template, this.data);
-          let parsedStyle = simply.parseStyle(style, this.data);
-
-          newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
-
-          //console.log(this.dom, newDom);
-          morphdom(this.dom, newDom, {
-            childrenOnly: true,
-            onBeforeElChildrenUpdated: function (fromEl) {
-              // console.log(fromEl.tagName);
-              if (fromEl.tagName == "CHILD-COMPONENT") {
-                console.log("dont again");
+            if (typeof this.lifecycle !== "undefined") {
+              if (typeof this.lifecycle.beforeRerender !== "undefined") {
+                this.lifecycle.beforeRerender();
               }
-
-              //console.log(toEl);
             }
-          });
+            var newDom = document.createElement("div");
+            let parsedTemplate = simply.parseTemplate(template, this.data);
+            let parsedStyle = simply.parseStyle(style, this.data);
+  
+            newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
+  
+            //console.log(this.dom, newDom);
+            morphdom(this.dom, newDom, {
+              childrenOnly: true,
+              onBeforeElChildrenUpdated: function (fromEl) {
+                // console.log(fromEl.tagName);
+                if (fromEl.tagName == "CHILD-COMPONENT") {
+                  console.log("dont again");
+                }
+  
+                //console.log(toEl);
+              }
+            });
+            if (typeof this.lifecycle !== "undefined") {
+              if (typeof this.lifecycle.afterRerender !== "undefined") {
+                this.lifecycle.afterRerender();
+              }
+            }
+          }
+          this.rendered = true;
+        }
+        // Invoked each time the custom element is
+        // disconnected from the document's DOM.
+        disconnectedCallback() {
           if (typeof this.lifecycle !== "undefined") {
-            if (typeof this.lifecycle.afterRerender !== "undefined") {
-              this.lifecycle.afterRerender();
+            if (typeof this.lifecycle.disconnected !== "undefined") {
+              this.lifecycle.disconnected();
             }
           }
         }
-        this.rendered = true;
-      }
-      // Invoked each time the custom element is
-      // disconnected from the document's DOM.
-      disconnectedCallback() {
-        if (typeof this.lifecycle !== "undefined") {
-          if (typeof this.lifecycle.disconnected !== "undefined") {
-            this.lifecycle.disconnected();
-          }
+        // invoked when one of the custom element's attributes
+        // is added, removed, or changed.
+        attributeChangedCallback(name, oldValue, newValue) {
+          // if data.
+  
+        }
+        adoptedCallback() { }
+  
+        _attachListeners() {
         }
       }
-      // invoked when one of the custom element's attributes
-      // is added, removed, or changed.
-      attributeChangedCallback(name, oldValue, newValue) {
-        // if data.
-
-      }
-      adoptedCallback() { }
-
-      _attachListeners() {
-        //console.log(this.dom.querySelectorAll("*"));
-      }
+      return customElements.define(name, UnityComponent);
     }
-    return customElements.define(name, UnityComponent);
   }
 }
 
