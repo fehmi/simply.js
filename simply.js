@@ -62,6 +62,7 @@ window.simply = {
           eachCount += 1;
           let subject = eval(logic[3]);
           let i = "s" + Math.random().toString(36).slice(-7);
+
           if (Array.isArray(subject)) {
             let key = typeof logic[8] !== "undefined" ? "let " + logic[8] + " = " + i + ";" : "";
             let index = typeof logic[8] !== "undefined" ? "let " + logic[12] + " = " + i + ";" : "";
@@ -72,15 +73,18 @@ window.simply = {
                         let " + logic[4] + "=" + logic[3] + "[" + i + "];";
           }
           else {
-            let key = typeof logic[12] !== "undefined" ? "let " + logic[12] + " = " + i + ";" : "";
+            let key = typeof logic[12] !== "undefined" ? "let " + logic[12] + " = " : "";
+            
             logic = "\
                     for (var ii in "+ logic[3] + ") { \
                       if (ii == '__o_') { continue; }\
-                      let " + key + "= Object.keys(" + logic[3] + ").indexOf(ii); \
+                      " + key + "Object.keys(" + logic[3] + ").indexOf(ii); \
                       let " + logic[8] + "= ii; \
                       let " + logic[4] + "=" + logic[3] + "[ii];";
           }
         }
+        // 
+
         else if ((logic = endEachStatement.exec(bucket)) !== null) {
           eachCount -= 1;
           logic = "};";
@@ -417,7 +421,6 @@ function utils() {
             }
             this.dom = this.attachShadow({ mode: 'open' });
             //this.dom.appendChild(style.cloneNode(true));
-            
             this.dom.innerHTML = parsedTemplate;
             
             setTimeout(() => {

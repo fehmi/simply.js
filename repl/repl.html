@@ -3,35 +3,35 @@
   <div id="editor">
     <ul id="file-tabs">
       <each data.files as file>
-        {file.filename}
+        <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{ file.filename }</li>
       </each>
-      <!--<li filename="index.html" class="selected" onclick="changeSelectedFile(event)">index.html</li>-->
     </ul>
-    <slot name="files" ref:navslot></slot>
+
     <ul id="files">
-
-      <li filename="hello-world.html">
-        <textarea>
-          <template>
-            hello world
-          </template>
-        </textarea>
-      </li>
+      <slot name="files" ref:navslot></slot>
+      <each data.files as file>
+        <li filename="{file.filename}" selected="{ file.selected }">
+          <textarea oninput="updateFile(event)">{file.content}</textarea>
+        </li>
+      </each>
     </ul>
-
   </div>
+
   <div id="result">
     <iframe id="result"></iframe>
     <div id="console"></div>
   </div>
 </template>
 
-
 <style>
   :host {
     display: flex;
     width: 960px;
     height: 450px;
+  }
+
+  slot[name=files] {
+    display: none;
   }
 
   #editor {
@@ -44,6 +44,16 @@
     width: 35%;
   }
 
+  #file-tabs li {
+    cursor: pointer;
+  }
+
+  #file-tabs li[selected=true] {
+    cursor: default;
+    pointer-events: none;
+    font-weight: 600;
+  }
+
   #file-tabs,
   #files {
     display: flex;
@@ -52,25 +62,22 @@
     margin: 0px;
   }
 
-  #file-tabs li.selected {
-    font-weight: 600;
-  }
-
-  #files,
-  #editor textarea {
+  #files {
     flex: 1;
+    flex-direction: column;
   }
 
   #files li {
+    height: 100%;
     width: 100%;
     display: none;
+    cursor: pointer;
   }
 
-  #files li.selected {
+  #files li[selected=true] {
     display: block;
   }
 
-  #files li,
   #files textarea,
   iframe#result {
     width: 100%;
@@ -83,19 +90,32 @@
     data = {
       files: []
     }
+    watch() {
+      console.log("hey");
+    }
     methods = {
+      updateFile(event) {
+        var filename = event.target.parentNode.getAttribute("filename");
+        for (let index = 0; index < data.files.length; index++) {
+          if (data.files[index]["filename"] == filename) {
+            data.files[index]["content"] = event.target.value;
+          }
+        }
+        component.methods.render();
+      },
       render() {
-        var slot = component.dom.querySelector('slot');
-        var indexContent = slot.assignedNodes()[0].querySelector("textarea").value;
+        console.log("render");
+        var indexContent = component.dom.querySelector("li[filename=index\\.html] textarea").value;
 
         var files = component.methods.rewriteGet("index.html", indexContent, 0).reverse();
+        console.log(files);
         var blobs = [];
         var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
         for (let index = 0; index < files.length; index++) {
           const element = files[index];
           for (const filename in element) {
             if (blobs[filename] == undefined) {
-              var content = element[filename];
+              var content = element["content"];
               let m;
 
               while ((m = regex.exec(content)) !== null) {
@@ -109,9 +129,8 @@
               var blob = new Blob([content], { type: "text/html; charset=utf-8" });
               var blobUrl = URL.createObjectURL(blob);
               //content = content.replace(filename, blobUrl);
-
-              blobs[filename] = {
-                filename: filename,
+              blobs[element["filename"]] = {
+                filename: element["filename"],
                 blobUrl: blobUrl,
                 content: content
               };
@@ -120,12 +139,11 @@
         }
         // debug için script'in başına template ve style kadar \n koysam
         // satır numarasını tutturabilir miyim?
-        component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
+
         console.log(blobs);
+        component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
       },
       rewriteGet(filename, content, i) {
-        var slot = component.dom.querySelector('slot');
-        // var indexContent = slot.assignedNodes()[0].querySelector("textarea").value;        
         var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
         var regex2 = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
         var blobs = "";
@@ -147,23 +165,28 @@
             regex.lastIndex++;
           }
           var fn = m[3];
-          var nestedComponentContent = slot.assignedNodes()[0].querySelector("textarea[filename=" + fn.replace(/\./g, "\\.") + "] ").value;
+          var nestedComponentContent = component.dom.querySelector("li[filename=" + fn.replace(/\./g, "\\.") + "] textarea").value;
 
           while ((mm = regex2.exec(content)) !== null) {
-            var nnestedComponentContent = slot.assignedNodes()[0].querySelector("textarea[filename=" + mm[3].replace(/\./g, "\\.") + "] ").value;
+            var nnestedComponentContent = component.dom.querySelector("li[filename=" + mm[3].replace(/\./g, "\\.") + "] textarea").value;
             component.methods.rewriteGet(mm[3], nnestedComponentContent, i + 1);
           }
         }
-        component.files[i][filename] = content;
+        component.files[i]["content"] = content;
+        component.files[i]["filename"] = filename;
         return component.files;
       },
       changeSelectedFile(event) {
-        component.dom.querySelector("#file-tabs .selected").classList.remove("selected");
-        component.dom.querySelector("#files .selected").classList.remove("selected");
-        event.target.classList.add("selected");
-
-        var filename = event.target.getAttribute("filename").replace(/\./g, "\\.");
-        component.dom.querySelector("#files [filename=" + filename + "]").classList.add("selected");
+        var filename = event.target.getAttribute("filename");
+        var filenameSelector = filename.replace(/\./g, "\\.");
+        for (let i = 0; i < data.files.length; i++) {
+          if (data.files[i]["filename"] == filename) {
+            data.files[i].selected = true;
+          }
+          else if (data.files[i]) {
+            data.files[i].selected = false;
+          }
+        }
       }
     }
     lifecycle = {
@@ -171,19 +194,17 @@
         var slot = component.dom.querySelector('slot');
         var files = slot.assignedNodes()[0].querySelectorAll("textarea");
 
-          for (let index = 0; index < files.length; index++) {
-            var fileEl = files[index];
-            var filename = fileEl.getAttribute("filename");
-            var fileContent = fileEl.value;
-            var isFileSelected = fileEl.hasAttribute("selected");
-            data.files.push({
-              filename: filename,
-              content: fileContent,
-              selected: isFileSelected
-            })
-
-          }
-
+        for (let index = 0; index < files.length; index++) {
+          var fileEl = files[index];
+          var filename = fileEl.getAttribute("filename");
+          var fileContent = fileEl.value;
+          var isFileSelected = fileEl.hasAttribute("selected");
+          data.files.push({
+            filename: filename,
+            content: fileContent,
+            selected: isFileSelected
+          })
+        }
         component.methods.render();
       },
       beforeFirstRender(template) {
