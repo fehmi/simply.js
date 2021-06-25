@@ -364,10 +364,12 @@ function utils() {
               obaa(this.data, function (name, value, old, parents) {
                 if (typeof self.lifecycle !== "undefined") {
                   if (typeof self.lifecycle.whenDataChange !== "undefined") {
-                    self.lifecycle.whenDataChange(name, value, old, parents);
+                    console.log(self.lifecycle.whenDataChange(name, value, old, parents));
+                    if (self.lifecycle.whenDataChange(name, value, old, parents) == false) {
+                      return false;
+                    };
                   }
                 }
-  
                 self.render();
                 //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
                 if (self.props) {

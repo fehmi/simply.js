@@ -1,6 +1,6 @@
 <template>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/codemirror.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/monokai.min.css" />
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css,npm/codemirror@5.62.0/theme/monokai.min.css" />
 
   <div id="editor">
     <ul id="file-tabs">
@@ -108,7 +108,8 @@
       },
       render() {
         console.log("render");
-        var indexContent = component.dom.querySelector("li[filename=index\\.html] textarea").value;
+        console.log(component.editors);
+        var indexContent = component.editors["index.html"].getValue();
 
         var files = component.methods.rewriteGet("index.html", indexContent, 0).reverse();
         console.log(files);
@@ -143,8 +144,8 @@
         // debug için script'in başına template ve style kadar \n koysam
         // satır numarasını tutturabilir miyim?
 
-        console.log(blobs);
         component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
+        component.reactive = false;
       },
       rewriteGet(filename, content, i) {
         var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
@@ -168,10 +169,11 @@
             regex.lastIndex++;
           }
           var fn = m[3];
-          var nestedComponentContent = component.dom.querySelector("li[filename=" + fn.replace(/\./g, "\\.") + "] textarea").value;
+          console.log(component.editors[fn]);
+          var nestedComponentContent = component.editors[fn].getValue();
 
           while ((mm = regex2.exec(content)) !== null) {
-            var nnestedComponentContent = component.dom.querySelector("li[filename=" + mm[3].replace(/\./g, "\\.") + "] textarea").value;
+            var nnestedComponentContent = component.editors[mm[3]].getValue();;
             component.methods.rewriteGet(mm[3], nnestedComponentContent, i + 1);
           }
         }
@@ -182,14 +184,15 @@
       changeSelectedFile(event) {
         var filename = event.target.getAttribute("filename");
         var filenameSelector = filename.replace(/\./g, "\\.");
-        for (let i = 0; i < data.files.length; i++) {
-          if (data.files[i]["filename"] == filename) {
-            data.files[i].selected = true;
-          }
-          else if (data.files[i]) {
-            data.files[i].selected = false;
-          }
-        }
+        component.dom.querySelector("#file-tabs li[selected=true]").setAttribute("selected", false);
+        component.dom.querySelector("#files li[selected=true]").setAttribute("selected", false);
+        var tabLink = component.dom.querySelector("#file-tabs li[filename='" + filenameSelector + "']");
+        tabLink.setAttribute("selected", true);
+
+        var fileItself = component.dom.querySelector("#files li[filename='" + filenameSelector + "']");
+        fileItself.setAttribute("selected", true);
+        console.log(component.editors);
+        component.editors[filename].refresh();
       }
     }
     lifecycle = {
@@ -201,8 +204,7 @@
       afterFirstRender() {
         var slot = component.dom.querySelector('slot[name=files]');
         var files = slot.assignedNodes()[0].querySelectorAll("textarea");
-        var editors = [];
-
+        component.editors = [];
         for (let index = 0; index < files.length; index++) {
           var fileEl = files[index];
           var filename = fileEl.getAttribute("filename");
@@ -215,24 +217,27 @@
           });
         }
 
-        var textareas = component.dom.querySelectorAll("textarea");
-        for (let index = 0; index < textareas.length; index++) {
-          const ta = textareas[index];
-          editors[index] = CodeMirror.fromTextArea(ta, {
+        var fileLi = component.dom.querySelectorAll("#files li");
+        for (let index = 0; index < fileLi.length; index++) {
+          const li = fileLi[index];
+          const textarea = li.querySelector("textarea");
+
+          component.editors[li.getAttribute("filename")] = CodeMirror.fromTextArea(textarea, {
             lineNumbers: true,
             mode: "htmlmixed",
             theme: 'monokai'
-          }).on('change', editor => {
-            console.log(editor);
-          });;
+          });
+          component.editors[li.getAttribute("filename")].on("change", function () {
+            component.methods.render();
+          })
         }
-
+        console.log(component.editors);
         component.methods.render();
-
       },
-      beforeFirstRender(template) {
-        // burada template'i editleyip
-        // return edebilirim
+      whenDataChange() {
+        if (component.reactive == false) {
+          return false;
+        }
       }
     }
   }
