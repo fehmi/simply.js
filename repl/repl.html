@@ -1,9 +1,12 @@
 <template>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/monokai.min.css" />
 
   <div id="editor">
     <ul id="file-tabs">
       <each data.files as file>
-        <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{ file.filename }</li>
+        <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{ file.filename
+          }</li>
       </each>
     </ul>
 
@@ -190,9 +193,15 @@
       }
     }
     lifecycle = {
+      beforeConstruct() {
+        if (typeof CodeMirror == "undefined") {
+
+        }
+      },
       afterFirstRender() {
-        var slot = component.dom.querySelector('slot');
+        var slot = component.dom.querySelector('slot[name=files]');
         var files = slot.assignedNodes()[0].querySelectorAll("textarea");
+        var editors = [];
 
         for (let index = 0; index < files.length; index++) {
           var fileEl = files[index];
@@ -203,9 +212,23 @@
             filename: filename,
             content: fileContent,
             selected: isFileSelected
-          })
+          });
         }
+
+        var textareas = component.dom.querySelectorAll("textarea");
+        for (let index = 0; index < textareas.length; index++) {
+          const ta = textareas[index];
+          editors[index] = CodeMirror.fromTextArea(ta, {
+            lineNumbers: true,
+            mode: "htmlmixed",
+            theme: 'monokai'
+          }).on('change', editor => {
+            console.log(editor);
+          });;
+        }
+
         component.methods.render();
+
       },
       beforeFirstRender(template) {
         // burada template'i editleyip

@@ -10,27 +10,27 @@
   <repl-component>
     <section slot="files">
       <textarea filename="index.html" selected>
-        <html>
-          <head>
-            <title>simply / REPL</title>
-          </head>
-          <body>            
-            <hello-world></hello-world>
-            <script src="https://root/simply/simply.js"></script>
-            <script>
-              get("hello-world", "hello-world.html");
-            </script>
-          </body>
-        </html>          
+<html>
+  <head>
+    <title>simply / REPL</title>
+  </head>
+  <body>            
+    <hello-world></hello-world>
+    <script src="https://root/simply/simply.js"></script>
+    <script>
+      get("hello-world", "hello-world.html");
+    </script>
+  </body>
+</html>          
       </textarea>
       <textarea filename="hello-world.html">
-        <template>
-          hello canım
-        </template>
+<template>
+  hello canım
+</template>
       </textarea>
     </section>
     </rep-component>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.61.1/codemirror.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js"></script>
     <script src="../simply.js"></script>
     <script>
       get("repl-component", "repl.html");

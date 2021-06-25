@@ -1,6 +1,28 @@
 <template>
 
+  <each data.array as a>
+    {a}
+  </each>
 
+  <each data.arrayWithKeys as a>
+    {a.haydar}
+  </each>  
+
+  <each data.arrayWithKeys as a>
+    {a.haydar}
+  </each>    
+
+  <each data.arrayWithKeys as a, key>
+    <br></br>{a.haydar}<br>
+    {key}<br><br>
+  </each> 
+  
+  <each data.arrayWithKeys as a, key (index)>
+    <br></br>{a.haydar}<br>
+    {key}{index}<br><br>
+  </each> 
+  
+  
   <div class="hello" onclick="bcd()">
   <each data.personalities as personality, key (index)>
     <each data.personalities as p, key (index)>
