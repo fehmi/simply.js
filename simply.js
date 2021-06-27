@@ -365,7 +365,7 @@ function utils() {
                 if (typeof self.lifecycle !== "undefined") {
                   if (typeof self.lifecycle.whenDataChange !== "undefined") {
                     console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-                    if (self.lifecycle.whenDataChange(name, value, old, parents) == false) {
+                    if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
                       return false;
                     };
                   }

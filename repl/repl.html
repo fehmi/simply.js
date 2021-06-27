@@ -1,6 +1,5 @@
 <template>
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css,npm/codemirror@5.62.0/theme/monokai.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css" />
 
   <div id="editor">
     <ul id="file-tabs">
@@ -8,19 +7,18 @@
         <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{ file.filename
           }</li>
       </each>
+      <li class="add">+</li>
     </ul>
 
     <ul id="files">
-      <slot name="files" ref:navslot></slot>
-      <each data.files as file>
-        <li filename="{file.filename}" selected="{ file.selected }">
-          <textarea oninput="updateFile(event)">{file.content}</textarea>
-        </li>
-      </each>
+      <slot name="files"></slot>
     </ul>
   </div>
 
   <div id="result">
+    <div id="result-header">
+      Result
+    </div>
     <iframe id="result"></iframe>
     <div id="console"></div>
   </div>
@@ -31,6 +29,8 @@
     display: flex;
     width: 960px;
     height: 450px;
+    border: 2px solid #dddddd;
+    font-family: Arial, Helvetica, sans-serif;
   }
 
   slot[name=files] {
@@ -45,16 +45,45 @@
 
   #result {
     width: 35%;
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid #dddddd;
+  }
+
+  #file-tabs {
+    border-bottom: 2px solid #dddddd;
+    line-height: 35px;
   }
 
   #file-tabs li {
+    position: relative;
     cursor: pointer;
+    padding: 0px 15px;
+    font-size: 14px;
+    color: #888;
   }
 
   #file-tabs li[selected=true] {
     cursor: default;
     pointer-events: none;
-    font-weight: 600;
+    color: #292;
+  }
+
+  #file-tabs li[selected=true]::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background-color: #292;
+    bottom: 0px;
+    left: 0px;
+  }
+
+  #result-header {
+    border-bottom: 2px solid #dddddd;
+    line-height: 35px;
+    font-size: 14px;
+    padding: 0px 15px;
   }
 
   #file-tabs,
@@ -68,16 +97,16 @@
   #files {
     flex: 1;
     flex-direction: column;
+    height: 100px;
   }
 
-  #files li {
+  .CodeMirror {
     height: 100%;
     width: 100%;
     display: none;
-    cursor: pointer;
   }
 
-  #files li[selected=true] {
+  .CodeMirror[selected=true] {
     display: block;
   }
 
@@ -85,7 +114,9 @@
   iframe#result {
     width: 100%;
     height: 100%;
+    border: none;
   }
+
 </style>
 
 <script>
@@ -93,28 +124,13 @@
     data = {
       files: []
     }
-    watch() {
-      console.log("hey");
-    }
     methods = {
-      updateFile(event) {
-        var filename = event.target.parentNode.getAttribute("filename");
-        for (let index = 0; index < data.files.length; index++) {
-          if (data.files[index]["filename"] == filename) {
-            data.files[index]["content"] = event.target.value;
-          }
-        }
-        component.methods.render();
-      },
-      render() {
-        console.log("render");
-        console.log(component.editors);
+      renderResult() {
         var indexContent = component.editors["index.html"].getValue();
-
         var files = component.methods.rewriteGet("index.html", indexContent, 0).reverse();
-        console.log(files);
         var blobs = [];
         var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
+
         for (let index = 0; index < files.length; index++) {
           const element = files[index];
           for (const filename in element) {
@@ -184,14 +200,16 @@
       changeSelectedFile(event) {
         var filename = event.target.getAttribute("filename");
         var filenameSelector = filename.replace(/\./g, "\\.");
-        component.dom.querySelector("#file-tabs li[selected=true]").setAttribute("selected", false);
-        component.dom.querySelector("#files li[selected=true]").setAttribute("selected", false);
+        var targetTab = component.dom.querySelector("#file-tabs li[selected=true]");
         var tabLink = component.dom.querySelector("#file-tabs li[filename='" + filenameSelector + "']");
-        tabLink.setAttribute("selected", true);
+        var targetFile = component.dom.querySelector("#files .CodeMirror[selected=true]");
+        var fileItself = component.dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
 
-        var fileItself = component.dom.querySelector("#files li[filename='" + filenameSelector + "']");
+        targetTab.setAttribute("selected", false);
+        targetFile.setAttribute("selected", false);
+        tabLink.setAttribute("selected", true);
         fileItself.setAttribute("selected", true);
-        console.log(component.editors);
+
         component.editors[filename].refresh();
       }
     }
@@ -212,33 +230,46 @@
           var isFileSelected = fileEl.hasAttribute("selected");
           data.files.push({
             filename: filename,
-            content: fileContent,
             selected: isFileSelected
           });
         }
 
-        var fileLi = component.dom.querySelectorAll("#files li");
-        for (let index = 0; index < fileLi.length; index++) {
-          const li = fileLi[index];
-          const textarea = li.querySelector("textarea");
-
-          component.editors[li.getAttribute("filename")] = CodeMirror.fromTextArea(textarea, {
+        for (let index = 0; index < files.length; index++) {
+          var textarea = files[index];
+          var filename = files[index].getAttribute("filename");
+          var selected = files[index].hasAttribute("selected");
+          var targetEl = component.dom.querySelector("ul#files");
+          component.editors[textarea.getAttribute("filename")] = CodeMirror(function (node) {
+            node.setAttribute("filename", filename);
+            node.setAttribute("selected", selected);
+            targetEl.appendChild(node, targetEl);
+          }, {
+            value: textarea.value,
+            autoRefresh: { delay: 0 },
             lineNumbers: true,
             mode: "htmlmixed",
-            theme: 'monokai'
+            theme: 'default' // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
           });
-          component.editors[li.getAttribute("filename")].on("change", function () {
-            component.methods.render();
-          })
+
+          component.editors[textarea.getAttribute("filename")].on("change", function () {
+            component.methods.renderResult();
+          });
         }
-        console.log(component.editors);
-        component.methods.render();
+
+        component.methods.renderResult();
+
+        var cmInitCheck = setInterval(() => {
+          var px = parseInt(component.dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
+          console.log(px);
+          if (px > 100) {
+            component.editors["index.html"].refresh();
+          }
+          else {
+            console.log("done!");
+            clearInterval(cmInitCheck);
+          }
+        }, 10);
       },
-      whenDataChange() {
-        if (component.reactive == false) {
-          return false;
-        }
-      }
     }
   }
 </script>
