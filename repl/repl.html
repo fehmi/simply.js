@@ -7,7 +7,7 @@
         <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{ file.filename
           }</li>
       </each>
-      <li class="add">+</li>
+      <li class="add" onclick="addFile()">+</li>
     </ul>
 
     <ul id="files">
@@ -63,6 +63,11 @@
     color: #888;
   }
 
+  #file-tabs .add {
+    font-size: 22px;
+    padding: 0px 10px 0px 5px;
+  }
+
   #file-tabs li[selected=true] {
     cursor: default;
     pointer-events: none;
@@ -104,6 +109,7 @@
     height: 100%;
     width: 100%;
     display: none;
+    line-height: 20px;
   }
 
   .CodeMirror[selected=true] {
@@ -185,7 +191,6 @@
             regex.lastIndex++;
           }
           var fn = m[3];
-          console.log(component.editors[fn]);
           var nestedComponentContent = component.editors[fn].getValue();
 
           while ((mm = regex2.exec(content)) !== null) {
@@ -211,6 +216,9 @@
         fileItself.setAttribute("selected", true);
 
         component.editors[filename].refresh();
+      },
+      addFile() {
+        console.log("ekleriz sorun değil");
       }
     }
     lifecycle = {
@@ -260,12 +268,10 @@
 
         var cmInitCheck = setInterval(() => {
           var px = parseInt(component.dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
-          console.log(px);
           if (px > 100) {
             component.editors["index.html"].refresh();
           }
           else {
-            console.log("done!");
             clearInterval(cmInitCheck);
           }
         }, 10);
