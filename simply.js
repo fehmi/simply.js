@@ -153,6 +153,7 @@ function utils() {
   }
   loadAndParseComponent = function (name, path, callback) {
     var request = new XMLHttpRequest();
+    console.log(path);
     //request.responseType = 'document';
     request.open('GET', path, true);
 
@@ -801,7 +802,7 @@ function utils() {
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = global || self, factory(global.Vaadin = global.Vaadin || {}));
+  (global = global || self, factory(global.simply = global.simply || {}));
 }(this, function (exports) { 'use strict';
 
   function _typeof(obj) {
@@ -942,7 +943,7 @@ function utils() {
     return Array.isArray(objectOrArray) ? objectOrArray : [objectOrArray];
   }
   function log(msg) {
-    return "[Vaadin.Router] ".concat(msg);
+    return "[Router] ".concat(msg);
   }
   function logValue(value) {
     if (_typeof(value) !== 'object') {
@@ -1059,7 +1060,7 @@ function utils() {
     }
   }
   function fireRouterEvent(type, detail) {
-    return !window.dispatchEvent(new CustomEvent("vaadin-router-".concat(type), {
+    return !window.dispatchEvent(new CustomEvent("router-".concat(type), {
       cancelable: type === 'go',
       detail: detail
     }));
@@ -1102,7 +1103,7 @@ function utils() {
   //  - the 'rel' attribute is not considered
 
 
-  function vaadinRouterGlobalClickHandler(event) {
+  function routerGlobalClickHandler(event) {
     // ignore the click if the default action is prevented
     if (event.defaultPrevented) {
       return;
@@ -1179,23 +1180,23 @@ function utils() {
     }
   }
   /**
-   * A navigation trigger for Vaadin Router that translated clicks on `<a>` links
-   * into Vaadin Router navigation events.
+   * A navigation trigger for Router that translated clicks on `<a>` links
+   * into Router navigation events.
    *
    * Only regular clicks on in-app links are translated (primary mouse button, no
    * modifier keys, the target href is within the app's URL space).
    *
-   * @memberOf Vaadin.Router.Triggers
+   * @memberOf Router.Triggers
    * @type {NavigationTrigger}
    */
 
 
   var CLICK = {
     activate: function activate() {
-      window.document.addEventListener('click', vaadinRouterGlobalClickHandler);
+      window.document.addEventListener('click', routerGlobalClickHandler);
     },
     inactivate: function inactivate() {
-      window.document.removeEventListener('click', vaadinRouterGlobalClickHandler);
+      window.document.removeEventListener('click', routerGlobalClickHandler);
     }
   };
 
@@ -1214,8 +1215,8 @@ function utils() {
     window.PopStateEvent.prototype = window.Event.prototype;
   }
 
-  function vaadinRouterGlobalPopstateHandler(event) {
-    if (event.state === 'vaadin-router-ignore') {
+  function routerGlobalPopstateHandler(event) {
+    if (event.state === 'router-ignore') {
       return;
     }
 
@@ -1230,20 +1231,20 @@ function utils() {
     });
   }
   /**
-   * A navigation trigger for Vaadin Router that translates popstate events into
-   * Vaadin Router navigation events.
+   * A navigation trigger for Router that translates popstate events into
+   * Router navigation events.
    *
-   * @memberOf Vaadin.Router.Triggers
+   * @memberOf Router.Triggers
    * @type {NavigationTrigger}
    */
 
 
   var POPSTATE = {
     activate: function activate() {
-      window.addEventListener('popstate', vaadinRouterGlobalPopstateHandler);
+      window.addEventListener('popstate', routerGlobalPopstateHandler);
     },
     inactivate: function inactivate() {
-      window.removeEventListener('popstate', vaadinRouterGlobalPopstateHandler);
+      window.removeEventListener('popstate', routerGlobalPopstateHandler);
     }
   };
 
@@ -1885,7 +1886,7 @@ function utils() {
     }
   }
   /**
-   * @memberof Vaadin
+   * @memberof Router
    */
 
 
@@ -2429,23 +2430,22 @@ function utils() {
    *   keys are supported:
    *   * `baseUrl` — the initial value for [
    *     the `baseUrl` property
-   *   ](#/classes/Vaadin.Router#property-baseUrl)
+   *   ](#/classes/Router#property-baseUrl)
    *
    * The Router instance is automatically subscribed to navigation events
    * on `window`.
    *
-   * See [Live Examples](#/classes/Vaadin.Router/demos/demo/index.html) for the detailed usage demo and code snippets.
+   * See [Live Examples](#/classes/Router/demos/demo/index.html) for the detailed usage demo and code snippets.
    *
    * See also detailed API docs for the following methods, for the advanced usage:
    *
-   * * [setOutlet](#/classes/Vaadin.Router#method-setOutlet) – should be used to configure the outlet.
-   * * [setTriggers](#/classes/Vaadin.Router#method-setTriggers) – should be used to configure the navigation events.
-   * * [setRoutes](#/classes/Vaadin.Router#method-setRoutes) – should be used to configure the routes.
+   * * [setOutlet](#/classes/Router#method-setOutlet) – should be used to configure the outlet.
+   * * [setTriggers](#/classes/Router#method-setTriggers) – should be used to configure the navigation events.
+   * * [setRoutes](#/classes/Router#method-setRoutes) – should be used to configure the routes.
    *
    * Only `setRoutes` has to be called manually, others are automatically invoked when creating a new instance.
    *
-   * @memberof Vaadin
-   * @extends Vaadin.Resolver
+   * @extends Resolver
    * @demo demo/index.html
    * @summary JavaScript class that renders different DOM content depending on
    *    a given path. It can re-render when triggered or automatically on
@@ -2464,7 +2464,7 @@ function utils() {
      * Using a constructor argument or a setter for outlet is equivalent:
      *
      * ```
-     * const router = new Vaadin.Router();
+     * const router = new Router();
      * router.setOutlet(outlet);
      * ```
      * @param {?Node} outlet
@@ -2505,7 +2505,7 @@ function utils() {
        * with the last render cycle result.
        *
        * @public
-       * @type {!Promise<!Vaadin.Router.Location>}
+       * @type {!Promise<!Router.Location>}
        */
 
       _this.ready;
@@ -2513,11 +2513,11 @@ function utils() {
       /**
        * Contains read-only information about the current router location:
        * pathname, active routes, parameters. See the
-       * [Location type declaration](#/classes/Vaadin.Router.Location)
+       * [Location type declaration](#/classes/Router.Location)
        * for more details.
        *
        * @public
-       * @type {!Vaadin.Router.Location}
+       * @type {!Router.Location}
        */
 
       _this.location;
@@ -2654,11 +2654,11 @@ function utils() {
        * a `commands.component(name)` result, a `commands.redirect(path)` result,
        * or a `context.next()` result, the current route resolution is finished,
        * and other route config properties are ignored.
-       * See also **Route Actions** section in [Live Examples](#/classes/Vaadin.Router/demos/demo/index.html).
+       * See also **Route Actions** section in [Live Examples](#/classes/Router/demos/demo/index.html).
        *
        * * `redirect` – other route's path to redirect to. Passes all route parameters to the redirect target.
        * The target route should also be defined.
-       * See also **Redirects** section in [Live Examples](#/classes/Vaadin.Router/demos/demo/index.html).
+       * See also **Redirects** section in [Live Examples](#/classes/Router/demos/demo/index.html).
        *
        * * `bundle` – string containing the path to `.js` or `.mjs` bundle to load before resolving the route,
        * or the object with "module" and "nomodule" keys referring to different bundles.
@@ -2666,7 +2666,7 @@ function utils() {
        * depending on whether the browser supports ES modules or not.
        * The property is ignored when either an `action` returns the result or `redirect` property is present.
        * Any error, e.g. 404 while loading bundle will cause route resolution to throw.
-       * See also **Code Splitting** section in [Live Examples](#/classes/Vaadin.Router/demos/demo/index.html).
+       * See also **Code Splitting** section in [Live Examples](#/classes/Router/demos/demo/index.html).
        *
        * * `component` – the tag name of the Web Component to resolve the route to.
        * The property is ignored when either an `action` returns the result or `redirect` property is present.
@@ -2675,7 +2675,7 @@ function utils() {
        * will be rendered as a light dom child of a parent component.
        *
        * * `name` – the string name of the route to use in the
-       * [`router.urlForName(name, params)`](#/classes/Vaadin.Router#method-urlForName)
+       * [`router.urlForName(name, params)`](#/classes/Router#method-urlForName)
        * navigation helper method.
        *
        * For any route function (`action`, `children`) defined, the corresponding `route` object is available inside the callback
@@ -2987,7 +2987,7 @@ function utils() {
           var changeState = replace ? 'replaceState' : 'pushState';
           window.history[changeState](null, document.title, pathname + search + hash);
           window.dispatchEvent(new PopStateEvent('popstate', {
-            state: 'vaadin-router-ignore'
+            state: 'router-ignore'
           }));
         }
       }
@@ -3067,7 +3067,7 @@ function utils() {
         if (!targetContext) {
           return;
         } // REVERSE iteration: from Z to A
-
+        console.log("__runOnAfterLeaveCallbacks");
 
         for (var i = targetContext.chain.length - 1; i >= currentContext.__divergedChainIndex; i--) {
           var currentComponent = targetContext.chain[i].element;
@@ -3087,6 +3087,7 @@ function utils() {
     }, {
       key: "__runOnAfterEnterCallbacks",
       value: function __runOnAfterEnterCallbacks(currentContext) {
+        console.log("__runOnAfterEnterCallbacks");
         // forward iteration: from A to Z
         for (var i = currentContext.__divergedChainIndex; i < currentContext.chain.length; i++) {
           var currentComponent = currentContext.chain[i].element || {};
@@ -3131,7 +3132,7 @@ function utils() {
     }, {
       key: "subscribe",
       value: function subscribe() {
-        window.addEventListener('vaadin-router-go', this.__navigationEventHandler);
+        window.addEventListener('router-go', this.__navigationEventHandler);
       }
       /**
        * Removes the subscription to navigation events created in the `subscribe()`
@@ -3141,7 +3142,7 @@ function utils() {
     }, {
       key: "unsubscribe",
       value: function unsubscribe() {
-        window.removeEventListener('vaadin-router-go', this.__navigationEventHandler);
+        window.removeEventListener('router-go', this.__navigationEventHandler);
       }
     }, {
       key: "__onNavigationEvent",
@@ -3159,7 +3160,7 @@ function utils() {
         }
       }
       /**
-       * Configures what triggers Vaadin.Router navigation events:
+       * Configures what triggers Router navigation events:
        *  - `POPSTATE`: popstate events on the current `window`
        *  - `CLICK`: click events on `<a>` links leading to the current page
        *
@@ -3170,7 +3171,7 @@ function utils() {
        * create the own one and only import the triggers you need, instead of pulling in all the code,
        * e.g. if you want to handle `click` differently.
        *
-       * See also **Navigation Triggers** section in [Live Examples](#/classes/Vaadin.Router/demos/demo/index.html).
+       * See also **Navigation Triggers** section in [Live Examples](#/classes/Router/demos/demo/index.html).
        *
        * @param {...NavigationTrigger} triggers
        */
@@ -3182,7 +3183,7 @@ function utils() {
        * Generates a URL for the route with the given name, optionally performing
        * substitution of parameters.
        *
-       * The route is searched in all the Vaadin.Router instances subscribed to
+       * The route is searched in all the Router instances subscribed to
        * navigation events.
        *
        * **Note:** For child route names, only array children are considered.
@@ -3223,7 +3224,7 @@ function utils() {
       }
       /**
        * Triggers navigation to a new path. Returns a boolean without waiting until
-       * the navigation is complete. Returns `true` if at least one `Vaadin.Router`
+       * the navigation is complete. Returns `true` if at least one `Router`
        * has handled the navigation (was subscribed and had `baseUrl` matching
        * the `pathname` argument), otherwise returns `false`.
        *
@@ -3251,566 +3252,6 @@ function utils() {
 
     return Router;
   }(Resolver);
-
-  var DEV_MODE_CODE_REGEXP = /\/\*\*\s+vaadin-dev-mode:start([\s\S]*)vaadin-dev-mode:end\s+\*\*\//i;
-  var FlowClients = window.Vaadin && window.Vaadin.Flow && window.Vaadin.Flow.clients;
-
-  function isMinified() {
-    function test() {
-      /** vaadin-dev-mode:start
-      return false;
-      vaadin-dev-mode:end **/
-      return true;
-    }
-
-    return uncommentAndRun(test);
-  }
-
-  function isDevelopmentMode() {
-    try {
-      if (isForcedDevelopmentMode()) {
-        return true;
-      }
-
-      if (!isLocalhost()) {
-        return false;
-      }
-
-      if (FlowClients) {
-        return !isFlowProductionMode();
-      }
-
-      return !isMinified();
-    } catch (e) {
-      // Some error in this code, assume production so no further actions will be taken
-      return false;
-    }
-  }
-
-  function isForcedDevelopmentMode() {
-    return localStorage.getItem("vaadin.developmentmode.force");
-  }
-
-  function isLocalhost() {
-    return ["localhost", "127.0.0.1"].indexOf(window.location.hostname) >= 0;
-  }
-
-  function isFlowProductionMode() {
-    if (FlowClients) {
-      var productionModeApps = Object.keys(FlowClients).map(function (key) {
-        return FlowClients[key];
-      }).filter(function (client) {
-        return client.productionMode;
-      });
-
-      if (productionModeApps.length > 0) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  function uncommentAndRun(callback, args) {
-    if (typeof callback !== 'function') {
-      return;
-    }
-
-    var match = DEV_MODE_CODE_REGEXP.exec(callback.toString());
-
-    if (match) {
-      try {
-        // requires CSP: script-src 'unsafe-eval'
-        callback = new Function(match[1]);
-      } catch (e) {
-        // eat the exception
-        console.log('vaadin-development-mode-detector: uncommentAndRun() failed', e);
-      }
-    }
-
-    return callback(args);
-  } // A guard against polymer-modulizer removing the window.Vaadin
-  // initialization above.
-
-
-  window['Vaadin'] = window['Vaadin'] || {};
-  /**
-   * Inspects the source code of the given `callback` function for
-   * specially-marked _commented_ code. If such commented code is found in the
-   * callback source, uncomments and runs that code instead of the callback
-   * itself. Otherwise runs the callback as is.
-   *
-   * The optional arguments are passed into the callback / uncommented code,
-   * the result is returned.
-   *
-   * See the `isMinified()` function source code in this file for an example.
-   *
-   */
-
-  var runIfDevelopmentMode = function runIfDevelopmentMode(callback, args) {
-    if (window.Vaadin.developmentMode) {
-      return uncommentAndRun(callback, args);
-    }
-  };
-
-  if (window.Vaadin.developmentMode === undefined) {
-    window.Vaadin.developmentMode = isDevelopmentMode();
-  }
-
-  /* This file is autogenerated from src/vaadin-usage-statistics.tpl.html */
-
-  function maybeGatherAndSendStats() {
-    /** vaadin-dev-mode:start
-    (function () {
-    'use strict';
-    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-    } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-    };
-    var classCallCheck = function (instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-    };
-    var createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-     return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-    }();
-    var getPolymerVersion = function getPolymerVersion() {
-    return window.Polymer && window.Polymer.version;
-    };
-    var StatisticsGatherer = function () {
-    function StatisticsGatherer(logger) {
-      classCallCheck(this, StatisticsGatherer);
-       this.now = new Date().getTime();
-      this.logger = logger;
-    }
-     createClass(StatisticsGatherer, [{
-      key: 'frameworkVersionDetectors',
-      value: function frameworkVersionDetectors() {
-        return {
-          'Flow': function Flow() {
-            if (window.Vaadin && window.Vaadin.Flow && window.Vaadin.Flow.clients) {
-              var flowVersions = Object.keys(window.Vaadin.Flow.clients).map(function (key) {
-                return window.Vaadin.Flow.clients[key];
-              }).filter(function (client) {
-                return client.getVersionInfo;
-              }).map(function (client) {
-                return client.getVersionInfo().flow;
-              });
-              if (flowVersions.length > 0) {
-                return flowVersions[0];
-              }
-            }
-          },
-          'Vaadin Framework': function VaadinFramework() {
-            if (window.vaadin && window.vaadin.clients) {
-              var frameworkVersions = Object.values(window.vaadin.clients).filter(function (client) {
-                return client.getVersionInfo;
-              }).map(function (client) {
-                return client.getVersionInfo().vaadinVersion;
-              });
-              if (frameworkVersions.length > 0) {
-                return frameworkVersions[0];
-              }
-            }
-          },
-          'AngularJs': function AngularJs() {
-            if (window.angular && window.angular.version && window.angular.version) {
-              return window.angular.version.full;
-            }
-          },
-          'Angular': function Angular() {
-            if (window.ng) {
-              var tags = document.querySelectorAll("[ng-version]");
-              if (tags.length > 0) {
-                return tags[0].getAttribute("ng-version");
-              }
-              return "Unknown";
-            }
-          },
-          'Backbone.js': function BackboneJs() {
-            if (window.Backbone) {
-              return window.Backbone.VERSION;
-            }
-          },
-          'React': function React() {
-            var reactSelector = '[data-reactroot], [data-reactid]';
-            if (!!document.querySelector(reactSelector)) {
-              // React does not publish the version by default
-              return "unknown";
-            }
-          },
-          'Ember': function Ember() {
-            if (window.Em && window.Em.VERSION) {
-              return window.Em.VERSION;
-            } else if (window.Ember && window.Ember.VERSION) {
-              return window.Ember.VERSION;
-            }
-          },
-          'jQuery': function (_jQuery) {
-            function jQuery() {
-              return _jQuery.apply(this, arguments);
-            }
-             jQuery.toString = function () {
-              return _jQuery.toString();
-            };
-             return jQuery;
-          }(function () {
-            if (typeof jQuery === 'function' && jQuery.prototype.jquery !== undefined) {
-              return jQuery.prototype.jquery;
-            }
-          }),
-          'Polymer': function Polymer() {
-            var version = getPolymerVersion();
-            if (version) {
-              return version;
-            }
-          },
-          'LitElement': function LitElement() {
-            var version = window.litElementVersions && window.litElementVersions[0];
-            if (version) {
-              return version;
-            }
-          },
-          'LitHtml': function LitHtml() {
-            var version = window.litHtmlVersions && window.litHtmlVersions[0];
-            if (version) {
-              return version;
-            }
-          },
-          'Vue.js': function VueJs() {
-            if (window.Vue) {
-              return window.Vue.version;
-            }
-          }
-        };
-      }
-    }, {
-      key: 'getUsedVaadinElements',
-      value: function getUsedVaadinElements(elements) {
-        var version = getPolymerVersion();
-        var elementClasses = void 0;
-        if (version && version.indexOf('2') === 0) {
-          // Polymer 2: components classes are stored in window.Vaadin
-          elementClasses = Object.keys(window.Vaadin).map(function (c) {
-            return window.Vaadin[c];
-          }).filter(function (c) {
-            return c.is;
-          });
-        } else {
-          // Polymer 3: components classes are stored in window.Vaadin.registrations
-          elementClasses = window.Vaadin.registrations || [];
-        }
-        elementClasses.forEach(function (klass) {
-          var version = klass.version ? klass.version : "0.0.0";
-          elements[klass.is] = { version: version };
-        });
-      }
-    }, {
-      key: 'getUsedVaadinThemes',
-      value: function getUsedVaadinThemes(themes) {
-        ['Lumo', 'Material'].forEach(function (themeName) {
-          var theme;
-          var version = getPolymerVersion();
-          if (version && version.indexOf('2') === 0) {
-            // Polymer 2: themes are stored in window.Vaadin
-            theme = window.Vaadin[themeName];
-          } else {
-            // Polymer 3: themes are stored in custom element registry
-            theme = customElements.get('vaadin-' + themeName.toLowerCase() + '-styles');
-          }
-          if (theme && theme.version) {
-            themes[themeName] = { version: theme.version };
-          }
-        });
-      }
-    }, {
-      key: 'getFrameworks',
-      value: function getFrameworks(frameworks) {
-        var detectors = this.frameworkVersionDetectors();
-        Object.keys(detectors).forEach(function (framework) {
-          var detector = detectors[framework];
-          try {
-            var version = detector();
-            if (version) {
-              frameworks[framework] = { version: version };
-            }
-          } catch (e) {}
-        });
-      }
-    }, {
-      key: 'gather',
-      value: function gather(storage) {
-        var storedStats = storage.read();
-        var gatheredStats = {};
-        var types = ["elements", "frameworks", "themes"];
-         types.forEach(function (type) {
-          gatheredStats[type] = {};
-          if (!storedStats[type]) {
-            storedStats[type] = {};
-          }
-        });
-         var previousStats = JSON.stringify(storedStats);
-         this.getUsedVaadinElements(gatheredStats.elements);
-        this.getFrameworks(gatheredStats.frameworks);
-        this.getUsedVaadinThemes(gatheredStats.themes);
-         var now = this.now;
-        types.forEach(function (type) {
-          var keys = Object.keys(gatheredStats[type]);
-          keys.forEach(function (key) {
-            if (!storedStats[type][key] || _typeof(storedStats[type][key]) != _typeof({})) {
-              storedStats[type][key] = { firstUsed: now };
-            }
-            // Discards any previously logged version number
-            storedStats[type][key].version = gatheredStats[type][key].version;
-            storedStats[type][key].lastUsed = now;
-          });
-        });
-         var newStats = JSON.stringify(storedStats);
-        storage.write(newStats);
-        if (newStats != previousStats && Object.keys(storedStats).length > 0) {
-          this.logger.debug("New stats: " + newStats);
-        }
-      }
-    }]);
-    return StatisticsGatherer;
-    }();
-    var StatisticsStorage = function () {
-    function StatisticsStorage(key) {
-      classCallCheck(this, StatisticsStorage);
-       this.key = key;
-    }
-     createClass(StatisticsStorage, [{
-      key: 'read',
-      value: function read() {
-        var localStorageStatsString = localStorage.getItem(this.key);
-        try {
-          return JSON.parse(localStorageStatsString ? localStorageStatsString : '{}');
-        } catch (e) {
-          return {};
-        }
-      }
-    }, {
-      key: 'write',
-      value: function write(data) {
-        localStorage.setItem(this.key, data);
-      }
-    }, {
-      key: 'clear',
-      value: function clear() {
-        localStorage.removeItem(this.key);
-      }
-    }, {
-      key: 'isEmpty',
-      value: function isEmpty() {
-        var storedStats = this.read();
-        var empty = true;
-        Object.keys(storedStats).forEach(function (key) {
-          if (Object.keys(storedStats[key]).length > 0) {
-            empty = false;
-          }
-        });
-         return empty;
-      }
-    }]);
-    return StatisticsStorage;
-    }();
-    var StatisticsSender = function () {
-    function StatisticsSender(url, logger) {
-      classCallCheck(this, StatisticsSender);
-       this.url = url;
-      this.logger = logger;
-    }
-     createClass(StatisticsSender, [{
-      key: 'send',
-      value: function send(data, errorHandler) {
-        var logger = this.logger;
-         if (navigator.onLine === false) {
-          logger.debug("Offline, can't send");
-          errorHandler();
-          return;
-        }
-        logger.debug("Sending data to " + this.url);
-         var req = new XMLHttpRequest();
-        req.withCredentials = true;
-        req.addEventListener("load", function () {
-          // Stats sent, nothing more to do
-          logger.debug("Response: " + req.responseText);
-        });
-        req.addEventListener("error", function () {
-          logger.debug("Send failed");
-          errorHandler();
-        });
-        req.addEventListener("abort", function () {
-          logger.debug("Send aborted");
-          errorHandler();
-        });
-        req.open("POST", this.url);
-        req.setRequestHeader("Content-Type", "application/json");
-        req.send(data);
-      }
-    }]);
-    return StatisticsSender;
-    }();
-    var StatisticsLogger = function () {
-    function StatisticsLogger(id) {
-      classCallCheck(this, StatisticsLogger);
-       this.id = id;
-    }
-     createClass(StatisticsLogger, [{
-      key: '_isDebug',
-      value: function _isDebug() {
-        return localStorage.getItem("vaadin." + this.id + ".debug");
-      }
-    }, {
-      key: 'debug',
-      value: function debug(msg) {
-        if (this._isDebug()) {
-          console.info(this.id + ": " + msg);
-        }
-      }
-    }]);
-    return StatisticsLogger;
-    }();
-    var UsageStatistics = function () {
-    function UsageStatistics() {
-      classCallCheck(this, UsageStatistics);
-       this.now = new Date();
-      this.timeNow = this.now.getTime();
-      this.gatherDelay = 10; // Delay between loading this file and gathering stats
-      this.initialDelay = 24 * 60 * 60;
-       this.logger = new StatisticsLogger("statistics");
-      this.storage = new StatisticsStorage("vaadin.statistics.basket");
-      this.gatherer = new StatisticsGatherer(this.logger);
-      this.sender = new StatisticsSender("https://tools.vaadin.com/usage-stats/submit", this.logger);
-    }
-     createClass(UsageStatistics, [{
-      key: 'maybeGatherAndSend',
-      value: function maybeGatherAndSend() {
-        var _this = this;
-         if (localStorage.getItem(UsageStatistics.optOutKey)) {
-          return;
-        }
-        this.gatherer.gather(this.storage);
-        setTimeout(function () {
-          _this.maybeSend();
-        }, this.gatherDelay * 1000);
-      }
-    }, {
-      key: 'lottery',
-      value: function lottery() {
-        return Math.random() <= 0.05;
-      }
-    }, {
-      key: 'currentMonth',
-      value: function currentMonth() {
-        return this.now.getYear() * 12 + this.now.getMonth();
-      }
-    }, {
-      key: 'maybeSend',
-      value: function maybeSend() {
-        var firstUse = Number(localStorage.getItem(UsageStatistics.firstUseKey));
-        var monthProcessed = Number(localStorage.getItem(UsageStatistics.monthProcessedKey));
-         if (!firstUse) {
-          // Use a grace period to avoid interfering with tests, incognito mode etc
-          firstUse = this.timeNow;
-          localStorage.setItem(UsageStatistics.firstUseKey, firstUse);
-        }
-         if (this.timeNow < firstUse + this.initialDelay * 1000) {
-          this.logger.debug("No statistics will be sent until the initial delay of " + this.initialDelay + "s has passed");
-          return;
-        }
-        if (this.currentMonth() <= monthProcessed) {
-          this.logger.debug("This month has already been processed");
-          return;
-        }
-        localStorage.setItem(UsageStatistics.monthProcessedKey, this.currentMonth());
-        // Use random sampling
-        if (this.lottery()) {
-          this.logger.debug("Congratulations, we have a winner!");
-        } else {
-          this.logger.debug("Sorry, no stats from you this time");
-          return;
-        }
-         this.send();
-      }
-    }, {
-      key: 'send',
-      value: function send() {
-        // Ensure we have the latest data
-        this.gatherer.gather(this.storage);
-         // Read, send and clean up
-        var data = this.storage.read();
-        data["firstUse"] = Number(localStorage.getItem(UsageStatistics.firstUseKey));
-        data["usageStatisticsVersion"] = UsageStatistics.version;
-        var info = 'This request contains usage statistics gathered from the application running in development mode. \n\nStatistics gathering is automatically disabled and excluded from production builds.\n\nFor details and to opt-out, see https://github.com/vaadin/vaadin-usage-statistics.\n\n\n\n';
-        var self = this;
-        this.sender.send(info + JSON.stringify(data), function () {
-          // Revert the 'month processed' flag
-          localStorage.setItem(UsageStatistics.monthProcessedKey, self.currentMonth() - 1);
-        });
-      }
-    }], [{
-      key: 'version',
-      get: function get$1() {
-        return '2.0.8';
-      }
-    }, {
-      key: 'firstUseKey',
-      get: function get$1() {
-        return 'vaadin.statistics.firstuse';
-      }
-    }, {
-      key: 'monthProcessedKey',
-      get: function get$1() {
-        return 'vaadin.statistics.monthProcessed';
-      }
-    }, {
-      key: 'optOutKey',
-      get: function get$1() {
-        return 'vaadin.statistics.optout';
-      }
-    }]);
-    return UsageStatistics;
-    }();
-    try {
-    window.Vaadin = window.Vaadin || {};
-    window.Vaadin.usageStatsChecker = window.Vaadin.usageStatsChecker || new UsageStatistics();
-    window.Vaadin.usageStatsChecker.maybeGatherAndSend();
-    } catch (e) {
-    // Intentionally ignored as this is not a problem in the app being developed
-    }
-    }());
-     vaadin-dev-mode:end **/
-  }
-
-  var usageStatistics = function usageStatistics() {
-    if (typeof runIfDevelopmentMode === 'function') {
-      return runIfDevelopmentMode(maybeGatherAndSendStats);
-    }
-  };
-
-  window.Vaadin = window.Vaadin || {};
-  window.Vaadin.registrations = window.Vaadin.registrations || [];
-  window.Vaadin.registrations.push({
-    is: '@vaadin/router',
-    version: '1.2.0'
-  });
-  usageStatistics();
 
   Router.NavigationTrigger = {
     POPSTATE: POPSTATE,
@@ -3884,4 +3325,3 @@ function utils() {
   Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-//# sourceMappingURL=vaadin-router.umd.js.map

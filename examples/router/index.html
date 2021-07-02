@@ -1,0 +1,45 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Router Example - simply</title>
+  <base href="https://root/simply/examples/router/">
+</head>
+
+<a href=".">Home</a>
+<a href="users">Users</a>
+<a href="users/kim">Kim</a>
+
+<router></router>
+<user-profile></user-profile>
+
+<body>
+
+  <script src="/simply/simply.js"></script>
+
+  <script>
+    get("hello-world", 'component.html');
+    get("user-list", 'user-list.html');
+    get("not-found", 'not-found.html');
+    get("user-profile", 'user-profile.html');
+
+    const outlet = document.querySelector('router');
+    const router = new simply.Router(outlet, {
+      baseUrl: "/simply/examples/router/" // https://root/simply/examples/router/ or router or /simply/examples/router/
+    });
+
+    router.setRoutes([
+      { path: '/', component: 'hello-world' },
+      {
+        path: '/users',
+        children: [
+          { path: '/', component: 'user-list' },
+          { path: '/:user', component: 'user-profile' }
+        ]
+      },
+      { path: '(.*)', component: 'not-found' },
+    ]);
+  </script>
+</body>
+
+</html>
