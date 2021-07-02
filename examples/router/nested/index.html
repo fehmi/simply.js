@@ -23,6 +23,7 @@
     const outlet = document.querySelector('router');
     const router = new simply.Router(outlet, {
       //baseUrl: "/simply/examples/router/" // https://root/simply/examples/router/ or router or /simply/examples/router/
+      // hooks
     });
 
     router.setRoutes([
@@ -30,7 +31,7 @@
         path: '/', component: 'nav-template', children: [
           {
             path: '/', component: 'home-view', action: (context, commands) => {
-              console.log(context, commands);
+              console.log("action", context, commands);
             }
           },
           { path: '/users', component: 'user-list' },
@@ -39,6 +40,18 @@
       },
       { path: '(.*)', component: 'not-found' },
     ]);
+
+    router.hooks = {
+      before: function(router, pathnameOrContext) {
+        console.log("selam before", pathnameOrContext.pathname);
+      if (pathnameOrContext.pathname == "/simply/examples/router/nested/users") {
+        return false;
+      }
+      },
+      after: function(context) {
+        console.log("hello after");
+      }
+    }
 
   </script>
 </body>
