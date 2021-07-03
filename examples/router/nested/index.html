@@ -32,6 +32,7 @@
           {
             path: '/', component: 'home-view', action: (context, commands) => {
               console.log("action", context, commands);
+              return commands.redirect('/');
             }
           },
           { path: '/users', component: 'user-list' },
@@ -42,13 +43,13 @@
     ]);
 
     router.hooks = {
-      before: function(router, pathnameOrContext) {
+      before: function (router, pathnameOrContext) {
         console.log("selam before", pathnameOrContext.pathname);
-      if (pathnameOrContext.pathname == "/simply/examples/router/nested/users") {
-        return false;
-      }
+        if (pathnameOrContext.pathname == "/simply/examples/router/nested/users") {
+          return false;
+        }
       },
-      after: function(context) {
+      after: function (context) {
         console.log("hello after");
       }
     }
