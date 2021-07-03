@@ -122,7 +122,6 @@
     height: 100%;
     border: none;
   }
-
 </style>
 
 <script>
@@ -223,58 +222,60 @@
     }
     lifecycle = {
       beforeConstruct() {
-        if (typeof CodeMirror == "undefined") {
 
-        }
       },
       afterFirstRender() {
-        var slot = component.dom.querySelector('slot[name=files]');
-        var files = slot.assignedNodes()[0].querySelectorAll("textarea");
-        component.editors = [];
-        for (let index = 0; index < files.length; index++) {
-          var fileEl = files[index];
-          var filename = fileEl.getAttribute("filename");
-          var fileContent = fileEl.value;
-          var isFileSelected = fileEl.hasAttribute("selected");
-          data.files.push({
-            filename: filename,
-            selected: isFileSelected
-          });
-        }
+        if (typeof CodeMirror == "undefined") {
+          loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/display/autorefresh.min.js,npm/jszip@3.1.5/dist/jszip.min.js", function () {
+            var slot = component.dom.querySelector('slot[name=files]');
+            var files = slot.assignedNodes()[0].querySelectorAll("textarea");
+            component.editors = [];
+            for (let index = 0; index < files.length; index++) {
+              var fileEl = files[index];
+              var filename = fileEl.getAttribute("filename");
+              var fileContent = fileEl.value;
+              var isFileSelected = fileEl.hasAttribute("selected");
+              data.files.push({
+                filename: filename,
+                selected: isFileSelected
+              });
+            }
 
-        for (let index = 0; index < files.length; index++) {
-          var textarea = files[index];
-          var filename = files[index].getAttribute("filename");
-          var selected = files[index].hasAttribute("selected");
-          var targetEl = component.dom.querySelector("ul#files");
-          component.editors[textarea.getAttribute("filename")] = CodeMirror(function (node) {
-            node.setAttribute("filename", filename);
-            node.setAttribute("selected", selected);
-            targetEl.appendChild(node, targetEl);
-          }, {
-            value: textarea.value,
-            autoRefresh: { delay: 0 },
-            lineNumbers: true,
-            mode: "htmlmixed",
-            theme: 'default' // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
-          });
+            for (let index = 0; index < files.length; index++) {
+              var textarea = files[index];
+              var filename = files[index].getAttribute("filename");
+              var selected = files[index].hasAttribute("selected");
+              var targetEl = component.dom.querySelector("ul#files");
+              component.editors[textarea.getAttribute("filename")] = CodeMirror(function (node) {
+                node.setAttribute("filename", filename);
+                node.setAttribute("selected", selected);
+                targetEl.appendChild(node, targetEl);
+              }, {
+                value: textarea.value,
+                autoRefresh: { delay: 0 },
+                lineNumbers: true,
+                mode: "htmlmixed",
+                theme: 'default' // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
+              });
 
-          component.editors[textarea.getAttribute("filename")].on("change", function () {
+              component.editors[textarea.getAttribute("filename")].on("change", function () {
+                component.methods.renderResult();
+              });
+            }
+
             component.methods.renderResult();
-          });
+
+            var cmInitCheck = setInterval(() => {
+              var px = parseInt(component.dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
+              if (px > 100) {
+                component.editors["index.html"].refresh();
+              }
+              else {
+                clearInterval(cmInitCheck);
+              }
+            }, 10);
+          })
         }
-
-        component.methods.renderResult();
-
-        var cmInitCheck = setInterval(() => {
-          var px = parseInt(component.dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
-          if (px > 100) {
-            component.editors["index.html"].refresh();
-          }
-          else {
-            clearInterval(cmInitCheck);
-          }
-        }, 10);
       },
     }
   }
