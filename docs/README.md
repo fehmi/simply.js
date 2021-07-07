@@ -1,10 +1,10 @@
 ## simply
 
-> Simple JavaScript framework for simple apps.
+> Simple JavaScript toolkit for simple web apps.
 
 ## What it is
 
-simply devoloped on top of native web components technology. It provides a single file component concept with a clean syntax. It has built-in template engine coded from scratch. It is plug & play. No need to npm or terminal. Just include the js file to your html and you are ready to go.
+simply developed on top of native web components. It provides a single file component concept with a clean syntax. It has built-in template engine coded from scratch. It is plug & play. No need to npm or terminal. Just include the js file to your html and you are ready to go.
 
 See the [Quick start](quickstart.md) guide for more details.
 
