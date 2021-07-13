@@ -12,7 +12,7 @@ utils();
 window.simply = {
   components: {},
   // simplate
-  parseTemplate: function (template, data) {
+  parseTemplate: function (template, data, state) {
     let ifStatement = /\<(\s+)?if(\s+)([a-zA-Z_\.]+(\s+)??.*)(\s+)?(\>)$/;
     let elseIfStatement = /\<(\s+)?else(\s+)if(\s+)(.*(\s+?.*))(\s+)?(\>)$/;
     let endIfStatement = /\<(\s+)?\/(\s+)?if(\s+)?\>$/;
@@ -171,83 +171,121 @@ function utils() {
     }
   }(typeof global !== "undefined" ? global : this));
 
-  get = function (name, path) {
-    loadAndParseComponent(name, path, function (component) {
-      getSettings(component, function (settings) {
-        registerComponent(settings);
-      })
-    });
+  get = function (path, name) {
+    if (Array.isArray(path)) {
+      console.log(path + " array");
+      for (let i = 0; i < path.length; i++) {
+        var p = path[i];
+        loadAndParseComponent(p, name, function (component) {
+          getSettings(component, function (settings) {
+            registerComponent(settings);
+          })
+        });
+      }
+    }
+    else {
+      console.log(path, name + " array değil");
+      loadAndParseComponent(path, name, function (component) {
+        getSettings(component, function (settings) {
+          registerComponent(settings);
+        })
+      });
+    }
+
   }
-  loadAndParseComponent = function (name, path, callback) {
-    var request = new XMLHttpRequest();
+  loadAndParseComponent = function (path, name, callback) {
+    if (typeof name == "undefined") {
+      var ext = path.split(".").pop();
+      var name = path.split('\\').pop().split('/').pop().split('.').slice(0, -1).join('.');
+    }
+    else {
+      var ext = name.split(".").pop();
+      var name = name.replace("."+ext, "");
+    }
+
     //request.responseType = 'document';
-    request.open('GET', path, true);
 
-    request.onload = function () {
-      if (this.status >= 200 && this.status < 400) {
-        var txt = document.createElement("textarea");
-        var parser = new DOMParser();
-        var dom = parser.parseFromString(this.response, "text/html");
+    if (ext == "js") {
+      console.log("galiba store/state");
+    }
+    else if (ext == "html") {
+      if (typeof simply.components[name] == "undefined") {
+        simply.components[name] = {};
+        var request = new XMLHttpRequest();
+        request.open('GET', path, true);
 
-        var template = "";
-        if (this.response.indexOf("<template>") > -1) {
-          var templateOpenTag = /<template(.*)>/g;
-          var templateCloseTag = /<\/template>/g;
-          var bucket = "";
-          var processedLetters = "";
-          var templateCount = 0;
+        request.onload = function () {
+          if (this.status >= 200 && this.status < 400) {
+            var txt = document.createElement("textarea");
+            var parser = new DOMParser();
+            var dom = parser.parseFromString(this.response, "text/html");
 
-          for (var i = 0; i < this.response.length; i++) {
-            bucket += this.response[i];
-            if ((logic = templateOpenTag.exec(bucket)) !== null) {
-              templateCount += 1;
-              bucket = "";
-            }
-            else if ((logic = templateCloseTag.exec(bucket)) !== null) {
-              templateCount -= 1;
-              bucket = "";
-              if (templateCount == 0) { // done
-                template = processedLetters.replace(new RegExp("<\/template>" + '$'), '');
-                break;
+            var template = "";
+            if (this.response.indexOf("<template>") > -1) {
+              var templateOpenTag = /<template(.*)>/g;
+              var templateCloseTag = /<\/template>/g;
+              var bucket = "";
+              var processedLetters = "";
+              var templateCount = 0;
+
+              for (var i = 0; i < this.response.length; i++) {
+                bucket += this.response[i];
+                if ((logic = templateOpenTag.exec(bucket)) !== null) {
+                  templateCount += 1;
+                  bucket = "";
+                }
+                else if ((logic = templateCloseTag.exec(bucket)) !== null) {
+                  templateCount -= 1;
+                  bucket = "";
+                  if (templateCount == 0) { // done
+                    template = processedLetters.replace(new RegExp("<\/template>" + '$'), '');
+                    break;
+                  }
+                }
+                if (templateCount > 0) {
+                  processedLetters += this.response[i + 1];
+                }
               }
             }
-            if (templateCount > 0) {
-              processedLetters += this.response[i + 1];
+
+            var style = "";
+            if (dom.querySelector("style")) {
+              style = dom.querySelector("style");
+              txt.innerHTML = style.innerHTML;
+              style = txt.value;
             }
+
+            var script = "";
+            if (dom.querySelector("script")) {
+              var script = dom.querySelector("script");
+              txt.innerHTML = script.innerHTML;
+              script = txt.value;
+            }
+
+            simply.components[name] = {
+              template: template,
+              style: style,
+              script: script
+            }
+
+            callback({
+              name,
+              template,
+              style,
+              script
+            });
+            //console.log(simply.importCompleted[name]);
+          } else {
+            console.log("Component import error: We reached our target server, but it returned an error");
           }
-        }
-
-        var style = "";
-        if (dom.querySelector("style")) {
-          style = dom.querySelector("style");
-          txt.innerHTML = style.innerHTML;
-          style = txt.value;
-        }
-
-        var script = "";
-        if (dom.querySelector("script")) {
-          var script = dom.querySelector("script");
-          txt.innerHTML = script.innerHTML;
-          script = txt.value;
-        }
-
-        if (path.indexOf("blob") > -1) {
-
-        }
-
-        callback({
-          name,
-          template,
-          style,
-          script
-        });
-        //console.log(simply.importCompleted[name]);
-      } else {
-        console.log("Component import error: We reached our target server, but it returned an error");
+        };
+        request.onerror = function () { };
+        request.send();
       }
-    };
-    request.onerror = function () { };
-    request.send();
+      else {
+        console.log(path + " daha önce yüklendi")
+      }
+    }
   }
   getSettings = function ({ name, template, style, script }, callback) {
     //const jsFile = new Blob([script.textContent], { type: 'application/javascript' });
@@ -285,16 +323,32 @@ function utils() {
         constructor() {
           // Always call super first in constructor
           super();
-
+          console.log(template, script);
           if (script !== "") {
-            var m;
-            var importRegex = /get\(.*\)\;/m;
 
-            while ((m = importRegex.exec(script)) !== null) {
-              m.forEach(function () {
-                script = script.replace(m[0], "");
-                eval(m[0]);
-              });
+            var gets = "";
+            // class ile üst tarafı (getler) ayıralım
+            if (script.indexOf("class") > -1) {
+              var scriptParts = script.split("class");
+              gets = scriptParts[0];
+              script = "class " + scriptParts[1];
+            }
+            else {
+              gets = script;
+            }
+
+            var m;
+            // var importRegex = /(?<!\/\/(\s+)?)get\(.*\)\;/m;
+            var importRegex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm
+
+            // if (get is multiple)
+
+            while ((m = importRegex.exec(gets)) !== null) {
+              // This is necessary to avoid infinite loops with zero-width matches
+              var component = this;
+              eval(m[0]);
+              // pass param with eval
+              // window.eval.call(window, '(function (component) {' + m[0].replace(")", ", component )") + '})')(component);
             }
 
             var timelateLines = template.split("\n");
@@ -312,17 +366,18 @@ function utils() {
                   this.lifecycle.beforeConstruct();
                 }
               }
+
               this.uid = '_' + Math.random().toString(36).substr(2, 9);
               var component = this;
-
+              var state;
               var data = this.componentClass.data;
               data.props = {};
               this.methods = this.componentClass.methods;
-
               this.watch = this.componentClass.watch;
               this.component = this;
-
               this.parent = this.getRootNode().host;
+
+
 
               // simply.components[this.uid] = this;
 
@@ -337,11 +392,32 @@ function utils() {
               }
               this.data = data;
 
+
+              if (this.getRootNode().host) {
+                if (typeof this.getRootNode().host.state !== "undefined") {
+                  this.state = this.getRootNode().host.state;
+                  console.log("parent'tan state'i al");
+                }
+              }
+
+              if (typeof this.componentClass.state !== "undefined") {
+                if (!this.state) {
+                  this.state = {};
+                }
+                var newStates = this.componentClass.state;
+                for (let key in newStates) {
+                  console.log(newStates);
+                  this.state[key] = newStates[key];
+               }
+              }
+
               if (typeof this.lifecycle !== "undefined") {
                 if (typeof this.lifecycle.afterConstruct !== "undefined") {
                   this.lifecycle.afterConstruct();
                 }
               }
+
+              state = this.state;
             }
           }
         }
@@ -386,19 +462,17 @@ function utils() {
           let self = this;
           this.render();
 
-          if (this.data) {
-
-            obaa(this.data, function (name, value, old, parents) {
+          function react(name, value, old, parents) {
               if (typeof self.lifecycle !== "undefined") {
                 if (typeof self.lifecycle.whenDataChange !== "undefined") {
-                  console.log(self.lifecycle.whenDataChange(name, value, old, parents));
+                  //console.log(self.lifecycle.whenDataChange(name, value, old, parents));
                   if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
                     return false;
                   };
                 }
               }
               self.render();
-              //console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+              console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
               if (self.props) {
                 if (parents == "#-props") {
                   self.setAttribute(name, JSON.stringify(self.data.props[name]));
@@ -411,12 +485,18 @@ function utils() {
               if (typeof self.watch !== "undefined") {
                 self.watch(name, value, old, parents);
               }
-            });
-            //this._attachListeners();
-
-
           }
 
+          if (this.data) {
+            obaa(this.data, function (name, value, old, parents) {
+              react(name, value, old, parents);
+            });
+          }
+          if (this.state) {
+            obaa(this.state, function (name, value, old, parents) {
+              react(name, value, old, parents);
+            });
+          }
         }
 
         render() {
@@ -435,7 +515,7 @@ function utils() {
           }
 
           if (!this.rendered) {
-            let parsedTemplate = simply.parseTemplate(template, this.data);
+            let parsedTemplate = simply.parseTemplate(template, this.data, this.state);
             if (style !== "") {
               let parsedStyle = simply.parseStyle(style, this.data);
               parsedTemplate = parsedTemplate + "<style>" + parsedStyle + "</style>";
@@ -468,7 +548,7 @@ function utils() {
               }
             }
             var newDom = document.createElement("div");
-            let parsedTemplate = simply.parseTemplate(template, this.data);
+            let parsedTemplate = simply.parseTemplate(template, this.data, this.state);
             let parsedStyle = simply.parseStyle(style, this.data);
 
             newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";

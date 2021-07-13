@@ -1,0 +1,42 @@
+<template>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <h1>test</h1>
+  <h2>{state.user.name}</h2>
+  <commented-get></commented-get>
+</template>
+
+<style>
+  * {
+    color: blue;
+  }
+</style>
+
+<script>
+  get([
+    "commented-get.html"
+  ]);
+  class {
+    data = {
+    }
+    state = {
+      user: {
+        name: "fehmi"
+      }
+    }
+    methods = {
+      asd() {
+
+      }
+    }
+    lifecycle = {
+      afterFirstRender() {
+        /*
+        get([
+          "deneme.html",
+          "haydar.css"
+        ])
+        */
+      }
+    }
+  }
+</script>

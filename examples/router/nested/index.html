@@ -13,12 +13,12 @@
   <script src="/simply/simply.js"></script>
 
   <script>
-    get("hello-world", '../component.html');
-    get("user-list", '../user-list.html');
-    get("not-found", '../not-found.html');
-    get("user-profile", '../user-profile.html');
-    get("nav-template", 'nav-template.html');
-    get("home-view", 'home-view.html');
+    get('../hello-world.html');
+    get('../user-list.html');
+    get('../not-found.html');
+    get('../user-profile.html');
+    get('nav-template.html');
+    get('home-view.html');
 
     const outlet = document.querySelector('router');
     const router = new simply.Router(outlet, {

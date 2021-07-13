@@ -9,30 +9,55 @@
   <repl-component>
     <section slot="files" style="display: none">
       <textarea filename="index.html" selected>
-<html>
-  <head>
-    <title>simply / REPL</title>
-  </head>
-  <body>
-    <hello-world></hello-world>
-    <script src="https://root/simply/simply.js"></script>
-    <script>
-      get("hello-world", "hello-world.html");
-    </script>
-  </body>
-</html>
+        <html>
+          <head>
+            <title>simply / REPL</title>
+          </head>
+          <body>
+            <hello-world></hello-world>
+            <how-are-you></how-are-you>
+            <script src="https://root/simply/simply.js"></script>
+            <script>
+              get("hello-world.html");
+              get("how-are-you.html");
+            </script>
+          </body>
+        </html>
       </textarea>
       <textarea filename="hello-world.html">
-<template>
-  hello canım
-</template>
+        <template>
+          hello canım
+        </template>
+      </textarea>
+      <textarea filename="how-are-you.html">
+        <template>
+          how are you?
+          <nested-comp></nested-comp>
+        </template>
+        <script>
+          get("nested-comp.html");
+        </script>
+      </textarea>
+      <textarea filename="nested-comp.html">
+        <template>
+          this is nested
+          <nested-oglu></nested-oglu>
+        </template>
+        <script>
+          get("nested-oglu.html");
+        </script>
+      </textarea>
+      <textarea filename="nested-oglu.html">
+        <template>
+          this is nested oglu nested
+        </template>
       </textarea>
     </section>
     </repl-component>
 
     <script src="../simply.js"></script>
     <script>
-      get("repl-component", "repl.html");
+      get("repl-component.html");
     </script>
 </body>
 

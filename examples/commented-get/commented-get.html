@@ -1,0 +1,111 @@
+<template>
+  <small>{state.user.name}</small>
+  <h5>{state.volume.level}</h5>
+  <third-child></third-child>
+  <each data.array as a>
+    {a}
+  </each>
+
+  <each data.arrayWithKeys as a>
+    {a.haydar}
+  </each>
+
+  <each data.arrayWithKeys as a>
+    {a.haydar}
+  </each>
+
+  <each data.arrayWithKeys as a, key>
+    <br></br>{a.haydar}<br>
+    {key}<br><br>
+  </each>
+
+  <each data.arrayWithKeys as a, key (index)>
+    <br></br>{a.haydar}<br>
+    {key}{index}<br><br>
+  </each>
+
+
+  <div class="hello" onclick="bcd()">
+  <each data.personalities as personality, key (index)>
+    <each data.personalities as p, key (index)>
+      <if p=="Calm">
+        <h1>hay yaşa calm</h1>
+      </if>
+      {p}
+      {data.name}
+      <each data.hobbies as hobby, key (index)>
+        <each data.hobbies as hobbie, key (index)>
+          <li>{key}:{hobbie}:{index}</li>
+        </each>
+        <li>{hobby}{key}{index}</li>
+      </each>
+    </each>
+    {key}{index}
+  </each>
+
+</template>
+<style>
+  p {
+    background: aquamarine;
+    border-radius: 30px;
+    padding: 20px;
+    font-size: 20px;
+    text-align: center;
+    width: 300px;
+    margin: 0 auto;
+    color: aquamarine;
+    color: "{data.color}";
+  }
+</style>
+<script>
+  get("third-child.html");
+  class {
+    data = {
+      array: [
+        1, 2, 3
+      ],
+      arrayWithKeys: [],
+      obj: {
+        "a": "A",
+        "b": "B",
+        "c": "C"
+      },
+      name: "fehmi",
+      age: 37,
+      personalities: ["Calm", "Creative", "Passionate"],
+      hobbies: {
+        "Music Producing": "Kırk yılda bir",
+        Gaming: "Aydı yılda bir",
+        Sports: "Meeeh",
+      },
+      color: "blue",
+      ney: "neyney"
+    };
+    state = {
+      volume: {
+        level: 80
+      }
+    }
+    methods = {
+      asd(e) {
+        alert("asd function called");
+        console.log(event);
+      },
+      bcd() {
+        alert("bcd")
+      }
+    };
+    lifecycle = {
+
+      afterFirstRender() {
+        console.log(state);
+        setTimeout(() => {
+          state.user.name = "erghgndg";
+        }, 1000);
+        setTimeout(() => {
+          state.volume.level = 3;
+        }, 4000);
+      }
+    }
+  }
+</script>

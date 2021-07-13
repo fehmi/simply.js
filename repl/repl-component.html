@@ -1,5 +1,10 @@
 <template>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css" />
+  <!--
+  <div id="adressbar">
+    <input type="text" name="url" value="">
+  </div>
+  -->
 
   <div id="editor">
     <ul id="file-tabs">
@@ -131,24 +136,34 @@
     }
     methods = {
       renderResult() {
+        console.log("he");
         var indexContent = component.editors["index.html"].getValue();
-        var files = component.methods.rewriteGet("index.html", indexContent, 0).reverse();
+        var files = component.methods.rewriteGet("index.html", indexContent);
         var blobs = [];
-        var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
 
-        for (let index = 0; index < files.length; index++) {
-          const element = files[index];
+        for (let index = 0; index < Object.keys(files).length; index++) {
+          const element = files[Object.keys(files).reverse()[index]];
+
           for (const filename in element) {
             if (blobs[filename] == undefined) {
               var content = element["content"];
-              let m;
 
+              let m;
+              var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm;
+              console.log(content);
               while ((m = regex.exec(content)) !== null) {
                 // This is necessary to avoid infinite loops with zero-width matches
                 if (m.index === regex.lastIndex) {
                   regex.lastIndex++;
                 }
-                content = content.replace(m[3], blobs[m[3]].blobUrl);
+                m[4] = m[4].slice(0, -1);
+                console.log(m[4]);
+                console.log(blobs);
+                var newGet = "get('"+blobs[m[4]].blobUrl+"', '"+m[4]+"');";
+                content = content.replace(m[0], newGet);
+
+                //content = content.replace(m[4], blobs[m[4]].blobUrl);
+                console.log(content);
               }
 
               var blob = new Blob([content], { type: "text/html; charset=utf-8" });
@@ -164,13 +179,12 @@
         }
         // debug için script'in başına template ve style kadar \n koysam
         // satır numarasını tutturabilir miyim?
-
         component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
         component.reactive = false;
       },
       rewriteGet(filename, content, i) {
-        var regex = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
-        var regex2 = /get\(.*,(\s+)?("|')(.*)("|')(\s+)?\)/gm;
+        var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm;
+        var regex2 = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm;
         var blobs = "";
 
         if (!component.files) {
@@ -178,27 +192,32 @@
         }
 
         if (!component.files[i]) {
-          component.files[i] = {};
+          component.files[filename] = {};
         }
 
         let m;
         let mm;
 
         while ((m = regex.exec(content)) !== null) {
+
+          // if (get is multiple)
+
           // This is necessary to avoid infinite loops with zero-width matches
           if (m.index === regex.lastIndex) {
             regex.lastIndex++;
           }
-          var fn = m[3];
+          var fn = m[4].slice(0, -1);
+          console.log(fn);
           var nestedComponentContent = component.editors[fn].getValue();
 
           while ((mm = regex2.exec(content)) !== null) {
-            var nnestedComponentContent = component.editors[mm[3]].getValue();;
-            component.methods.rewriteGet(mm[3], nnestedComponentContent, i + 1);
+            var nnestedComponentContent = component.editors[fn].getValue();;
+            component.methods.rewriteGet(fn, nnestedComponentContent);
           }
         }
-        component.files[i]["content"] = content;
-        component.files[i]["filename"] = filename;
+
+        component.files[filename]["content"] = content;
+        component.files[filename]["filename"] = filename;
         return component.files;
       },
       changeSelectedFile(event) {
@@ -276,6 +295,7 @@
             }, 10);
           })
         }
+        //console.log(component.dom.querySelector('iframe#result').contentWindow.location.href);
       },
     }
   }

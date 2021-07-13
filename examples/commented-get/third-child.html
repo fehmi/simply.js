@@ -1,0 +1,25 @@
+<template>
+  {state.user.name}
+  <h2>{state.volume.level}</h2>
+</template>
+<style>
+</style>
+<script>
+  class {
+    data = {
+
+    };
+    methods = {
+
+    };
+    lifecycle = {
+      afterFirstRender() {
+        console.log(state);
+        setTimeout(() => {
+          state.user.name = "uuuuu";
+          state.volume.level = "70";
+        }, 2000);
+      }
+    }
+  }
+</script>
