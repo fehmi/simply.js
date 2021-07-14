@@ -54,3 +54,5 @@ You can put the files to your server when they are ready. You can use any server
 
 python -m SimpleHTTPServer 8000
 python3 -m http.server 8080
+
+https://www.npmjs.com/package/http-server
