@@ -42,23 +42,57 @@
         <template>
           this is nested
           <nested-oglu></nested-oglu>
+          <multi-one></multi-one>
         </template>
         <script>
           get("nested-oglu.html");
+          get([
+            "multi-one.html",
+            "multi-two.html"
+          ])
         </script>
       </textarea>
       <textarea filename="nested-oglu.html">
         <template>
           this is nested oglu nested
+          <multi-one-one></multi-one-one>
+        </template>
+      </textarea>
+      <textarea filename="multi-one.html">
+        <template>
+          multi one
+          <multi-two></multi-two>
+        </template>
+        <script>
+          get([
+            "multi-one-one.html",
+            "multi-two-two.html"
+          ])
+        </script>
+      </textarea>
+      <textarea filename="multi-two.html">
+        <template>
+          multi two
+        </template>
+      </textarea>
+      <textarea filename="multi-one-one.html">
+        <template>
+          multi one one
+          <multi-two-two></multi-two-two>
+        </template>
+      </textarea>
+      <textarea filename="multi-two-two.html">
+        <template>
+          multi two two
         </template>
       </textarea>
     </section>
-    </repl-component>
+  </repl-component>
 
-    <script src="../simply.js"></script>
-    <script>
-      get("repl-component.html");
-    </script>
+  <script src="../simply.js"></script>
+  <script>
+    get("repl-component.html");
+  </script>
 </body>
 
 </html>

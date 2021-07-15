@@ -18,3 +18,37 @@
   }
 </script>
 ```
+
+## Get multiple components
+
+```html
+<script>
+get([
+  "first-component.html",
+  "second-component.html",
+  "third-component.html"
+])
+</script>
+```
+
+Then you can use component in your template likes.
+
+```html
+<first-component></first-component>
+<second-component></second-component>
+<third-component></third-component>
+```
+
+As you can see filename bofere file extension becomes the tag name. You can also specify custom tag name for your components like this
+
+```html
+<template>
+  <hello-world></hello-world>
+</template>
+
+<script>
+  get("first-component.html", "hello-world");
+</script>
+```
+
+?> Just don't forget to use "-" character in your component's filenames or custom tag names.

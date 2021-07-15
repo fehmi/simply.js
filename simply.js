@@ -184,7 +184,7 @@ function utils() {
       }
     }
     else {
-      console.log(path, name + " array değil");
+      // console.log(path, name + " array değil");
       loadAndParseComponent(path, name, function (component) {
         getSettings(component, function (settings) {
           registerComponent(settings);
@@ -323,7 +323,6 @@ function utils() {
         constructor() {
           // Always call super first in constructor
           super();
-          console.log(template, script);
           if (script !== "") {
 
             var gets = "";
@@ -339,10 +338,7 @@ function utils() {
 
             var m;
             // var importRegex = /(?<!\/\/(\s+)?)get\(.*\)\;/m;
-            var importRegex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm
-
-            // if (get is multiple)
-
+            var importRegex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm
             while ((m = importRegex.exec(gets)) !== null) {
               // This is necessary to avoid infinite loops with zero-width matches
               var component = this;
@@ -472,7 +468,7 @@ function utils() {
                 }
               }
               self.render();
-              console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+              // console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
               if (self.props) {
                 if (parents == "#-props") {
                   self.setAttribute(name, JSON.stringify(self.data.props[name]));

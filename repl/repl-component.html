@@ -136,7 +136,6 @@
     }
     methods = {
       renderResult() {
-        console.log("he");
         var indexContent = component.editors["index.html"].getValue();
         var files = component.methods.rewriteGet("index.html", indexContent);
         var blobs = [];
@@ -146,45 +145,51 @@
 
           for (const filename in element) {
             if (blobs[filename] == undefined) {
-              var content = element["content"];
+              var newContent = element["content"];
 
               let m;
-              var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm;
-              console.log(content);
-              while ((m = regex.exec(content)) !== null) {
+              var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
+
+              while ((m = regex.exec(element["content"])) !== null) {
                 // This is necessary to avoid infinite loops with zero-width matches
                 if (m.index === regex.lastIndex) {
                   regex.lastIndex++;
                 }
-                m[4] = m[4].slice(0, -1);
-                console.log(m[4]);
-                console.log(blobs);
-                var newGet = "get('"+blobs[m[4]].blobUrl+"', '"+m[4]+"');";
-                content = content.replace(m[0], newGet);
 
-                //content = content.replace(m[4], blobs[m[4]].blobUrl);
-                console.log(content);
+                if (m[3].indexOf(",") > -1) { // multi
+                  console.log("hello multi");
+                  var f = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
+                  var fns = f.split(",");
+                  var newGet = "";
+                  for (let i = 0; i < fns.length; i++) {
+                    const element = fns[i];
+                    newGet += "get('" + blobs[element].blobUrl + "', '" + element + "');";
+                  }
+                  newContent = newContent.replace(m[0], newGet);
+                }
+                else {
+                  m[4] = m[4].slice(0, -1);
+                  var newGet = "get('" + blobs[m[4]].blobUrl + "', '" + m[4] + "');";
+                  newContent = newContent.replace(m[0], newGet);
+                }
               }
 
-              var blob = new Blob([content], { type: "text/html; charset=utf-8" });
+              var blob = new Blob([newContent], { type: "text/html; charset=utf-8" });
               var blobUrl = URL.createObjectURL(blob);
-              //content = content.replace(filename, blobUrl);
               blobs[element["filename"]] = {
                 filename: element["filename"],
                 blobUrl: blobUrl,
-                content: content
+                content: newContent
               };
             }
           }
         }
-        // debug için script'in başına template ve style kadar \n koysam
-        // satır numarasını tutturabilir miyim?
         component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
         component.reactive = false;
       },
-      rewriteGet(filename, content, i) {
-        var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm;
-        var regex2 = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)\;/gm;
+      rewriteGet(filename, content) {
+        var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
+        var regex2 = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
         var blobs = "";
 
         if (!component.files) {
@@ -200,19 +205,34 @@
 
         while ((m = regex.exec(content)) !== null) {
 
-          // if (get is multiple)
-
           // This is necessary to avoid infinite loops with zero-width matches
           if (m.index === regex.lastIndex) {
             regex.lastIndex++;
           }
-          var fn = m[4].slice(0, -1);
-          console.log(fn);
-          var nestedComponentContent = component.editors[fn].getValue();
 
-          while ((mm = regex2.exec(content)) !== null) {
-            var nnestedComponentContent = component.editors[fn].getValue();;
-            component.methods.rewriteGet(fn, nnestedComponentContent);
+          if (m[3].indexOf(",") > -1) {
+            console.log("bu multi", m[3]);
+            var f = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
+            var fns = f.split(",");
+            for (let i = 0; i < fns.length; i++) {
+              const fn = fns[i];
+              var nestedComponentContent = component.editors[fn].getValue();
+
+              while ((mm = regex2.exec(content)) !== null) {
+                var nnestedComponentContent = component.editors[fn].getValue();;
+                component.methods.rewriteGet(fn, nnestedComponentContent);
+              }
+            }
+          }
+
+          else {
+            var fn = m[4].slice(0, -1);
+            var nestedComponentContent = component.editors[fn].getValue();
+
+            while ((mm = regex2.exec(content)) !== null) {
+              var nnestedComponentContent = component.editors[fn].getValue();;
+              component.methods.rewriteGet(fn, nnestedComponentContent);
+            }
           }
         }
 
@@ -295,7 +315,6 @@
             }, 10);
           })
         }
-        //console.log(component.dom.querySelector('iframe#result').contentWindow.location.href);
       },
     }
   }
