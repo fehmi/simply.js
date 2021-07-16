@@ -216,6 +216,7 @@ function utils() {
 
         request.onload = function () {
           if (this.status >= 200 && this.status < 400) {
+            var docStr = this.response;
             var txt = document.createElement("textarea");
             var parser = new DOMParser();
             var dom = parser.parseFromString(this.response, "text/html");
@@ -272,7 +273,8 @@ function utils() {
               name,
               template,
               style,
-              script
+              script,
+              docStr
             });
             //console.log(simply.importCompleted[name]);
           } else {
@@ -287,7 +289,7 @@ function utils() {
       }
     }
   }
-  getSettings = function ({ name, template, style, script }, callback) {
+  getSettings = function ({ name, template, style, script, docStr }, callback) {
     //const jsFile = new Blob([script.textContent], { type: 'application/javascript' });
     //const jsURL = URL.createObjectURL(jsFile);
     function getListeners(settings) {
@@ -313,16 +315,18 @@ function utils() {
       template,
       style,
       script,
+      docStr
       //settings
     });
     //});
   }
-  registerComponent = function ({ template, style, name, listeners, script, settings }) {
+  registerComponent = function ({ template, style, name, script, docStr }) {
     if (!customElements.get(name)) {
       class UnityComponent extends HTMLElement {
         constructor() {
           // Always call super first in constructor
           super();
+
           if (script !== "") {
 
             var gets = "";
@@ -347,10 +351,10 @@ function utils() {
               // window.eval.call(window, '(function (component) {' + m[0].replace(")", ", component )") + '})')(component);
             }
 
-            var timelateLines = template.split("\n");
-            var styleLines = style.split("\n");
-            var lineBreaks = "\n";
-            for (let index = 0; index < timelateLines.length + 1 + styleLines.length; index++) {
+            var lines = docStr.split('<script>')[0].split("\n");
+            var lineBreaks = "";
+
+            for (let index = 0; index < lines.length - 2; index++) {
               lineBreaks += "\n"
             }
 
