@@ -1,10 +1,10 @@
-## simply
+## simply.js
 
 > Simple JavaScript toolkit for simple web apps.
 
 ## What it is
 
-simply developed on top of native web components. It provides a single file component concept with a clean syntax. It has built-in template engine coded from scratch. It is plug & play. No need to npm or terminal. Just include the js file to your html and you are ready to go.
+Developed on top of 'Custom Elements API' of the 'Web Components' standard. It provides a single file component concept with a clean syntax. It has built-in super fast 100 lines template engine coded from scratch. It is plug & play. No need to npm or terminal. Just include the js file to your html and you are ready to go.
 
 See the [Quick start](quickstart.md) guide for more details.
 
@@ -15,6 +15,9 @@ See the [Quick start](quickstart.md) guide for more details.
 - 7kb gzipped
 - Reactive
 - Built-in template engine
+- State management
+- Router
+- REPL
 - Compatible with IE9+
 
 ## Examples
