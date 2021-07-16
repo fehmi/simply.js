@@ -1,0 +1,335 @@
+<template>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css" />
+
+  <div id="editor">
+    <ul id="file-tabs">
+      <each data.files as file>
+        <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{ file.filename
+          }</li>
+      </each>
+      <li class="add" onclick="addFile()">+</li>
+    </ul>
+
+    <ul id="files">
+      <slot name="files"></slot>
+    </ul>
+  </div>
+
+  <div id="result">
+    <div id="result-header">
+      Result
+    </div>
+    <iframe id="result"></iframe>
+    <div id="console"></div>
+  </div>
+</template>
+
+<style>
+  :host {
+    display: flex;
+    width: 960px;
+    height: 450px;
+    border: 2px solid #dddddd;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  slot[name=files] {
+    display: none;
+  }
+
+  #editor {
+    display: flex;
+    flex-direction: column;
+    width: 65%;
+  }
+
+  #result {
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid #dddddd;
+  }
+
+  #file-tabs {
+    border-bottom: 2px solid #dddddd;
+    line-height: 35px;
+    overflow: auto;
+  }
+
+  #file-tabs li {
+    position: relative;
+    cursor: pointer;
+    padding: 0px 15px;
+    font-size: 14px;
+    color: #888;
+    white-space: nowrap;
+  }
+
+  #file-tabs .add {
+    font-size: 22px;
+    padding: 0px 10px 0px 5px;
+  }
+
+  #file-tabs li[selected=true] {
+    cursor: default;
+    pointer-events: none;
+    color: #292;
+  }
+
+  #file-tabs li[selected=true]::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background-color: #292;
+    bottom: 0px;
+    left: 0px;
+  }
+
+  #result-header {
+    border-bottom: 2px solid #dddddd;
+    line-height: 35px;
+    font-size: 14px;
+    padding: 0px 15px;
+  }
+
+  #file-tabs,
+  #files {
+    display: flex;
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+  }
+
+  #files {
+    flex: 1;
+    flex-direction: column;
+    height: 100px;
+  }
+
+  .CodeMirror {
+    height: 100%;
+    width: 100%;
+    display: none;
+    line-height: 20px;
+  }
+
+  .CodeMirror[selected=true] {
+    display: block;
+  }
+
+  #files textarea,
+  iframe#result {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+</style>
+
+<script>
+  class {
+    data = {
+      files: []
+    }
+    methods = {
+      renderResult() {
+        var indexContent = component.editors["index.html"].getValue();
+        var files = component.methods.rewriteGet("index.html", indexContent);
+        var blobs = [];
+
+        for (let index = 0; index < Object.keys(files).length; index++) {
+          var file = files[Object.keys(files).reverse()[index]];
+
+          for (const filename in file) {
+            if (blobs[filename] == undefined) {
+              var newContent = file["content"];
+              var m;
+              var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
+
+              while ((m = regex.exec(file["content"])) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === regex.lastIndex) {
+                  regex.lastIndex++;
+                }
+
+                if (m[3].indexOf(",") > -1) { // multi
+                  console.log("hello multi");
+                  var filenames = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
+                  var filenames = filenames.split(",");
+                  var get = m[0];
+                  var newGet = "";
+                  for (let i = 0; i < filenames.length; i++) {
+                    var fn = filenames[i];
+                    newGet += "get('" + blobs[fn].blobUrl + "', '" + fn + "');";
+                  }
+                  newContent = newContent.replace(get, newGet);
+                }
+                else {
+                  var fn = m[4].slice(0, -1);
+                  var get = m[0];
+                  var newGet = "get('" + blobs[fn].blobUrl + "', '" + fn + "');";
+                  newContent = newContent.replace(get, newGet);
+                }
+              }
+
+              var blob = new Blob([newContent], { type: "text/html; charset=utf-8" });
+              var blobUrl = URL.createObjectURL(blob);
+              blobs[file["filename"]] = {
+                filename: file["filename"],
+                blobUrl: blobUrl,
+                content: newContent
+              };
+            }
+          }
+        }
+        if (typeof component.data.props.urlbar !== "undefined") {
+
+          var urlchangeevent = "<script>window.addEventListener('popstate', function (event) {alert(event.state);});<\/script>";
+          blobs["index.html"].content += urlchangeevent;
+          console.log("urlbar koyalım");
+        }
+
+        component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
+        // component.reactive = false;
+      },
+      rewriteGet(filename, content) {
+        var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
+        var regex2 = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
+        var blobs = "";
+
+        if (!component.files) {
+          component.files = [];
+        }
+
+        if (!component.files[i]) {
+          component.files[filename] = {};
+        }
+
+        let m;
+        let mm;
+
+        while ((m = regex.exec(content)) !== null) {
+
+          // This is necessary to avoid infinite loops with zero-width matches
+          if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+          }
+
+          if (m[3].indexOf(",") > -1) {
+            console.log("bu multi", m[3]);
+            var f = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
+            var fns = f.split(",");
+            for (let i = 0; i < fns.length; i++) {
+              const fn = fns[i];
+              var nestedComponentContent = component.editors[fn].getValue();
+
+              while ((mm = regex2.exec(content)) !== null) {
+                var nnestedComponentContent = component.editors[fn].getValue();;
+                component.methods.rewriteGet(fn, nnestedComponentContent);
+              }
+            }
+          }
+
+          else {
+            var fn = m[4].slice(0, -1);
+            var nestedComponentContent = component.editors[fn].getValue();
+
+            while ((mm = regex2.exec(content)) !== null) {
+              var nnestedComponentContent = component.editors[fn].getValue();;
+              component.methods.rewriteGet(fn, nnestedComponentContent);
+            }
+          }
+        }
+
+        component.files[filename]["content"] = content;
+        component.files[filename]["filename"] = filename;
+        return component.files;
+      },
+      changeSelectedFile(event) {
+        var filename = event.target.getAttribute("filename");
+        var filenameSelector = filename.replace(/\./g, "\\.");
+        var targetTab = component.dom.querySelector("#file-tabs li[selected=true]");
+        var tabLink = component.dom.querySelector("#file-tabs li[filename='" + filenameSelector + "']");
+        var targetFile = component.dom.querySelector("#files .CodeMirror[selected=true]");
+        var fileItself = component.dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
+
+        targetTab.setAttribute("selected", false);
+        targetFile.setAttribute("selected", false);
+        tabLink.setAttribute("selected", true);
+        fileItself.setAttribute("selected", true);
+
+        component.editors[filename].refresh();
+      },
+      addFile() {
+        console.log("ekleriz sorun değil");
+      }
+    }
+    lifecycle = {
+      beforeConstruct() {
+
+      },
+      afterFirstRender() {
+        if (typeof CodeMirror == "undefined") {
+          loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/display/autorefresh.min.js,npm/codemirror-formatting@1.0.0/formatting.min.js,npm/jszip@3.1.5/dist/jszip.min.js", function () {
+            var slot = component.dom.querySelector('slot[name=files]');
+            var files = slot.assignedNodes()[0].querySelectorAll("textarea");
+            component.editors = [];
+            for (let index = 0; index < files.length; index++) {
+              var fileEl = files[index];
+              var filename = fileEl.getAttribute("filename");
+              var fileContent = fileEl.value;
+              var isFileSelected = fileEl.hasAttribute("selected");
+              data.files.push({
+                filename: filename,
+                selected: isFileSelected
+              });
+            }
+
+            for (let index = 0; index < files.length; index++) {
+              var textarea = files[index];
+              var filename = files[index].getAttribute("filename");
+              var selected = files[index].hasAttribute("selected");
+              var targetEl = component.dom.querySelector("ul#files");
+
+              // remove unnecessary indents
+              var indent = textarea.value.split('\n').join('').match(/^\s*/)[0].length;
+              var text = textarea.value.trim();
+              var a = new RegExp("^\\s{"+indent+"}", "gm");
+              text = text.replace(a, "");
+
+              component.editors[textarea.getAttribute("filename")] = CodeMirror(function (node) {
+                node.setAttribute("filename", filename);
+                node.setAttribute("selected", selected);
+                targetEl.appendChild(node, targetEl);
+              }, {
+                value: text,
+                autoRefresh: { delay: 0 },
+                lineNumbers: true,
+                smartIndent: true,
+                mode: "htmlmixed",
+                theme: 'default' // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
+              });
+
+
+              component.editors[textarea.getAttribute("filename")].on("change", function () {
+                component.methods.renderResult();
+              });
+            }
+
+            component.methods.renderResult();
+
+            var cmInitCheck = setInterval(() => {
+              var px = parseInt(component.dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
+              if (px > 100) {
+                component.editors["index.html"].refresh();
+              }
+              else {
+                clearInterval(cmInitCheck);
+              }
+            }, 10);
+          })
+        }
+      },
+    }
+  }
+</script>

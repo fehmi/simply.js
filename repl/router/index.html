@@ -1,0 +1,98 @@
+<html>
+
+<head>
+  <title>simply / REPL</title>
+  <meta charset="UTF-8">
+</head>
+
+<body>
+  <repl-component urlbar>
+    <section slot="files" style="display: none">
+      <textarea filename="index.html" selected>
+        <html>
+          <head>
+            <title>simply / REPL</title>
+          </head>
+          <body>
+            <hello-world></hello-world>
+            <how-are-you></how-are-you>
+            <script src="https://root/simply/simply.js"></script>
+            <script>
+              get("hello-world.html");
+              get("how-are-you.html");
+            </script>
+          </body>
+        </html>
+      </textarea>
+      <textarea filename="hello-world.html">
+        <template>
+          hello canım
+        </template>
+      </textarea>
+      <textarea filename="how-are-you.html">
+        <template>
+          how are you?
+          <nested-comp></nested-comp>
+        </template>
+        <script>
+          get("nested-comp.html");
+        </script>
+      </textarea>
+      <textarea filename="nested-comp.html">
+        <template>
+          this is nested
+          <nested-oglu></nested-oglu>
+          <multi-one></multi-one>
+        </template>
+        <script>
+          get("nested-oglu.html");
+          get([
+            "multi-one.html",
+            "multi-two.html"
+          ])
+        </script>
+      </textarea>
+      <textarea filename="nested-oglu.html">
+        <template>
+          this is nested oglu nested
+          <multi-two-two></multi-two-two>
+          <multi-one-one></multi-one-one>
+        </template>
+      </textarea>
+      <textarea filename="multi-one.html">
+        <template>
+          multi one
+          <multi-two></multi-two>
+        </template>
+        <script>
+          get([
+            "multi-one-one.html",
+            "multi-two-two.html"
+          ])
+        </script>
+      </textarea>
+      <textarea filename="multi-two.html">
+        <template>
+          multi two
+        </template>
+      </textarea>
+      <textarea filename="multi-one-one.html">
+        <template>
+          multi one one
+        </template>
+      </textarea>
+      <textarea filename="multi-two-two.html">
+        <template>
+          multi two two
+        </template>
+      </textarea>
+    </section>
+  </repl-component>
+
+  <script src="../simply.js"></script>
+  <script>
+    get("repl-component.html");
+  </script>
+</body>
+
+</html>
