@@ -49,7 +49,16 @@
           get([
             "multi-one.html",
             "multi-two.html"
-          ])
+          ]);
+          class {
+            data = {}
+            lifecycle = {
+
+              afterFirstRender() {
+                console.log("hay");
+              }
+            }
+          }
         </script>
       </textarea>
       <textarea filename="nested-oglu.html">

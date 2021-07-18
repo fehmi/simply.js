@@ -14,84 +14,326 @@
             <title>simply / REPL</title>
           </head>
           <body>
-            <hello-world></hello-world>
-            <how-are-you></how-are-you>
+            <router></router>
+
             <script src="https://root/simply/simply.js"></script>
             <script>
-              get("hello-world.html");
-              get("how-are-you.html");
+              get('hello-world.html');
+              get('user-list.html');
+              get('not-found.html');
+              get('user-profile.html');
+              get('nav-template.html');
+              get('home-view.html');
+              const outlet = document.querySelector('router');
+
+              var router = new Router(outlet, {
+                //baseUrl: "/simply/examples/router/srcdoc/" // https://root/simply/examples/router/ or router or /simply/examples/router/
+                // hooks
+              });
+
+              router.setRoutes([
+                {
+                  path: '/', component: 'nav-template', children: [
+                    {
+                      path: '/', component: 'home-view', action: (context, commands) => {
+                        console.log("action", context, commands);
+                        // return commands.redirect('/');
+                      }
+                    },
+                    { path: '/users', component: 'user-list' },
+                    { path: '/users/:user', component: 'user-profile' },
+                  ]
+                },
+                { path: '(.*)', component: 'not-found' },
+              ]);
+
+              router.hooks = {
+                before: function (router, pathnameOrContext) {
+
+                },
+                after: function (context) {
+                  console.log("hello after");
+                }
+              }
             </script>
           </body>
         </html>
       </textarea>
+
+      <textarea filename="nav-template.html">
+        <template>
+          <a href=".">Home</a>
+          <a href="users">Users</a>
+          <a href="users/kim">Kim</a>
+          <slot></slot>
+        </template>
+        <style>
+          p {
+            background: aquamarine;
+            border-radius: 30px;
+            padding: 20px;
+            font-size: 20px;
+            text-align: center;
+            width: 300px;
+            margin: 0 auto;
+            color: aquamarine;
+            color: "{data.color}";
+          }
+        </style>
+        <script>
+          class {
+            data = {
+            };
+            methods = {
+            };
+          }
+        </script>
+      </textarea>
+
+      <textarea filename="home-view.html">
+        <template>
+          <div class="hello" onclick="bcd()">
+            { data.age * (2) }
+            <p onclick="asd(); event.stopPropagation();">Hello, world! My name is <slot></slot>.</p>
+            <if self.count==0>
+              <h1>hahahha {name}</h1>
+              <h1>joker misin mübarek {name}</h1>
+
+              <else>
+                asdasdasd
+            </if>
+            <if data.name=="deneme">
+              <h1>hahahha {data.name} ddd</h1>
+              <h1>joker misin mübarek {data.name} ddd</h1>
+            </if>
+          </div>
+          <if data.name=="fehmi">
+            <h1>hahahha {data.name}</h1>
+            <h1>joker misin mübarek {data.name}</h1>
+          </if>
+          <each data.personalities as personality, key (index)>
+            <each data.personalities as p, key (index)>
+              <if p=="Calm">
+                <h1>hay yaşa calm</h1>
+              </if>
+              {p}
+              {data.name}
+              <each data.hobbies as hobby, key (index)>
+                <each data.hobbies as hobbie, key (index)>
+                  <li>{key}:{hobbie}:{index}</li>
+                </each>
+                <li>{hobby}{key}{index}</li>
+              </each>
+            </each>
+            {key}{index}
+          </each>
+
+        </template>
+        <style>
+          p {
+            background: aquamarine;
+            border-radius: 30px;
+            padding: 20px;
+            font-size: 20px;
+            text-align: center;
+            width: 300px;
+            margin: 0 auto;
+            color: aquamarine;
+            color: "{data.color}";
+          }
+        </style>
+        <script>
+          class {
+            data = {
+              name: "fehmi",
+              age: 37,
+              personalities: ["Calm", "Creative", "Passionate"],
+              hobbies: {
+                "Music Producing": "Kırk yılda bir",
+                Gaming: "Aydı yılda bir",
+                Sports: "Meeeh",
+              },
+              color: "blue"
+            };
+            methods = {
+              asd(e) {
+                alert("asd function called");
+                console.log(event);
+              },
+              bcd() {
+                alert("bcd")
+              }
+            };
+          }
+        </script>
+      </textarea>
+
+      <textarea filename="user-list.html">
+        <template>
+          hello users
+          <a href="users/kim">kİmkifduk</a>
+          <slot></slot>
+          </template>
+          <style>
+            p {
+              background: aquamarine;
+              border-radius: 30px;
+              padding: 20px;
+              font-size: 20px;
+              text-align: center;
+              width: 300px;
+              margin: 0 auto;
+              color: aquamarine;
+              color: "{data.color}";
+            }
+          </style>
+          <script>
+            class {
+              data = {
+              };
+              methods = {
+              };
+            }
+          </script>
+      </textarea>
+
+      <textarea filename="user-profile.html">
+        <template>
+          bunu yükle beeeeabi
+          </template>
+          <style>
+            p {
+              background: aquamarine;
+              border-radius: 30px;
+              padding: 20px;
+              font-size: 20px;
+              text-align: center;
+              width: 300px;
+              margin: 0 auto;
+              color: aquamarine;
+              color: "{data.color}";
+            }
+          </style>
+          <script>
+            class {
+              data = {
+              };
+              methods = {
+              };
+            }
+          </script>
+      </textarea>
+
+      <textarea filename="not-found.html">
+        <template>
+          404
+          </template>
+          <style>
+            p {
+              background: aquamarine;
+              border-radius: 30px;
+              padding: 20px;
+              font-size: 20px;
+              text-align: center;
+              width: 300px;
+              margin: 0 auto;
+              color: aquamarine;
+              color: "{data.color}";
+            }
+          </style>
+          <script>
+            class {
+              data = {
+              };
+              methods = {
+              };
+            }
+          </script>
+      </textarea>
+
       <textarea filename="hello-world.html">
         <template>
-          hello canım
+          <div class="hello" onclick="bcd()">
+            { data.age * (2) }
+            <p onclick="asd(); event.stopPropagation();">Hello, world! My name is <slot></slot>.</p>
+            <if self.count==0>
+              <h1>hahahha {name}</h1>
+              <h1>joker misin mübarek {name}</h1>
+
+              <else>
+                asdasdasd
+            </if>
+            <if data.name=="deneme">
+              <h1>hahahha {data.name} ddd</h1>
+              <h1>joker misin mübarek {data.name} ddd</h1>
+            </if>
+          </div>
+          <if data.name=="fehmi">
+            <h1>hahahha {data.name}</h1>
+            <h1>joker misin mübarek {data.name}</h1>
+          </if>
+          <each data.personalities as personality, key (index)>
+            <each data.personalities as p, key (index)>
+              <if p=="Calm">
+                <h1>hay yaşa calm</h1>
+              </if>
+              {p}
+              {data.name}
+              <each data.hobbies as hobby, key (index)>
+                <each data.hobbies as hobbie, key (index)>
+                  <li>{key}:{hobbie}:{index}</li>
+                </each>
+                <li>{hobby}{key}{index}</li>
+              </each>
+            </each>
+            {key}{index}
+          </each>
+
         </template>
-      </textarea>
-      <textarea filename="how-are-you.html">
-        <template>
-          how are you?
-          <nested-comp></nested-comp>
-        </template>
+        <style>
+          p {
+            background: aquamarine;
+            border-radius: 30px;
+            padding: 20px;
+            font-size: 20px;
+            text-align: center;
+            width: 300px;
+            margin: 0 auto;
+            color: aquamarine;
+            color: "{data.color}";
+          }
+        </style>
         <script>
-          get("nested-comp.html");
+          class {
+            data = {
+              name: "fehmi",
+              age: 37,
+              personalities: ["Calm", "Creative", "Passionate"],
+              hobbies: {
+                "Music Producing": "Kırk yılda bir",
+                Gaming: "Aydı yılda bir",
+                Sports: "Meeeh",
+              },
+              color: "blue"
+            };
+            methods = {
+              asd(e) {
+                alert("asd function called");
+                console.log(event);
+              },
+              bcd() {
+                alert("bcd")
+              }
+            };
+          }
         </script>
-      </textarea>
-      <textarea filename="nested-comp.html">
-        <template>
-          this is nested
-          <nested-oglu></nested-oglu>
-          <multi-one></multi-one>
-        </template>
-        <script>
-          get("nested-oglu.html");
-          get([
-            "multi-one.html",
-            "multi-two.html"
-          ])
-        </script>
-      </textarea>
-      <textarea filename="nested-oglu.html">
-        <template>
-          this is nested oglu nested
-          <multi-two-two></multi-two-two>
-          <multi-one-one></multi-one-one>
-        </template>
-      </textarea>
-      <textarea filename="multi-one.html">
-        <template>
-          multi one
-          <multi-two></multi-two>
-        </template>
-        <script>
-          get([
-            "multi-one-one.html",
-            "multi-two-two.html"
-          ])
-        </script>
-      </textarea>
-      <textarea filename="multi-two.html">
-        <template>
-          multi two
-        </template>
-      </textarea>
-      <textarea filename="multi-one-one.html">
-        <template>
-          multi one one
-        </template>
-      </textarea>
-      <textarea filename="multi-two-two.html">
-        <template>
-          multi two two
-        </template>
       </textarea>
     </section>
   </repl-component>
 
-  <script src="../simply.js"></script>
+  <script src="../../simply.js"></script>
   <script>
-    get("repl-component.html");
+    get("../repl-component.html");
   </script>
 </body>
 

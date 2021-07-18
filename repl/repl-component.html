@@ -10,7 +10,7 @@
       <li class="add" onclick="addFile()">+</li>
     </ul>
 
-    <ul id="files">
+    <ul id="files" passive>
       <slot name="files"></slot>
     </ul>
   </div>
@@ -19,7 +19,13 @@
     <div id="result-header">
       Result
     </div>
-    <iframe id="result"></iframe>
+    <div id="addressbar">
+      {data.urlHistory.length} - {data.currentUrlIndex}
+      <button {(data.currentUrlIndex < 2) ? "disabled" : ""}>Back</button>
+      <button disabled>Next</button>
+      <input type="text" value="{data.url}" id="url" onchange="changeURL(event)">
+    </div>
+    <iframe id="result" name="result"></iframe>
     <div id="console"></div>
   </div>
 </template>
@@ -124,12 +130,23 @@
     height: 100%;
     border: none;
   }
+
+  div#addressbar {
+    background-color: #f2f3f7;
+    border-bottom: 1px solid #ced0dd;
+    padding: 10px 10px;
+  }
 </style>
 
 <script>
   class {
     data = {
-      files: []
+      files: [],
+      url: "/",
+      urlHistory: [
+        "/"
+      ],
+      currentUrlIndex: 1
     }
     methods = {
       renderResult() {
@@ -182,20 +199,26 @@
             }
           }
         }
-        if (typeof component.data.props.urlbar !== "undefined") {
+        var runInResult = "<script>function " + component.methods.runInResult.toString() + "runInResult();<\/script>";
+        blobs["index.html"].content += runInResult;
 
-          var urlchangeevent = "<script>window.addEventListener('popstate', function (event) {alert(event.state);});<\/script>";
-          blobs["index.html"].content += urlchangeevent;
-          console.log("urlbar koyalım");
-        }
+        // component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
+        // component.dom.querySelector("iframe").src = blobs["index.html"].blobUrl;
+        component.dom.querySelector("iframe").contentWindow.document.write(blobs["index.html"].content);
 
-        component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
+        // add base for make router work
+        var base = document.createElement('base');
+        base.href = document.location.href;
+        component.dom.querySelector("iframe").contentWindow.document.querySelector("head").appendChild(base);
+
         // component.reactive = false;
       },
       rewriteGet(filename, content) {
         var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
         var regex2 = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
         var blobs = "";
+        let m;
+        let mm;
 
         if (!component.files) {
           component.files = [];
@@ -204,9 +227,6 @@
         if (!component.files[i]) {
           component.files[filename] = {};
         }
-
-        let m;
-        let mm;
 
         while ((m = regex.exec(content)) !== null) {
 
@@ -262,6 +282,25 @@
       },
       addFile() {
         console.log("ekleriz sorun değil");
+      },
+      runInResult() {
+        window.addEventListener('message', (event) => {
+          console.log(`Received message from parent: ${event.data}`);
+          window.frameElement.contentWindow.Router.go(event.data);
+        });
+
+        window.addEventListener('popstate', function (event) {
+          window.parent.postMessage({
+            action: "urlChange",
+            url: "/" + router.location.pathname
+          }, event);
+        });
+      },
+      changeURL(event) {
+        var result = component.dom.querySelector("iframe#result").contentWindow;
+        var url = event.target.value;
+        event.target.blur();
+        result.postMessage(document.location.pathname + url.replace(/^\//, ''));
       }
     }
     lifecycle = {
@@ -269,6 +308,16 @@
 
       },
       afterFirstRender() {
+        // listen messages from child
+        window.addEventListener('message', (event) => {
+          if (event.data.action == "urlChange") {
+            data.url = event.data.url.replace(document.location.pathname, "");
+            data.urlHistory.push(data.url);
+            data.currentUrlIndex += 1;
+            console.log(data.urlHistory);
+          }
+        });
+
         if (typeof CodeMirror == "undefined") {
           loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/display/autorefresh.min.js,npm/codemirror-formatting@1.0.0/formatting.min.js,npm/jszip@3.1.5/dist/jszip.min.js", function () {
             var slot = component.dom.querySelector('slot[name=files]');
@@ -294,7 +343,7 @@
               // remove unnecessary indents
               var indent = textarea.value.split('\n').join('').match(/^\s*/)[0].length;
               var text = textarea.value.trim();
-              var a = new RegExp("^\\s{"+indent+"}", "gm");
+              var a = new RegExp("^\\s{" + indent + "}", "gm");
               text = text.replace(a, "");
 
               component.editors[textarea.getAttribute("filename")] = CodeMirror(function (node) {

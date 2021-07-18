@@ -19,7 +19,8 @@ window.simply = {
     let elseStatement = /\<(\s+)?else(\s+)?\>$/;
     let eachStatement = /\<(\s+)?each(\s+)?(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?(\s+)?\>$/;
     let endEachStatement = /\<(\s+)?\/(\s+)?each(\s+)?\>/;
-    let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
+    // let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
+    let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)\<\>\=\:\?\;\(\)\"]+)(\s+)?}$/;
 
     let ifCount = 0;
     let eachCount = 0;
@@ -97,7 +98,8 @@ window.simply = {
         let logicLine = capturedLogics[capturedLogics.length - 1];
         let staticText = processedLetters.replace(logicLine, "");
         let replaceThis = staticText + logicLine;
-        var withThis = "ht+=`" + staticText.trim().replace(/\n/g, "") + "`;" + logic;
+        var withThis = "ht+=`" + staticText.replace(/\n/g, "") + "`;" + logic;
+
         bucket = bucket.replace(replaceThis, withThis);
         processedLetters = "";
       }
@@ -556,13 +558,15 @@ function utils() {
             //console.log(this.dom, newDom);
             morphdom(this.dom, newDom, {
               childrenOnly: true,
-              onBeforeElChildrenUpdated: function (fromEl) {
-                // console.log(fromEl.tagName);
+              onBeforeElChildrenUpdated: function (fromEl, toEl) {
                 if (fromEl.tagName == "CHILD-COMPONENT") {
                   console.log("dont again");
                 }
 
-                //console.log(toEl);
+                if (toEl.hasAttribute("passive") === true) {
+                  return false;
+                }
+
               }
             });
             if (typeof this.lifecycle !== "undefined") {
@@ -908,7 +912,7 @@ function utils() {
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
-      (global = global || self, factory(global.simply = global.simply || {}));
+      (global = global || self, factory(global.window = global.window || {}));
 }(this, function (exports) {
   'use strict';
 
@@ -2877,7 +2881,7 @@ function utils() {
                   router: _this2,
                   location: _this2.location
                 });
-
+                console.log(context, _this2, _this2.location);
                 if (shouldUpdateHistory) {
                   _this2.__updateBrowserHistory(context, context.redirectFrom);
                 }
@@ -2955,6 +2959,7 @@ function utils() {
                   var matchedPath = getPathnameForRouter(getMatchedPath(contextAfterRedirects.chain), contextAfterRedirects.resolver);
 
                   if (matchedPath !== contextAfterRedirects.pathname) {
+                    //console.log(contextAfterRedirects);
                     throw getNotFoundError(topOfTheChainContextAfterRedirects);
                   }
                 }
@@ -3101,8 +3106,17 @@ function utils() {
             _ref2$hash = _ref2.hash,
             hash = _ref2$hash === void 0 ? '' : _ref2$hash;
 
+
+
           if (window.location.pathname !== pathname || window.location.search !== search || window.location.hash !== hash) {
             var changeState = replace ? 'replaceState' : 'pushState';
+
+            if (window.frameElement.hasAttribute("name")) {
+              if (window.frameElement.getAttribute("name") == "result") {
+                changeState = "replaceState";
+              }
+            }
+
             window.history[changeState](null, document.title, pathname + search + hash);
             window.dispatchEvent(new PopStateEvent('popstate', {
               state: 'router-ignore'

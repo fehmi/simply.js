@@ -45,9 +45,9 @@
     router.hooks = {
       before: function (router, pathnameOrContext) {
         console.log("selam before", pathnameOrContext.pathname);
-        if (pathnameOrContext.pathname == "/simply/examples/router/nested/users") {
-          return false;
-        }
+        //if (pathnameOrContext.pathname == "/simply/examples/router/nested/users") {
+        //  return false;
+        //}
       },
       after: function (context) {
         console.log("hello after");
