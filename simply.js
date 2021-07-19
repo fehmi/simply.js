@@ -20,7 +20,7 @@ window.simply = {
     let eachStatement = /\<(\s+)?each(\s+)?(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?(\s+)?\>$/;
     let endEachStatement = /\<(\s+)?\/(\s+)?each(\s+)?\>/;
     // let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
-    let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)\<\>\=\:\?\;\(\)\"]+)(\s+)?}$/;
+    let variable = /(\{)([^{}\n]*)\}$/;
 
     let ifCount = 0;
     let eachCount = 0;
@@ -87,6 +87,7 @@ window.simply = {
         //
 
         else if ((logic = endEachStatement.exec(bucket)) !== null) {
+
           eachCount -= 1;
           logic = "};";
         }
@@ -2881,7 +2882,7 @@ function utils() {
                   router: _this2,
                   location: _this2.location
                 });
-                console.log(context, _this2, _this2.location);
+
                 if (shouldUpdateHistory) {
                   _this2.__updateBrowserHistory(context, context.redirectFrom);
                 }

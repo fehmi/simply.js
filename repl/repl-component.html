@@ -4,8 +4,8 @@
   <div id="editor">
     <ul id="file-tabs">
       <each data.files as file>
-        <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{ file.filename
-          }</li>
+        <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">{file.filename}
+        </li>
       </each>
       <li class="add" onclick="addFile()">+</li>
     </ul>
@@ -20,9 +20,10 @@
       Result
     </div>
     <div id="addressbar">
-      {data.urlHistory.length} - {data.currentUrlIndex}
-      <button {(data.currentUrlIndex < 2) ? "disabled" : ""}>Back</button>
-      <button disabled>Next</button>
+      <!-- {data.urlHistory.length} - {data.currentUrlIndex} -->
+      <button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="goBack(event);"></button>
+      <button {(data.currentUrlIndex> data.urlHistory.length - 1) ? "disabled" : ""}
+        onclick="goNext(event);"></button>
       <input type="text" value="{data.url}" id="url" onchange="changeURL(event)">
     </div>
     <iframe id="result" name="result"></iframe>
@@ -131,10 +132,56 @@
     border: none;
   }
 
+  #addressbar {
+    display: flex;
+    align-items: center;
+  }
+
+  #addressbar button {
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 17px;
+    height: 17px;
+    border: none;
+    cursor: pointer;
+  }
+
+  #addressbar button:disabled {
+    opacity: .4;
+    cursor: default;
+  }
+
+  #addressbar button:nth-child(1) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ctitle%3Eicon-arrow-left%3C/title%3E%3Cpolyline points='20.6 8 5.62 24.1 20.6 40.2' fill='none' stroke='%23686f75' stroke-linecap='round' stroke-miterlimit='10' stroke-width='6'%3E%3C/polyline%3E%3Cline x1='7.53' y1='24.1' x2='42.33' y2='24.1' fill='none' stroke='%23686f75' stroke-linecap='round' stroke-miterlimit='10' stroke-width='6'%3E%3C/line%3E%3C/svg%3E");
+    margin-right: 10px;
+  }
+
+  #addressbar button:nth-child(2) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ctitle%3Eicon-arrow-right%3C/title%3E%3Cpolyline points='27.35 40.2 42.33 24.1 27.35 8' fill='none' stroke='%23686f75' stroke-linecap='round' stroke-miterlimit='10' stroke-width='6'%3E%3C/polyline%3E%3Cline x1='40.42' y1='24.1' x2='5.62' y2='24.1' fill='none' stroke='%23686f75' stroke-linecap='round' stroke-miterlimit='10' stroke-width='6'%3E%3C/line%3E%3C/svg%3E");
+  }
+
   div#addressbar {
     background-color: #f2f3f7;
     border-bottom: 1px solid #ced0dd;
     padding: 10px 10px;
+  }
+
+  input#url {
+    flex: 1;
+    border-radius: 3px;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #ced0dd;
+    padding: 0px 10px;
+    line-height: 26px;
+    font-size: 14px;
+    margin-left: 10px;
+    transition: all ease-in .1s;
+  }
+
+  input#url:focus {
+    border: 1px solid #9ec5ef;
+    box-shadow: 0 2px 8px 0 rgb(0 0 0 / 8%);
   }
 </style>
 
@@ -170,13 +217,12 @@
                 }
 
                 if (m[3].indexOf(",") > -1) { // multi
-                  console.log("hello multi");
                   var filenames = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
                   var filenames = filenames.split(",");
                   var get = m[0];
                   var newGet = "";
                   for (let i = 0; i < filenames.length; i++) {
-                    var fn = filenames[i];
+                    var fn = filenames[i].replace(/\'\"/g, '');;
                     newGet += "get('" + blobs[fn].blobUrl + "', '" + fn + "');";
                   }
                   newContent = newContent.replace(get, newGet);
@@ -200,18 +246,23 @@
           }
         }
         var runInResult = "<script>function " + component.methods.runInResult.toString() + "runInResult();<\/script>";
-        blobs["index.html"].content += runInResult;
+        var base = "<head><base href=" + document.location.href + ">";
+        blobs["index.html"].content = blobs["index.html"].content.replace("<head>", base) + runInResult;
 
-        // component.dom.querySelector("iframe").srcdoc = blobs["index.html"].content;
-        // component.dom.querySelector("iframe").src = blobs["index.html"].blobUrl;
-        component.dom.querySelector("iframe").contentWindow.document.write(blobs["index.html"].content);
+        component.dom.querySelector("iframe").setAttribute("srcdoc", "");
+        // component.dom.querySelector("iframe").setAttribute("src", "about:blank");
 
-        // add base for make router work
-        var base = document.createElement('base');
-        base.href = document.location.href;
-        component.dom.querySelector("iframe").contentWindow.document.querySelector("head").appendChild(base);
+        component.dom.querySelector("iframe").addEventListener("load", function bas() {
+          console.log("load");
+          component.dom.querySelector("iframe").removeEventListener("load", bas);
+          //component.dom.querySelector("iframe").removeAttribute("src");
+          component.dom.querySelector("iframe").contentWindow.document.write(blobs["index.html"].content);
+          // rever url
+          data.urlHistory = [data.urlHistory[0]];
+          data.url = data.urlHistory[0];
+          data.currentUrlIndex = 1;
+        });
 
-        // component.reactive = false;
       },
       rewriteGet(filename, content) {
         var regex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm;
@@ -236,11 +287,11 @@
           }
 
           if (m[3].indexOf(",") > -1) {
-            console.log("bu multi", m[3]);
+
             var f = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
             var fns = f.split(",");
             for (let i = 0; i < fns.length; i++) {
-              const fn = fns[i];
+              const fn = fns[i].replace(/\'\"/g, '');
               var nestedComponentContent = component.editors[fn].getValue();
 
               while ((mm = regex2.exec(content)) !== null) {
@@ -298,9 +349,24 @@
       },
       changeURL(event) {
         var result = component.dom.querySelector("iframe#result").contentWindow;
-        var url = event.target.value;
-        event.target.blur();
+        if (event.target) {
+          var url = event.target.value;
+          event.target.blur();
+        }
+        else {
+          var url = event;
+        }
         result.postMessage(document.location.pathname + url.replace(/^\//, ''));
+      },
+      goBack(event) {
+        data.currentUrlIndex -= 1;
+        var url = data.urlHistory[data.currentUrlIndex - 1];
+        component.methods.changeURL(url);
+      },
+      goNext(event) {
+        data.currentUrlIndex += 1;
+        var url = data.urlHistory[data.currentUrlIndex - 1];
+        component.methods.changeURL(url);
       }
     }
     lifecycle = {
@@ -312,9 +378,11 @@
         window.addEventListener('message', (event) => {
           if (event.data.action == "urlChange") {
             data.url = event.data.url.replace(document.location.pathname, "");
-            data.urlHistory.push(data.url);
-            data.currentUrlIndex += 1;
-            console.log(data.urlHistory);
+            if (data.url !== data.urlHistory[data.currentUrlIndex - 1]) {
+              data.urlHistory = data.urlHistory.slice(0, data.currentUrlIndex);
+              data.urlHistory.push(data.url);
+              data.currentUrlIndex += 1;
+            };
           }
         });
 

@@ -18,13 +18,14 @@
 
             <script src="https://root/simply/simply.js"></script>
             <script>
-              get('hello-world.html');
-              get('user-list.html');
-              get('not-found.html');
-              get('user-profile.html');
-              get('nav-template.html');
-              get('home-view.html');
-              const outlet = document.querySelector('router');
+      get(["hello-world.html",
+      "user-list.html",
+      "not-found.html",
+      "user-profile.html",
+      "nav-template.html",
+      "home-view.html"
+      ]);
+              var outlet = document.querySelector('router');
 
               var router = new Router(outlet, {
                 //baseUrl: "/simply/examples/router/srcdoc/" // https://root/simply/examples/router/ or router or /simply/examples/router/
@@ -36,7 +37,7 @@
                   path: '/', component: 'nav-template', children: [
                     {
                       path: '/', component: 'home-view', action: (context, commands) => {
-                        console.log("action", context, commands);
+                        // console.log("action", context, commands);
                         // return commands.redirect('/');
                       }
                     },
@@ -52,7 +53,6 @@
 
                 },
                 after: function (context) {
-                  console.log("hello after");
                 }
               }
             </script>
@@ -331,7 +331,7 @@
     </section>
   </repl-component>
 
-  <script src="../../simply.js"></script>
+  <script src="https://root/simply/simply.js"></script>
   <script>
     get("../repl-component.html");
   </script>
