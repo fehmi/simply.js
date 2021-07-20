@@ -86,6 +86,13 @@
             };
             methods = {
             };
+            lifecycle = {
+              afterFirstRender() {
+                setTimeout(() => {
+                  console.error("asdasdasd");
+                }, 1000);
+              }
+            }
           }
         </script>
       </textarea>
