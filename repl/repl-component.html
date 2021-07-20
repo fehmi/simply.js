@@ -60,23 +60,26 @@
   #file-tabs {
     /* border-bottom: 2px solid #dddddd; */
     line-height: 35px;
-    overflow: auto;
+    overflow: overlay;
   }
 
   #file-tabs::-webkit-scrollbar,
-  .CodeMirror-vscrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  .CodeMirror-vscrollbar::-webkit-scrollbar,
+  .CodeMirror-hscrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
   }
 
   #file-tabs::-webkit-scrollbar-track,
-  .CodeMirror-vscrollbar::-webkit-scrollbar-track {
+  .CodeMirror-vscrollbar::-webkit-scrollbar-track,
+  .CodeMirror-hscrollbar::-webkit-scrollbar-track   {
     background:transparent;
 
   }
 
   #file-tabs::-webkit-scrollbar-thumb,
-  .CodeMirror-vscrollbar::-webkit-scrollbar-thumb {
+  .CodeMirror-vscrollbar::-webkit-scrollbar-thumb,
+  .CodeMirror-hscrollbar::-webkit-scrollbar-thumb{
     background: #666;
   }
 
@@ -85,7 +88,7 @@
   }
 
   #file-tabs:hover::-webkit-scrollbar-thumb {
-    background: rgb(223, 223, 223);
+    background: rgb(206, 206, 206);
   }
 
   #file-tabs li {
