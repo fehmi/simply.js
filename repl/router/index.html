@@ -18,25 +18,25 @@
 
             <script src="https://root/simply/simply.js"></script>
             <script>
-      get(["hello-world.html",
-      "user-list.html",
-      "not-found.html",
-      "user-profile.html",
-      "nav-template.html",
-      "home-view.html"
-      ]);
+              get(["hello-world.html",
+                "user-list.html",
+                "not-found.html",
+                "user-profile.html",
+                "nav-template.html",
+                "home-view.html"
+              ]);
               var outlet = document.querySelector('router');
 
               var router = new Router(outlet, {
-                //baseUrl: "/simply/examples/router/srcdoc/" // https://root/simply/examples/router/ or router or /simply/examples/router/
-                // hooks
               });
 
               router.setRoutes([
                 {
                   path: '/', component: 'nav-template', children: [
                     {
-                      path: '/', component: 'home-view', action: (context, commands) => {
+                      path: '/',
+                      component: 'home-view',
+                      action: (context, commands) => {
                         // console.log("action", context, commands);
                         // return commands.redirect('/');
                       }
