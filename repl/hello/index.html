@@ -1,0 +1,53 @@
+<html>
+
+<head>
+  <title>simply / REPL</title>
+  <meta charset="UTF-8">
+</head>
+
+<body>
+  <repl-component urlbar>
+    <section slot="files" style="display: none">
+      <textarea filename="index.html" selected>
+        <html>
+          <head>
+            <title>simply / REPL</title>
+          </head>
+          <body>
+            <hello-world></hello-world>
+
+            <script src="https://root/simply/simply.js"></script>
+            <script>
+              get("hello-world.html");
+            </script>
+          </body>
+        </html>
+      </textarea>
+
+      <textarea filename="hello-world.html">
+        <template>
+          Hello world. Greetings from { data.name }
+        </template>
+        <script>
+          class {
+            data = {
+              name: "simply.js"
+            }
+            lifecycle = {
+              afterFirstRender() {
+                console.log("mounted");
+              }
+            }
+          }
+        </script>
+      </textarea>
+    </section>
+  </repl-component>
+
+  <script src="https://root/simply/simply.js"></script>
+  <script>
+    get("../repl-component.html");
+  </script>
+</body>
+
+</html>

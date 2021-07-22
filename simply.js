@@ -362,7 +362,7 @@ function utils() {
             }
 
             if (script.trim().indexOf("class") == 0) {
-              this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "");
+              this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "//@ sourceURL="+name+".html");
               this.lifecycle = this.componentClass.lifecycle;
               if (typeof this.lifecycle !== "undefined") {
                 if (typeof this.lifecycle.beforeConstruct !== "undefined") {

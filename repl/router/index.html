@@ -53,6 +53,7 @@
 
                 },
                 after: function (context) {
+                  console.log("after");
                 }
               }
             </script>
@@ -89,7 +90,8 @@
             lifecycle = {
               afterFirstRender() {
                 setTimeout(() => {
-                  console.error("asdasdasd");
+                  console.warn("test");
+                  asdasdasd
                 }, 1000);
               }
             }
