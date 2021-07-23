@@ -4,13 +4,13 @@
     <if data.props.title>
       <div class="inputContainer">
         <input class="title" value="{ data.props.title}" readonly onclick="titleFocus(event);"
-          oninput="titleInput(event);" onchange="titleRename(event);"  onblur="titleRename(event);">
+          oninput="titleInput(event);" onchange="titleRename(event);" onblur="titleRename(event);">
         <div class="ghost-input">{ data.props.title}</div>
       </div>
     </if>
     <div class="buttons">
       <if data.props.download==true>
-        <button>Download</button>
+        <button onclick="download()">Download</button>
       </if>
       <if data.props.save==true>
         <button>Save</button>
@@ -400,7 +400,7 @@
     margin-top: -9px;
   }
 
-  input.title + .ghost-input {
+  input.title+.ghost-input {
     font-size: 16px;
     z-index: 0;
     opacity: 0;
@@ -546,7 +546,8 @@
     }
     methods = {
       renderResult() {
-        component.dom.querySelector("iframe").setAttribute("srcdoc", "");
+
+
         var indexContent = component.editors["index.html"].getValue();
         var files = component.methods.rewriteGet("index.html", indexContent);
         var blobs = [];
@@ -599,7 +600,7 @@
         blobs["index.html"].content = blobs["index.html"].content.replace("<head>", base) + runInResult;
 
         // component.dom.querySelector("iframe").setAttribute("src", "about:blank");
-
+        component.dom.querySelector("iframe").setAttribute("srcdoc", "");
         component.dom.querySelector("iframe").addEventListener("load", function bas() {
           console.log("load");
           component.dom.querySelector("iframe").removeEventListener("load", bas);
@@ -641,7 +642,6 @@
             var fns = f.split(",");
             for (let i = 0; i < fns.length; i++) {
               const fn = fns[i].replace(/\'\"/g, '');
-              console.log(fn);
               var nestedComponentContent = component.editors[fn].getValue();
 
               while ((mm = regex2.exec(content)) !== null) {
@@ -1102,9 +1102,15 @@
           theme: 'default', // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
           styleActiveLine: true,
         });
-
+        var render;
         component.editors[filename].on("changes", function (a, b, c, d) {
-          component.methods.renderResult();
+          try {
+            clearTimeout(render);
+          } catch (error) {}
+          render = setTimeout(function () {
+            component.methods.renderResult();
+          }, 250); // How long do you want the delay to be (in milliseconds)?
+
         });
 
         var currentHandle = null, currentLine;
@@ -1151,6 +1157,23 @@
         }
 
         console.log("yeah");
+      },
+      download() {
+        console.log(component.editors);
+        var zip = new JSZip();
+        //zip.file("Hello.txt", "Hello World\n");
+        //var img = zip.folder("images");
+        //img.file("smile.gif", imgData, { base64: true });
+        for (let i = 0; i < data.files.length; i++) {
+          var filename = data.files[i].filename;
+          var editor = component.editors[filename];
+          var content = editor.getValue();
+          zip.file(filename, content);
+        }
+        zip.generateAsync({ type: "blob" }).then(function (content) {
+          // see FileSaver.js
+          saveAs(content, data.props.title + ".zip");
+        });
       }
     }
     lifecycle = {
@@ -1194,7 +1217,7 @@
         });
 
         if (typeof CodeMirror == "undefined") {
-          loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/display/autorefresh.min.js,npm/codemirror-formatting@1.0.0/formatting.min.js,npm/jszip@3.1.5/dist/jszip.min.js", function () {
+          loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/display/autorefresh.min.js,npm/codemirror-formatting@1.0.0/formatting.min.js,npm/jszip@3.1.5/dist/jszip.min.js,npm/filesaver.js@1.3.4/FileSaver.min.js", function () {
             var slot = component.dom.querySelector('slot[name=files]');
             var files = slot.assignedNodes()[0].querySelectorAll("textarea");
             component.editors = [];
