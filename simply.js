@@ -331,13 +331,12 @@ function utils() {
           super();
 
           if (script !== "") {
-
             var gets = "";
             // class ile üst tarafı (getler) ayıralım
-            if (script.indexOf("class") > -1) {
-              var scriptParts = script.split("class");
+            if (script.indexOf("class {") > -1) {
+              var scriptParts = script.split("class {");
               gets = scriptParts[0];
-              script = "class " + scriptParts[1];
+              script = "class {" + scriptParts[1];
             }
             else {
               gets = script;
@@ -361,7 +360,7 @@ function utils() {
               lineBreaks += "\n"
             }
 
-            if (script.trim().indexOf("class") == 0) {
+            if (script.trim().indexOf("class {") == 0) {
               this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "//@ sourceURL="+name+".html");
               this.lifecycle = this.componentClass.lifecycle;
               if (typeof this.lifecycle !== "undefined") {
@@ -374,7 +373,10 @@ function utils() {
               var component = this;
               var state;
               var data = this.componentClass.data;
-              data.props = {};
+              if (data) {
+                data.props = {};
+              }
+
               this.methods = this.componentClass.methods;
               this.watch = this.componentClass.watch;
               this.component = this;
@@ -504,7 +506,7 @@ function utils() {
 
         render() {
           let m;
-          let regex = /\s+on[a-z]+\=(\"|\')(.+)(\"|\')/gm;
+          let regex = /\s+on[a-z]+\=(\"|\')([^}"\n]*)(\"|\')/gm;
           while ((m = regex.exec(template)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === regex.lastIndex) {
@@ -518,6 +520,7 @@ function utils() {
           }
 
           if (!this.rendered) {
+
             let parsedTemplate = simply.parseTemplate(template, this.data, this.state);
             if (style !== "") {
               let parsedStyle = simply.parseStyle(style, this.data);
@@ -555,7 +558,6 @@ function utils() {
             let parsedStyle = simply.parseStyle(style, this.data);
 
             newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
-
             //console.log(this.dom, newDom);
             morphdom(this.dom, newDom, {
               childrenOnly: true,

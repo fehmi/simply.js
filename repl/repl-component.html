@@ -1,11 +1,38 @@
 <template>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css" />
+  <header>
+    <if data.props.title>
+      <div class="inputContainer">
+        <input class="title" value="{ data.props.title}" readonly onclick="titleFocus(event);"
+          oninput="titleInput(event);" onchange="titleRename(event);"  onblur="titleRename(event);">
+        <div class="ghost-input">{ data.props.title}</div>
+      </div>
+    </if>
+    <div class="buttons">
+      <if data.props.download==true>
+        <button>Download</button>
+      </if>
+      <if data.props.save==true>
+        <button>Save</button>
+      </if>
+      <if data.props.fullscreen==true>
+        <button onclick="fullscreenToggle()">Fullscreen</button>
+      </if>
+    </div>
+  </header>
+
   <div id="topArea">
     <div id="editor">
       <ul id="file-tabs">
         <each data.files as file>
-          <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event)">
-            {file.filename}
+          <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event);">
+            <div class="inputContainer">
+              <input class="filename" value="{file.filename.replace('.html', '')}" readonly
+                onclick="focusFilename(event);" oninput="inputFilename(event);" onchange="renameFilename(event);">
+              <div class="ghost-input">{file.filename.replace('.html', '')}</div>
+            </div>
+            <div class="extension">.html</div>
+            <div class="delete" onclick="deleteFile(event)">✕</div>
           </li>
         </each>
         <li class="add" onclick="addFile()">+</li>
@@ -30,18 +57,22 @@
       <iframe id="result" name="result" {(data.resize.x || data.resize.y) ? "resizing" : "" }></iframe>
     </div>
   </div>
-  <div class="h-resizer"></div>
+  <div class="h-resizer" onmousedown="resize(event)"></div>
   <div id="console">
     <label>CONSOLE <a onclick="clearConsole(event)">Clear</a></label>
-    <ul class="messages">
-      <each data.console as entry>
-        <li class="{entry.method}">{entry.message} <if entry.file>(<span class="debugLink"
-              onclick="openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}</span>)
-          </if>
-        </li>
-      </each>
-    </ul>
-    <input placeholder=">_" name="consoleEntry" onkeyup="sendJStoResult(event)">
+    <div class="messages">
+      <ul>
+        <each data.console as entry>
+          <li class="{entry.method}">{entry.message} <if entry.file>(<span class="debugLink"
+                onclick="openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}</span>)
+            </if>
+          </li>
+        </each>
+      </ul>
+      <div><input placeholder=">_" name="consoleEntry" onkeyup="sendJStoResult(event)"></div>
+    </div>
+
+
   </div>
 </template>
 
@@ -55,6 +86,28 @@
     flex-direction: column;
   }
 
+  :host(.fullscreen) {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
+
+  header {
+    background-color: #677876;
+    color: white;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0px 10px;
+    margin-left: -2px;
+    width: calc(100% + 4px);
+    box-sizing: border-box;
+    margin-top: -2px;
+    justify-content: space-between;
+  }
+
   slot[name=files] {
     display: none;
   }
@@ -62,7 +115,8 @@
   #topArea {
     display: flex;
     height: 80%;
-    height: calc(100% - 120px);
+    height: calc(100% - "{data.topAreaHeight}");
+    max-height: calc(100% - 30px);
   }
 
   #editor {
@@ -118,11 +172,23 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: overlay;
+    position: relative;
   }
 
   #console .messages {
-    flex: 1;
+    list-style: none;
+    font-family: monospace;
+    padding: 0;
+    margin: 0px;
+    overflow: auto;
+    position: absolute;
+    top: 26px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  #console .messages ul {
     list-style: none;
     font-family: monospace;
     padding: 0;
@@ -169,6 +235,7 @@
     padding: 5px 10px;
     font-size: 12px;
     outline: none;
+    width: 100%;
   }
 
   #file-tabs {
@@ -180,6 +247,15 @@
     background-color: rgba(0, 0, 0, 0);
     transition: background-color .8s;
     height: 35px;
+    position: relative;
+  }
+
+  #file-tabs:before {
+    content: "";
+    width: 100%;
+    position: absolute;
+    background-color: #f1f1f1;
+    height: 100%;
   }
 
   .CodeMirror-vscrollbar,
@@ -230,6 +306,15 @@
     background-color: rgb(206, 206, 206);
   }
 
+  .CodeMirror-linenumber.CodeMirror-gutter-elt {
+    transform: translateX(-20px);
+  }
+
+  .CodeMirror-lines {
+    padding-left: 20px;
+    padding-top: 20px;
+  }
+
   #file-tabs li {
     position: relative;
     cursor: pointer;
@@ -238,18 +323,89 @@
     color: #888;
     white-space: nowrap;
     background-color: #f1f1f1;
+    display: flex;
   }
 
   #file-tabs .add {
     font-size: 22px;
-    padding: 0px 10px 0px 5px;
+    padding: 0px 10px 0px 10px;
   }
+
+  #file-tabs .delete {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 500ms;
+  }
+
+  #file-tabs li[selected=true] .delete {
+    opacity: 1;
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  #file-tabs li[selected=false]:hover .delete {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  #file-tabs li:first-child input {
+    pointer-events: none;
+  }
+
+  #file-tabs li:first-child .delete {
+    pointer-events: none;
+    display: none;
+  }
+
 
   #file-tabs li[selected=true] {
     cursor: default;
-    pointer-events: none;
     background-color: white;
     color: #292;
+  }
+
+  .inputContainer {
+    position: relative;
+  }
+
+  input.filename {
+    position: absolute;
+    width: 100%;
+    padding: 0;
+    margin-top: 10px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  #file-tabs li[selected=true] input.filename {
+    cursor: text;
+  }
+
+  .ghost-input {
+    font-size: 13.3333px;
+    min-width: 3px;
+  }
+
+  input.title {
+    position: absolute;
+    width: 100%;
+    padding: 0;
+    outline: 0;
+    border: none;
+    font-size: 16px;
+    background: none;
+    color: white;
+    z-index: 1;
+    margin-top: -9px;
+  }
+
+  input.title + .ghost-input {
+    font-size: 16px;
+    z-index: 0;
+    opacity: 0;
+    height: 0px;
+    padding-right: 50px;
   }
 
   /*
@@ -385,10 +541,12 @@
         x: false,
         y: false
       },
-      editorWidth: "65%"
+      editorWidth: "65%",
+      topAreaHeight: "120px"
     }
     methods = {
       renderResult() {
+        component.dom.querySelector("iframe").setAttribute("srcdoc", "");
         var indexContent = component.editors["index.html"].getValue();
         var files = component.methods.rewriteGet("index.html", indexContent);
         var blobs = [];
@@ -407,9 +565,8 @@
                 if (m.index === regex.lastIndex) {
                   regex.lastIndex++;
                 }
-
-                if (m[3].indexOf(",") > -1) { // multi
-                  var filenames = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
+                if (m[4].indexOf("]") > -1) { // multi
+                  var filenames = m[4].replace(/((\\n)|[\\\s\"\[\]])/g, "");
                   var filenames = filenames.split(",");
                   var get = m[0];
                   var newGet = "";
@@ -441,7 +598,6 @@
         var base = "<head><base href=" + document.location.href + ">";
         blobs["index.html"].content = blobs["index.html"].content.replace("<head>", base) + runInResult;
 
-        component.dom.querySelector("iframe").setAttribute("srcdoc", "");
         // component.dom.querySelector("iframe").setAttribute("src", "about:blank");
 
         component.dom.querySelector("iframe").addEventListener("load", function bas() {
@@ -454,6 +610,7 @@
           data.url = data.urlHistory[0];
           data.currentUrlIndex = 1;
           data.console = [];
+
         });
 
       },
@@ -473,18 +630,18 @@
         }
 
         while ((m = regex.exec(content)) !== null) {
-
           // This is necessary to avoid infinite loops with zero-width matches
           if (m.index === regex.lastIndex) {
             regex.lastIndex++;
           }
 
-          if (m[3].indexOf(",") > -1) {
+          if (m[4].indexOf("]") > -1) {
 
-            var f = m[3].replace(/((\\n)|[\\\s\"\[\]])/g, "");
+            var f = m[4].replace(/((\\n)|[\\\s\"\[\]])/g, "");
             var fns = f.split(",");
             for (let i = 0; i < fns.length; i++) {
               const fn = fns[i].replace(/\'\"/g, '');
+              console.log(fn);
               var nestedComponentContent = component.editors[fn].getValue();
 
               while ((mm = regex2.exec(content)) !== null) {
@@ -510,7 +667,10 @@
         return component.files;
       },
       changeSelectedFile(event) {
-        var filename = event.target.getAttribute("filename");
+        event.preventDefault();
+        event.stopPropagation();
+        var filename = event.currentTarget.getAttribute("filename");
+        console.log(event.currentTarget);
         var filenameSelector = filename.replace(/\./g, "\\.");
 
         for (let i = 0; i < data.files.length; i++) {
@@ -530,193 +690,10 @@
         fileItself.setAttribute("selected", true);
 
         component.editors[filename].refresh();
-      },
-      addFile() {
-        console.log("ekleriz sorun değil");
+        component.editors[filename].focus();
+
       },
       runInResult() {
-/*
-    cycle.js
-    2021-05-31
-
-    Public Domain.
-
-    NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-
-    This code should be minified before deployment.
-    See https://www.crockford.com/jsmin.html
-
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
-*/
-
-// The file uses the WeakMap feature of ES6.
-
-/*jslint eval */
-
-/*property
-    $ref, decycle, forEach, get, indexOf, isArray, keys, length, push,
-    retrocycle, set, stringify, test
-*/
-
-if (typeof JSON.decycle !== "function") {
-    JSON.decycle = function decycle(object, replacer) {
-        "use strict";
-
-// Make a deep copy of an object or array, assuring that there is at most
-// one instance of each object or array in the resulting structure. The
-// duplicate references (which might be forming cycles) are replaced with
-// an object of the form
-
-//      {"$ref": PATH}
-
-// where the PATH is a JSONPath string that locates the first occurance.
-
-// So,
-
-//      var a = [];
-//      a[0] = a;
-//      return JSON.stringify(JSON.decycle(a));
-
-// produces the string '[{"$ref":"$"}]'.
-
-// If a replacer function is provided, then it will be called for each value.
-// A replacer function receives a value and returns a replacement value.
-
-// JSONPath is used to locate the unique object. $ indicates the top level of
-// the object or array. [NUMBER] or [STRING] indicates a child element or
-// property.
-
-        var objects = new WeakMap();     // object to path mappings
-
-        return (function derez(value, path) {
-
-// The derez function recurses through the object, producing the deep copy.
-
-            var old_path;   // The path of an earlier occurance of value
-            var nu;         // The new object or array
-
-// If a replacer function was provided, then call it to get a replacement value.
-
-            if (replacer !== undefined) {
-                value = replacer(value);
-            }
-
-// typeof null === "object", so go on if this value is really an object but not
-// one of the weird builtin objects.
-
-            if (
-                typeof value === "object"
-                && value !== null
-                && !(value instanceof Boolean)
-                && !(value instanceof Date)
-                && !(value instanceof Number)
-                && !(value instanceof RegExp)
-                && !(value instanceof String)
-            ) {
-
-// If the value is an object or array, look to see if we have already
-// encountered it. If so, return a {"$ref":PATH} object. This uses an
-// ES6 WeakMap.
-
-                old_path = objects.get(value);
-                if (old_path !== undefined) {
-                    return {$ref: old_path};
-                }
-
-// Otherwise, accumulate the unique value and its path.
-
-                objects.set(value, path);
-
-// If it is an array, replicate the array.
-
-                if (Array.isArray(value)) {
-                    nu = [];
-                    value.forEach(function (element, i) {
-                        nu[i] = derez(element, path + "[" + i + "]");
-                    });
-                } else {
-
-// If it is an object, replicate the object.
-
-                    nu = {};
-                    Object.keys(value).forEach(function (name) {
-                        nu[name] = derez(
-                            value[name],
-                            path + "[" + JSON.stringify(name) + "]"
-                        );
-                    });
-                }
-                return nu;
-            }
-            return value;
-        }(object, "$"));
-    };
-}
-
-
-if (typeof JSON.retrocycle !== "function") {
-    JSON.retrocycle = function retrocycle($) {
-        "use strict";
-
-// Restore an object that was reduced by decycle. Members whose values are
-// objects of the form
-//      {$ref: PATH}
-// are replaced with references to the value found by the PATH. This will
-// restore cycles. The object will be mutated.
-
-// The eval function is used to locate the values described by a PATH. The
-// root object is kept in a $ variable. A regular expression is used to
-// assure that the PATH is extremely well formed. The regexp contains nested
-// * quantifiers. That has been known to have extremely bad performance
-// problems on some browsers for very long strings. A PATH is expected to be
-// reasonably short. A PATH is allowed to belong to a very restricted subset of
-// Goessner's JSONPath.
-
-// So,
-//      var s = '[{"$ref":"$"}]';
-//      return JSON.retrocycle(JSON.parse(s));
-// produces an array containing a single element which is the array itself.
-
-        var px = /^\$(?:\[(?:\d+|"(?:[^\\"\u0000-\u001f]|\\(?:[\\"\/bfnrt]|u[0-9a-zA-Z]{4}))*")\])*$/;
-
-        (function rez(value) {
-
-// The rez function walks recursively through the object looking for $ref
-// properties. When it finds one that has a value that is a path, then it
-// replaces the $ref object with a reference to the value that is found by
-// the path.
-
-            if (value && typeof value === "object") {
-                if (Array.isArray(value)) {
-                    value.forEach(function (element, i) {
-                        if (typeof element === "object" && element !== null) {
-                            var path = element.$ref;
-                            if (typeof path === "string" && px.test(path)) {
-                                value[i] = eval(path);
-                            } else {
-                                rez(element);
-                            }
-                        }
-                    });
-                } else {
-                    Object.keys(value).forEach(function (name) {
-                        var item = value[name];
-                        if (typeof item === "object" && item !== null) {
-                            var path = item.$ref;
-                            if (typeof path === "string" && px.test(path)) {
-                                value[name] = eval(path);
-                            } else {
-                                rez(item);
-                            }
-                        }
-                    });
-                }
-            }
-        }($));
-        return $;
-    };
-}
         window.addEventListener('message', (event) => {
           if (event.data.action == "consoleEnter") {
             eval("console.log(" + JSON.stringify(event.data.code) + ");//@ sourceURL=console");
@@ -946,29 +923,47 @@ if (typeof JSON.retrocycle !== "function") {
           var code = event.target.value;
           event.target.value = "";
           result.postMessage({ action: "consoleEnter", code: code });
+          component.dom.querySelector("input[name=consoleEntry]").focus();
+
         }
       },
       clearConsole(e) {
         data.console = [];
       },
       resize(e) {
-        data.resize.x = true;
+        var direction = e.target.className == "v-resizer" ? "v" : "h";
+        if (direction == "v") {
+          data.resize.x = true;
+        }
+        else {
+          data.resize.y = true;
+        }
+
         e.preventDefault();
         component.dom.addEventListener("mousemove", function (me) {
-          if (!data.resize.x) {
+          if (!data.resize.x && !data.resize.y) {
             return;
           }
           me.preventDefault();
           var containerWidth = component.dom.getRootNode().host.offsetWidth;
-          var offsetRight = containerWidth - (me.clientX - component.dom.getRootNode().host.offsetLeft);
-          var birim = containerWidth / 100;
-          var offsetRight = 100 - (offsetRight / birim);
-          data.editorWidth = offsetRight + "%";
-          console.log("resize");
+          var containerHeight = component.dom.getRootNode().host.offsetHeight;
+
+          if (data.resize.x) {
+            var offsetRight = containerWidth - (me.clientX - component.dom.getRootNode().host.offsetLeft);
+            var birim = containerWidth / 100;
+            offsetRight = 100 - (offsetRight / birim);
+            data.editorWidth = offsetRight + "%";
+            console.log(offsetRight);
+          }
+          else {
+            var offsetTop = containerHeight - (me.clientY - component.dom.getRootNode().host.offsetTop);
+            data.topAreaHeight = Math.abs(offsetTop) + "px";
+          }
         });
         document.addEventListener("mouseup", function (e) {
           e.preventDefault();
           data.resize.x = false;
+          data.resize.y = false;
         });
       },
       openFileGotoLine(filename, line, char) {
@@ -992,6 +987,170 @@ if (typeof JSON.retrocycle !== "function") {
         component.editors[filename].setCursor(line - 1, char - 1);
         component.editors[filename].refresh();
         component.editors[filename].focus();
+      },
+      focusFilename(e) {
+        var selected = e.target.parentElement.parentElement.getAttribute("selected");
+        if (selected == "true") {
+          e.stopPropagation();
+          e.target.readOnly = false;
+          e.target.focus();
+        }
+      },
+      inputFilename(e) {
+        var ghost = e.target.parentElement.parentElement.querySelector(".ghost-input");
+        ghost.innerHTML = e.target.value;
+      },
+      renameFilename(e) {
+        var oldName = e.target.parentElement.parentElement.getAttribute("filename");
+        var newName = e.target.value;
+        if (newName !== "" && !component.editors[newName + ".html"]) {
+          console.log("hem boş değil hem duplicate değil");
+          for (let i = 0; i < data.files.length; i++) {
+            const file = data.files[i];
+            if (file.filename == oldName) {
+              newName += ".html";
+              file.filename = newName;
+              component.editors[newName] = component.editors[oldName];
+              delete component.editors[oldName];
+              component.dom.querySelector(".CodeMirror[filename='" + oldName + "']").setAttribute("filename", newName);
+              console.log(component.editors[newName]);
+            }
+          }
+          component.methods.renderResult();
+        }
+        else {
+          console.log("boş ya da duplicate");
+          e.target.focus();
+          return false;
+        }
+      },
+      deleteFile(e) {
+        e.stopPropagation();
+        var filename = e.target.parentElement.getAttribute("filename");
+
+        component.editors[filename].setOption("mode", "text/x-csrc");
+        component.editors[filename].getWrapperElement().remove();
+        delete component.editors[filename];
+
+        for (let i = 0; i < data.files.length; i++) {
+          const file = data.files[i];
+          if (file.filename == filename) {
+            data.files.splice(i, 1);
+            console.log(data.files);
+
+
+            filename = data.files[i - 1].filename;
+            var filenameSelector = filename.replace(/\./g, "\\.");
+            var targetFile = component.dom.querySelector("#files .CodeMirror[selected=true]");
+            if (!targetFile) {
+              data.files[i - 1].selected = true;
+              var fileItself = component.dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
+              fileItself.setAttribute("selected", true);
+            }
+          }
+        }
+        component.methods.renderResult();
+        return false;
+      },
+      addFile() {
+        var i = 1;
+        var filename = "component-" + i + ".html";
+        while (component.editors["component-" + i + ".html"]) {
+          i = i + 1;
+        }
+        filename = "component-" + i + ".html";
+        for (let i = 0; i < data.files.length; i++) {
+          const file = data.files[i];
+          file.selected = false;
+        }
+        data.files.push({ "filename": filename, "selected": true });
+
+        var fileTabs = component.dom.querySelector("#file-tabs");
+        fileTabs.scrollLeft = fileTabs.scrollWidth;
+
+        var filenameInput = component.dom.querySelector("li[filename=" + filename.replace(/\./g, "\\.") + "] input");
+        var template = "<template>\n\n</template>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>";
+
+
+        var target = component.dom.querySelector("ul#files");
+        component.methods.createNewCodemirror(filename, true, target, template);
+
+        filenameInput.click();
+        filenameInput.setSelectionRange(0, filenameInput.value.length);
+
+        component.dom.querySelector("#files .CodeMirror[selected=true]").setAttribute("selected", false);
+        //component.editors[filename].setCursor({ line: 1, ch: 0 });
+        component.files[filename] = {
+          filename: filename,
+          content: template
+        }
+        console.log(component.files);
+      },
+      createNewCodemirror(filename, selected, targetEl, text) {
+        component.editors[filename] = CodeMirror(function (node) {
+          node.setAttribute("filename", filename);
+          node.setAttribute("selected", selected);
+          targetEl.appendChild(node, targetEl);
+        }, {
+          value: text,
+          autoRefresh: { delay: 0 },
+          lineNumbers: true,
+          gutter: true,
+          smartIndent: true,
+          autofocus: true,
+          mode: "htmlmixed",
+          theme: 'default', // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
+          styleActiveLine: true,
+        });
+
+        component.editors[filename].on("changes", function (a, b, c, d) {
+          component.methods.renderResult();
+        });
+
+        var currentHandle = null, currentLine;
+        component.editors[filename].on("cursorActivity", highlight);
+        component.editors[filename].on("focus", highlight);
+
+        function highlight(cm) {
+          var line = cm.getCursor().line;
+          var handle = cm.getLineHandle(line);
+
+          if (currentHandle) {
+            cm.removeLineClass(currentHandle, "wrap", "activeline");
+          }
+          currentHandle = handle;
+          currentLine = line;
+          cm.addLineClass(currentHandle, null, "activeline");
+        }
+      },
+      fullscreenToggle() {
+        if (component.dom.getRootNode().host.className.indexOf("fullscreen") > -1) {
+          component.dom.getRootNode().host.classList.remove("fullscreen");
+        }
+        else {
+          component.dom.getRootNode().host.classList.add("fullscreen");
+        }
+
+      },
+      titleFocus(e) {
+        e.stopPropagation();
+        e.target.readOnly = false;
+        e.target.focus();
+      },
+      titleInput(e) {
+        var ghost = e.target.parentElement.querySelector(".ghost-input");
+        ghost.innerHTML = e.target.value;
+      },
+      titleRename(e) {
+        if (e.target.value.length !== 0) {
+          data.props.title = e.target.value;
+          e.target.blur();
+        }
+        else {
+          e.target.focus();
+        }
+
+        console.log("yeah");
       }
     }
     lifecycle = {
@@ -999,6 +1158,13 @@ if (typeof JSON.retrocycle !== "function") {
 
       },
       afterFirstRender() {
+        window.onerror = function (error, file, line, char) {
+          data.console = [];
+          data.console.push({
+            method: "error",
+            message: error
+          });
+        };
         // listen messages from child
         window.addEventListener('message', (event) => {
           if (event.data.action == "urlChange") {
@@ -1022,8 +1188,8 @@ if (typeof JSON.retrocycle !== "function") {
               line,
               char
             });
-            var cnsl = component.dom.querySelector("#console");
-            cnsl.scrollTop = cnsl.scrollHeight;
+            var messages = component.dom.querySelector("#console .messages");
+            messages.scrollTop = messages.scrollHeight;
           }
         });
 
@@ -1055,36 +1221,7 @@ if (typeof JSON.retrocycle !== "function") {
               var a = new RegExp("^\\s{" + indent + "}", "gm");
               text = text.replace(a, "");
 
-              component.editors[textarea.getAttribute("filename")] = CodeMirror(function (node) {
-                node.setAttribute("filename", filename);
-                node.setAttribute("selected", selected);
-                targetEl.appendChild(node, targetEl);
-              }, {
-                value: text,
-                autoRefresh: { delay: 0 },
-                lineNumbers: true,
-                gutter: true,
-                smartIndent: true,
-                mode: "htmlmixed",
-                theme: 'default', // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
-                styleActiveLine: true,
-              });
-
-              component.editors[textarea.getAttribute("filename")].on("change", function () {
-                component.methods.renderResult();
-              });
-
-              var currentHandle = null, currentLine;
-              component.editors[files[index].getAttribute("filename")].on("cursorActivity", function (cm) {
-                var line = cm.getCursor().line;
-                var handle = cm.getLineHandle(line);
-
-                if (currentHandle) {
-                  cm.removeLineClass(currentHandle, "wrap", "activeline");
-                }
-                currentHandle = handle; currentLine = line;
-                cm.addLineClass(currentHandle, null, "activeline");
-              });
+              component.methods.createNewCodemirror(filename, selected, targetEl, text);
             }
 
             component.methods.renderResult();

@@ -6,7 +6,7 @@
 </head>
 
 <body>
-  <repl-component urlbar>
+  <repl-component title="REPL Example" download="true" fullscreen="true" save="true">
     <section slot="files" style="display: none">
       <textarea filename="index.html" selected>
         <html>
@@ -19,6 +19,7 @@
             <script src="https://root/simply/simply.js"></script>
             <script>
               get("hello-world.html");
+                    get(["hello-world.html"]);
             </script>
           </body>
         </html>
@@ -41,6 +42,24 @@
           }
         </script>
       </textarea>
+      <textarea filename="hello-world2.html">
+        <template>
+          Hello world. Greetings from { data.name }
+        </template>
+        <script>
+          class {
+            data = {
+              name: "simply.js"
+            }
+            lifecycle = {
+              afterFirstRender() {
+                console.log("mounted");
+              }
+            }
+          }
+        </script>
+      </textarea>
+
     </section>
   </repl-component>
 
