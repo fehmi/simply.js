@@ -176,7 +176,6 @@ function utils() {
 
   get = function (path, name) {
     if (Array.isArray(path)) {
-      console.log(path + " array");
       for (let i = 0; i < path.length; i++) {
         var p = path[i];
         loadAndParseComponent(p, name, function (component) {
@@ -288,7 +287,7 @@ function utils() {
         request.send();
       }
       else {
-        console.log(path + " daha önce yüklendi")
+        // console.log(path + " daha önce yüklendi")
       }
     }
   }
@@ -3114,11 +3113,14 @@ function utils() {
           if (window.location.pathname !== pathname || window.location.search !== search || window.location.hash !== hash) {
             var changeState = replace ? 'replaceState' : 'pushState';
 
-            if (window.frameElement.hasAttribute("name")) {
-              if (window.frameElement.getAttribute("name") == "result") {
-                changeState = "replaceState";
+            if (window.frameElement) {
+              if (typeof window.frameElement.hasAttribute("name") !== "undefined") {
+                if (window.frameElement.getAttribute("name") == "result") {
+                  changeState = "replaceState";
+                }
               }
             }
+
 
             window.history[changeState](null, document.title, pathname + search + hash);
             window.dispatchEvent(new PopStateEvent('popstate', {
