@@ -1,0 +1,20 @@
+<template>
+  this is nested
+  <nested-oglu></nested-oglu>
+  <multi-one></multi-one>
+</template>
+<script>
+  get("nested-oglu.html");
+  get([
+    "multi-one.html",
+    "multi-two.html"
+  ]);
+  class {
+    data = {}
+    lifecycle = {
+       afterFirstRender() {
+        console.log("hay");
+      }
+    }
+  }
+</script>

@@ -6,7 +6,8 @@
 </head>
 
 <body>
-  <repl-component urlbar>
+  <repl-component title="" fullscreen="true" save="true" download="true">
+    <!--
     <section slot="files" style="display: none">
       <textarea filename="index.html" selected>
         <html>
@@ -16,10 +17,12 @@
           <body>
             <hello-world></hello-world>
             <how-are-you></how-are-you>
+            <deneme-bee></deneme-bee>
             <script src="https://root/simply/simply.js"></script>
             <script>
               get("hello-world.html");
               get("how-are-you.html");
+              get("deneme-be.html", "deneme-bee");
             </script>
           </body>
         </html>
@@ -37,6 +40,12 @@
         <script>
           get("nested-comp.html");
         </script>
+      </textarea>
+      <textarea filename="deneme-be.html">
+        <template>
+          denemebe
+          <nested-comp></nested-comp>
+        </template>
       </textarea>
       <textarea filename="nested-comp.html">
         <template>
@@ -96,6 +105,7 @@
         </template>
       </textarea>
     </section>
+    -->
   </repl-component>
 
   <script src="../simply.js"></script>

@@ -201,8 +201,13 @@ function utils() {
       var name = path.split('\\').pop().split('/').pop().split('.').slice(0, -1).join('.');
     }
     else {
-      var ext = name.split(".").pop();
-      var name = name.replace("."+ext, "");
+      if (name.indexOf(".") > -1) {
+        var ext = name.split(".").pop();
+        var name = name.replace("."+ext, "");
+      }
+      else {
+        var ext = "html";
+      }
     }
 
     //request.responseType = 'document';
@@ -343,7 +348,7 @@ function utils() {
 
             var m;
             // var importRegex = /(?<!\/\/(\s+)?)get\(.*\)\;/m;
-            var importRegex = /(?<!\/\/(\s+)?)get\((\[)?([\s\S]*?)?(.*)\)(\;)?/gm
+            var importRegex = /(?<!\/\/(\s+)?)get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
             while ((m = importRegex.exec(gets)) !== null) {
               // This is necessary to avoid infinite loops with zero-width matches
               var component = this;
