@@ -28,7 +28,8 @@
           <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event);">
             <div class="inputContainer">
               <input class="filename" value="{file.filename.replace('.html', '')}" readonly
-                onclick="focusFilename(event);" oninput="inputFilename(event);" onchange="renameFilename(event);">
+                onclick="focusFilename(event);" oninput="inputFilename(event);" onchange="renameFilename(event);"
+                onblur="blurFilename(event)">
               <div class="ghost-input">{file.filename.replace('.html', '')}</div>
             </div>
             <div class="extension">.html</div>
@@ -47,43 +48,57 @@
       <div id="result-header">
         Result
       </div>
-      <div id="addressbar">
-        <!-- {data.urlHistory.length} - {data.currentUrlIndex} -->
-        <button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="goBack(event);"></button>
-        <button {(data.currentUrlIndex> data.urlHistory.length - 1) ? "disabled" : ""}
-          onclick="goNext(event);"></button>
-        <input type="text" value="{data.url}" id="url" onchange="changeURL(event)">
-      </div>
+      <if data.props.addressbar == true>
+        <div id="addressbar">
+          <!-- {data.urlHistory.length} - {data.currentUrlIndex} -->
+          <button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="goBack(event);"></button>
+          <button {(data.currentUrlIndex> data.urlHistory.length - 1) ? "disabled" : ""}
+            onclick="goNext(event);"></button>
+          <input type="text" value="{data.url}" id="url" onchange="changeURL(event)">
+        </div>
+      </if>
+
       <iframe id="result" name="result" {(data.resize.x || data.resize.y) ? "resizing" : "" }></iframe>
     </div>
   </div>
-  <div class="h-resizer" onmousedown="resize(event)"></div>
-  <div id="console">
-    <label>CONSOLE <a onclick="clearConsole(event)">Clear</a></label>
-    <div class="messages">
-      <ul>
-        <each data.console as entry>
-          <li class="{entry.method}">{entry.message} <if entry.file>(<span class="debugLink"
-                onclick="openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}</span>)
-            </if>
-          </li>
-        </each>
-      </ul>
-      <div><input placeholder=">_" name="consoleEntry" onkeyup="sendJStoResult(event)"></div>
+  <if data.props.console == true>
+    <div class="h-resizer" onmousedown="resize(event)"></div>
+    <div id="console">
+      <label>CONSOLE <a onclick="clearConsole(event)">Clear</a></label>
+      <div class="messages">
+        <ul>
+          <each data.console as entry>
+            <li class="{entry.method}">{entry.message} <if entry.file>(<span class="debugLink"
+                  onclick="openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}</span>)
+              </if>
+            </li>
+          </each>
+        </ul>
+        <div><input placeholder=">_" name="consoleEntry" onkeyup="sendJStoResult(event)"></div>
+      </div>
     </div>
+  </if>
 
-
-  </div>
 </template>
 
 <style>
   :host {
     display: flex;
-    width: 960px;
-    height: 550px;
+    width: 100%;
+    height: 100%;
+    max-width: 1200px;
+    max-height: 700px;
     border: 2px solid #dddddd;
     font-family: Arial, Helvetica, sans-serif;
     flex-direction: column;
+    background-color: white;
+    box-shadow: 0px 0px 25px rgb(0 0 0 / 10%);
+    /* border-radius: 10px; */
+    /* overflow: hidden; */
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   :host(.fullscreen) {
@@ -92,6 +107,9 @@
     height: 100%;
     left: 0;
     top: 0;
+    transform: translate(0, 0);
+    max-width: unset;
+    max-height: unset;
   }
 
   header {
@@ -113,10 +131,11 @@
   }
 
   #topArea {
-    display: flex;
-    height: 80%;
-    height: calc(100% - "{data.topAreaHeight}");
-    max-height: calc(100% - 30px);
+    display: flex;/*
+    height: calc(100% - 40px - "{data.topAreaHeight}");
+    max-height: calc(100% - 30px);*/
+    flex: 1;
+    overflow: hidden;
   }
 
   #editor {
@@ -124,7 +143,7 @@
     flex-direction: column;
     width: "{data.editorWidth}";
     min-width: 30%;
-    max-width: 70%;
+    max-width: 60%;
   }
 
   #result {
@@ -169,10 +188,11 @@
 
   #console {
     border-top: 2px solid #dddddd;
-    flex: 1;
     display: flex;
     flex-direction: column;
     position: relative;
+    min-height: 30px;
+    height: "{data.topAreaHeight}"
   }
 
   #console .messages {
@@ -318,7 +338,7 @@
   #file-tabs li {
     position: relative;
     cursor: pointer;
-    padding: 0px 15px;
+    padding: 0px 10px 0px 15px;
     font-size: 14px;
     color: #888;
     white-space: nowrap;
@@ -335,6 +355,9 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 500ms;
+    font-size: 12px;
+    position: ;
+    margin-left: 10px;
   }
 
   #file-tabs li[selected=true] .delete {
@@ -364,6 +387,16 @@
     color: #292;
   }
 
+  #file-tabs li.focus .delete {
+    visibility: hidden;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  #file-tabs li.focus .extension {
+    color: #888888;
+  }
+
   .inputContainer {
     position: relative;
   }
@@ -376,10 +409,13 @@
     border: none;
     cursor: pointer;
     outline: none;
+    background-color: transparent;
+    color: #888888;
   }
 
   #file-tabs li[selected=true] input.filename {
     cursor: text;
+    color: #229921;
   }
 
   .ghost-input {
@@ -611,13 +647,12 @@
         var base = "<head><base href=" + document.location.href + ">";
         blobs["index.html"].content = blobs["index.html"].content.replace("<head>", base) + runInResult;
 
-        // component.dom.querySelector("iframe").setAttribute("src", "about:blank");
-        component.dom.querySelector("iframe").setAttribute("srcdoc", "");
-        component.dom.querySelector("iframe").addEventListener("load", function bas() {
-          console.log("load");
-          component.dom.querySelector("iframe").removeEventListener("load", bas);
-          //component.dom.querySelector("iframe").removeAttribute("src");
-          component.dom.querySelector("iframe").contentWindow.document.write(blobs["index.html"].content);
+        // dom.querySelector("iframe").setAttribute("src", "about:blank");
+        dom.querySelector("iframe").setAttribute("srcdoc", "");
+        dom.querySelector("iframe").addEventListener("load", function bas() {
+          dom.querySelector("iframe").removeEventListener("load", bas);
+          //dom.querySelector("iframe").removeAttribute("src");
+          dom.querySelector("iframe").contentWindow.document.write(blobs["index.html"].content);
           // rever url
           data.urlHistory = [data.urlHistory[0]];
           data.url = data.urlHistory[0];
@@ -701,8 +736,8 @@
           }
         }
 
-        var targetFile = component.dom.querySelector("#files .CodeMirror[selected=true]");
-        var fileItself = component.dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
+        var targetFile = dom.querySelector("#files .CodeMirror[selected=true]");
+        var fileItself = dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
 
         targetFile.setAttribute("selected", false);
         fileItself.setAttribute("selected", true);
@@ -726,14 +761,17 @@
                   else if (typeof JSON.parse(event.data.code) == "object") {
                     var type = "Object: "
                   }
+
                   eval("console.log('" + type + "' + " + JSON.stringify(event.data.code) + ");//@ sourceURL=console");
                 }
               } catch (error) {
                 if (typeof eval(event.data.code) == "object") {
                   var type = eval(event.data.code) instanceof Element ? "[HTMLElement]" : "[Object]";
+
                   eval("console.log('" + type + "');//@ sourceURL=console");
                 }
                 else {
+                  console.log(event.data.code);
                   eval("console.log(" + event.data.code + ");//@ sourceURL=console");
                 }
               }
@@ -912,7 +950,7 @@
         };
       },
       changeURL(event) {
-        var result = component.dom.querySelector("iframe#result").contentWindow;
+        var result = dom.querySelector("iframe#result").contentWindow;
         if (event.target) {
           var url = event.target.value;
           event.target.blur();
@@ -937,11 +975,11 @@
       },
       sendJStoResult(event) {
         if (event.which == 13) {
-          var result = component.dom.querySelector("iframe#result").contentWindow;
+          var result = dom.querySelector("iframe#result").contentWindow;
           var code = event.target.value;
           event.target.value = "";
           result.postMessage({ action: "consoleEnter", code: code });
-          component.dom.querySelector("input[name=consoleEntry]").focus();
+          dom.querySelector("input[name=consoleEntry]").focus();
 
         }
       },
@@ -958,23 +996,23 @@
         }
 
         e.preventDefault();
-        component.dom.addEventListener("mousemove", function (me) {
+        dom.addEventListener("mousemove", function (me) {
           if (!data.resize.x && !data.resize.y) {
             return;
           }
           me.preventDefault();
-          var containerWidth = component.dom.getRootNode().host.offsetWidth;
-          var containerHeight = component.dom.getRootNode().host.offsetHeight;
+          var containerWidth = dom.getRootNode().host.offsetWidth;
+          var containerHeight = dom.getRootNode().host.offsetHeight;
 
           if (data.resize.x) {
-            var offsetRight = containerWidth - (me.clientX - component.dom.getRootNode().host.offsetLeft);
+            var offsetRight = containerWidth - (me.clientX - dom.getRootNode().host.offsetLeft);
             var birim = containerWidth / 100;
             offsetRight = 100 - (offsetRight / birim);
             data.editorWidth = offsetRight + "%";
             console.log(offsetRight);
           }
           else {
-            var offsetTop = containerHeight - (me.clientY - component.dom.getRootNode().host.offsetTop);
+            var offsetTop = containerHeight - (me.clientY - dom.getRootNode().host.offsetTop);
             data.topAreaHeight = Math.abs(offsetTop) + "px";
           }
         });
@@ -996,8 +1034,8 @@
         }
         var filenameSelector = filename.replace(/\./g, "\\.");
 
-        var targetFile = component.dom.querySelector("#files .CodeMirror[selected=true]");
-        var fileItself = component.dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
+        var targetFile = dom.querySelector("#files .CodeMirror[selected=true]");
+        var fileItself = dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
 
         targetFile.setAttribute("selected", false);
         fileItself.setAttribute("selected", true);
@@ -1008,9 +1046,11 @@
       },
       focusFilename(e) {
         var selected = e.target.parentElement.parentElement.getAttribute("selected");
+
         if (selected == "true") {
           e.stopPropagation();
           e.target.readOnly = false;
+          e.target.parentElement.parentElement.classList.add("focus");
           e.target.focus();
         }
       },
@@ -1030,7 +1070,7 @@
               file.filename = newName;
               component.editors[newName] = component.editors[oldName];
               delete component.editors[oldName];
-              component.dom.querySelector(".CodeMirror[filename='" + oldName + "']").setAttribute("filename", newName);
+              dom.querySelector(".CodeMirror[filename='" + oldName + "']").setAttribute("filename", newName);
               console.log(component.editors[newName]);
             }
           }
@@ -1038,37 +1078,55 @@
         }
         else {
           console.log("boş ya da duplicate");
-          e.target.focus();
-          return false;
+          if (oldName !== e.target.focus()) {
+            e.target.focus();
+            return false;
+          }
+        }
+      },
+      blurFilename(e) {
+        var selected = e.target.parentElement.parentElement.getAttribute("selected");
+
+        if (selected == "true") {
+          e.stopPropagation();
+          e.target.parentElement.parentElement.classList.remove("focus");
         }
       },
       deleteFile(e) {
         e.stopPropagation();
         var filename = e.target.parentElement.getAttribute("filename");
 
-        component.editors[filename].setOption("mode", "text/x-csrc");
-        component.editors[filename].getWrapperElement().remove();
-        delete component.editors[filename];
+        if (confirm('Delete ' + filename + '?')) {
+          component.editors[filename].setOption("mode", "text/x-csrc");
+          component.editors[filename].getWrapperElement().remove();
+          delete component.editors[filename];
 
-        for (let i = 0; i < data.files.length; i++) {
-          const file = data.files[i];
-          if (file.filename == filename) {
-            data.files.splice(i, 1);
-            console.log(data.files);
-
-
-            filename = data.files[i - 1].filename;
-            var filenameSelector = filename.replace(/\./g, "\\.");
-            var targetFile = component.dom.querySelector("#files .CodeMirror[selected=true]");
-            if (!targetFile) {
-              data.files[i - 1].selected = true;
-              var fileItself = component.dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
-              fileItself.setAttribute("selected", true);
+          console.time();
+          for (let i = 0; i < data.files.length; i++) {
+            const file = data.files[i];
+            if (file.filename == filename) {
+              console.log(data.files, i);
+              delete data.files[i];
+              data.files = data.files.filter(Boolean);
+              console.timeEnd();
+              filename = data.files[i - 1].filename;
+              var filenameSelector = filename.replace(/\./g, "\\.");
+              var targetFile = dom.querySelector("#files .CodeMirror[selected=true]");
+              if (!targetFile) {
+                data.files[i - 1].selected = true;
+                var fileItself = dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
+                fileItself.setAttribute("selected", true);
+              }
+              break;
             }
           }
+          component.methods.renderResult();
+          return false;
+        } else {
+          return false;
         }
-        component.methods.renderResult();
-        return false;
+
+
       },
       addFile() {
         var i = 1;
@@ -1083,20 +1141,20 @@
         }
         data.files.push({ "filename": filename, "selected": true });
 
-        var fileTabs = component.dom.querySelector("#file-tabs");
+        var fileTabs = dom.querySelector("#file-tabs");
         fileTabs.scrollLeft = fileTabs.scrollWidth;
 
-        var filenameInput = component.dom.querySelector("li[filename=" + filename.replace(/\./g, "\\.") + "] input");
+        var filenameInput = dom.querySelector("li[filename=" + filename.replace(/\./g, "\\.") + "] input");
         var template = "<template>\n\n</template>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>";
 
 
-        var target = component.dom.querySelector("ul#files");
+        var target = dom.querySelector("ul#files");
         component.methods.createNewCodemirror(filename, true, target, template);
 
         filenameInput.click();
         filenameInput.setSelectionRange(0, filenameInput.value.length);
 
-        component.dom.querySelector("#files .CodeMirror[selected=true]").setAttribute("selected", false);
+        dom.querySelector("#files .CodeMirror[selected=true]").setAttribute("selected", false);
         //component.editors[filename].setCursor({ line: 1, ch: 0 });
         component.files[filename] = {
           filename: filename,
@@ -1147,11 +1205,11 @@
         }
       },
       fullscreenToggle() {
-        if (component.dom.getRootNode().host.className.indexOf("fullscreen") > -1) {
-          component.dom.getRootNode().host.classList.remove("fullscreen");
+        if (dom.getRootNode().host.className.indexOf("fullscreen") > -1) {
+          dom.getRootNode().host.classList.remove("fullscreen");
         }
         else {
-          component.dom.getRootNode().host.classList.add("fullscreen");
+          dom.getRootNode().host.classList.add("fullscreen");
         }
 
       },
@@ -1280,16 +1338,43 @@ SOFTWARE.';
               line,
               char
             });
-            var messages = component.dom.querySelector("#console .messages");
+            var messages = dom.querySelector("#console .messages");
             messages.scrollTop = messages.scrollHeight;
           }
         });
 
         if (typeof CodeMirror == "undefined") {
           loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/display/autorefresh.min.js,npm/codemirror-formatting@1.0.0/formatting.min.js,npm/jszip@3.1.5/dist/jszip.min.js,npm/filesaver.js@1.3.4/FileSaver.min.js", function () {
-            var slot = component.dom.querySelector('slot[name=files]');
+            var slot = dom.querySelector('slot[name=files]');
             component.editors = [];
-            if (slot.assignedNodes()[0]) {
+
+            if (location.search.length > 1 && location.search.indexOf("?") == 0) {
+              var xhr = new XMLHttpRequest();
+              xhr.withCredentials = true;
+              xhr.open("GET", data.URLShortening.redirect + location.search.substring(1), true);
+              xhr.send();
+              xhr.addEventListener("readystatechange", function () {
+                if (this.readyState === 4) {
+
+                  var project = JSON.parse(decodeURIComponent(escape(atob(this.responseText))));
+
+
+                  var targetEl = dom.querySelector("ul#files");
+
+                  for (var i = 0; i < project.files.length; i++) {
+                    var file = project.files[i];
+                    data.files.push({
+                      filename: file.filename,
+                      selected: file.selected
+                    });
+                    component.methods.createNewCodemirror(file.filename, file.selected, targetEl, file.content);
+                  }
+                  data.props.title = project.title;
+                  component.methods.renderResult();
+                }
+              });
+            }
+            else if (slot.assignedNodes()[0]) {
               var files = slot.assignedNodes()[0].querySelectorAll("textarea");
               for (let index = 0; index < files.length; index++) {
                 var fileEl = files[index];
@@ -1306,51 +1391,23 @@ SOFTWARE.';
                 var textarea = files[index];
                 var filename = files[index].getAttribute("filename");
                 var selected = files[index].hasAttribute("selected");
-                var targetEl = component.dom.querySelector("ul#files");
+                var targetEl = dom.querySelector("ul#files");
 
                 // remove unnecessary indents
                 var indent = textarea.value.split('\n').join('').match(/^\s*/)[0].length;
                 var text = textarea.value.trim();
-                var a = new RegExp("^\\s{" + indent + "}", "gm");
+                var a = new RegExp("^\ {" + indent + "}", "gm");
                 text = text.replace(a, "");
 
                 component.methods.createNewCodemirror(filename, selected, targetEl, text);
               }
               component.methods.renderResult();
             }
-            else {
-              if (location.search.length > 1 && location.search.indexOf("?") == 0) {
-                var xhr = new XMLHttpRequest();
-                xhr.withCredentials = true;
-                xhr.open("GET", data.URLShortening.redirect + location.search.substring(1), true);
-                xhr.send();
-                xhr.addEventListener("readystatechange", function () {
-                  if (this.readyState === 4) {
-
-                    var project = JSON.parse(decodeURIComponent(escape(atob(this.responseText))));
-
-
-                    var targetEl = component.dom.querySelector("ul#files");
-
-                    for (var i = 0; i < project.files.length; i++) {
-                      var file = project.files[i];
-                      data.files.push({
-                        filename: file.filename,
-                        selected: file.selected
-                      });
-                      component.methods.createNewCodemirror(file.filename, file.selected, targetEl, file.content);
-                    }
-                    data.props.title = project.title;
-                    component.methods.renderResult();
-                  }
-                });
-              }
-            }
 
             var cmInitCheck = setInterval(() => {
               var px = 0;
               try {
-                var px = parseInt(component.dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
+                var px = parseInt(dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
               } catch (error) { }
 
               if (px > 100) {

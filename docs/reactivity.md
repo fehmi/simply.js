@@ -1,15 +1,29 @@
+# Reactivity
+
 ## Simple form of variables
 
-You can define your variables on the data section in your component like this.
+You can disable activity for specific elements in you template like this. The div that has "passive" parameter remain passive after first render. It and its children will not affected from data changes.
 
-```bash
-<script>
-  class {
-    data = {
-      "name": "fehmi",
-      "age": 37
-    };
-</script>
+```html
+  <template>
+    <div>{data.name}</div>
+    <div passive>{data.name}</div>
+  </template>
+
+  <script>
+    class {
+      data = {
+        name = "test"
+      }
+      lifecycle = {
+        afterFirstRender() {
+          setTimeout(() => {
+              data.name = "test2"
+          }, 1000);
+        }
+      }
+    }
+  </script>
 ```
 
 Then you will be able to use them in your template like this.
@@ -51,7 +65,7 @@ If you decide to use `key` and `index` when you define `each` loop. You can reac
 All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
 
 ```html
-  <each data.hobbies as hobbie, key (index)> 
+  <each data.hobbies as hobbie, key (index)>
     <li>{key}:{hobbie}:{index}</li>
   </each>
 ```

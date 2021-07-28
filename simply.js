@@ -12,7 +12,7 @@ utils();
 window.simply = {
   components: {},
   // simplate
-  parseTemplate: function (template, data, state) {
+  parseTemplate: function (template, data, state, parent) {
     let ifStatement = /\<(\s+)?if(\s+)([a-zA-Z_\.]+(\s+)??.*)(\s+)?(\>)$/;
     let elseIfStatement = /\<(\s+)?else(\s+)if(\s+)(.*(\s+?.*))(\s+)?(\>)$/;
     let endIfStatement = /\<(\s+)?\/(\s+)?if(\s+)?\>$/;
@@ -296,6 +296,8 @@ function utils() {
       }
     }
   }
+
+
   getSettings = function ({ name, template, style, script, docStr }, callback) {
     //const jsFile = new Blob([script.textContent], { type: 'application/javascript' });
     //const jsURL = URL.createObjectURL(jsFile);
@@ -382,9 +384,18 @@ function utils() {
               }
 
               this.methods = this.componentClass.methods;
+              var methods = this.methods;
+
               this.watch = this.componentClass.watch;
               this.component = this;
+
               this.parent = this.getRootNode().host;
+              var parent = this.parent;
+
+              var dom = this.attachShadow({ mode: 'open' });
+              //this.dom.appendChild(style.cloneNode(true));
+              dom.innerHTML = "";
+              this.dom = dom;
 
 
 
@@ -430,6 +441,7 @@ function utils() {
             }
           }
         }
+
         // invoked each time the custom element is appended
         // into a document-connected element
         observeAttrChange(el, callback) {
@@ -525,7 +537,7 @@ function utils() {
 
           if (!this.rendered) {
 
-            let parsedTemplate = simply.parseTemplate(template, this.data, this.state);
+            let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
             if (style !== "") {
               let parsedStyle = simply.parseStyle(style, this.data);
               parsedTemplate = parsedTemplate + "<style>" + parsedStyle + "</style>";
@@ -538,7 +550,8 @@ function utils() {
                 }
               }
             }
-            this.dom = this.attachShadow({ mode: 'open' });
+            console.log(this.data);
+            //this.dom = this.attachShadow({ mode: 'open' });
             //this.dom.appendChild(style.cloneNode(true));
             this.dom.innerHTML = parsedTemplate;
 
@@ -558,7 +571,7 @@ function utils() {
               }
             }
             var newDom = document.createElement("div");
-            let parsedTemplate = simply.parseTemplate(template, this.data, this.state);
+            let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
             let parsedStyle = simply.parseStyle(style, this.data);
 
             newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
@@ -597,6 +610,7 @@ function utils() {
         // is added, removed, or changed.
         attributeChangedCallback(name, oldValue, newValue) {
           // if data.
+          console.log(name, oldValue, newValue);
 
         }
         adoptedCallback() { }

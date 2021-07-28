@@ -3,109 +3,72 @@
 <head>
   <title>simply / REPL</title>
   <meta charset="UTF-8">
+  <style>
+    body {
+      background-color: aliceblue;
+    }
+  </style>
 </head>
 
 <body>
-  <repl-component title="" fullscreen="true" save="true" download="true">
-    <!--
+  <repl-component class="fullscreen" title="Hello World!" fullscreen="true" save="true" download="true" console="true">
     <section slot="files" style="display: none">
-      <textarea filename="index.html" selected>
+      <textarea filename="index.html">
         <html>
           <head>
             <title>simply / REPL</title>
           </head>
           <body>
             <hello-world></hello-world>
-            <how-are-you></how-are-you>
-            <deneme-bee></deneme-bee>
             <script src="https://root/simply/simply.js"></script>
             <script>
               get("hello-world.html");
-              get("how-are-you.html");
-              get("deneme-be.html", "deneme-bee");
             </script>
           </body>
         </html>
       </textarea>
-      <textarea filename="hello-world.html">
+      <textarea filename="hello-world.html" selected>
         <template>
-          hello canım
+          <h1>Hello World!</h1>
+          <p>Greetings from {data.name}</p>
+          <test-test></test-test>
         </template>
-      </textarea>
-      <textarea filename="how-are-you.html">
-        <template>
-          how are you?
-          <nested-comp></nested-comp>
-        </template>
+
         <script>
-          get("nested-comp.html");
+          get("test-test.html");
+          class {
+            data = {
+              name: "simply.js"
+            }
+          }
         </script>
       </textarea>
-      <textarea filename="deneme-be.html">
+      <textarea filename="test-test.html">
         <template>
-          denemebe
-          <nested-comp></nested-comp>
+          <h1 onclick="a.c()">bu h1</h1>
+          test test {parent.name}
         </template>
-      </textarea>
-      <textarea filename="nested-comp.html">
-        <template>
-          this is nested
-          <nested-oglu></nested-oglu>
-          <multi-one></multi-one>
-        </template>
-        <script>
-          get("nested-oglu.html");
-          get([
-            "multi-one.html",
-            "multi-two.html"
-          ]);
-          class {
-            data = {}
-            lifecycle = {
 
+        <script>
+
+          class {
+            methods = {
+              a: {
+                c() {
+                  alert("cee'ee");
+                }
+              }
+            }
+            lifecycle = {
               afterFirstRender() {
-                console.log("hay");
+                //dom.querySelector("h1").style.display = "none";
+                console.log(parent.data.name);
               }
             }
           }
         </script>
       </textarea>
-      <textarea filename="nested-oglu.html">
-        <template>
-          this is nested oglu nested
-          <multi-two-two></multi-two-two>
-          <multi-one-one></multi-one-one>
-        </template>
-      </textarea>
-      <textarea filename="multi-one.html">
-        <template>
-          multi one
-          <multi-two></multi-two>
-        </template>
-        <script>
-          get([
-            "multi-one-one.html",
-            "multi-two-two.html"
-          ])
-        </script>
-      </textarea>
-      <textarea filename="multi-two.html">
-        <template>
-          multi two
-        </template>
-      </textarea>
-      <textarea filename="multi-one-one.html">
-        <template>
-          multi one one
-        </template>
-      </textarea>
-      <textarea filename="multi-two-two.html">
-        <template>
-          multi two two
-        </template>
-      </textarea>
     </section>
-    -->
   </repl-component>
 
   <script src="../simply.js"></script>
