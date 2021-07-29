@@ -219,6 +219,7 @@ function utils() {
       if (typeof simply.components[name] == "undefined") {
         simply.components[name] = {};
         var request = new XMLHttpRequest();
+
         request.open('GET', path, true);
 
         request.onload = function () {
@@ -600,6 +601,7 @@ function utils() {
         // Invoked each time the custom element is
         // disconnected from the document's DOM.
         disconnectedCallback() {
+          console.log("disko");
           if (typeof this.lifecycle !== "undefined") {
             if (typeof this.lifecycle.disconnected !== "undefined") {
               this.lifecycle.disconnected();

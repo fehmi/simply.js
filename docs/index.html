@@ -206,11 +206,6 @@
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
   <script>
     (function () {
-      function loadJS(src, attrs) {
-        document.write(
-          '<script src="' + src + '" ' + (attrs || '') + '><\/script>'
-        );
-      }
 
       // Public site only
       if (/docsify/.test(location.host)) {
@@ -224,9 +219,19 @@
       }
     })();
   </script>
-  <script src="https://cdn.jsdelivr.net/gh/fehmi/simply.js/simply.min.js"></script>
+
+  <script src="../simply.min.js"></script>
   <script>
-    get("https://cdn.jsdelivr.net/gh/fehmi/simply.js/repl/repl-component.html");
+    if (document.location.host == "root") {
+      loadJS("../simply.min.js", function () {
+        get("../repl/repl-component.html");
+      });
+    }
+    else {
+      loadJS("https://cdn.jsdelivr.net/gh/fehmi/simply.js/simply.min.js", function () {
+        get("https://cdn.jsdelivr.net/gh/fehmi/simply.js/repl/repl-component.html");
+      });
+    }
   </script>
 </body>
 
