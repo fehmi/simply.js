@@ -1,4 +1,4 @@
-* [<img src="_images/logo.png">](/)
+* [<img src="images/logo.png">](/)
 - [Documentation](quickstart.md)
 - Tutorial
 - Examples
