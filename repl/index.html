@@ -7,6 +7,13 @@
     body {
       background-color: aliceblue;
     }
+
+    repl-component {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
   </style>
 </head>
 
@@ -31,39 +38,19 @@
         <template>
           <h1>Hello World!</h1>
           <p>Greetings from {data.name}</p>
-          <test-test></test-test>
         </template>
 
+        <style>
+          h1 {
+            font-family: Arial, Helvetica;
+            color: cadetblue;
+          }
+        </style>
+
         <script>
-          get("test-test.html");
           class {
             data = {
               name: "simply.js"
-            }
-          }
-        </script>
-      </textarea>
-      <textarea filename="test-test.html">
-        <template>
-          <h1 onclick="a.c()">bu h1</h1>
-          test test {parent.name}
-        </template>
-
-        <script>
-
-          class {
-            methods = {
-              a: {
-                c() {
-                  alert("cee'ee");
-                }
-              }
-            }
-            lifecycle = {
-              afterFirstRender() {
-                //dom.querySelector("h1").style.display = "none";
-                console.log(parent.data.name);
-              }
             }
           }
         </script>

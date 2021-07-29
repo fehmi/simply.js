@@ -12,13 +12,13 @@ See the [Quick start](quickstart.md) guide for more details.
 
 - Zero dependency
 - Simple and lightweight
-- 7kb gzipped
+- Lightweight (10kb gzipped)
 - Reactive
-- Built-in template engine
+- Built-in powerfull template engine
 - State management
 - Router
 - REPL
-- Compatible with IE9+
+- IE 11+, Edge, Chrome, Firefox, Safari, Opera
 
 ## Examples
 
@@ -32,6 +32,6 @@ Please consider donating if you think simply is helpful to you. I am happy if yo
 
 _Obaa_ for reactive variables<br>
 _Morphdom_ for DOM diffing/pathing<br>
-_Navigoo_ for router<br>
+_Vaadin_ for router<br>
 _Docsify_ for documentation
 

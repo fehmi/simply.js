@@ -1,5 +1,6 @@
 # Quick Start
 
+
 ## Installation
 
 You can add simply to your document via `<script>` tag and that's all.

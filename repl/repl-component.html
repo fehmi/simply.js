@@ -48,7 +48,7 @@
       <div id="result-header">
         Result
       </div>
-      <if data.props.addressbar == true>
+      <if data.props.addressbar==true>
         <div id="addressbar">
           <!-- {data.urlHistory.length} - {data.currentUrlIndex} -->
           <button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="goBack(event);"></button>
@@ -61,7 +61,7 @@
       <iframe id="result" name="result" {(data.resize.x || data.resize.y) ? "resizing" : "" }></iframe>
     </div>
   </div>
-  <if data.props.console == true>
+  <if data.props.console==true>
     <div class="h-resizer" onmousedown="resize(event)"></div>
     <div id="console">
       <label>CONSOLE <a onclick="clearConsole(event)">Clear</a></label>
@@ -84,21 +84,18 @@
 <style>
   :host {
     display: flex;
-    width: 100%;
-    height: 100%;
-    max-width: 1200px;
-    max-height: 700px;
+    width: 1000px;
+    height: 500px;
     border: 2px solid #dddddd;
     font-family: Arial, Helvetica, sans-serif;
     flex-direction: column;
     background-color: white;
     box-shadow: 0px 0px 25px rgb(0 0 0 / 10%);
+    text-align: left;
+    font-size: 13px;
+    box-sizing: border-box;
     /* border-radius: 10px; */
     /* overflow: hidden; */
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
   }
 
   :host(.fullscreen) {
@@ -131,7 +128,8 @@
   }
 
   #topArea {
-    display: flex;/*
+    display: flex;
+    /*
     height: calc(100% - 40px - "{data.topAreaHeight}");
     max-height: calc(100% - 30px);*/
     flex: 1;
@@ -1005,14 +1003,14 @@
           var containerHeight = dom.getRootNode().host.offsetHeight;
 
           if (data.resize.x) {
-            var offsetRight = containerWidth - (me.clientX - dom.getRootNode().host.offsetLeft);
+            var offsetRight = containerWidth - (me.clientX - dom.getRootNode().host.getBoundingClientRect().left);
             var birim = containerWidth / 100;
             offsetRight = 100 - (offsetRight / birim);
             data.editorWidth = offsetRight + "%";
-            console.log(offsetRight);
           }
           else {
-            var offsetTop = containerHeight - (me.clientY - dom.getRootNode().host.offsetTop);
+            console.log(containerHeight);
+            var offsetTop = containerHeight - (me.clientY - dom.getRootNode().host.getBoundingClientRect().top);
             data.topAreaHeight = Math.abs(offsetTop) + "px";
           }
         });
@@ -1339,7 +1337,9 @@ SOFTWARE.';
               char
             });
             var messages = dom.querySelector("#console .messages");
-            messages.scrollTop = messages.scrollHeight;
+            if (messages) {
+              messages.scrollTop = messages.scrollHeight;
+            }
           }
         });
 
@@ -1348,10 +1348,16 @@ SOFTWARE.';
             var slot = dom.querySelector('slot[name=files]');
             component.editors = [];
 
-            if (location.search.length > 1 && location.search.indexOf("?") == 0) {
+            if ((location.search.length > 1 && location.search.indexOf("?") == 0) || data.props.id) {
+              if (data.props.id) {
+                var id = data.props.id;
+              }
+              else {
+                var id = location.search.substring(1);
+              }
               var xhr = new XMLHttpRequest();
               xhr.withCredentials = true;
-              xhr.open("GET", data.URLShortening.redirect + location.search.substring(1), true);
+              xhr.open("GET", data.URLShortening.redirect + id, true);
               xhr.send();
               xhr.addEventListener("readystatechange", function () {
                 if (this.readyState === 4) {
@@ -1374,6 +1380,7 @@ SOFTWARE.';
                 }
               });
             }
+
             else if (slot.assignedNodes()[0]) {
               var files = slot.assignedNodes()[0].querySelectorAll("textarea");
               for (let index = 0; index < files.length; index++) {
