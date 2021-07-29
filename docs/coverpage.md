@@ -1,4 +1,4 @@
-<img src="images/fav.png" width="50px">
+<img src="docs/images/fav.png" width="50px">
 
 # <b>simply.js</b> <small>0.3 alpha</small>
 > Simple toolkit for simple web-apps.

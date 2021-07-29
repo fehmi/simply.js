@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>simply</title>
-  <link rel="icon" href="images/fav.png" />
+  <link rel="icon" href="docs/images/fav.png" />
   <meta name="google-site-verification" content="6t0LoIeFksrjF4c9sqUEsVXiQNxLp2hgoqo0KryT-sE" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="keywords" content="doc,docs,documentation,gitbook,creator,generator,github,jekyll,github-pages" />
@@ -126,7 +126,7 @@
         '.*?/changelog':
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
         '/_navbar.md': '/navbar.md',
-        '/_sidebar.md': '/sidebar.md',
+        '/_sidebar.md': 'docs/sidebar.md',
         '/zh-cn/(.*)':
           'https://raw.githubusercontent.com/docsifyjs/docs-zh/master/$1',
         '/de-de/(.*)':
@@ -139,10 +139,10 @@
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
       },
       auto2top: true,
-      coverpage: 'coverpage.md',
+      coverpage: 'docs/coverpage.md',
       executeScript: true,
       loadSidebar: true,
-      loadNavbar: 'navbar.md',
+      loadNavbar: 'docs/navbar.md',
       mergeNavbar: true,
       maxLevel: 4,
       subMaxLevel: 2,
@@ -151,7 +151,7 @@
         host: '//matomo.thunderwave.de',
         id: 6,
       },
-      name: 'simply',
+      name: 'simply.js',
       search: {
         noData: {
           '/de-de/': 'Keine Ergebnisse!',
@@ -252,16 +252,10 @@
   </script>
 
   <script>
-    if (document.location.host == "root") {
-      loadJS("../simply.min.js", function () {
-        get("../repl/repl-component.html");
+      loadJS("simply.min.js", function () {
+        get("repl/repl-component.html");
       });
-    }
-    else {
-      loadJS("https://cdn.jsdelivr.net/gh/fehmi/simply.js@latest/simply.min.js", function () {
-        get("https://cdn.jsdelivr.net/gh/fehmi/simply.js@latest/repl/repl-component.html");
-      });
-    }
+
     // :)
   </script>
 </body>

@@ -1,9 +1,9 @@
-* [<img src="images/logo.png">](/)
-- [Documentation](quickstart.md)
+* [<img src="docs/images/logo.png">](/)
+- [Documentation](docs/quickstart.md)
 - Tutorial
 - Examples
 - Playground
 - Translations
-  - [:uk: English](/)
-  - [:tr: Turkish](/tr/)
+  - [:uk: English](docs/)
+  - [:tr: Turkish](docs/tr/)
 - Github
