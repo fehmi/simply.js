@@ -1,3 +1,4 @@
+* [<img src="_images/logo.png">](/)
 - [Documentation](quickstart.md)
 - Tutorial
 - Examples
@@ -5,3 +6,4 @@
 - Translations
   - [:uk: English](/)
   - [:tr: Turkish](/tr/)
+- Github

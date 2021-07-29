@@ -4,7 +4,3 @@
 > Simple toolkit for simple web-apps.
 
 <center><repl-component id="p" download="true"></replcomponent></center>
-
-
-[GitHub](https://github.com/fehmi/simply.js)
-[Getting Started](#main)

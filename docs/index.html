@@ -50,6 +50,50 @@
     section.cover h1 small {
       bottom: unset;
     }
+
+    section.cover .anchor {
+      pointer-events: none;
+      padding-top: 0px;
+    }
+
+    nav.app-nav {
+      position: fixed;
+      background-color: white;
+      margin: 0 !important;
+      width: 100%;
+      height: 60px;
+      border-bottom: 1px solid #677876;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 25px;
+    }
+
+    .anchor {
+      pointer-events: none;
+      padding-top: 75px;
+    }
+
+    body[data-page='README.md'] {
+      overflow: hidden;
+    }
+
+    nav.app-nav>ul:first-child {
+      flex: 1;
+      justify-content: left;
+      text-align: left;
+      padding-left: 0px;
+    }
+
+    nav.app-nav>ul:first-child li {
+      padding-left: 0px;
+      margin-left: 0px;
+    }
+
+
+    nav.app-nav>ul:first-child img {
+      width: 170px;
+    }
   </style>
 </head>
 
