@@ -1,9 +1,6 @@
 * [<img src="docs/images/logo.png">](/)
-- [Documentation](docs/quickstart.md)
+- [Documentation](docs/)
 - Tutorial
 - Examples
-- Playground
-- Translations
-  - [:uk: English](docs/)
-  - [:tr: Turkish](docs/tr/)
-- Github
+- [Playground](playground.md)
+- [Github](https://github.com/fehmi/simply.js)

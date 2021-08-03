@@ -3,65 +3,8 @@
 <head>
   <title>simply / REPL</title>
   <meta charset="UTF-8">
-  <style>
-    body {
-      background-color: aliceblue;
-    }
-
-    repl-component {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-  </style>
+  <meta http-equiv="refresh" content="0; url=../#/repl">
 </head>
 
-<body>
-  <repl-component class="fullscreen" title="Hello World!" fullscreen="true" save="true" download="true" console="true">
-    <section slot="files" style="display: none">
-      <textarea filename="index.html">
-        <html>
-          <head>
-            <title>simply / REPL</title>
-          </head>
-          <body>
-            <hello-world></hello-world>
-            <script src="https://root/simply/simply.js"></script>
-            <script>
-              get("hello-world.html");
-            </script>
-          </body>
-        </html>
-      </textarea>
-      <textarea filename="hello-world.html" selected>
-        <template>
-          <h1>Hello World!</h1>
-          <p>Greetings from {data.name}</p>
-        </template>
-
-        <style>
-          h1 {
-            font-family: Arial, Helvetica;
-            color: cadetblue;
-          }
-        </style>
-
-        <script>
-          class {
-            data = {
-              name: "simply.js"
-            }
-          }
-        </script>
-      </textarea>
-    </section>
-  </repl-component>
-
-  <script src="../simply.js"></script>
-  <script>
-    get("repl-component.html");
-  </script>
-</body>
 
 </html>

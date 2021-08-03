@@ -523,7 +523,7 @@ function utils() {
 
         render() {
           let m;
-          let regex = /\s+on[a-z]+\=(\"|\')([^}"\n]*)(\"|\')/gm;
+          let regex = /\s+on[a-z]+\=(\"|\')([^"\n]*)(\"|\')/gm;
           while ((m = regex.exec(template)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === regex.lastIndex) {
@@ -551,7 +551,6 @@ function utils() {
                 }
               }
             }
-            console.log(this.data);
             //this.dom = this.attachShadow({ mode: 'open' });
             //this.dom.appendChild(style.cloneNode(true));
             this.dom.innerHTML = parsedTemplate;
@@ -601,7 +600,6 @@ function utils() {
         // Invoked each time the custom element is
         // disconnected from the document's DOM.
         disconnectedCallback() {
-          console.log("disko");
           if (typeof this.lifecycle !== "undefined") {
             if (typeof this.lifecycle.disconnected !== "undefined") {
               this.lifecycle.disconnected();

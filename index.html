@@ -60,13 +60,14 @@
       position: fixed;
       background-color: white;
       margin: 0 !important;
-      width: 100%;
+      width: 100vw;
       height: 60px;
       border-bottom: 1px solid #677876;
       display: flex;
       align-items: center;
       justify-content: flex-end;
       padding: 0 25px;
+      right: unset;
     }
 
     .anchor {
@@ -113,6 +114,11 @@
     .sidebar .app-name-link {
       display: none;
     }
+
+    body[data-page=docs\/playground\.md] .sidebar,
+    body[data-page=docs\/playground\.md] .sidebar-toggle {
+      display: none;
+    }
   </style>
 </head>
 
@@ -137,9 +143,12 @@
           'https://raw.githubusercontent.com/docsifyjs/docs-es/master/$1',
         '/write-a-plugin':
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
+          '/playground': 'docs/playground.md',
       },
       auto2top: true,
-      coverpage: 'docs/coverpage.md',
+      coverpage: {
+        '/': 'docs/coverpage.md'
+      },
       executeScript: true,
       loadSidebar: true,
       loadNavbar: 'docs/navbar.md',
@@ -147,10 +156,6 @@
       maxLevel: 4,
       subMaxLevel: 2,
       ga: 'UA-106147152-1',
-      matomo: {
-        host: '//matomo.thunderwave.de',
-        id: 6,
-      },
       name: 'simply.js',
       search: {
         noData: {
@@ -240,21 +245,16 @@
 
       // Public site only
       if (/docsify/.test(location.host)) {
-        ((window.gitter = {}).chat = {}).options = {
-          room: 'docsifyjs/Lobby',
-        };
 
         loadJS('//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/ga.min.js');
-        loadJS('//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/matomo.min.js');
-        loadJS('//sidecar.gitter.im/dist/sidecar.v1.js', 'async defer');
       }
     })();
   </script>
 
   <script>
-      loadJS("simply.min.js", function () {
-        get("repl/repl-component.html");
-      });
+    loadJS("simply.min.js", function () {
+      get("repl/repl-component.html");
+    });
 
     // :)
   </script>

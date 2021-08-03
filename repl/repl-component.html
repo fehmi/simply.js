@@ -33,10 +33,14 @@
               <div class="ghost-input">{file.filename.replace('.html', '')}</div>
             </div>
             <div class="extension">.html</div>
-            <div class="delete" onclick="deleteFile(event)">✕</div>
+            <if data.props.crud==true>
+              <div class="delete" onclick="deleteFile(event)">✕</div>
+            </if>
           </li>
         </each>
-        <li class="add" onclick="addFile()">+</li>
+        <if data.props.crud==true>
+          <li class="add" onclick="addFile()">+</li>
+        </if>
       </ul>
 
       <ul id="files" passive>
@@ -101,12 +105,12 @@
   :host(.fullscreen) {
     position: fixed;
     width: 100%;
-    height: 100%;
+
     left: 0;
-    top: 0;
     transform: translate(0, 0);
     max-width: unset;
     max-height: unset;
+    top: 0;
   }
 
   header {
@@ -200,7 +204,7 @@
     margin: 0px;
     overflow: auto;
     position: absolute;
-    top: 26px;
+    top: 35px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -254,6 +258,7 @@
     font-size: 12px;
     outline: none;
     width: 100%;
+    box-sizing: border-box;
   }
 
   #file-tabs {
@@ -657,7 +662,6 @@
           data.console = [];
 
         });
-
       },
       rewriteGet(filename, content) {
         var regex = /(?<!\/\/(\s+)?)get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm;
@@ -1042,13 +1046,14 @@
         component.editors[filename].focus();
       },
       focusFilename(e) {
-        var selected = e.target.parentElement.parentElement.getAttribute("selected");
-
-        if (selected == "true") {
-          e.stopPropagation();
-          e.target.readOnly = false;
-          e.target.parentElement.parentElement.classList.add("focus");
-          e.target.focus();
+        if (data.props.crud == true) {
+          var selected = e.target.parentElement.parentElement.getAttribute("selected");
+          if (selected == "true") {
+            e.stopPropagation();
+            e.target.readOnly = false;
+            e.target.parentElement.parentElement.classList.add("focus");
+            e.target.focus();
+          }
         }
       },
       inputFilename(e) {
@@ -1292,7 +1297,7 @@ SOFTWARE.';
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             var id = this.responseText;
-            window.history.pushState('', '', document.location.origin + document.location.pathname + "?" + id);
+            window.history.pushState('', '', document.location.origin + document.location.pathname + document.location.hash + "?" + id);
           }
         });
 
@@ -1300,87 +1305,88 @@ SOFTWARE.';
         xhr.send(d);
       },
       init() {
+
         var slot = dom.querySelector('slot[name=files]');
-            component.editors = [];
-            console.log("id", data.props.id);
-            if ((location.search.length > 1 && location.search.indexOf("?") == 0) || data.props.id) {
+        component.editors = [];
+        if ((location.hash.length > 1 && location.hash.indexOf("?") == 0) || data.props.id) {
+
+          if (location.hash.split("?")[1] !== undefined) {
+            var id = location.hash.split("?")[1];
+            console.log("hay der", id);
+          }
+          else if (data.props.id) {
+            var id = data.props.id;
+          }
+
+          var xhr = new XMLHttpRequest();
+          xhr.withCredentials = true;
+          xhr.open("GET", data.URLShortening.redirect + id, true);
+          xhr.send();
+          xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+              var project = JSON.parse(decodeURIComponent(escape(atob(this.responseText))));
 
 
-              if (data.props.id) {
-                var id = data.props.id;
-              }
-              else {
-                var id = location.search.substring(1);
-              }
-              var xhr = new XMLHttpRequest();
-              xhr.withCredentials = true;
-              xhr.open("GET", data.URLShortening.redirect + id, true);
-              xhr.send();
-              xhr.addEventListener("readystatechange", function () {
-                if (this.readyState === 4) {
+              var targetEl = dom.querySelector("ul#files");
 
-                  var project = JSON.parse(decodeURIComponent(escape(atob(this.responseText))));
-
-
-                  var targetEl = dom.querySelector("ul#files");
-
-                  for (var i = 0; i < project.files.length; i++) {
-                    var file = project.files[i];
-                    data.files.push({
-                      filename: file.filename,
-                      selected: file.selected
-                    });
-                    component.methods.createNewCodemirror(file.filename, file.selected, targetEl, file.content);
-                  }
-                  data.props.title = project.title;
-                  component.methods.renderResult();
-                }
-              });
-            }
-
-            else if (slot.assignedNodes()[0]) {
-              var files = slot.assignedNodes()[0].querySelectorAll("textarea");
-              for (let index = 0; index < files.length; index++) {
-                var fileEl = files[index];
-                var filename = fileEl.getAttribute("filename");
-                var fileContent = fileEl.value;
-                var isFileSelected = fileEl.hasAttribute("selected");
+              for (var i = 0; i < project.files.length; i++) {
+                var file = project.files[i];
                 data.files.push({
-                  filename: filename,
-                  selected: isFileSelected
+                  filename: file.filename,
+                  selected: file.selected
                 });
+                component.methods.createNewCodemirror(file.filename, file.selected, targetEl, file.content);
               }
+              data.props.title = project.title;
 
-              for (var index = 0; index < files.length; index++) {
-                var textarea = files[index];
-                var filename = files[index].getAttribute("filename");
-                var selected = files[index].hasAttribute("selected");
-                var targetEl = dom.querySelector("ul#files");
-
-                // remove unnecessary indents
-                var indent = textarea.value.split('\n').join('').match(/^\s*/)[0].length;
-                var text = textarea.value.trim();
-                var a = new RegExp("^\ {" + indent + "}", "gm");
-                text = text.replace(a, "");
-
-                component.methods.createNewCodemirror(filename, selected, targetEl, text);
-              }
               component.methods.renderResult();
             }
+          });
+        }
 
-            var cmInitCheck = setInterval(() => {
-              var px = 0;
-              try {
-                var px = parseInt(dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
-              } catch (error) { }
+        else if (slot.assignedNodes()[0]) {
+          var files = slot.assignedNodes()[0].querySelectorAll("textarea");
+          for (let index = 0; index < files.length; index++) {
+            var fileEl = files[index];
+            var filename = fileEl.getAttribute("filename");
+            var fileContent = fileEl.value;
+            var isFileSelected = fileEl.hasAttribute("selected");
+            data.files.push({
+              filename: filename,
+              selected: isFileSelected
+            });
+          }
 
-              if (px > 100) {
-                component.editors["index.html"].refresh();
-              }
-              else {
-                clearInterval(cmInitCheck);
-              }
-            }, 10);
+          for (var index = 0; index < files.length; index++) {
+            var textarea = files[index];
+            var filename = files[index].getAttribute("filename");
+            var selected = files[index].hasAttribute("selected");
+            var targetEl = dom.querySelector("ul#files");
+
+            // remove unnecessary indents
+            var indent = textarea.value.split('\n').join('').match(/^\s*/)[0].length;
+            var text = textarea.value.trim();
+            var a = new RegExp("^\ {" + indent + "}", "gm");
+            text = text.replace(a, "");
+
+            component.methods.createNewCodemirror(filename, selected, targetEl, text);
+          }
+          component.methods.renderResult();
+        }
+
+        var cmInitCheck = setInterval(() => {
+          var px = 0;
+          try {
+            var px = parseInt(dom.querySelector(".CodeMirror[selected=true] > div:first-child").style.left.replace("px", ""));
+          } catch (error) { }
+
+          if (px > 100) {
+            component.editors["index.html"].refresh();
+          }
+          else {
+            clearInterval(cmInitCheck);
+          }
+        }, 10);
       }
     }
     lifecycle = {
