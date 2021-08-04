@@ -779,7 +779,6 @@
             }
             else {
               eval(event.data.code + "//@ sourceURL=console");
-
             }
           }
           else if (event.data.action = "go") {
@@ -921,6 +920,46 @@
         }(this));
 
         ConsoleListener.on(function (methodName, message) {
+          try {
+            if (typeof eval(message) == "object") {
+              if (message instanceof ShadowRoot) {
+                message = "[ShadowRoot]"
+              }
+              else if (message instanceof Window) {
+                message = "[Window]"
+              }
+              else if (message instanceof Document) {
+                message = "[Document]"
+              }
+              else if (eval(message) instanceof Element) {
+                message = "[HTMLElement] " + message.tagName
+              }
+              else {
+                // normal obj ise
+                try {
+                  message = JSON.stringify(message);
+                } catch (e) {
+                  // circular obj ise
+                  const getCircularReplacer = () => {
+                    const seen = new WeakSet();
+                    return (key, value) => {
+                      if (typeof value === "object" && value !== null) {
+                        if (seen.has(value)) {
+                          return;
+                        }
+                        seen.add(value);
+                      }
+                      if (key !== "__o_" && key !== "__c_" && key !== "__p_" && key !== "__r_") {
+                        return value;
+                      }
+                    };
+                  };
+                  message = JSON.stringify(message, getCircularReplacer());
+                }
+              }
+            }
+          } catch (error) { }
+
           self = this;
           window.parent.postMessage({
             action: "console",
@@ -931,7 +970,6 @@
             char: self.char
           }, event);
         });
-
 
         window.onerror = function (error, file, line, char) {
           if (file !== "console") {
@@ -1297,7 +1335,14 @@ SOFTWARE.';
         xhr.addEventListener("readystatechange", function () {
           if (this.readyState === 4) {
             var id = this.responseText;
-            window.history.pushState('', '', document.location.origin + document.location.pathname + document.location.hash + "?" + id);
+            if (document.location.hash.indexOf("?") > -1) {
+              var hash = document.location.hash.split("?")[0];
+            }
+            else {
+              var hash = document.location.hash;
+            }
+
+            window.history.pushState('', '', document.location.origin + document.location.pathname + hash + "?" + id);
           }
         });
 
