@@ -9,7 +9,12 @@
   <meta name="keywords" content="simply, ui, ux, toolkit, mvc" />
   <meta name="description" content="Simple toolkit for simple web-apps." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />
+  <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />-->
+  <link
+  rel="stylesheet"
+  href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css"
+  title="vue"
+/>
   <style>
     nav.app-nav li ul {
       min-width: 100px;
@@ -30,8 +35,8 @@
     section.cover {
       background: aliceblue !important;
       align-items: flex-start;
-      margin-top: 65px;
-      height: calc(100vh - 65px);
+      margin-top: 60px;
+      height: calc(100vh - 60px);
       overflow: auto;
       padding-bottom: 30px;
       padding-top: 30px;
@@ -80,7 +85,6 @@
 
     .anchor {
       pointer-events: none;
-      padding-top: 75px;
     }
 
     body[data-page='README.md'] {
@@ -164,6 +168,7 @@
       maxLevel: 4,
       subMaxLevel: 2,
       ga: 'UA-106147152-1',
+      topMargin: 75,
       name: 'simply.js',
       search: {
         noData: {
