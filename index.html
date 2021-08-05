@@ -3,17 +3,13 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>simply</title>
+  <title>simply.js</title>
   <link rel="icon" href="docs/images/fav.png" />
-  <meta name="google-site-verification" content="6t0LoIeFksrjF4c9sqUEsVXiQNxLp2hgoqo0KryT-sE" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="keywords" content="doc,docs,documentation,gitbook,creator,generator,github,jekyll,github-pages" />
-  <meta name="description" content="A magical documentation generator." />
+  <meta name="keywords" content="simply, ui, ux, toolkit, mvc" />
+  <meta name="description" content="Simple toolkit for simple web-apps." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" title="vue" disabled />
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css" title="dark" disabled />
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/pure.css" title="pure" disabled />
   <style>
     nav.app-nav li ul {
       min-width: 100px;
@@ -33,6 +29,16 @@
 
     section.cover {
       background: aliceblue !important;
+      align-items: flex-start;
+      margin-top: 65px;
+      height: calc(100vh - 65px);
+      overflow: auto;
+      padding-bottom: 30px;
+      padding-top: 30px;
+    }
+
+    section.cover .cover-main {
+      margin: 0;
     }
 
     section.cover h1 {
@@ -40,7 +46,8 @@
     }
 
     section.cover blockquote {
-      margin-top: 0px;
+      margin-top: -5px;
+      margin-bottom: 45px;
     }
 
     section.cover p {
@@ -68,6 +75,7 @@
       justify-content: flex-end;
       padding: 0 25px;
       right: unset;
+      top: 0;
     }
 
     .anchor {
@@ -143,7 +151,7 @@
           'https://raw.githubusercontent.com/docsifyjs/docs-es/master/$1',
         '/write-a-plugin':
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
-          '/playground': 'docs/playground.md',
+        '/playground': 'docs/playground.md',
       },
       auto2top: true,
       coverpage: {
