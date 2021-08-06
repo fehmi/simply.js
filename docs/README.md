@@ -8,6 +8,7 @@ Long story short, simply.js is the name of the brand new template engine and the
 
 See the [Quick start](quickstart.md) guide for more details.
 
+
 ## Features
 
 - Zero dependency

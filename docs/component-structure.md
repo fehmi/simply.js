@@ -1,3 +1,7 @@
+## How it works
+
+Component concept are at the center of simply.js. All other things are shaped around it. Simply.js is responsible the communication between the parts or components and their orchestration. Actually, a component is just a simple HTML file that has three parts. Template, style and script. So how does a component looks like.
+
 ## Component Syntax
 
 You can define your variables on the data section in your component like this.

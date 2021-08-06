@@ -10,12 +10,31 @@
   <meta name="description" content="Simple toolkit for simple web-apps." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
   <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />-->
-  <link
-  rel="stylesheet"
-  href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css"
-  title="vue"
-/>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" title="vue" />
   <style>
+    :root {
+      --theme-color: #2c9cb5;
+    }
+
+    body {
+      font-size: 18px;
+      font-family: system-ui, Helvetica, Arial, sans-serif;
+    }
+
+    .markdown-section ol,
+    .markdown-section p,
+    .markdown-section ul {
+      line-height: 1.8rem;
+    }
+
+    .sidebar ul li a {
+      font-size: 16px;
+    }
+
+    .sidebar li {
+      margin: 2px 0;
+    }
+
     nav.app-nav li ul {
       min-width: 100px;
     }
@@ -74,13 +93,13 @@
       margin: 0 !important;
       width: 100vw;
       height: 60px;
-      border-bottom: 1px solid #677876;
       display: flex;
       align-items: center;
       justify-content: flex-end;
       padding: 0 25px;
       right: unset;
       top: 0;
+      box-shadow: 0 -0.4rem 0.9rem 0.2rem rgb(0 0 0 / 30%);
     }
 
     .anchor {
@@ -130,6 +149,61 @@
     body[data-page=docs\/playground\.md] .sidebar,
     body[data-page=docs\/playground\.md] .sidebar-toggle {
       display: none;
+    }
+
+    .sidebar {
+      background-color: slategray;
+      /* color: white; */
+    }
+
+    .sidebar ul li a {
+      color: rgb(216 221 226);
+      font-weight: 500;
+    }
+
+    .sidebar li>p {
+      font-weight: 700;
+      margin: 0;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 15px;
+    }
+
+    .search input {
+      outline: none;
+      border: none;
+      width: 100%;
+      padding: 0 7px;
+      line-height: 36px;
+      font-size: 14px;
+      border: none;
+      background: transparent;
+      color: white;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    .search input::placeholder {
+      color: rgba(255, 255, 255, .5);
+    }
+
+    li.active>a {
+      color: white !important;
+      border-right: 4px solid white !important;
+      background: transparent;
+    }
+
+    .sidebar-toggle {
+      display: none;
+    }
+
+    .app-sub-sidebar li:before {
+      color: #d8dde2;
+    }
+
+    .sidebar-nav>ul {
+      margin: 35px 0px 10px 40px;
     }
   </style>
 </head>
