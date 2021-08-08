@@ -1,6 +1,6 @@
 - Introduction
 
-  - [What is simple.js](docs/)
+  - [About](docs/)
   - [Getting Started](docs/quickstart.md)
 
 - <br>Component Syntax

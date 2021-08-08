@@ -47,7 +47,7 @@
     .markdown-section {
       margin: 0 auto;
       max-width: 50%;
-      padding: 30px 15px 40px;
+      padding: 50px 15px 40px;
       position: relative;
     }
 
@@ -74,8 +74,13 @@
       margin-bottom: 45px;
     }
 
+    section.cover blockquote p {
+      margin-top: 5px;
+    }
+
     section.cover p {
       margin-top: 10px;
+      margin-bottom: 0px;
     }
 
     section.cover h1 small {
@@ -124,6 +129,8 @@
 
     nav.app-nav>ul:first-child a {
       border: none;
+      display: block;
+      font-size: 0;
     }
 
     nav.app-nav>ul:first-child img {
@@ -192,6 +199,11 @@
       color: white !important;
       border-right: 4px solid white !important;
       background: transparent;
+      border: none !important;
+      background-position: right;
+      background-repeat: no-repeat;
+      background-image: url("data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 25.2.0, SVG Export Plug-In --%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='18.4px' height='17.4px' viewBox='0 0 18.4 17.4' style='overflow:visible;enable-background:new 0 0 18.4 17.4;' xml:space='preserve'%3E%3Cstyle type='text/css'%3E .st0%7Bfill-rule:evenodd;clip-rule:evenodd;fill:%23FFFFFF;%7D%0A%3C/style%3E%3Cdefs%3E%3C/defs%3E%3Cg%3E%3Cpath class='st0' d='M14.6,9.7H0v-2h14.6L8.3,1.4L9.7,0l8.7,8.7l-8.7,8.7L8.3,16L14.6,9.7z'/%3E%3C/g%3E%3C/svg%3E%0A");
+      margin-right: 10px;
     }
 
     .sidebar-toggle {
@@ -205,6 +217,47 @@
     .sidebar-nav>ul {
       margin: 35px 0px 10px 40px;
     }
+
+    section.cover small {
+      vertical-align: top;
+    }
+
+    .markdown-section code {
+      color: #2ea971;
+    }
+
+    span.edit a {
+      font-weight: 400;
+      color: #c5c5c5;
+      /* opacity: .3; */
+    }
+
+    .sidebar li.collapse .app-sub-sidebar {
+      display: block;
+    }
+
+    .markdown-section h1 {
+      font-size: 2.4rem;
+    }
+
+    /*
+    .sidebar-nav>ul>li>ul>li.collapse:not(.open) a {
+      background: none;
+    }
+
+    .sidebar-nav>ul>li>ul>li.collapse:not(.open) >a {
+      color: white;
+    font-weight: 600;
+    color: white !important;
+    border-right: 4px solid white !important;
+    background: transparent;
+    border: none !important;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 25.2.0, SVG Export Plug-In --%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='18.4px' height='17.4px' viewBox='0 0 18.4 17.4' style='overflow:visible;enable-background:new 0 0 18.4 17.4;' xml:space='preserve'%3E%3Cstyle type='text/css'%3E .st0%7Bfill-rule:evenodd;clip-rule:evenodd;fill:%23FFFFFF;%7D%0A%3C/style%3E%3Cdefs%3E%3C/defs%3E%3Cg%3E%3Cpath class='st0' d='M14.6,9.7H0v-2h14.6L8.3,1.4L9.7,0l8.7,8.7l-8.7,8.7L8.3,16L14.6,9.7z'/%3E%3C/g%3E%3C/svg%3E%0A");
+    margin-right: 10px;
+    }
+    */
   </style>
 </head>
 
@@ -231,7 +284,7 @@
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
         '/playground': 'docs/playground.md',
       },
-      auto2top: true,
+      auto2top: false,
       coverpage: {
         '/': 'docs/coverpage.md'
       },
@@ -241,8 +294,9 @@
       mergeNavbar: true,
       maxLevel: 4,
       subMaxLevel: 2,
+      sidebarDisplayLevel: 2,
       ga: 'UA-106147152-1',
-      topMargin: 75,
+      topMargin: 95,
       name: 'simply.js',
       search: {
         noData: {
@@ -270,13 +324,13 @@
                 .replace('@master', '/blob/main');
             } else {
               url =
-                'https://github.com/fehmi/simply.js/blob/main/docs/' +
+                'https://github.com/fehmi/simply.js/tree/main/' +
                 vm.route.file;
             }
-            var editHtml = '[:memo: Edit Document](' + url + ')\n';
+            var editHtml = '\n<span class="edit">[:memo: Edit Document](' + url + ')</span>';
             return (
-              editHtml +
               html +
+              editHtml +
               ''
             );
           }),
@@ -296,6 +350,7 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-plugin-carbon@1/index.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+
   <script>
     (function (w) {
       var loadJS = function (src, cb, ordered) {
@@ -343,7 +398,46 @@
       get("repl/repl-component.html");
     });
 
-    // :)
+    function scrollIntoView(path, id) {
+      if (!id) {
+        return
+      }
+      setTimeout(() => {
+        var section = find('#' + id);
+        section && section.scrollIntoView();
+        var li = nav[getNavKey(path, id)];
+        var sidebar = getNode('.sidebar');
+        var active = find(sidebar, 'li.active');
+        active && active.classList.remove('active');
+        li && li.classList.add('active');
+      }, 200)
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelector('.sidebar-nav').addEventListener(
+        'click', e => {
+
+          if (e.target.tagName === 'P') {
+            // e.target.parentElement.classList.toggle('open')
+          }
+
+          if (e.target.tagName === 'A') {
+            if (e.target.className.indexOf("section-link") == -1) {
+              selectFirst(e);
+            }
+          }
+        })
+    })
+
+    function selectFirst(e) {
+      var active = document.querySelectorAll("li.active");
+      for (let i = 0; i < active.length; i++) {
+        const element = active[i];
+        element.classList.remove("active");
+      }
+      e.target.parentNode.classList.add("active");
+      document.querySelector("body").scrollIntoView({ behavior: "auto", block: "end", inline: "nearest" });;
+    }
+
   </script>
 </body>
 
