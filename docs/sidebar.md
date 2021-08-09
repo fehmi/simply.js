@@ -1,7 +1,7 @@
 - Introduction
 
   - [About](docs/)
-  - [Getting Started](docs/quickstart.md)
+  - [Getting Started](docs/getting-started.md)
 
 - <br>Component Syntax
 

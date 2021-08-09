@@ -46,7 +46,7 @@
 
     .markdown-section {
       margin: 0 auto;
-      max-width: 50%;
+      max-width: 60%;
       padding: 50px 15px 40px;
       position: relative;
     }
@@ -240,6 +240,16 @@
       font-size: 2.4rem;
     }
 
+    .markdown-section>:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) code {
+      font-size: 1rem;
+      line-height: 1.8rem;
+    }
+
+    .markdown-section h4 {
+      margin-bottom: -10px;
+      margin-top: 40px;
+    }
+
     /*
     .sidebar-nav>ul>li>ul>li.collapse:not(.open) a {
       background: none;
@@ -258,6 +268,10 @@
     margin-right: 10px;
     }
     */
+
+    body section:not(.cover) repl-component {
+      width: 100%;
+    }
   </style>
 </head>
 
@@ -266,8 +280,6 @@
   <script>
     window.$docsify = {
       alias: {
-        '.*?/awesome':
-          'https://raw.githubusercontent.com/docsifyjs/awesome-docsify/master/README.md',
         '.*?/changelog':
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
         '/_navbar.md': '/navbar.md',
@@ -284,6 +296,7 @@
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
         '/playground': 'docs/playground.md',
       },
+      homepage: "docs/README.MD",
       auto2top: false,
       coverpage: {
         '/': 'docs/coverpage.md'
@@ -327,7 +340,7 @@
                 'https://github.com/fehmi/simply.js/tree/main/' +
                 vm.route.file;
             }
-            var editHtml = '\n<span class="edit">[:memo: Edit Document](' + url + ')</span>';
+            var editHtml = '\n<br><span class="edit">[:memo: Edit Document](' + url + ')</span>';
             return (
               html +
               editHtml +
