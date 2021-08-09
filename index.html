@@ -282,8 +282,8 @@
       alias: {
         '.*?/changelog':
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
-        '/_navbar.md': '/navbar.md',
-        '/_sidebar.md': 'docs/sidebar.md',
+        '/navbar.md': '/docs/navbar.md',
+        '/sidebar.md': 'docs/sidebar.md',
         '/zh-cn/(.*)':
           'https://raw.githubusercontent.com/docsifyjs/docs-zh/master/$1',
         '/de-de/(.*)':
@@ -303,8 +303,8 @@
         '/': 'docs/coverpage.md'
       },
       executeScript: true,
-      loadSidebar: true,
-      loadNavbar: 'docs/navbar.md',
+      loadSidebar: "sidebar.md",
+      loadNavbar: 'navbar.md',
       mergeNavbar: true,
       maxLevel: 4,
       subMaxLevel: 2,
