@@ -1208,6 +1208,8 @@
         console.log(component.files);
       },
       createNewCodemirror(filename, selected, targetEl, text) {
+        var autofocus = data.props.focus ? true: false;
+
         component.editors[filename] = CodeMirror(function (node) {
           node.setAttribute("filename", filename);
           node.setAttribute("selected", selected);
@@ -1218,7 +1220,7 @@
           lineNumbers: true,
           gutter: true,
           smartIndent: true,
-          autofocus: true,
+          autofocus: autofocus,
           mode: "htmlmixed",
           theme: 'default', // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
           styleActiveLine: true,
