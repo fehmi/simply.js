@@ -12,6 +12,12 @@
   <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />-->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" title="vue" />
   <style>
+    html {}
+
+    .cover.show+main {
+      display: none;
+    }
+
     :root {
       --theme-color: #2c9cb5;
     }
@@ -54,15 +60,24 @@
     section.cover {
       background: aliceblue !important;
       align-items: flex-start;
-      margin-top: 60px;
-      height: calc(100vh - 60px);
-      overflow: auto;
-      padding-bottom: 30px;
-      padding-top: 30px;
+      /* margin-top: 60px; */
+      height: 100%;
+      overflow: visible;
+      /* padding-bottom: 30px; */
+      padding-top: 120px;
+      /* flex: 1; */
+      position: relative;
+
     }
 
     section.cover .cover-main {
       margin: 0;
+      flex: 1;
+      margin: -20px 16px 0;
+      text-align: center;
+      position: relative;
+      background: aliceblue !important;
+      padding-bottom: 60px;
     }
 
     section.cover h1 {
@@ -109,10 +124,6 @@
 
     .anchor {
       pointer-events: none;
-    }
-
-    body[data-page='README.md'] {
-      overflow: hidden;
     }
 
     nav.app-nav>ul:first-child {
@@ -280,10 +291,12 @@
   <script>
     window.$docsify = {
       alias: {
-        '.*?/changelog':
-          'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
         '/navbar.md': '/docs/navbar.md',
         '/sidebar.md': 'docs/sidebar.md',
+        '/docs/': 'README.md',
+        '/README.MD': 'README.md',
+        '/playground': 'docs/playground.md',
+        '.*?/changelog': 'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
         '/zh-cn/(.*)':
           'https://raw.githubusercontent.com/docsifyjs/docs-zh/master/$1',
         '/de-de/(.*)':
@@ -294,10 +307,8 @@
           'https://raw.githubusercontent.com/docsifyjs/docs-es/master/$1',
         '/write-a-plugin':
           'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
-        '/playground': 'docs/playground.md',
-        '/README.MD': 'README.md',
       },
-      homepage: "docs/README.md",
+      homepage: "README.md",
       auto2top: false,
       coverpage: {
         '/': 'docs/coverpage.md'
