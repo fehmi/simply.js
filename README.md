@@ -13,7 +13,7 @@ Long story short, simply.js is the name of the brand new template engine and the
 
 ## How it works
 
-You will need to have basic understanding with [HTML](https://www.w3schools.com/html/default.asp), [CSS](https://www.w3schools.com/css/default.asp) and [JavaScript](https://www.w3schools.com/js/default.asp) to work with simply.js. They are relatively easy to learn languages when you think Super Mario was [hand-written](https://gist.github.com/1wErt3r/4048722) with 6502 assembly 40 years ago by Toshihiko Nakago. So don't worry about to jump in to learn them. [W3Schools](https://www.w3schools.com/) is a great stating point about these web related languages. You don't have to learn their every details. The big part of programming is to know how to search things on Google nowadays :)
+You will need to have basic understanding with [HTML](https://www.w3schools.com/html/default.asp), [CSS](https://www.w3schools.com/css/default.asp) and [JavaScript](https://www.w3schools.com/js/default.asp) to work with simply.js. They are relatively easy to learn languages when you think Super Mario was [hand-written](https://gist.github.com/1wErt3r/4048722) with 6502 assembly 40 years ago by Toshihiko Nakago. So don't worry about to jump in to learn them. [W3Schools](https://www.w3schools.com/) is a great stating point. You don't have to learn their every details. The big part of programming is to know how to search things on Google nowadays :)
 
 While you are working with simply.js everything will run in the browser of the user. So no compiler, no bundler, no builder, no config files. Just good old plain HTML, CSS, vanilla JavaScript and your [favourite text editor](https://code.visualstudio.com/). That's all.
 

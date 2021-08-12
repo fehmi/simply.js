@@ -169,11 +169,11 @@
       display: none;
     }
 
-    body.ready[data-page='docs/playground.md'] #main > * {
+    body.ready[data-page='docs/playground.md'] #main>* {
       display: none;
     }
 
-    body.ready[data-page='docs/playground.md'] #main > style + p {
+    body.ready[data-page='docs/playground.md'] #main>style+p {
       display: block;
     }
 
@@ -291,6 +291,14 @@
     body section:not(.cover) repl-component {
       width: 100%;
     }
+
+    .docsify-pagination-container {
+      margin: 2em 0 1em !important;
+    }
+
+    .pagination-item-subtitle {
+      margin-top: 5px!important;
+    }
   </style>
 </head>
 
@@ -320,6 +328,17 @@
       auto2top: false,
       coverpage: {
         '/': 'docs/coverpage.md'
+      },
+      tabs: {
+        persist: true,      // default
+        sync: true,      // default
+        theme: 'classic', // default
+        tabComments: true,      // default
+        tabHeadings: true       // default
+      },
+      pagination: {
+        crossChapter: true,
+        crossChapterText: true,
       },
       executeScript: true,
       loadSidebar: "sidebar.md",
@@ -383,6 +402,8 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-plugin-carbon@1/index.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
 
   <script>
     (function (w) {

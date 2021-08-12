@@ -568,6 +568,11 @@
     position: relative;
     background-color: rgba(0, 0, 0, .04);
   }
+
+  /* word wrap */
+  .cke_reset_all .CodeMirror-scroll * {
+    white-space: pre-wrap;
+  }
 </style>
 
 <script>
@@ -1208,7 +1213,7 @@
         console.log(component.files);
       },
       createNewCodemirror(filename, selected, targetEl, text) {
-        var autofocus = data.props.focus ? true: false;
+        var autofocus = data.props.focus ? true : false;
 
         component.editors[filename] = CodeMirror(function (node) {
           node.setAttribute("filename", filename);
@@ -1224,6 +1229,7 @@
           mode: "htmlmixed",
           theme: 'default', // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
           styleActiveLine: true,
+          lineWrapping: true
         });
         var render;
         component.editors[filename].on("changes", function (a, b, c, d) {
@@ -1261,9 +1267,12 @@
 
       },
       titleFocus(e) {
-        e.stopPropagation();
-        e.target.readOnly = false;
-        e.target.focus();
+        if (data.props.crud) {
+          e.stopPropagation();
+          e.target.readOnly = false;
+          e.target.focus();
+        }
+
       },
       titleInput(e) {
         var ghost = e.target.parentElement.querySelector(".ghost-input");

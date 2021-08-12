@@ -13,4 +13,4 @@
   }
   </style>
 
-<repl-component id="p" download="true" save="true" console="true" crud="true"></replcomponent>
+<repl-component id="N" download="true" save="true" console="true" crud="true" focus="true"></replcomponent>

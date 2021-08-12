@@ -6,7 +6,7 @@
 - <br>Component Syntax
 
   - [Structure](docs/component-structure.md)
-  - [Template]()
+  - [Template](docs/template.md)
   - [Style]()
   - [Script]()
 
