@@ -297,7 +297,36 @@
     }
 
     .pagination-item-subtitle {
-      margin-top: 5px!important;
+      margin-top: 5px !important;
+    }
+
+    p.warn:before {
+      background-color: #31ab7c;
+      border-radius: 100%;
+      color: #fff;
+      content: "i";
+      font-family: Dosis, Source Sans Pro, Helvetica Neue, Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      left: -12px;
+      line-height: 20px;
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      text-align: center;
+      top: 14px;
+    }
+
+    .markdown-section p.warn {
+      background: rgba(66, 185, 131, .1);
+      border-radius: 2px;
+      padding: 1rem;
+      border-bottom-right-radius: 2px;
+      border-left: 4px solid #31ab7c;
+      border-top-right-radius: 2px;
+      margin: 2em 0;
+      padding: 12px 24px 12px 30px;
+      position: relative;
     }
   </style>
 </head>
