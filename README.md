@@ -4,11 +4,11 @@
 
 !> This project is in an alpha state and non-production ready.
 
-Simply.js is a JavaScript toolkit for developing web application user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file.
+Simply.js is a web component library for developing web application user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file.
 
 It has a built-in super-fast declarative template engine coded from scratch. Some parts of simply.js are respectfully forked from other beautiful projects. For example; [obaa.js](https://github.com/Tencent/omi/blob/v6.18.0/packages/omix/utils/obaa.js) for reactive variables, [morphdom](https://github.com/patrick-steele-idem/morphdom) for DOM diffing/patching and an old version (1.3) of [Vaadin](https://github.com/vaadin/router/tree/v1.3.0) for the router.
 
-Long story short, simply.js is the name of the brand new template engine and the bridge between the adopted tools. That is why it is called a toolkit.
+Long story short, simply.js is the name of the brand new template engine and the bridge between the adopted tools.
 
 
 ## How it works

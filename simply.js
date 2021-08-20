@@ -118,13 +118,15 @@ window.simply = {
     return ht;
   },
   parseStyle: function (style, data) {
-    let variable = /(\"|')(\s+)?{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}(\s+)?(\"|')/gm;
+    let variable = /(\"|\')(\{)([^{}\n]*)\}(\"|\')/;
+
     while ((m = variable.exec(style)) !== null) {
+      console.log(m);
       // This is necessary to avoid infinite loops with zero-width matches
       if (m.index === variable.lastIndex) {
         variable.lastIndex++;
       }
-      style = style.split(m[0]).join(eval(m[4]));
+      style = style.split(m[0]).join(eval(m[3]));
     }
 
     return style;

@@ -7,8 +7,8 @@
 
   - [Structure](docs/component-structure.md)
   - [Template](docs/template.md)
-  - [Style]()
-  - [Script]()
+  - [Style](docs/style.md)
+  - [Script](docs/script.md)
 
 - <br>Template Engine
 
