@@ -17,6 +17,7 @@
   - [Each Loops](docs/loops.md)
   - [DOM Events](docs/dom-events.md)
   - [Nested Components](docs/nested-components.md)
+  - [Slot](docs/slot.md)
 
 - <br>Script Syntax
 

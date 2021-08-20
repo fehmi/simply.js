@@ -11,13 +11,13 @@
     </if>
     <div class="buttons">
       <if data.props.download==true>
-        <button onclick="download()">Download</button>
+        <button onclick="methods.download()">Download</button>
       </if>
       <if data.props.save==true>
-        <button onclick="save()">Save</button>
+        <button onclick="methods.save()">Save</button>
       </if>
       <if data.props.fullscreen==true>
-        <button onclick="fullscreenToggle()">Fullscreen</button>
+        <button onclick="methods.fullscreenToggle()">Fullscreen</button>
       </if>
     </div>
   </header>
@@ -1068,7 +1068,6 @@
             data.editorWidth = offsetRight + "%";
           }
           else {
-            console.log(containerHeight);
             var offsetTop = containerHeight - (me.clientY - dom.getRootNode().host.getBoundingClientRect().top);
             data.topAreaHeight = Math.abs(offsetTop) + "px";
           }

@@ -6,4 +6,6 @@ The template engine of simply.js works in `<template>` tag and acts like a super
 
 ?> It is possible to reach all of data, state, parent, dom and methods defined in the script tag.
 
+!> You can't include script files in the template tag but you can link css files if you want.
+
 You can learn more about the engine from the [template engine](template-engine.md) section.

@@ -42,10 +42,8 @@ An other option to add a CSS file to the component is `@import`. It brings a sty
 
 ### JavaScript Variables
 
-The best thing about styling for simpy.js components is you can use reactive JS variables defined in the script section of the component.
+The best thing about styling is you can use reactive JS variables in style tag. Syntax is like `color: "{data.color}";`.
 
-The template engine of simply.js works in `<template>` tag and acts like a superset of HTML. The engine has [conditionals](conditionals.md), [each loops](loops.md), [reactive variables](variables.md), [literals](literals.md), [expressions](expressions.md), [DOM events](dom-events.md) and  [nested components](nested-components.md).
+?> Just don't forget to write variable name in apostrophes like `"{data.color}"`
 
-?> It is possible to reach all of data, state, parent, dom and methods defined in the script tag.
-
-You can learn more about the engine from the [template engine](template-engine.md) section.
+<repl-component id="Q" download="true"></repl-component>

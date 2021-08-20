@@ -119,17 +119,23 @@ window.simply = {
   },
   parseStyle: function (style, data) {
     let variable = /(\"|\')(\{)([^{}\n]*)\}(\"|\')/;
+    var vars = {};
 
     while ((m = variable.exec(style)) !== null) {
-      console.log(m);
       // This is necessary to avoid infinite loops with zero-width matches
       if (m.index === variable.lastIndex) {
         variable.lastIndex++;
       }
-      style = style.split(m[0]).join(eval(m[3]));
+
+      var variableName = "--" + m[3].replace(/\./g, "-");
+      var variableValue = eval(m[3]);
+
+      vars[variableName] = variableValue;
+
+      style = style.split(m[0]).join("var(" + variableName + ")");
     }
 
-    return style;
+    return { style, vars };
   }
 }
 
@@ -205,7 +211,7 @@ function utils() {
     else {
       if (name.indexOf(".") > -1) {
         var ext = name.split(".").pop();
-        var name = name.replace("."+ext, "");
+        var name = name.replace("." + ext, "");
       }
       else {
         var ext = "html";
@@ -370,7 +376,7 @@ function utils() {
             }
 
             if (script.trim().indexOf("class {") == 0) {
-              this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "//@ sourceURL="+name+".html");
+              this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "//@ sourceURL=" + name + ".html");
               this.lifecycle = this.componentClass.lifecycle;
               if (typeof this.lifecycle !== "undefined") {
                 if (typeof this.lifecycle.beforeConstruct !== "undefined") {
@@ -430,7 +436,7 @@ function utils() {
                 for (let key in newStates) {
                   console.log(newStates);
                   this.state[key] = newStates[key];
-               }
+                }
               }
 
               if (typeof this.lifecycle !== "undefined") {
@@ -486,28 +492,28 @@ function utils() {
           this.render();
 
           function react(name, value, old, parents) {
-              if (typeof self.lifecycle !== "undefined") {
-                if (typeof self.lifecycle.whenDataChange !== "undefined") {
-                  //console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-                  if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
-                    return false;
-                  };
-                }
+            if (typeof self.lifecycle !== "undefined") {
+              if (typeof self.lifecycle.whenDataChange !== "undefined") {
+                //console.log(self.lifecycle.whenDataChange(name, value, old, parents));
+                if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
+                  return false;
+                };
               }
-              self.render();
-              // console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-              if (self.props) {
-                if (parents == "#-props") {
-                  self.setAttribute(name, JSON.stringify(self.data.props[name]));
-                }
-                else {
-                  name = parents.split("-")[2];
-                  self.setAttribute(name, JSON.stringify(self.data.props[name]));
-                }
+            }
+            self.render();
+            // console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+            if (self.props) {
+              if (parents == "#-props") {
+                self.setAttribute(name, JSON.stringify(self.data.props[name]));
               }
-              if (typeof self.watch !== "undefined") {
-                self.watch(name, value, old, parents);
+              else {
+                name = parents.split("-")[2];
+                self.setAttribute(name, JSON.stringify(self.data.props[name]));
               }
+            }
+            if (typeof self.watch !== "undefined") {
+              self.watch(name, value, old, parents);
+            }
           }
 
           if (this.data) {
@@ -541,8 +547,8 @@ function utils() {
 
             let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
             if (style !== "") {
-              let parsedStyle = simply.parseStyle(style, this.data);
-              parsedTemplate = parsedTemplate + "<style>" + parsedStyle + "</style>";
+              var parsedStyle = simply.parseStyle(style, this.data);
+              parsedTemplate = parsedTemplate + "<style simply-vars></style><style>" + parsedStyle.style + "</style>";
             }
 
             if (typeof this.lifecycle !== "undefined") {
@@ -555,6 +561,16 @@ function utils() {
             //this.dom = this.attachShadow({ mode: 'open' });
             //this.dom.appendChild(style.cloneNode(true));
             this.dom.innerHTML = parsedTemplate;
+            var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
+            //console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
+
+            var vars = ":host {";
+            for (var key in parsedStyle.vars) {
+              if (!parsedStyle.vars.hasOwnProperty(key)) continue;
+              vars += key + ":" + parsedStyle.vars[key] + ";";
+            }
+
+            sheet.insertRule(vars + "}", 0);
 
             setTimeout(() => {
               if (typeof this.lifecycle !== "undefined") {
@@ -573,9 +589,9 @@ function utils() {
             }
             var newDom = document.createElement("div");
             let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
-            let parsedStyle = simply.parseStyle(style, this.data);
+            var parsedStyle = simply.parseStyle(style, this.data);
 
-            newDom.innerHTML = parsedTemplate + "<style>" + parsedStyle + "</style>";
+            newDom.innerHTML = parsedTemplate + "<style simply-vars></style><style></style>";
             //console.log(this.dom, newDom);
             morphdom(this.dom, newDom, {
               childrenOnly: true,
@@ -584,12 +600,25 @@ function utils() {
                   console.log("dont again");
                 }
 
+                if (fromEl.tagName == "STYLE") {
+                  return false;
+                }
+
                 if (toEl.hasAttribute("passive") === true) {
                   return false;
                 }
 
               }
             });
+            var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
+            for (var key in parsedStyle.vars) {
+              if (!parsedStyle.vars.hasOwnProperty(key)) continue;
+              //this.dom.getRootNode().host.style.setProperty(key, parsedStyle.vars[key])
+              sheet.cssRules[0].style.setProperty(key, parsedStyle.vars[key]);
+              //console.log(this.dom.getRootNode().querySelector("style[simply-vars]").sheet.cssRules[0]);
+              //this.dom.getRootNode().querySelector("style[simply-vars]").sheet.insertRule(":host {" + key + ":" + parsedStyle.vars[key] + ";}", 0);
+            }
+
             if (typeof this.lifecycle !== "undefined") {
               if (typeof this.lifecycle.afterRerender !== "undefined") {
                 this.lifecycle.afterRerender();
