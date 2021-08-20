@@ -1,10 +1,11 @@
 <template>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/addon/fold/foldgutter.css" />
   <header>
     <if data.props.title>
       <div class="inputContainer">
-        <input class="title" value="{ data.props.title}" readonly onclick="titleFocus(event);"
-          oninput="titleInput(event);" onchange="titleRename(event);" onblur="titleRename(event);">
+        <input class="title" value="{ data.props.title}" readonly onclick="methods.titleFocus(event);"
+          oninput="methods.titleInput(event);" onchange="methods.titleRename(event);" onblur="methods.titleRename(event);">
         <div class="ghost-input">{ data.props.title}</div>
       </div>
     </if>
@@ -25,21 +26,21 @@
     <div id="editor">
       <ul id="file-tabs">
         <each data.files as file>
-          <li filename="{file.filename}" selected="{ file.selected }" onclick="changeSelectedFile(event);">
+          <li filename="{file.filename}" selected="{ file.selected }" onclick="methods.changeSelectedFile(event);">
             <div class="inputContainer">
               <input class="filename" value="{file.filename.replace('.html', '')}" readonly
-                onclick="focusFilename(event);" oninput="inputFilename(event);" onchange="renameFilename(event);"
-                onblur="blurFilename(event)">
+                onclick="methods.focusFilename(event);" oninput="methods.inputFilename(event);" onchange="methods.renameFilename(event);"
+                onblur="methods.blurFilename(event)">
               <div class="ghost-input">{file.filename.replace('.html', '')}</div>
             </div>
             <div class="extension">.html</div>
             <if data.props.crud==true>
-              <div class="delete" onclick="deleteFile(event)">✕</div>
+              <div class="delete" onclick="methods.deleteFile(event)">✕</div>
             </if>
           </li>
         </each>
         <if data.props.crud==true>
-          <li class="add" onclick="addFile()">+</li>
+          <li class="add" onclick="methods.addFile()">+</li>
         </if>
       </ul>
 
@@ -47,7 +48,7 @@
         <slot name="files"></slot>
       </ul>
     </div>
-    <div class="v-resizer" onmousedown="resize(event)"></div>
+    <div class="v-resizer" onmousedown="methods.resize(event)"></div>
     <div id="result">
       <div id="result-header">
         Result
@@ -55,10 +56,10 @@
       <if data.props.addressbar==true>
         <div id="addressbar">
           <!-- {data.urlHistory.length} - {data.currentUrlIndex} -->
-          <button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="goBack(event);"></button>
+          <button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="methods.goBack(event);"></button>
           <button {(data.currentUrlIndex> data.urlHistory.length - 1) ? "disabled" : ""}
             onclick="goNext(event);"></button>
-          <input type="text" value="{data.url}" id="url" onchange="changeURL(event)">
+          <input type="text" value="{data.url}" id="url" onchange="methods.changeURL(event)">
         </div>
       </if>
 
@@ -66,19 +67,19 @@
     </div>
   </div>
   <if data.props.console==true>
-    <div class="h-resizer" onmousedown="resize(event)"></div>
+    <div class="h-resizer" onmousedown="methods.resize(event)"></div>
     <div id="console">
-      <label>CONSOLE <a onclick="clearConsole(event)">Clear</a></label>
+      <label>CONSOLE <a onclick="methods.clearConsole(event)">Clear</a></label>
       <div class="messages">
         <ul>
           <each data.console as entry>
             <li class="{entry.method}">{entry.message} <if entry.file>(<span class="debugLink"
-                  onclick="openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}</span>)
+                  onclick="methods.openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}</span>)
               </if>
             </li>
           </each>
         </ul>
-        <div><input placeholder=">_" name="consoleEntry" onkeyup="sendJStoResult(event)"></div>
+        <div><input placeholder=">_" name="consoleEntry" onkeyup="methods.sendJStoResult(event)"></div>
       </div>
     </div>
   </if>
@@ -573,6 +574,13 @@
   .cke_reset_all .CodeMirror-scroll * {
     white-space: pre-wrap;
   }
+
+  .CodeMirror-gutter-elt {
+    position: absolute;
+    cursor: default;
+    z-index: 4;
+    transform: translateX(-21px);
+}
 </style>
 
 <script>
@@ -1229,7 +1237,9 @@
           mode: "htmlmixed",
           theme: 'default', // ambiance, ayu-mirage, cobalt, dracula, material, rubyblue, nord
           styleActiveLine: true,
-          lineWrapping: true
+          lineWrapping: true,
+          foldGutter: true,
+    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
         });
         var render;
         component.editors[filename].on("changes", function (a, b, c, d) {
@@ -1493,7 +1503,7 @@ SOFTWARE.';
         });
 
         if (typeof CodeMirror == "undefined") {
-          loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/display/autorefresh.min.js,npm/codemirror-formatting@1.0.0/formatting.min.js,npm/jszip@3.1.5/dist/jszip.min.js,npm/filesaver.js@1.3.4/FileSaver.min.js", function () {
+          loadJS("https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.js,npm/codemirror@5.62.0/mode/javascript/javascript.min.js,npm/codemirror@5.62.0/mode/css/css.min.js,npm/codemirror@5.62.0/mode/xml/xml.min.js,npm/codemirror@5.62.0/mode/htmlmixed/htmlmixed.min.js,npm/codemirror@5.62.0/addon/fold/foldcode.js,npm/codemirror@5.62.0/addon/fold/foldgutter.js,npm/codemirror@5.62.0/addon/fold/xml-fold.js,npm/codemirror@5.62.0/addon/fold/brace-fold.js,npm/codemirror@5.62.0/addon/fold/comment-fold.js,npm/codemirror@5.62.0/addon/fold/indent-fold.js,npm/codemirror-formatting@1.0.0/formatting.min.js,npm/jszip@3.1.5/dist/jszip.min.js,npm/filesaver.js@1.3.4/FileSaver.min.js", function () {
             methods.init();
           })
         }

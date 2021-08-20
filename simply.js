@@ -413,7 +413,6 @@ function utils() {
               }
               this.data = data;
 
-
               if (this.getRootNode().host) {
                 if (typeof this.getRootNode().host.state !== "undefined") {
                   this.state = this.getRootNode().host.state;
@@ -529,10 +528,10 @@ function utils() {
             if (m.index === regex.lastIndex) {
               regex.lastIndex++;
             }
-            if (m[2].indexOf("this.getRootNode().host.methods") == -1) {
+            if (m[2].indexOf("this.getRootNode().host") == -1) {
               //template = template.replace(m[2], "this.getRootNode().host.methods." + m[2]);
               //template = template.replace(new RegExp(escapeRegExp(m[2]), 'g'), "this.getRootNode().host.methods." + m[2]);
-              template = template.split(m[2]).join("this.getRootNode().host.methods." + m[2])
+              template = template.split(m[2]).join("this.getRootNode().host." + m[2])
             }
           }
 
