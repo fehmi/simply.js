@@ -32,3 +32,8 @@
 - <br>Router
 
   - [Router](docs/router.md)
+
+- <br>Integrations
+
+  - [Flow](docs/flow.md)
+  - [IPFS](docs/ipfs.md)

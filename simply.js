@@ -18,7 +18,7 @@ window.simply = {
     let endIfStatement = /\<(\s+)?\/(\s+)?if(\s+)?\>$/;
     let elseStatement = /\<(\s+)?else(\s+)?\>$/;
     let eachStatement = /\<(\s+)?each(\s+)?(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?(\s+)?\>$/;
-    let endEachStatement = /\<(\s+)?\/(\s+)?each(\s+)?\>/;
+    let endEachStatement = /\<(\s+)?\/(\s+)?each(\s+)?\>$/;
     // let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
     let variable = /(\{)([^{}\n]*)\}$/;
 
@@ -29,7 +29,6 @@ window.simply = {
     var processedLetters = "";
     var capturedLogics = [];
     var staticLetters = "";
-
     for (var i = 0; i < template.length; i++) {
       processedLetters += template[i];
       bucket += template[i];
@@ -41,6 +40,7 @@ window.simply = {
         (m = eachStatement.exec(bucket)) !== null ||
         (m = endEachStatement.exec(bucket)) !== null ||
         (m = variable.exec(bucket)) !== null) {
+
 
         if ((logic = ifStatement.exec(bucket)) !== null) {
           logic = unescape("if (" + logic[3] + ") {");
@@ -94,7 +94,6 @@ window.simply = {
         else if ((logic = variable.exec(bucket)) !== null) {
           logic = "ht+=" + m[2] + ";";
         }
-
         capturedLogics.push(m[0]);
         let logicLine = capturedLogics[capturedLogics.length - 1];
         let staticText = processedLetters.replace(logicLine, "");
@@ -103,6 +102,7 @@ window.simply = {
 
         bucket = bucket.replace(replaceThis, withThis);
         processedLetters = "";
+
       }
     }
     // for the last non-logical text
@@ -115,6 +115,7 @@ window.simply = {
     var ht = "";
     // console.log(bucket);
     eval(bucket + "//@ sourceURL=foo.js");
+
     return ht;
   },
   parseStyle: function (style, data) {
@@ -501,6 +502,7 @@ function utils() {
               }
             }
             self.render();
+
             // console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
             if (self.props) {
               if (parents == "#-props") {
@@ -542,6 +544,7 @@ function utils() {
               template = template.split(m[2]).join("this.getRootNode().host." + m[2])
             }
           }
+
 
           if (!this.rendered) {
 

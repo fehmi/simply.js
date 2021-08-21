@@ -1,4 +1,30 @@
-# Style
+# Script
+
+The last and most important part of a component. It contains all entire logic and data of a component. It can communicate with template section. As you guess we are writing our script in a `class { ... }` object. It can hold data, hook variable changes with `watch`, manage states, and contain functions etc. Here is how an empty component script looks like.
+
+```html
+<script>
+  class {
+    data = {
+      // Datas that available in <template>
+    }
+    state = {
+      // States available for all children
+    }
+    watch = {
+      // Hook for variable changes
+    }
+    methods = {
+      // Component functions
+    }
+    lifecycle = {
+      // Lifecycle events
+    }
+  }
+</script>
+```
+
+You can learn more about all of the parts from the [Script Syntax](yaa.md) section.
 
 Encapsulated style definitions only affect the elements inside the template tag of the component. But there is one exception. The inherited styles of the document can affect all child components. For example, when you define `color` property of `body` as `red` in the document then texts of all components inside the document will be `red` if you don't define otherwise inside the style tag of a component.
 
