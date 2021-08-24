@@ -1,24 +1,16 @@
-/*
-if (componentString.indexOf("style scoped") > -1) {
-
-    var scopedStyles = Array.prototype.map.call(componentHtml.querySelector("style").sheet.cssRules,
-        function css_text(x) { return "[simply-id=f" + id + "] " + x.cssText; }).join('\n');
-    componentHtml.querySelector("style").innerHTML = scopedStyles;
-}
-*/
 
 utils();
 
 window.simply = {
   components: {},
-  // simplate
   parseTemplate: function (template, data, state, parent) {
-    let ifStatement = /\<(\s+)?if(\s+)([a-zA-Z_\.]+(\s+)??.*)(\s+)?(\>)$/;
-    let elseIfStatement = /\<(\s+)?else(\s+)if(\s+)(.*(\s+?.*))(\s+)?(\>)$/;
-    let endIfStatement = /\<(\s+)?\/(\s+)?if(\s+)?\>$/;
-    let elseStatement = /\<(\s+)?else(\s+)?\>$/;
-    let eachStatement = /\<(\s+)?each(\s+)?(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?(\s+)?\>$/;
-    let endEachStatement = /\<(\s+)?\/(\s+)?each(\s+)?\>$/;
+    //console.time();
+    let ifStatement = /\<if(\s)(.*)(\>)$/;
+    let elseIfStatement = /\<else\sif\s(.*)(\/)?\>$/;
+    let endIfStatement = /\<\/if\>$/;
+    let elseStatement = /\<else\>$/;
+    let eachStatement = /\<each(\s)(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?\>$/;
+    let endEachStatement = /\<\/each\>$/;
     // let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
     let variable = /(\{)([^{}\n]*)\}$/;
 
@@ -29,81 +21,86 @@ window.simply = {
     var processedLetters = "";
     var capturedLogics = [];
     var staticLetters = "";
+    var flag = false;
     for (var i = 0; i < template.length; i++) {
       processedLetters += template[i];
       bucket += template[i];
-      if (
-        (m = ifStatement.exec(bucket)) !== null ||
-        (m = elseIfStatement.exec(bucket)) !== null ||
-        (m = endIfStatement.exec(bucket)) !== null ||
-        (m = elseStatement.exec(bucket)) !== null ||
-        (m = eachStatement.exec(bucket)) !== null ||
-        (m = endEachStatement.exec(bucket)) !== null ||
-        (m = variable.exec(bucket)) !== null) {
 
 
-        if ((logic = ifStatement.exec(bucket)) !== null) {
-          logic = unescape("if (" + logic[3] + ") {");
+      if ((m = variable.exec(bucket)) !== null) {
+        logic = "ht+=" + m[2] + ";";
+        flag = true;
+      }
+        else if ((m = ifStatement.exec(bucket)) !== null) {
+          m[2] = m[2].replace(/(?<!\=)\=(?!\=)/g, "==");
+          logic = unescape("if (" + m[2] + ") {");
           //logic = (ifCount == 0 ? 'let ht = "";' + logic : logic);
           ifCount += 1;
+          flag = true;
         }
-        else if ((logic = elseIfStatement.exec(bucket)) !== null) {
-          logic = unescape(logic[4]);
+        else if ((m = elseIfStatement.exec(bucket)) !== null) {
+          logic = unescape(m[3]);
           logic = "}else if (" + logic + ") {";
+          flag = true;
         }
-        else if ((logic = elseStatement.exec(bucket)) !== null) {
+        else if ((m = elseStatement.exec(bucket)) !== null) {
           logic = "}else {";
+          flag = true;
 
         }
-        else if ((logic = endIfStatement.exec(bucket)) !== null) {
+        else if ((m = endIfStatement.exec(bucket)) !== null) {
           ifCount -= 1;
           logic = "}";
+          flag = true;
         }
-        else if ((logic = eachStatement.exec(bucket)) !== null) {
+        else if ((m = eachStatement.exec(bucket)) !== null) {
           eachCount += 1;
-          let subject = eval(logic[3]);
+          let subject = eval(m[2]);
           let i = "s" + Math.random().toString(36).slice(-7);
 
           if (Array.isArray(subject)) {
-            let key = typeof logic[8] !== "undefined" ? "let " + logic[8] + " = " + i + ";" : "";
-            let index = typeof logic[8] !== "undefined" ? "let " + logic[12] + " = " + i + ";" : "";
+            let key = typeof m[7] !== "undefined" ? "let " + m[7] + " = " + i + ";" : "";
+            let index = typeof m[7] !== "undefined" ? "let " + m[11] + " = " + i + ";" : "";
 
-            logic = "for (" + i + " = 0; " + i + " < " + logic[3] + ".length; " + i + "++) { \
+            logic = "for (" + i + " = 0; " + i + " < " + m[2] + ".length; " + i + "++) { \
                         " + key + "; \
                         " + index + "; \
-                        let " + logic[4] + "=" + logic[3] + "[" + i + "];";
+                        let " + m[3] + "=" + m[2] + "[" + i + "];";
           }
           else {
-            let key = typeof logic[12] !== "undefined" ? "let " + logic[12] + " = " : "";
+            let key = typeof m[11] !== "undefined" ? "let " + m[11] + " = " : "";
 
             logic = "\
-                    for (var ii in "+ logic[3] + ") { \
+                    for (var ii in "+ m[2] + ") { \
                       if (ii == '__o_') { continue; }\
-                      " + key + "Object.keys(" + logic[3] + ").indexOf(ii); \
-                      let " + logic[8] + "= ii; \
-                      let " + logic[4] + "=" + logic[3] + "[ii];";
+                      " + key + "Object.keys(" + m[2] + ").indexOf(ii); \
+                      let " + m[7] + "= ii; \
+                      let " + m[3] + "=" + m[2] + "[ii];";
           }
+          flag = true;
         }
         //
 
-        else if ((logic = endEachStatement.exec(bucket)) !== null) {
-
+        else if ((m = endEachStatement.exec(bucket)) !== null) {
           eachCount -= 1;
           logic = "};";
+          flag = true;
         }
-        else if ((logic = variable.exec(bucket)) !== null) {
-          logic = "ht+=" + m[2] + ";";
+
+
+        if (flag === true) {
+          capturedLogics.push(m[0]);
+          let logicLine = capturedLogics[capturedLogics.length - 1];
+          let staticText = processedLetters.replace(logicLine, "");
+          let replaceThis = staticText + logicLine;
+          var withThis = "ht+=`" + staticText.replace(/\n/g, "") + "`;" + logic;
+          bucket = bucket.replace(replaceThis, withThis);
+          //console.log(replaceThis, withThis);
+          flag = false;
+          processedLetters = "";
         }
-        capturedLogics.push(m[0]);
-        let logicLine = capturedLogics[capturedLogics.length - 1];
-        let staticText = processedLetters.replace(logicLine, "");
-        let replaceThis = staticText + logicLine;
-        var withThis = "ht+=`" + staticText.replace(/\n/g, "") + "`;" + logic;
 
-        bucket = bucket.replace(replaceThis, withThis);
-        processedLetters = "";
 
-      }
     }
     // for the last non-logical text
     if (processedLetters.trim() !== "") {
@@ -111,11 +108,11 @@ window.simply = {
       //bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
       bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.trim() + "`;")
     }
-    // console.log(bucket);
-    var ht = "";
-    // console.log(bucket);
-    eval(bucket + "//@ sourceURL=foo.js");
 
+    var ht = "";
+    //console.log(bucket);
+    eval(bucket);
+    //console.timeEnd();
     return ht;
   },
   parseStyle: function (style, data) {
@@ -135,7 +132,6 @@ window.simply = {
 
       style = style.split(m[0]).join("var(" + variableName + ")");
     }
-
     return { style, vars };
   }
 }
