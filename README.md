@@ -23,7 +23,7 @@ While you are working with simply.js everything will run in the browser of the u
 🚫 No compiler, bundler or builder<br>
 🍃 Lightweight (18 KB gzipped)<br>
 ⚛️ Atomic design<br>
-🧪 Reactive<br>
+🧪 Reactive DOM<br>
 🧱 Single file components<br>
 ⚡ Lighting fast template engine<br>
 🔮 State management<br>
