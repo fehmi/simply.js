@@ -560,16 +560,20 @@ function utils() {
             //this.dom = this.attachShadow({ mode: 'open' });
             //this.dom.appendChild(style.cloneNode(true));
             this.dom.innerHTML = parsedTemplate;
-            var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
-            //console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
+            try {
+              var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
+              //console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
 
-            var vars = ":host {";
-            for (var key in parsedStyle.vars) {
-              if (!parsedStyle.vars.hasOwnProperty(key)) continue;
-              vars += key + ":" + parsedStyle.vars[key] + ";";
+              var vars = ":host {";
+              for (var key in parsedStyle.vars) {
+                if (!parsedStyle.vars.hasOwnProperty(key)) continue;
+                vars += key + ":" + parsedStyle.vars[key] + ";";
+              }
+
+              sheet.insertRule(vars + "}", 0);
+            } catch (error) {
+
             }
-
-            sheet.insertRule(vars + "}", 0);
 
             setTimeout(() => {
               if (typeof this.lifecycle !== "undefined") {
