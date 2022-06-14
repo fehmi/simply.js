@@ -612,7 +612,7 @@
         var files = component.methods.rewriteGet("index.html", indexContent);
         var blobs = [];
 
-        for (let index = 0; index < Object.keys(files).length; index++) {
+				for (let index = 0; index < Object.keys(files).length; index++) {
           var file = files[Object.keys(files).reverse()[index]];
 
           for (const filename in file) {
@@ -667,12 +667,13 @@
         var base = "<head><base href=" + document.location.href + ">";
         blobs["index.html"].content = blobs["index.html"].content.replace("<head>", base) + runInResult;
 
-        // dom.querySelector("iframe").setAttribute("src", "about:blank");
-        dom.querySelector("iframe").setAttribute("srcdoc", "");
-        dom.querySelector("iframe").addEventListener("load", function bas() {
-          dom.querySelector("iframe").removeEventListener("load", bas);
+				// dom.querySelector("iframe").setAttribute("src", "about:blank");
+        dom.querySelector("iframe#result").setAttribute("srcdoc", "");
+        dom.querySelector("iframe#result").addEventListener("load", function bas() {
+          dom.querySelector("iframe#result").removeEventListener("load", bas);
           //dom.querySelector("iframe").removeAttribute("src");
-          dom.querySelector("iframe").contentWindow.document.write(blobs["index.html"].content);
+
+          dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
           // rever url
           data.urlHistory = [data.urlHistory[0]];
           data.url = data.urlHistory[0];

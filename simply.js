@@ -291,10 +291,13 @@ function utils() {
             });
             //console.log(simply.importCompleted[name]);
           } else {
-            console.log("Component import error: We reached our target server, but it returned an error");
+            //console.log("Component import error: We reached our target server, but it returned an error");
+						// console.error(path + " not found!");
           }
         };
-        request.onerror = function () { };
+        request.onerror = function () {
+
+				};
         request.send();
       }
       else {
