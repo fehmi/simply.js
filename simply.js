@@ -492,6 +492,7 @@ function utils() {
           this.render();
 
           function react(name, value, old, parents) {
+
             if (typeof self.lifecycle !== "undefined") {
               if (typeof self.lifecycle.whenDataChange !== "undefined") {
                 //console.log(self.lifecycle.whenDataChange(name, value, old, parents));
@@ -519,12 +520,16 @@ function utils() {
 
           if (this.data) {
             obaa(this.data, function (name, value, old, parents) {
-              react(name, value, old, parents);
+							setTimeout(function() {
+								react(name, value, old, parents);
+							}, 0);
             });
           }
           if (this.state) {
             obaa(this.state, function (name, value, old, parents) {
-              react(name, value, old, parents);
+							setTimeout(function() {
+								react(name, value, old, parents);
+							}, 0);
             });
           }
         }
