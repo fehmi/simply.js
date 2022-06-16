@@ -492,44 +492,41 @@ function utils() {
           this.render();
 
           function react(name, value, old, parents) {
+						setTimeout(function() {
+							if (typeof self.lifecycle !== "undefined") {
+								if (typeof self.lifecycle.whenDataChange !== "undefined") {
+									//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
+									if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
+										return false;
+									};
+								}
+							}
+							self.render();
 
-            if (typeof self.lifecycle !== "undefined") {
-              if (typeof self.lifecycle.whenDataChange !== "undefined") {
-                //console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-                if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
-                  return false;
-                };
-              }
-            }
-            self.render();
-
-            // console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-            if (self.props) {
-              if (parents == "#-props") {
-                self.setAttribute(name, JSON.stringify(self.data.props[name]));
-              }
-              else {
-                name = parents.split("-")[2];
-                self.setAttribute(name, JSON.stringify(self.data.props[name]));
-              }
-            }
-            if (typeof self.watch !== "undefined") {
-              self.watch(name, value, old, parents);
-            }
+							// console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+							if (self.props) {
+								if (parents == "#-props") {
+									self.setAttribute(name, JSON.stringify(self.data.props[name]));
+								}
+								else {
+									name = parents.split("-")[2];
+									self.setAttribute(name, JSON.stringify(self.data.props[name]));
+								}
+							}
+							if (typeof self.watch !== "undefined") {
+								self.watch(name, value, old, parents);
+							}
+						}, 0);
           }
 
           if (this.data) {
             obaa(this.data, function (name, value, old, parents) {
-							setTimeout(function() {
-								react(name, value, old, parents);
-							}, 0);
+							react(name, value, old, parents);
             });
           }
           if (this.state) {
             obaa(this.state, function (name, value, old, parents) {
-							setTimeout(function() {
-								react(name, value, old, parents);
-							}, 0);
+							react(name, value, old, parents);
             });
           }
         }
