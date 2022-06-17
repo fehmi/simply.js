@@ -32,7 +32,8 @@ window.simply = {
         flag = true;
       }
         else if ((m = ifStatement.exec(bucket)) !== null) {
-          m[2] = m[2].replace(/(?<!\=)\=(?!\=)/g, "==");
+					// https://stackoverflow.com/questions/28460473/how-do-i-match-a-single-equals-sign-with-regular-expressions
+          m[2] = m[2].replace(/(^|[^=])=($|[^=])/g, "$1==$2");
           logic = unescape("if (" + m[2] + ") {");
           //logic = (ifCount == 0 ? 'let ht = "";' + logic : logic);
           ifCount += 1;
@@ -359,7 +360,9 @@ function utils() {
 
             var m;
             // var importRegex = /(?<!\/\/(\s+)?)get\(.*\)\;/m;
-            var importRegex = /(?<!\/\/(\s+)?)get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
+            // var importRegex = /(?<!\/\/(\s+)?)get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
+						var importRegex = /^\s*get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
+
             while ((m = importRegex.exec(gets)) !== null) {
               // This is necessary to avoid infinite loops with zero-width matches
               var component = this;
