@@ -34,8 +34,9 @@
   - [Router](docs/router.md)
 
 - <br>Integrations
-
+	- [Tailwind](docs/twind.md)
   - [Flow](docs/flow.md)
   - [IPFS](docs/ipfs.md)
-  - [p5.js]
-  - [tone.js]
+  - [p5.js](docs/p5.md)
+  - [tone.js](docs/tone.md)
+	- [VR/AR](docs/vr.md)
