@@ -36,7 +36,7 @@ For step by step guide to making the first steps of using simply.js, you can vis
 
 ## Examples
 
-You can reach all examples used in the documentation via the [Examples](examples) section. All examples are editable, sharable and downloadable. This is one of the fastest ways to start using s,mply.js.
+You can reach all examples used in the documentation via the [Examples](examples) section. All examples are editable, sharable and downloadable. This is one of the fastest ways to start using simply.js.
 
 
 ## Playground
