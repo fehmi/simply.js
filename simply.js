@@ -230,6 +230,7 @@ function utils() {
 
         request.onload = function () {
           if (this.status >= 200 && this.status < 400) {
+            
             var docStr = this.response;
             var txt = document.createElement("textarea");
             var parser = new DOMParser();
@@ -504,6 +505,7 @@ function utils() {
 									};
 								}
 							}
+                            
 							self.render();
 
 							// console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
@@ -621,6 +623,7 @@ function utils() {
 
               }
             });
+            asdasd;
             var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
             for (var key in parsedStyle.vars) {
               if (!parsedStyle.vars.hasOwnProperty(key)) continue;

@@ -612,7 +612,7 @@
         var files = component.methods.rewriteGet("index.html", indexContent);
         var blobs = [];
 
-				for (let index = 0; index < Object.keys(files).length; index++) {
+		for (let index = 0; index < Object.keys(files).length; index++) {
           var file = files[Object.keys(files).reverse()[index]];
 
           for (const filename in file) {
@@ -664,21 +664,30 @@
           }
         }
         var runInResult = "<script>function " + component.methods.runInResult.toString() + "runInResult();<\/script>";
-        var base = "<head><base href=" + document.location.href + ">";
-        blobs["index.html"].content = blobs["index.html"].content.replace("<head>", base) + runInResult;
+        var base = "<head><base href='" + document.location.href + "'>";
 
-				// dom.querySelector("iframe").setAttribute("src", "about:blank");
-        dom.querySelector("iframe#result").setAttribute("srcdoc", "");
+        blobs["index.html"].content = blobs["index.html"].content.replace("<head>", base) + runInResult;
+		dom.querySelector("iframe").setAttribute("src", "about:blank");
+        //dom.querySelector("iframe#result").setAttribute("srcdoc", "");
+
         dom.querySelector("iframe#result").addEventListener("load", function bas() {
           dom.querySelector("iframe#result").removeEventListener("load", bas);
-          //dom.querySelector("iframe").removeAttribute("src");
+          dom.querySelector("iframe").removeAttribute("src");
+            data.urlHistory = [data.urlHistory[0]];
+            data.url = data.urlHistory[0];
+            data.currentUrlIndex = 1;
+            data.console = [];
+          console.log(data);
+          setTimeout(function() {
 
-          dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
-          // rever url
-          data.urlHistory = [data.urlHistory[0]];
-          data.url = data.urlHistory[0];
-          data.currentUrlIndex = 1;
-          data.console = [];
+
+            dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
+
+          //console.log(blobs["index.html"].content);
+            // rever url
+
+
+            }, 0);
 
         });
       },
@@ -1241,16 +1250,20 @@
           styleActiveLine: true,
           lineWrapping: true,
           foldGutter: true,
-    gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+          gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
         });
         var render;
         component.editors[filename].on("changes", function (a, b, c, d) {
           try {
             clearTimeout(render);
           } catch (error) { }
+
           render = setTimeout(function () {
             component.methods.renderResult();
-          }, 250); // How long do you want the delay to be (in milliseconds)?
+          }, 111); // How long do you want the delay to be (in milliseconds)?
+
+
+
         });
 
         var currentHandle = null, currentLine;
@@ -1381,11 +1394,10 @@ SOFTWARE.';
 
         var slot = dom.querySelector('slot[name=files]');
         component.editors = [];
-        if ((location.hash.length > 1 && location.hash.indexOf("?") == 0) || data.props.id) {
+        if ((location.hash.length > 1 && location.hash.indexOf("?") > -1) || data.props.id) {
 
-          if (location.hash.split("?")[1] !== undefined) {
+          if (location.hash.split("?")[1] !== "undefined") {
             var id = location.hash.split("?")[1];
-            console.log("hay der", id);
           }
           else if (data.props.id) {
             var id = data.props.id;
@@ -1398,7 +1410,6 @@ SOFTWARE.';
           xhr.addEventListener("readystatechange", function () {
             if (this.readyState === 4) {
               var project = JSON.parse(decodeURIComponent(escape(atob(this.responseText))));
-
 
               var targetEl = dom.querySelector("ul#files");
 
@@ -1514,6 +1525,12 @@ SOFTWARE.';
           // :)
         }
       },
+
     }
+      watch(name, value, old, parents) {
+
+          console.log(name, value);
+
+      }
   }
 </script>

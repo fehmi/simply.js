@@ -13,6 +13,6 @@
   }
   </style>
 
-<repl-component id="N" download="true" save="true" console="true" crud="true" focus="true"></replcomponent>
+<repl-component download="true" save="true" console="true" crud="true" focus="true"></replcomponent>
 
 <!-- //cdn.jsdelivr.net/gh/fehmi/simply.js/simply.min.js -->

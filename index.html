@@ -9,10 +9,12 @@
   <meta name="keywords" content="simply, ui, ux, toolkit, mvc" />
   <meta name="description" content="Simple toolkit for simple web-apps." />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
-  <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />-->
+  <!--<link rel="stylesheset" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />-->
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" title="vue" />
+  <link rel="stylesheet" href="test.css" title="vue" />
+
   <style>
-    html {}
+    html {display:black;}
 
     .cover.show+main {
       display: none;
@@ -432,7 +434,29 @@
   <script src="//cdn.jsdelivr.net/npm/docsify-plugin-carbon@1/index.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <script src="//cdn.jsdelivr.net/gh/pocketbase/js-sdk/dist/pocketbase.umd.js"></script>
+  <script>
+  /*
+    const pb = new PocketBase('https://pocket.typop.net/simply');
+    const authData = pb.admins.authWithPassword('woebegone@gmail.com', 'jD!KU8u9hCjj52d');
+    const authData = pb.collection('users').authWithPassword('playerground', 'playerground');
+
+    console.log(pb.authStore.isValid);
+    console.log(pb.authStore.token);
+    console.log(pb.authStore.model.id);
+
+    pb.collection('playground').subscribe('*', function (e) {
+        console.log(e.record);
+    });
+
+    const record = pb.collection('playground').getOne('j8iwejxcvs4ew35', {
+        expand: 'content',
+    })
+
+    record.then(console.log);
+  */
+  </script>
 
   <script>
     (function (w) {
@@ -522,6 +546,7 @@
     }
 
   </script>
+
 </body>
 
 </html>
