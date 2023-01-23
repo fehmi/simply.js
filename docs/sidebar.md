@@ -38,5 +38,6 @@
   - [Flow](docs/flow.md)
   - [IPFS](docs/ipfs.md)
   - [p5.js](docs/p5.md)
+  - [VR/AR](docs/vr.md)
+  - [Electron](docs/electron.md)
   - [tone.js](docs/tone.md)
-	- [VR/AR](docs/vr.md)

@@ -230,7 +230,7 @@ function utils() {
 
         request.onload = function () {
           if (this.status >= 200 && this.status < 400) {
-            
+
             var docStr = this.response;
             var txt = document.createElement("textarea");
             var parser = new DOMParser();
@@ -505,7 +505,7 @@ function utils() {
 									};
 								}
 							}
-                            
+
 							self.render();
 
 							// console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
@@ -607,7 +607,10 @@ function utils() {
             newDom.innerHTML = parsedTemplate + "<style simply-vars></style><style></style>";
             //console.log(this.dom, newDom);
             morphdom(this.dom, newDom, {
-              childrenOnly: true,
+              //childrenOnly: true,
+							onBeforeElUpdated: function(fromEl, toEl) {
+								// console.log("onBeforeMorphEl");
+							},
               onBeforeElChildrenUpdated: function (fromEl, toEl) {
                 if (fromEl.tagName == "CHILD-COMPONENT") {
                   console.log("dont again");
@@ -621,9 +624,22 @@ function utils() {
                   return false;
                 }
 
+								if (toEl.tagName === 'INPUT') {
+									toEl.value = fromEl.value;
+								}
+
+								if (toEl.type == 'radio' || toEl.type == 'checkbox') {
+									toEl.checked = fromEl.checked;
+								}
+
+								if (toEl.tagName === 'OPTION') {
+										toEl.selected = fromEl.selected;
+								}
+								//console.log(toEl.tagName);
               }
+
             });
-            asdasd;
+
             var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
             for (var key in parsedStyle.vars) {
               if (!parsedStyle.vars.hasOwnProperty(key)) continue;
@@ -964,9 +980,15 @@ function utils() {
   if (
     typeof module != 'undefined' &&
     module.exports) {
-    module.exports = obaa
+    module.exports = obaa;
+		try {
+			win.obaa = obaa;
+		} catch (error) {
+
+		}
   } else if (typeof define === 'function' && define.amd) {
     define(obaa)
+
   } else {
     win.obaa = obaa
   }
@@ -2628,7 +2650,32 @@ function utils() {
    *    'popstate' and / or 'click' events.
    */
 
+	var routerGlobalOptionsVar;
+	function globalHashChangeHandler(event)
+	{
 
+		console.log(event);
+
+			let pathname;
+			pathname = window.location.hash.replace("#", "");
+			console.log("HASHCHANGEEVENT: ");
+			console.log(event);
+			console.log("hay hash: " + pathname);
+			Router.go(router.baseUrl.replace(document.location.origin, "") + pathname);
+			console.log("base: " + router.baseUrl.replace(document.location.origin, ""));
+			console.log("pathname: " + pathname);
+	}
+	const HASHCHANGE = {
+		activate()
+		{
+			window.addEventListener('hashchange', globalHashChangeHandler, false);
+		},
+
+		inactivate()
+		{
+			window.removeEventListener('hashchange', globalHashChangeHandler, false);
+		}
+	};
   var Router =
     /*#__PURE__*/
     function (_Resolver) {
@@ -2647,6 +2694,7 @@ function utils() {
        * @param {?RouterOptions} options
        */
       function Router(outlet, options) {
+				routerGlobalOptionsVar = options;
         var _this;
 
         _classCallCheck(this, Router);
@@ -2660,6 +2708,11 @@ function utils() {
         _this.resolveRoute = function (context) {
           return _this.__resolveRoute(context);
         };
+				console.log(routerGlobalOptionsVar);
+				if (routerGlobalOptionsVar.enableHash) {
+					console.log("ha$$", Router.NavigationTrigger);
+					Router.NavigationTrigger = [HASHCHANGE];
+				}
 
         var triggers = Router.NavigationTrigger;
         Router.setTriggers.apply(Router, Object.keys(triggers).map(function (key) {
@@ -3165,31 +3218,63 @@ function utils() {
       }, {
         key: "__updateBrowserHistory",
         value: function __updateBrowserHistory(_ref2, replace) {
-          var pathname = _ref2.pathname,
+
+					if (typeof routerGlobalOptionsVar.enableHash !== "undefined") {
+							console.log("right here");
+							console.log("UPDATEBROWSERHISTORY");
+							var path = _ref2.pathname;
+							console.log("pathname: " + path);
+							path = path.replace(router.baseUrl.replace(document.location.origin, ""), "");
+							console.log("updatehash: " + path);
+							console.log("hash", window.location.hash);
+
+							// home ise skip et
+							if (path == "" && window.location.hash == "") {
+								console.log("home?");
+							}
+							else if ("#"+ path !== window.location.hash) {
+
+								if (window.location.hash.length > 1) {
+									console.log("trigger hashchange");
+									window.dispatchEvent(new HashChangeEvent("hashchange"));
+								}
+								else {
+									console.log("PAAAT", _ref2.pathname.replace(path, ""));
+									window.history.replaceState({ user: "john" }, "", _ref2.pathname.replace(path, "") + "#" + path);
+								}
+							}
+							else if ("#"+ path == window.location.hash) {
+								console.log("pathname ile hash aynı");
+							}
+							else {
+								console.log("else");
+							}
+					}
+					else {
+						var pathname = _ref2.pathname,
             _ref2$search = _ref2.search,
             search = _ref2$search === void 0 ? '' : _ref2$search,
             _ref2$hash = _ref2.hash,
             hash = _ref2$hash === void 0 ? '' : _ref2$hash;
 
+						if (window.location.pathname !== pathname || window.location.search !== search || window.location.hash !== hash) {
+							var changeState = replace ? 'replaceState' : 'pushState';
 
+							if (window.frameElement) {
+								if (typeof window.frameElement.hasAttribute("name") !== "undefined") {
+									if (window.frameElement.getAttribute("name") == "result") {
+										changeState = "replaceState";
+									}
+								}
+							}
 
-          if (window.location.pathname !== pathname || window.location.search !== search || window.location.hash !== hash) {
-            var changeState = replace ? 'replaceState' : 'pushState';
+							window.history[changeState](null, document.title, pathname + search + hash);
+							window.dispatchEvent(new PopStateEvent('popstate', {
+								state: 'router-ignore'
+							}));
+						}
+					}
 
-            if (window.frameElement) {
-              if (typeof window.frameElement.hasAttribute("name") !== "undefined") {
-                if (window.frameElement.getAttribute("name") == "result") {
-                  changeState = "replaceState";
-                }
-              }
-            }
-
-
-            window.history[changeState](null, document.title, pathname + search + hash);
-            window.dispatchEvent(new PopStateEvent('popstate', {
-              state: 'router-ignore'
-            }));
-          }
         }
       }, {
         key: "__addAppearingContent",

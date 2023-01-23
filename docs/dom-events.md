@@ -31,7 +31,7 @@ Full List of Events: [w3schools](https://www.w3schools.com/js/js_events.asp) / [
 
 ## Stop Propagation & Prevent Default
 
-You can use native `stopPropagation()` and `preventDefault()` after your event function.
+You can use native `stopPropagation()` and `preventDefault()` after your event function. You can use event or this in the value of an incline on* event definition.
 
 ```html
 <template>
@@ -48,8 +48,8 @@ You can use native `stopPropagation()` and `preventDefault()` after your event f
       },
       sayBye: function() {
         alert("Bye!");
-      }  
+      }
     }
-  }  
+  }
 </script>
 ```

@@ -1,0 +1,60 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Router Nested Component Example - simply</title>
+  <base href="https://root/simply/examples/router/nested/">
+</head>
+
+<router></router>
+
+<body>
+
+  <script src="/simply/simply.js"></script>
+
+  <script>
+    get('../hello-world.html');
+    get('../user-list.html');
+    get('../not-found.html');
+    get('../user-profile.html');
+    get('nav-template.html');
+    get('home-view.html');
+
+    const outlet = document.querySelector('router');
+    const router = new Router(outlet, {
+      //baseUrl: "/simply/examples/router/" // https://root/simply/examples/router/ or router or /simply/examples/router/
+      // hooks
+    });
+
+    router.setRoutes([
+      {
+        path: '/', component: 'nav-template', children: [
+          {
+            path: '/', component: 'home-view', action: (context, commands) => {
+              console.log("action", context, commands);
+              //return commands.redirect('/');
+            }
+          },
+          { path: '/users', component: 'user-list' },
+          { path: '/users/:user', component: 'user-profile' },
+        ]
+      },
+      { path: '(.*)', component: 'not-found' },
+    ]);
+
+    router.hooks = {
+      before: function (router, pathnameOrContext) {
+        console.log("selam before", pathnameOrContext.pathname);
+        //if (pathnameOrContext.pathname == "/simply/examples/router/nested/users") {
+        //  return false;
+        //}
+      },
+      after: function (context) {
+        console.log("hello after");
+      }
+    }
+
+  </script>
+</body>
+
+</html>

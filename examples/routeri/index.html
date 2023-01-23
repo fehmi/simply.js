@@ -3,14 +3,12 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Router Example - simply</title>
-	<base href="https://root/simply/examples/router/">
+	<base href="https://root/simply/examples/routeri/index.html">
 </head>
 
-<a href="">Home</a>
-<a href="users">Users</a>
-<a href="users">Users2</a>
-<a href="users/kim">Kim</a>
-<a href="users/kim">Kim2</a>
+<a href="#">Home</a>
+<a href="#/users">Users</a>
+<a href="#/users/kim">Kim</a>
 
 <router></router>
 <user-profile></user-profile>
@@ -27,17 +25,21 @@
 
 		const outlet = document.querySelector('router');
 		const router = new Router(outlet, {
-			// enableHash: true
-			// baseUrl: "/simply/examples/router/" // https://root/simply/examples/router/ or router or /simply/examples/router/
+			enableHash: true
+			// baseUrl: "#" // https://root/simply/examples/router/ or router or /simply/examples/router/
 		});
 
 		router.setRoutes([
-			{ path: '/', component: 'hello-world' },
 			{
-				path: '/users',
+				path: 'index.html',
 				children: [
-					{ path: '/', component: 'user-list' },
-					{ path: '/:user', component: 'user-profile' }
+					{ path: '/', component: 'hello-world' },
+					{
+						path: '/users', children: [
+							{ path: '/', component: 'user-list' },
+							{ path: '/:user', component: 'user-profile' }
+						]
+					}
 				]
 			},
 			{ path: '(.*)', component: 'not-found' },
@@ -46,14 +48,14 @@
 		router.hooks = {
 			before: function (router, pathnameOrContext)
 			{
-				// console.log("selam before", pathnameOrContext.pathname);
+				console.log("selam before", pathnameOrContext);
 				//if (pathnameOrContext.pathname == "/simply/examples/router/nested/users") {
 				//  return false;
 				//}
 			},
 			after: function (context)
 			{
-				// console.log("hello after");
+				console.log("after: ", context);
 			}
 		}
 
