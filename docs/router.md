@@ -78,6 +78,12 @@ router.hooks = {
 }
 ```
 
+?> Sometimes when you have a deep base path, you may need to play with the path options if you want navigate with JS.
+
+```js
+Router.go(router.baseUrl.replace(document.location.origin, "") + "/users");
+```
+
 Vaadin docs[Vaadin docs](https://vaadin.github.io/router/vaadin-router/#/classes/Router)<br>
 Demos [Demos](https://vaadin.github.io/router/vaadin-router/#/classes/Router/demos/demo/index.html)
 

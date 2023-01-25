@@ -219,7 +219,7 @@ function utils() {
     //request.responseType = 'document';
 
     if (ext == "js") {
-      console.log("galiba store/state");
+      // console.log("galiba store/state");
     }
     else if (ext == "html") {
       if (typeof simply.components[name] == "undefined") {
@@ -391,6 +391,8 @@ function utils() {
               this.uid = '_' + Math.random().toString(36).substr(2, 9);
               var component = this;
               var state;
+							var parent;
+							var sheet;
               var data = this.componentClass.data;
               if (data) {
                 data.props = {};
@@ -402,14 +404,12 @@ function utils() {
               this.watch = this.componentClass.watch;
               this.component = this;
 
-              this.parent = this.getRootNode().host;
-              var parent = this.parent;
-
               var dom = this.attachShadow({ mode: 'open' });
               //this.dom.appendChild(style.cloneNode(true));
               dom.innerHTML = "";
               this.dom = dom;
-
+							this.parent = this.getRootNode().host;
+							parent = this.parent;
 
 
               // simply.components[this.uid] = this;
@@ -425,20 +425,29 @@ function utils() {
               }
               this.data = data;
 
-              if (this.getRootNode().host) {
-                if (typeof this.getRootNode().host.state !== "undefined") {
-                  this.state = this.getRootNode().host.state;
-                  console.log("parent'tan state'i al");
+							// console.log("---------------------");
+							// console.log("--comp name: ", name);
+							// console.log("--this: ", this.dom.host);
+							// console.log("--parent: ", this.parent);
+							// console.log("--getrootnode:", this.getRootNode());
+							// console.log("--ppp:", this.ppp);
+
+							// anadan babadan gelen state varsa
+              if (parent) {
+                if (typeof parent.state !== "undefined") {
+                  this.state = parent.state;
+                  // console.log("parent'tan state'i al", this.state);
                 }
               }
 
+							// komponent içinde state tanımlı ise
               if (typeof this.componentClass.state !== "undefined") {
                 if (!this.state) {
                   this.state = {};
                 }
                 var newStates = this.componentClass.state;
                 for (let key in newStates) {
-                  console.log(newStates);
+                  // console.log(newStates);
                   this.state[key] = newStates[key];
                 }
               }
@@ -448,7 +457,6 @@ function utils() {
                   this.lifecycle.afterConstruct();
                 }
               }
-
               state = this.state;
             }
           }
@@ -496,6 +504,7 @@ function utils() {
           this.render();
 
           function react(name, value, old, parents) {
+						// console.log("react TO", name);
 						setTimeout(function() {
 							if (typeof self.lifecycle !== "undefined") {
 								if (typeof self.lifecycle.whenDataChange !== "undefined") {
@@ -553,11 +562,10 @@ function utils() {
 
 
           if (!this.rendered) {
-
-            let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
+						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
             if (style !== "") {
               var parsedStyle = simply.parseStyle(style, this.data);
-              parsedTemplate = parsedTemplate + "<style simply-vars></style><style>" + parsedStyle.style + "</style>";
+              parsedTemplate = parsedTemplate + "<style>" + parsedStyle.style + "</style><style simply-vars></style>";
             }
 
             if (typeof this.lifecycle !== "undefined") {
@@ -571,7 +579,7 @@ function utils() {
             //this.dom.appendChild(style.cloneNode(true));
             this.dom.innerHTML = parsedTemplate;
             try {
-              var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
+              this.sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
               //console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
 
               var vars = ":host {";
@@ -580,7 +588,8 @@ function utils() {
                 vars += key + ":" + parsedStyle.vars[key] + ";";
               }
 
-              sheet.insertRule(vars + "}", 0);
+              this.sheet.insertRule(vars + "}", 0);
+
             } catch (error) {
 
             }
@@ -604,8 +613,8 @@ function utils() {
             let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
             var parsedStyle = simply.parseStyle(style, this.data);
 
-            newDom.innerHTML = parsedTemplate + "<style simply-vars></style><style></style>";
-            //console.log(this.dom, newDom);
+            newDom.innerHTML = parsedTemplate + "<style></style><style simply-vars></style>";
+
             morphdom(this.dom, newDom, {
               //childrenOnly: true,
 							onBeforeElUpdated: function(fromEl, toEl) {
@@ -613,7 +622,7 @@ function utils() {
 							},
               onBeforeElChildrenUpdated: function (fromEl, toEl) {
                 if (fromEl.tagName == "CHILD-COMPONENT") {
-                  console.log("dont again");
+                  // console.log("dont again");
                 }
 
                 if (fromEl.tagName == "STYLE") {
@@ -628,6 +637,11 @@ function utils() {
 									toEl.value = fromEl.value;
 								}
 
+								if (toEl.tagName === 'ROUTER') {
+									// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
+									return false;
+								}
+
 								if (toEl.type == 'radio' || toEl.type == 'checkbox') {
 									toEl.checked = fromEl.checked;
 								}
@@ -640,20 +654,28 @@ function utils() {
 
             });
 
-            var sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
-            for (var key in parsedStyle.vars) {
-              if (!parsedStyle.vars.hasOwnProperty(key)) continue;
-              //this.dom.getRootNode().host.style.setProperty(key, parsedStyle.vars[key])
-              sheet.cssRules[0].style.setProperty(key, parsedStyle.vars[key]);
-              //console.log(this.dom.getRootNode().querySelector("style[simply-vars]").sheet.cssRules[0]);
-              //this.dom.getRootNode().querySelector("style[simply-vars]").sheet.insertRule(":host {" + key + ":" + parsedStyle.vars[key] + ";}", 0);
-            }
 
-            if (typeof this.lifecycle !== "undefined") {
-              if (typeof this.lifecycle.afterRerender !== "undefined") {
-                this.lifecycle.afterRerender();
-              }
-            }
+							// console.log("----name:", name, this.sheet);
+							// console.log("inner:", this.dom.innerHTML);
+							// console.log("parsed:", parsedStyle.vars);
+							// console.log("sheet:", this.dom.getRootNode().querySelector("style[simply-vars]"));
+							// console.log("root", this.dom.getRootNode());
+							for (var key in parsedStyle.vars) {
+								if (!parsedStyle.vars.hasOwnProperty(key)) continue;
+								//this.dom.getRootNode().host.style.setProperty(key, parsedStyle.vars[key])
+
+								this.sheet.cssRules[0].style.setProperty(key, parsedStyle.vars[key]);
+
+								//console.log(this.dom.getRootNode().querySelector("style[simply-vars]").sheet.cssRules[0]);
+								//this.dom.getRootNode().querySelector("style[simply-vars]").sheet.insertRule(":host {" + key + ":" + parsedStyle.vars[key] + ";}", 0);
+							}
+
+							if (typeof this.lifecycle !== "undefined") {
+								if (typeof this.lifecycle.afterRerender !== "undefined") {
+									this.lifecycle.afterRerender();
+								}
+							}
+
           }
           this.rendered = true;
         }
@@ -670,8 +692,7 @@ function utils() {
         // is added, removed, or changed.
         attributeChangedCallback(name, oldValue, newValue) {
           // if data.
-          console.log(name, oldValue, newValue);
-
+          // console.log(name, oldValue, newValue);
         }
         adoptedCallback() { }
 
@@ -2552,6 +2573,15 @@ function utils() {
       return item.route;
     }).indexOf(context.route);
     context.chain[index].element = element;
+
+		// simply.js state & parent fix
+		let outlet = context.resolver.__outlet;
+		if (outlet.getRootNode().host) {
+			let parent = outlet.getRootNode().host;
+			element.parent = parent;
+			let state = parent.state;
+			element.state = state;
+		}
     return element;
   }
 
@@ -2653,17 +2683,14 @@ function utils() {
 	var routerGlobalOptionsVar;
 	function globalHashChangeHandler(event)
 	{
-
-		console.log(event);
-
 			let pathname;
 			pathname = window.location.hash.replace("#", "");
-			console.log("HASHCHANGEEVENT: ");
-			console.log(event);
-			console.log("hay hash: " + pathname);
+			// console.log("HASHCHANGEEVENT: ");
+			// console.log(event);
+			// console.log("hay hash: " + pathname);
+			// console.log("base: " + router.baseUrl.replace(document.location.origin, ""));
+			// console.log("pathname: " + pathname);
 			Router.go(router.baseUrl.replace(document.location.origin, "") + pathname);
-			console.log("base: " + router.baseUrl.replace(document.location.origin, ""));
-			console.log("pathname: " + pathname);
 	}
 	const HASHCHANGE = {
 		activate()
@@ -2708,9 +2735,9 @@ function utils() {
         _this.resolveRoute = function (context) {
           return _this.__resolveRoute(context);
         };
-				console.log(routerGlobalOptionsVar);
+
+				// simply.js hash support for router
 				if (routerGlobalOptionsVar.enableHash) {
-					console.log("ha$$", Router.NavigationTrigger);
 					Router.NavigationTrigger = [HASHCHANGE];
 				}
 
@@ -3218,36 +3245,29 @@ function utils() {
       }, {
         key: "__updateBrowserHistory",
         value: function __updateBrowserHistory(_ref2, replace) {
-
+					// simply.js hash support extension
 					if (typeof routerGlobalOptionsVar.enableHash !== "undefined") {
-							console.log("right here");
-							console.log("UPDATEBROWSERHISTORY");
 							var path = _ref2.pathname;
-							console.log("pathname: " + path);
 							path = path.replace(router.baseUrl.replace(document.location.origin, ""), "");
-							console.log("updatehash: " + path);
-							console.log("hash", window.location.hash);
 
 							// home ise skip et
 							if (path == "" && window.location.hash == "") {
-								console.log("home?");
+								//console.log("home?");
 							}
+							// hash değişmişse trigger hashchange func manually
 							else if ("#"+ path !== window.location.hash) {
-
 								if (window.location.hash.length > 1) {
-									console.log("trigger hashchange");
 									window.dispatchEvent(new HashChangeEvent("hashchange"));
 								}
 								else {
-									console.log("PAAAT", _ref2.pathname.replace(path, ""));
-									window.history.replaceState({ user: "john" }, "", _ref2.pathname.replace(path, "") + "#" + path);
+									// path ile gelmişse hash'e dönüştür
+									window.history.replaceState({ }, "", _ref2.pathname.replace(path, "") + "#" + path);
 								}
 							}
+							// pathname ile hash aynı
 							else if ("#"+ path == window.location.hash) {
-								console.log("pathname ile hash aynı");
 							}
 							else {
-								console.log("else");
 							}
 					}
 					else {
