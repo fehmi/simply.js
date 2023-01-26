@@ -1,4 +1,4 @@
-console.log("haydari2");
+console.log("haydari3");
 utils();
 
 window.simply = {
