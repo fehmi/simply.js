@@ -1,4 +1,3 @@
-console.log("haydari4");
 utils();
 
 window.simply = {
@@ -127,7 +126,6 @@ window.simply = {
 			}
 
 			var variableName = "--" + m[3].replace(/\./g, "-");
-			console.log(m[3]);
 			var variableValue = eval(m[3]);
 
 			vars[variableName] = variableValue;

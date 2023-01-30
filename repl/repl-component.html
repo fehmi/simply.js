@@ -677,18 +677,10 @@
             data.url = data.urlHistory[0];
             data.currentUrlIndex = 1;
             data.console = [];
-          console.log(data);
+
           setTimeout(function() {
-
-
             dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
-
-          //console.log(blobs["index.html"].content);
-            // rever url
-
-
-            }, 0);
-
+          }, 0);
         });
       },
       rewriteGet(filename, content) {
@@ -1529,10 +1521,6 @@ SOFTWARE.';
       },
 
     }
-      watch(name, value, old, parents) {
-
-          console.log(name, value);
-
-      }
+      watch(name, value, old, parents) {}
   }
 </script>
