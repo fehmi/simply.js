@@ -389,6 +389,7 @@ function utils() {
 
 							this.uid = '_' + Math.random().toString(36).substr(2, 9);
 							var component = this;
+							var comp = this;
 							var state;
 							var parent;
 							var sheet;
@@ -402,6 +403,7 @@ function utils() {
 
 							this.watch = this.componentClass.watch;
 							this.component = this;
+							this.comp = this;
 
 							var dom = this.attachShadow({ mode: 'open' });
 							//this.dom.appendChild(style.cloneNode(true));
@@ -456,7 +458,14 @@ function utils() {
 									this.lifecycle.afterConstruct();
 								}
 							}
-							state = this.state;
+							state = component.state;
+							Object.defineProperty(this, 'state', {
+								get: function () { return state; },
+								set: function (v) {
+									state = v;
+									// print('Value changed! New value: ' + v);
+								}
+							});
 						}
 					}
 				}
@@ -500,6 +509,7 @@ function utils() {
 					});
 
 					let self = this;
+
 					this.render();
 
 					function react(name, value, old, parents) {
@@ -545,6 +555,7 @@ function utils() {
 				}
 
 				render() {
+
 					let m;
 					let regex = /\s+on[a-z]+\=(\"|\')([^"\n]*)(\"|\')/gm;
 					while ((m = regex.exec(template)) !== null) {
@@ -559,8 +570,8 @@ function utils() {
 						}
 					}
 
-
 					if (!this.rendered) {
+						var state = this.state;
 						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
 						if (style !== "") {
 							var parsedStyle = simply.parseStyle(style, this.data, this.state);
@@ -642,7 +653,7 @@ function utils() {
 								}
 
 								if (toEl.type == 'radio' || toEl.type == 'checkbox') {
-									toEl.checked = fromEl.checked;
+									//toEl.checked = fromEl.checked;
 								}
 
 								if (toEl.tagName === 'OPTION') {
@@ -650,9 +661,7 @@ function utils() {
 								}
 								//console.log(toEl.tagName);
 							}
-
 						});
-
 
 						// console.log("----name:", name, this.sheet);
 						// console.log("inner:", this.dom.innerHTML);

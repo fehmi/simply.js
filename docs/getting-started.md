@@ -6,7 +6,7 @@
 You can add simply.js to your app via `<script>` tag to start using it. Just be sure to add it right before the closing `</body>` tag.
 
 ```html
-<script src="//cdn.jsdelivr.net/gh/fehmi/simply.js@v0.4-alpha/simply.min.js"></script>
+<script src="https://simply.js.org/simply.min.js"></script>
 ```
 
 ## Create a Component
@@ -53,7 +53,7 @@ After getting your component, the filename without extension will be your custom
 
 Now you have two files and they are look like below. You can just click to download to have them in your local for fastest start if you don't want to create these files manually.
 
-<repl-component download="true" id="I"></repl-component>
+<repl-component download="true" id="10fcijpwru4j34e"></repl-component>
 
 ## Preview Your App
 

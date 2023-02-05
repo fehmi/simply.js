@@ -2,275 +2,287 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>simply.js</title>
-  <link rel="icon" href="docs/images/fav.png" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="keywords" content="simply, ui, ux, toolkit, mvc" />
-  <meta name="description" content="Simple toolkit for simple web-apps." />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
-  <!--<link rel="stylesheset" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />-->
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" title="vue" />
+	<meta charset="UTF-8" />
+	<title>simply.js</title>
+	<link rel="icon" href="docs/images/fav.png" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="keywords" content="simply, ui, ux, toolkit, mvc" />
+	<meta name="description" content="Simple toolkit for simple web-apps." />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
+	<!--<link rel="stylesheset" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/buble.css" title="buble" />-->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css" title="vue" />
 
-  <style>
-    html {display:black;}
+	<style>
+		html {
+			display: black;
+		}
 
-    .cover.show+main {
-      display: none;
-    }
+		.cover.show+main {
+			display: none;
+		}
 
-    :root {
-      --theme-color: #2c9cb5;
-    }
+		:root {
+			--theme-color: #2c9cb5;
+		}
 
-    body {
-      font-size: 18px;
-      font-family: system-ui, Helvetica, Arial, sans-serif;
-    }
+		body {
+			font-size: 18px;
+			font-family: system-ui, Helvetica, Arial, sans-serif;
+		}
 
-    .markdown-section ol,
-    .markdown-section p,
-    .markdown-section ul {
-      line-height: 1.8rem;
-    }
+		.markdown-section ol,
+		.markdown-section p,
+		.markdown-section ul {
+			line-height: 1.8rem;
+		}
 
-    .sidebar ul li a {
-      font-size: 16px;
-    }
+		.sidebar ul li a {
+			font-size: 16px;
+		}
 
-    .sidebar li {
-      margin: 2px 0;
-    }
+		.sidebar li {
+			margin: 2px 0;
+		}
 
-    nav.app-nav li ul {
-      min-width: 100px;
-    }
+		nav.app-nav li ul {
+			min-width: 100px;
+		}
 
-    #carbonads {
-      box-shadow: none !important;
-      width: auto !important;
-    }
+		#carbonads {
+			box-shadow: none !important;
+			width: auto !important;
+		}
 
-    .markdown-section {
-      margin: 0 auto;
-      max-width: 60%;
-      padding: 50px 15px 40px;
-      position: relative;
-    }
+		.markdown-section {
+			margin: 0 auto;
+			max-width: 100%;
+			padding: 50px 15px 40px;
+			position: relative;
+		}
 
-    section.cover {
-      background: aliceblue !important;
-      align-items: flex-start;
-      /* margin-top: 60px; */
-      height: 100%;
-      overflow: visible;
-      /* padding-bottom: 30px; */
-      padding-top: 120px;
-      /* flex: 1; */
-      position: relative;
+		.markdown-section>* {
+			max-width: 60%;
+			margin-left: auto !important;
+			margin-right: auto !important;
+		}
 
-    }
+		.markdown-section pre>code {
+			max-width: unset;
+		}
 
-    section.cover .cover-main {
-      margin: 0;
-      flex: 1;
-      margin: -20px 16px 0;
-      text-align: center;
-      position: relative;
-      background: aliceblue !important;
-      padding-bottom: 60px;
-    }
+		section.cover {
+			background: aliceblue !important;
+			align-items: flex-start;
+			/* margin-top: 60px; */
+			height: 100%;
+			overflow: visible;
+			/* padding-bottom: 30px; */
+			padding-top: 120px;
+			/* flex: 1; */
+			position: relative;
 
-    section.cover h1 {
-      margin-bottom: 10px;
-    }
+		}
 
-    section.cover blockquote {
-      margin-top: -5px;
-      margin-bottom: 45px;
-    }
+		section.cover .cover-main {
+			margin: 0;
+			flex: 1;
+			margin: -20px 16px 0;
+			text-align: center;
+			position: relative;
+			background: aliceblue !important;
+			padding-bottom: 60px;
+		}
 
-    section.cover blockquote p {
-      margin-top: 5px;
-    }
+		section.cover h1 {
+			margin-bottom: 10px;
+		}
 
-    section.cover p {
-      margin-top: 10px;
-      margin-bottom: 0px;
-    }
+		section.cover blockquote {
+			margin-top: -5px;
+			margin-bottom: 45px;
+		}
 
-    section.cover h1 small {
-      bottom: unset;
-    }
+		section.cover blockquote p {
+			margin-top: 5px;
+		}
 
-    section.cover .anchor {
-      pointer-events: none;
-      padding-top: 0px;
-    }
+		section.cover p {
+			margin-top: 10px;
+			margin-bottom: 0px;
+		}
 
-    nav.app-nav {
-      position: fixed;
-      background-color: white;
-      margin: 0 !important;
-      width: 100vw;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 0 25px;
-      right: unset;
-      top: 0;
-      box-shadow: 0 -0.4rem 0.9rem 0.2rem rgb(0 0 0 / 30%);
-    }
+		section.cover h1 small {
+			bottom: unset;
+		}
 
-    .anchor {
-      pointer-events: none;
-    }
+		section.cover .anchor {
+			pointer-events: none;
+			padding-top: 0px;
+		}
 
-    nav.app-nav>ul:first-child {
-      flex: 1;
-      justify-content: left;
-      text-align: left;
-      padding-left: 0px;
-    }
+		nav.app-nav {
+			position: fixed;
+			background-color: white;
+			margin: 0 !important;
+			width: 100vw;
+			height: 60px;
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			padding: 0 25px;
+			right: unset;
+			top: 0;
+			box-shadow: 0 -0.4rem 0.9rem 0.2rem rgb(0 0 0 / 30%);
+		}
 
-    nav.app-nav>ul:first-child li {
-      padding-left: 0px;
-      margin-left: 0px;
-    }
+		.anchor {
+			pointer-events: none;
+		}
 
-    nav.app-nav>ul:first-child a {
-      border: none;
-      display: block;
-      font-size: 0;
-    }
+		nav.app-nav>ul:first-child {
+			flex: 1;
+			justify-content: left;
+			text-align: left;
+			padding-left: 0px;
+		}
 
-    nav.app-nav>ul:first-child img {
-      width: 170px;
-    }
+		nav.app-nav>ul:first-child li {
+			padding-left: 0px;
+			margin-left: 0px;
+		}
 
-    .sidebar li.active {
-      background-color: unset;
-    }
+		nav.app-nav>ul:first-child a {
+			border: none;
+			display: block;
+			font-size: 0;
+		}
 
-    li.active>a {
-      background-color: aliceblue;
-    }
+		nav.app-nav>ul:first-child img {
+			width: 170px;
+		}
 
-    .sidebar {
-      margin-top: 60px;
-    }
+		.sidebar li.active {
+			background-color: unset;
+		}
 
-    .sidebar .app-name-link {
-      display: none;
-    }
+		li.active>a {
+			background-color: aliceblue;
+		}
 
-    body[data-page=docs\/playground\.md] .sidebar,
-    body[data-page=docs\/playground\.md] .sidebar-toggle {
-      display: none;
-    }
+		.sidebar {
+			margin-top: 60px;
+		}
 
-    body.ready[data-page='docs/playground.md'] #main>* {
-      display: none;
-    }
+		.sidebar .app-name-link {
+			display: none;
+		}
 
-    body.ready[data-page='docs/playground.md'] #main>style+p {
-      display: block;
-    }
+		body[data-page=docs\/playground\.md] .sidebar,
+		body[data-page=docs\/playground\.md] .sidebar-toggle {
+			display: none;
+		}
 
-    .sidebar {
-      background-color: slategray;
-      /* color: white; */
-    }
+		body.ready[data-page='docs/playground.md'] #main>* {
+			display: none;
+		}
 
-    .sidebar ul li a {
-      color: rgb(216 221 226);
-      font-weight: 500;
-    }
+		body.ready[data-page='docs/playground.md'] #main>style+p {
+			display: block;
+		}
 
-    .sidebar li>p {
-      font-weight: 700;
-      margin: 0;
-      color: white;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 15px;
-    }
+		.sidebar {
+			background-color: slategray;
+			/* color: white; */
+		}
 
-    .search input {
-      outline: none;
-      border: none;
-      width: 100%;
-      padding: 0 7px;
-      line-height: 36px;
-      font-size: 14px;
-      border: none;
-      background: transparent;
-      color: white;
-      box-shadow: none !important;
-      border: none !important;
-    }
+		.sidebar ul li a {
+			color: rgb(216 221 226);
+			font-weight: 500;
+		}
 
-    .search input::placeholder {
-      color: rgba(255, 255, 255, .5);
-    }
+		.sidebar li>p {
+			font-weight: 700;
+			margin: 0;
+			color: white;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			font-size: 15px;
+		}
 
-    li.active>a {
-      color: white !important;
-      border-right: 4px solid white !important;
-      background: transparent;
-      border: none !important;
-      background-position: right;
-      background-repeat: no-repeat;
-      background-image: url("data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 25.2.0, SVG Export Plug-In --%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='18.4px' height='17.4px' viewBox='0 0 18.4 17.4' style='overflow:visible;enable-background:new 0 0 18.4 17.4;' xml:space='preserve'%3E%3Cstyle type='text/css'%3E .st0%7Bfill-rule:evenodd;clip-rule:evenodd;fill:%23FFFFFF;%7D%0A%3C/style%3E%3Cdefs%3E%3C/defs%3E%3Cg%3E%3Cpath class='st0' d='M14.6,9.7H0v-2h14.6L8.3,1.4L9.7,0l8.7,8.7l-8.7,8.7L8.3,16L14.6,9.7z'/%3E%3C/g%3E%3C/svg%3E%0A");
-      margin-right: 10px;
-    }
+		.search input {
+			outline: none;
+			border: none;
+			width: 100%;
+			padding: 0 7px;
+			line-height: 36px;
+			font-size: 14px;
+			border: none;
+			background: transparent;
+			color: white;
+			box-shadow: none !important;
+			border: none !important;
+		}
 
-    .sidebar-toggle {
-      display: none;
-    }
+		.search input::placeholder {
+			color: rgba(255, 255, 255, .5);
+		}
 
-    .app-sub-sidebar li:before {
-      color: #d8dde2;
-    }
+		li.active>a {
+			color: white !important;
+			border-right: 4px solid white !important;
+			background: transparent;
+			border: none !important;
+			background-position: right;
+			background-repeat: no-repeat;
+			background-image: url("data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 25.2.0, SVG Export Plug-In --%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='18.4px' height='17.4px' viewBox='0 0 18.4 17.4' style='overflow:visible;enable-background:new 0 0 18.4 17.4;' xml:space='preserve'%3E%3Cstyle type='text/css'%3E .st0%7Bfill-rule:evenodd;clip-rule:evenodd;fill:%23FFFFFF;%7D%0A%3C/style%3E%3Cdefs%3E%3C/defs%3E%3Cg%3E%3Cpath class='st0' d='M14.6,9.7H0v-2h14.6L8.3,1.4L9.7,0l8.7,8.7l-8.7,8.7L8.3,16L14.6,9.7z'/%3E%3C/g%3E%3C/svg%3E%0A");
+			margin-right: 10px;
+		}
 
-    .sidebar-nav>ul {
-      margin: 35px 0px 10px 40px;
-    }
+		.sidebar-toggle {
+			display: none;
+		}
 
-    section.cover small {
-      vertical-align: top;
-    }
+		.app-sub-sidebar li:before {
+			color: #d8dde2;
+		}
 
-    .markdown-section code {
-      color: #2ea971;
-    }
+		.sidebar-nav>ul {
+			margin: 35px 0px 10px 40px;
+		}
 
-    span.edit a {
-      font-weight: 400;
-      color: #c5c5c5;
-      /* opacity: .3; */
-    }
+		section.cover small {
+			vertical-align: top;
+		}
 
-    .sidebar li.collapse .app-sub-sidebar {
-      display: block;
-    }
+		.markdown-section code {
+			color: #2ea971;
+		}
 
-    .markdown-section h1 {
-      font-size: 2.4rem;
-    }
+		span.edit a {
+			font-weight: 400;
+			color: #c5c5c5;
+			/* opacity: .3; */
+		}
 
-    .markdown-section>:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) code {
-      font-size: 1rem;
-      line-height: 1.8rem;
-    }
+		.sidebar li.collapse .app-sub-sidebar {
+			display: block;
+		}
 
-    .markdown-section h4 {
-      margin-bottom: -10px;
-      margin-top: 40px;
-    }
+		.markdown-section h1 {
+			font-size: 2.4rem;
+		}
 
-    /*
+		.markdown-section>:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) code {
+			font-size: 1rem;
+			line-height: 1.8rem;
+		}
+
+		.markdown-section h4 {
+			margin-bottom: -10px;
+			margin-top: 40px;
+		}
+
+		/*
     .sidebar-nav>ul>li>ul>li.collapse:not(.open) a {
       background: none;
     }
@@ -289,262 +301,267 @@
     }
     */
 
-    body section:not(.cover) repl-component {
-      width: 100%;
-    }
+		body section:not(.cover) repl-component {
+			width: 100%;
+		}
 
-    .docsify-pagination-container {
-      margin: 2em 0 1em !important;
-    }
+		.docsify-pagination-container {
+			margin: 2em 0 1em !important;
+		}
 
-    .pagination-item-subtitle {
-      margin-top: 5px !important;
-    }
+		.pagination-item-subtitle {
+			margin-top: 5px !important;
+		}
 
-    p.warn:before {
-      background-color: #31ab7c;
-      border-radius: 100%;
-      color: #fff;
-      content: "i";
-      font-family: Dosis, Source Sans Pro, Helvetica Neue, Arial, sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      left: -12px;
-      line-height: 20px;
-      position: absolute;
-      height: 20px;
-      width: 20px;
-      text-align: center;
-      top: 14px;
-    }
+		p.warn:before {
+			background-color: #31ab7c;
+			border-radius: 100%;
+			color: #fff;
+			content: "i";
+			font-family: Dosis, Source Sans Pro, Helvetica Neue, Arial, sans-serif;
+			font-size: 14px;
+			font-weight: 700;
+			left: -12px;
+			line-height: 20px;
+			position: absolute;
+			height: 20px;
+			width: 20px;
+			text-align: center;
+			top: 14px;
+		}
 
-    .markdown-section p.warn {
-      background: rgba(66, 185, 131, .1);
-      border-radius: 2px;
-      padding: 1rem;
-      border-bottom-right-radius: 2px;
-      border-left: 4px solid #31ab7c;
-      border-top-right-radius: 2px;
-      margin: 2em 0;
-      padding: 12px 24px 12px 30px;
-      position: relative;
-    }
-  </style>
+		.markdown-section p.warn {
+			background: rgba(66, 185, 131, .1);
+			border-radius: 2px;
+			padding: 1rem;
+			border-bottom-right-radius: 2px;
+			border-left: 4px solid #31ab7c;
+			border-top-right-radius: 2px;
+			margin: 2em 0;
+			padding: 12px 24px 12px 30px;
+			position: relative;
+		}
+
+		body section:not(.cover) repl-component {
+			width: calc(100% + 43%);
+			margin-left: -20%;
+		}
+	</style>
 </head>
 
 <body>
-  <div id="app">Loading ...</div>
-  <script>
-    window.$docsify = {
-      alias: {
-        '/navbar.md': '/docs/navbar.md',
-        '/sidebar.md': 'docs/sidebar.md',
-        '/docs/': 'README.md',
-        '/README.MD': 'README.md',
-        '/playground': 'docs/playground.md',
-        '.*?/changelog': 'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
-        '/zh-cn/(.*)':
-          'https://raw.githubusercontent.com/docsifyjs/docs-zh/master/$1',
-        '/de-de/(.*)':
-          'https://raw.githubusercontent.com/docsifyjs/docs-de/master/$1',
-        '/ru-ru/(.*)':
-          'https://raw.githubusercontent.com/docsifyjs/docs-ru/master/$1',
-        '/es/(.*)':
-          'https://raw.githubusercontent.com/docsifyjs/docs-es/master/$1',
-        '/write-a-plugin':
-          'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
-      },
-      homepage: "README.md",
-      auto2top: false,
-      coverpage: {
-        '/': 'docs/coverpage.md'
-      },
-      tabs: {
-        persist: true,      // default
-        sync: true,      // default
-        theme: 'classic', // default
-        tabComments: true,      // default
-        tabHeadings: true       // default
-      },
-      pagination: {
-        crossChapter: true,
-        crossChapterText: true,
-      },
-      executeScript: true,
-      loadSidebar: "sidebar.md",
-      loadNavbar: 'navbar.md',
-      mergeNavbar: true,
-      maxLevel: 4,
-      subMaxLevel: 2,
-      sidebarDisplayLevel: 2,
-      ga: 'UA-106147152-1',
-      topMargin: 95,
-      name: 'simply.js',
-      search: {
-        noData: {
-          '/de-de/': 'Keine Ergebnisse!',
-          '/zh-cn/': '没有结果!',
-          '/': 'No results!',
-        },
-        paths: 'auto',
-        placeholder: {
-          '/de-de/': 'Suche',
-          '/zh-cn/': '搜索',
-          '/': 'Search',
-        },
-      },
-      plugins: [
-        function (hook, vm) {
-          hook.beforeEach(function (html) {
-            if (/githubusercontent\.com/.test(vm.route.file)) {
-              url = vm.route.file
-                .replace('raw.githubusercontent.com', 'github.com')
-                .replace(/\/master/, '/blob/master');
-            } else if (/jsdelivr\.net/.test(vm.route.file)) {
-              url = vm.route.file
-                .replace('cdn.jsdelivr.net/gh', 'github.com')
-                .replace('@master', '/blob/main');
-            } else {
-              url =
-                'https://github.com/fehmi/simply.js/tree/main/' +
-                vm.route.file;
-            }
-            var editHtml = '\n<br><span class="edit">[:memo: Edit Document](' + url + ')</span>';
-            return (
-              html +
-              editHtml +
-              ''
-            );
-          }),
-            hook.afterEach(function (html) {
-              if (vm.route.path === '/') {
-                return html;
-              }
-              return `${html}`;
-            });
-        },
-      ],
-    };
-  </script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-plugin-carbon@1/index.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
-  <script src="//cdn.jsdelivr.net/gh/pocketbase/js-sdk/dist/pocketbase.umd.js"></script>
-  <script>
-  /*
-    const pb = new PocketBase('https://pocket.typop.net/simply');
-    const authData = pb.admins.authWithPassword('woebegone@gmail.com', 'jD!KU8u9hCjj52d');
-    const authData = pb.collection('users').authWithPassword('playerground', 'playerground');
+	<div id="app">Loading ...</div>
+	<script>
+		window.$docsify = {
+			alias: {
+				'/navbar.md': '/docs/navbar.md',
+				'/sidebar.md': 'docs/sidebar.md',
+				'/docs/': 'README.md',
+				'/README.MD': 'README.md',
+				'/playground': 'docs/playground.md',
+				'.*?/changelog': 'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
+				'/zh-cn/(.*)':
+					'https://raw.githubusercontent.com/docsifyjs/docs-zh/master/$1',
+				'/de-de/(.*)':
+					'https://raw.githubusercontent.com/docsifyjs/docs-de/master/$1',
+				'/ru-ru/(.*)':
+					'https://raw.githubusercontent.com/docsifyjs/docs-ru/master/$1',
+				'/es/(.*)':
+					'https://raw.githubusercontent.com/docsifyjs/docs-es/master/$1',
+				'/write-a-plugin':
+					'https://raw.githubusercontent.com/docsifyjs/docsify/master/docs/write-a-plugin.md',
+			},
+			homepage: "README.md",
+			auto2top: false,
+			coverpage: {
+				'/': 'docs/coverpage.md'
+			},
+			tabs: {
+				persist: true,      // default
+				sync: true,      // default
+				theme: 'classic', // default
+				tabComments: true,      // default
+				tabHeadings: true       // default
+			},
+			pagination: {
+				crossChapter: true,
+				crossChapterText: true,
+			},
+			executeScript: true,
+			loadSidebar: "sidebar.md",
+			loadNavbar: 'navbar.md',
+			mergeNavbar: true,
+			maxLevel: 4,
+			subMaxLevel: 2,
+			sidebarDisplayLevel: 2,
+			ga: 'UA-106147152-1',
+			topMargin: 95,
+			name: 'simply.js',
+			search: {
+				noData: {
+					'/de-de/': 'Keine Ergebnisse!',
+					'/zh-cn/': '没有结果!',
+					'/': 'No results!',
+				},
+				paths: 'auto',
+				placeholder: {
+					'/de-de/': 'Suche',
+					'/zh-cn/': '搜索',
+					'/': 'Search',
+				},
+			},
+			plugins: [
+				function (hook, vm) {
+					hook.beforeEach(function (html) {
+						if (/githubusercontent\.com/.test(vm.route.file)) {
+							url = vm.route.file
+								.replace('raw.githubusercontent.com', 'github.com')
+								.replace(/\/master/, '/blob/master');
+						} else if (/jsdelivr\.net/.test(vm.route.file)) {
+							url = vm.route.file
+								.replace('cdn.jsdelivr.net/gh', 'github.com')
+								.replace('@master', '/blob/main');
+						} else {
+							url =
+								'https://github.com/fehmi/simply.js/tree/main/' +
+								vm.route.file;
+						}
+						var editHtml = '\n<br><span class="edit">[:memo: Edit Document](' + url + ')</span>';
+						return (
+							html +
+							editHtml +
+							''
+						);
+					}),
+						hook.afterEach(function (html) {
+							if (vm.route.path === '/') {
+								return html;
+							}
+							return `${html}`;
+						});
+				},
+			],
+		};
+	</script>
+	<script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/docsify-plugin-carbon@1/index.min.js"></script>
+	<!-- <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script> -->
+	<script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+	<script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+	<script src="//cdn.jsdelivr.net/gh/pocketbase/js-sdk/dist/pocketbase.umd.js"></script>
+	<script>
+		/*
+			const pb = new PocketBase('https://pocket.typop.net/simply');
+			const authData = pb.admins.authWithPassword('woebegone@gmail.com', 'jD!KU8u9hCjj52d');
+			const authData = pb.collection('users').authWithPassword('playerground', 'playerground');
 
-    console.log(pb.authStore.isValid);
-    console.log(pb.authStore.token);
-    console.log(pb.authStore.model.id);
+			console.log(pb.authStore.isValid);
+			console.log(pb.authStore.token);
+			console.log(pb.authStore.model.id);
 
-    pb.collection('playground').subscribe('*', function (e) {
-        console.log(e.record);
-    });
+			pb.collection('playground').subscribe('*', function (e) {
+					console.log(e.record);
+			});
 
-    const record = pb.collection('playground').getOne('j8iwejxcvs4ew35', {
-        expand: 'content',
-    })
+			const record = pb.collection('playground').getOne('j8iwejxcvs4ew35', {
+					expand: 'content',
+			})
 
-    record.then(console.log);
-  */
-  </script>
+			record.then(console.log);
+		*/
+	</script>
 
-  <script>
-    (function (w) {
-      var loadJS = function (src, cb, ordered) {
-        "use strict";
-        var tmp;
-        var ref = w.document.getElementsByTagName("script")[0];
-        var script = w.document.createElement("script");
+	<script>
+		(function (w) {
+			var loadJS = function (src, cb, ordered) {
+				"use strict";
+				var tmp;
+				var ref = w.document.getElementsByTagName("script")[0];
+				var script = w.document.createElement("script");
 
-        if (typeof (cb) === 'boolean') {
-          tmp = ordered;
-          ordered = cb;
-          cb = tmp;
-        }
+				if (typeof (cb) === 'boolean') {
+					tmp = ordered;
+					ordered = cb;
+					cb = tmp;
+				}
 
-        script.src = src;
-        script.async = !ordered;
-        ref.parentNode.insertBefore(script, ref);
+				script.src = src;
+				script.async = !ordered;
+				ref.parentNode.insertBefore(script, ref);
 
-        if (cb && typeof (cb) === "function") {
-          script.onload = cb;
-        }
-        return script;
-      };
-      // commonjs
-      if (typeof module !== "undefined") {
-        module.exports = loadJS;
-      }
-      else {
-        w.loadJS = loadJS;
-      }
-    }(typeof global !== "undefined" ? global : this));
+				if (cb && typeof (cb) === "function") {
+					script.onload = cb;
+				}
+				return script;
+			};
+			// commonjs
+			if (typeof module !== "undefined") {
+				module.exports = loadJS;
+			}
+			else {
+				w.loadJS = loadJS;
+			}
+		}(typeof global !== "undefined" ? global : this));
 
-    (function () {
+		(function () {
 
-      // Public site only
-      if (/docsify/.test(location.host)) {
+			// Public site only
+			if (/docsify/.test(location.host)) {
 
-        loadJS('//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/ga.min.js');
-      }
-    })();
-  </script>
+				loadJS('//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/ga.min.js');
+			}
+		})();
+	</script>
 
-  <script>
-    loadJS("simply.js", function () {
-      get("repl/repl-component.html");
-    });
+	<script>
+		loadJS("simply.js", function () {
+			get("repl/repl-component.html");
+		});
 
-    function scrollIntoView(path, id) {
-      if (!id) {
-        return
-      }
-      setTimeout(() => {
-        var section = find('#' + id);
-        section && section.scrollIntoView();
-        var li = nav[getNavKey(path, id)];
-        var sidebar = getNode('.sidebar');
-        var active = find(sidebar, 'li.active');
-        active && active.classList.remove('active');
-        li && li.classList.add('active');
-      }, 200)
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelector('.sidebar-nav').addEventListener(
-        'click', e => {
+		function scrollIntoView(path, id) {
+			if (!id) {
+				return
+			}
+			setTimeout(() => {
+				var section = find('#' + id);
+				section && section.scrollIntoView();
+				var li = nav[getNavKey(path, id)];
+				var sidebar = getNode('.sidebar');
+				var active = find(sidebar, 'li.active');
+				active && active.classList.remove('active');
+				li && li.classList.add('active');
+			}, 200)
+		}
+		document.addEventListener('DOMContentLoaded', () => {
+			document.querySelector('.sidebar-nav').addEventListener(
+				'click', e => {
 
-          if (e.target.tagName === 'P') {
-            // e.target.parentElement.classList.toggle('open')
-          }
+					if (e.target.tagName === 'P') {
+						// e.target.parentElement.classList.toggle('open')
+					}
 
-          if (e.target.tagName === 'A') {
-            if (e.target.className.indexOf("section-link") == -1) {
-              selectFirst(e);
-            }
-          }
-        })
-    })
+					if (e.target.tagName === 'A') {
+						if (e.target.className.indexOf("section-link") == -1) {
+							selectFirst(e);
+						}
+					}
+				})
+		})
 
-    function selectFirst(e) {
-      var active = document.querySelectorAll("li.active");
-      for (let i = 0; i < active.length; i++) {
-        const element = active[i];
-        element.classList.remove("active");
-      }
-      e.target.parentNode.classList.add("active");
-      document.querySelector("body").scrollIntoView({ behavior: "auto", block: "end", inline: "nearest" });;
-    }
+		function selectFirst(e) {
+			var active = document.querySelectorAll("li.active");
+			for (let i = 0; i < active.length; i++) {
+				const element = active[i];
+				element.classList.remove("active");
+			}
+			e.target.parentNode.classList.add("active");
+			document.querySelector("body").scrollIntoView({ behavior: "auto", block: "end", inline: "nearest" });;
+		}
 
-  </script>
+	</script>
 
 </body>
 
