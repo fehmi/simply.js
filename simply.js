@@ -5,7 +5,7 @@ window.simply = {
 	parseTemplate: function (template, data, state, parent) {
 		//console.time();
 		let ifStatement = /\<if(\s)(.*)(\>)$/;
-		let elseIfStatement = /\<else\sif\s(.*)(\/)?\>$/;
+		let elseIfStatement = /\<else(\s)if(\s)(.*)(\/)?\>$/;
 		let endIfStatement = /\<\/if\>$/;
 		let elseStatement = /\<else\>$/;
 		let eachStatement = /\<each(\s)(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?\>$/;
@@ -39,7 +39,7 @@ window.simply = {
 				flag = true;
 			}
 			else if ((m = elseIfStatement.exec(bucket)) !== null) {
-				logic = unescape(m[3]);
+				logic = unescape(m[3]); // bu niye 3 tü
 				logic = "}else if (" + logic + ") {";
 				flag = true;
 			}
@@ -54,39 +54,46 @@ window.simply = {
 				flag = true;
 			}
 			else if ((m = eachStatement.exec(bucket)) !== null) {
+				// if (eachCount > 0) {} //each içinde each
 				eachCount += 1;
-				let subject = eval(m[2]);
-				let i = "s" + Math.random().toString(36).slice(-7);
+				try {
+					subject = eval(m[2]);
+				} catch (error) {
+					// console.log(lastM + "." + m[2]);
+					subject = m[2];
+				}
+
+				iiii = "s" + Math.random().toString(36).slice(-7);
 
 				if (Array.isArray(subject)) {
-					let key = typeof m[7] !== "undefined" ? "let " + m[7] + " = " + i + ";" : "";
-					let index = typeof m[7] !== "undefined" ? "let " + m[11] + " = " + i + ";" : "";
+					key = typeof m[7] !== "undefined" ? "let " + m[7] + " = " + iiii + ";" : "";
+					let index = typeof m[7] !== "undefined" ? "let " + m[11] + " = " + iiii + ";" : "";
 
-					logic = "for (" + i + " = 0; " + i + " < " + m[2] + ".length; " + i + "++) { \
+					logic = "for (" + iiii + " = 0; " + iiii + " < " + m[2] + ".length; " + iiii + "++) { \
                         " + key + "; \
                         " + index + "; \
-                        let " + m[3] + "=" + m[2] + "[" + i + "];";
+                        let " + m[3] + "=" + m[2] + "[" + iiii + "];";
 				}
 				else {
-					let key = typeof m[11] !== "undefined" ? "let " + m[11] + " = " : "";
+					key = typeof m[11] !== "undefined" ? "let " + m[11] + " = " : "";
 
 					logic = "\
                     for (var ii in "+ m[2] + ") { \
-                      if (ii == '__o_') { continue; }\
+                      if (ii == '__o_' || ii == '__c_' || ii == 'size') { continue; }\
                       " + key + "Object.keys(" + m[2] + ").indexOf(ii); \
                       let " + m[7] + "= ii; \
                       let " + m[3] + "=" + m[2] + "[ii];";
 				}
 				flag = true;
+				lastM = m[2];
+				lasti = iiii;
 			}
-			//
 
 			else if ((m = endEachStatement.exec(bucket)) !== null) {
 				eachCount -= 1;
 				logic = "};";
 				flag = true;
 			}
-
 
 			if (flag === true) {
 				capturedLogics.push(m[0]);
@@ -99,8 +106,6 @@ window.simply = {
 				flag = false;
 				processedLetters = "";
 			}
-
-
 		}
 		// for the last non-logical text
 		if (processedLetters.trim() !== "") {
@@ -110,7 +115,7 @@ window.simply = {
 		}
 
 		var ht = "";
-		//console.log(bucket);
+		console.log(bucket);
 		eval(bucket);
 		//console.timeEnd();
 		return ht;
