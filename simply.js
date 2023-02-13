@@ -385,6 +385,7 @@ function utils() {
 	}
 	registerComponent = function ({ template, style, name, script, docStr }) {
 		if (!customElements.get(name)) {
+			ahaDom = "";
 			class UnityComponent extends HTMLElement {
 				constructor() {
 					// Always call super first in constructor
@@ -454,7 +455,7 @@ function utils() {
 							this.comp = this;
 
 							var dom = this.attachShadow({ mode: 'open' });
-
+							ahaDom = dom;
 							//this.dom.appendChild(style.cloneNode(true));
 							dom.innerHTML = "";
 							this.dom = dom;
@@ -739,23 +740,6 @@ function utils() {
 
 					}
 					this.rendered = true;
-					setTimeout(() => {
-						if (window.twind) {
-							// Create separate CSSStyleSheet
-							let sheet = window.cssom(new CSSStyleSheet());
-
-							// Use sheet and config to create an twind instance. `tw` will
-							// append the right CSS to our custom stylesheet.
-							const tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind(), window.presetRemToPx()]}, sheet);
-
-							// link sheet target to shadow dom root
-							this.dom.adoptedStyleSheets = [sheet.target];
-
-							// finally, observe using tw function
-							window.observe(tw, this.dom);
-						}
-					}, 1000);
-
 				}
 				// Invoked each time the custom element is
 				// disconnected from the document's DOM.
@@ -779,8 +763,21 @@ function utils() {
 			}
 			// return customElements.define(name, UnityComponent);
 			// twind eki için return'ü sildim. inş bi yer patlamaz
-			return customElements.define(name, UnityComponent);
+			customElements.define(name, UnityComponent);
+			if (window.twind) {
+				// Create separate CSSStyleSheet
+				let sheet = window.cssom(new CSSStyleSheet());
 
+				// Use sheet and config to create an twind instance. `tw` will
+				// append the right CSS to our custom stylesheet.
+				const tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind(), window.presetRemToPx()]}, sheet);
+
+				// link sheet target to shadow dom root
+				this.ahaDom.adoptedStyleSheets = [sheet.target];
+
+				// finally, observe using tw function
+				window.observe(tw, this.ahaDom);
+			}
 
 		}
 	}
