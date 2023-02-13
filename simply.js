@@ -385,7 +385,6 @@ function utils() {
 	}
 	registerComponent = function ({ template, style, name, script, docStr }) {
 		if (!customElements.get(name)) {
-			ahaDom = "";
 			class UnityComponent extends HTMLElement {
 				constructor() {
 					// Always call super first in constructor
@@ -455,7 +454,7 @@ function utils() {
 							this.comp = this;
 
 							var dom = this.attachShadow({ mode: 'open' });
-							ahaDom = dom;
+
 							//this.dom.appendChild(style.cloneNode(true));
 							dom.innerHTML = "";
 							this.dom = dom;
@@ -740,6 +739,40 @@ function utils() {
 
 					}
 					this.rendered = true;
+
+						if (window.twind) {
+							// Create separate CSSStyleSheet
+							let sheet = window.cssom(new CSSStyleSheet());
+
+							// Use sheet and config to create an twind instance. `tw` will
+							// append the right CSS to our custom stylesheet.
+							const tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind()], 	finalize(rule) {
+								if (typeof rule.d !== "undefined") {
+									const unit = 'px';
+									return {
+										...rule,
+										// d: the CSS declaration body
+										// Based on https://github.com/TheDutchCoder/postcss-rem-to-px/blob/main/index.js
+										d: rule.d.replace(/"[^"]+"|'[^']+'|url\([^)]+\)|(-?\d*\.?\d+)rem/g, (match, p1) => {
+											if (p1 === undefined) return match
+											return `${p1 * 16}${p1 == 0 ? '' : unit}`
+										}),
+									}
+								}
+								else {
+									return rule;
+								}
+
+								}}, sheet);
+
+							// link sheet target to shadow dom root
+							this.dom.adoptedStyleSheets = [sheet.target];
+
+							// finally, observe using tw function
+							window.observe(tw, this.dom);
+						}
+
+
 				}
 				// Invoked each time the custom element is
 				// disconnected from the document's DOM.
@@ -763,21 +796,8 @@ function utils() {
 			}
 			// return customElements.define(name, UnityComponent);
 			// twind eki için return'ü sildim. inş bi yer patlamaz
-			customElements.define(name, UnityComponent);
-			if (window.twind) {
-				// Create separate CSSStyleSheet
-				let sheet = window.cssom(new CSSStyleSheet());
+			return customElements.define(name, UnityComponent);
 
-				// Use sheet and config to create an twind instance. `tw` will
-				// append the right CSS to our custom stylesheet.
-				const tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind(), window.presetRemToPx()]}, sheet);
-
-				// link sheet target to shadow dom root
-				this.ahaDom.adoptedStyleSheets = [sheet.target];
-
-				// finally, observe using tw function
-				window.observe(tw, this.ahaDom);
-			}
 
 		}
 	}
