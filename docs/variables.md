@@ -51,7 +51,7 @@ If you decide to use `key` and `index` when you define `each` loop. You can reac
 All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
 
 ```html
-  <each data.hobbies as hobbie, key (index)> 
+  <each data.hobbies as hobbie, key (index)>
     <li>{key}:{hobbie}:{index}</li>
   </each>
 ```
@@ -79,3 +79,18 @@ You can use your reactive data variables as a property value in style tag.
   }
 </script>
 ```
+
+## Changing variable values in `<template>`
+
+It's totally acceptable to change variables in template. Just do like `{data.name = "marilyn monroe"}`. It will change and render the new value right away and trigger reactions. If you want to change the variable value wihout rendering it just comment it like `<!-- {data.name = "marilyn monroe"} -->`
+
+<repl-component id="86xhf51pxnmaa7j" download="true"></replcomponent>
+
+## Using variables from functions that returns values
+
+It can be useful when need a post processing for your data before showing them. Here is an example for it. You can write your return functions in data or methods. But please don't forget that the only reactive variables lives in `data` or `state`.
+
+<repl-component id="6c0w9k4em2ywkix" download="true"></replcomponent>
+
+?> You can use your return values in conditionals and loops if you like.
+

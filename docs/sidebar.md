@@ -33,7 +33,13 @@
 
   - [Router](docs/router.md)
 
+- <br>Components
+	- [Combobox](docs/components/combo.md)
+  - [Button](docs/components/button.md)
+  - [Input](docs/components/input.md)
+
 - <br>Integrations
+
 	- [Tailwind](docs/twind.md)
   - [Flow](docs/flow.md)
   - [IPFS](docs/ipfs.md)

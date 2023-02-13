@@ -655,6 +655,10 @@
 
               var blob = new Blob([newContent], { type: "text/html; charset=utf-8" });
               var blobUrl = URL.createObjectURL(blob);
+
+							if (document.location.host == "root") {// dev env
+								newContent = newContent.replace("https://simply.js.org/simply.min.js", "//root/simply/simply.min.js");
+							}
               blobs[file["filename"]] = {
                 filename: file["filename"],
                 blobUrl: blobUrl,
@@ -1252,10 +1256,7 @@
 
           render = setTimeout(function () {
             component.methods.renderResult();
-          }, 111); // How long do you want the delay to be (in milliseconds)?
-
-
-
+          }, 1000); // How long do you want the delay to be (in milliseconds)?
         });
 
         var currentHandle = null, currentLine;

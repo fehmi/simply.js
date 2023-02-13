@@ -2,9 +2,9 @@ utils();
 
 window.simply = {
 	components: {},
-	parseTemplate: function (template, data, state, parent) {
+	parseTemplate: function (template, data, state, parent, methods) {
 		//console.time();
-		let ifStatement = /\<if(\s)(.*)(\>)$/;
+		let ifStatement = /\<if(\s)(.*)(\>$)/;
 		let elseIfStatement = /\<else(\s)if(\s)(.*)(\/)?\>$/;
 		let endIfStatement = /\<\/if\>$/;
 		let elseStatement = /\<else\>$/;
@@ -39,6 +39,13 @@ window.simply = {
 				flag = true;
 			}
 			else if ((m = elseIfStatement.exec(bucket)) !== null) {
+				/* Use like this from now on
+					(?<name>...)
+					This capturing group can be referred to using the given name instead of a number.
+					Please note this feature is experimental in JavaScript and might not be supported by your browser.
+					/(?<name>Sally)/
+					Call me Sally.
+				*/
 				logic = unescape(m[3]); // bu niye 3 tü
 				logic = "}else if (" + logic + ") {";
 				flag = true;
@@ -79,7 +86,7 @@ window.simply = {
 
 					logic = "\
                     for (var ii in "+ m[2] + ") { \
-                      if (ii == '__o_' || ii == '__c_' || ii == 'size') { continue; }\
+                      if (ii == '__o_' || typeof "+ m[2] + "[ii] == 'function') { continue; }\
                       " + key + "Object.keys(" + m[2] + ").indexOf(ii); \
                       let " + m[7] + "= ii; \
                       let " + m[3] + "=" + m[2] + "[ii];";
@@ -108,14 +115,14 @@ window.simply = {
 			}
 		}
 		// for the last non-logical text
-		if (processedLetters.trim() !== "") {
+		if (processedLetters.trimEnd() !== "") {
 			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			//bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
-			bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.trim() + "`;")
+			bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.trimEnd() + "`;")
 		}
 
 		var ht = "";
-		console.log(bucket);
+		// console.log(bucket);
 		eval(bucket);
 		//console.timeEnd();
 		return ht;
@@ -199,7 +206,17 @@ function utils() {
 			// console.log(path, name + " array değil");
 			loadAndParseComponent(path, name, function (component) {
 				getSettings(component, function (settings) {
-					registerComponent(settings);
+					if (/class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms.test(settings.script)) {
+						if (typeof window.twind == "undefined") {
+							loadJS("/style/twind.min.js", function() {
+								registerComponent(settings);
+								console.log("yes, load twind");
+							});
+						}
+					}
+					else {
+						registerComponent(settings)
+					}
 				})
 			});
 		}
@@ -398,13 +415,17 @@ function utils() {
 							var state;
 							var parent;
 							var sheet;
+							var methods;
 							var data = this.componentClass.data;
+
+
+
 							if (data) {
 								data.props = {};
 							}
 
 							this.methods = this.componentClass.methods;
-							var methods = this.methods;
+							methods = this.methods;
 
 							this.watch = this.componentClass.watch;
 							this.component = this;
@@ -577,7 +598,7 @@ function utils() {
 
 					if (!this.rendered) {
 						var state = this.state;
-						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
+						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
 						if (style !== "") {
 							var parsedStyle = simply.parseStyle(style, this.data, this.state);
 							parsedTemplate = parsedTemplate + "<style>" + parsedStyle.style + "</style><style simply-vars></style>";
@@ -625,7 +646,7 @@ function utils() {
 							}
 						}
 						var newDom = document.createElement("div");
-						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent);
+						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
 						var parsedStyle = simply.parseStyle(style, this.data, this.state);
 
 						newDom.innerHTML = parsedTemplate + "<style></style><style simply-vars></style>";
@@ -658,7 +679,11 @@ function utils() {
 								}
 
 								if (toEl.type == 'radio' || toEl.type == 'checkbox') {
-									//toEl.checked = fromEl.checked;
+									return false;
+								}
+
+								if (toEl.tagName == 'LABEL') {
+									return false;
 								}
 
 								if (toEl.tagName === 'OPTION') {
