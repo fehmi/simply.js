@@ -684,7 +684,6 @@
 
           setTimeout(function() {
             dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
-						console.log("test");
           }, 0);
         });
       },
@@ -878,10 +877,13 @@
 
                       var file = new Error().stack.split("\n")[2].split("(");
 
-                      file = file[1].split(":");
+											if (typeof file[1] == undefined) {
+												file = file[1].split(":");
                       console.file = file[0];
                       console.line = file[1];
                       console.char = file[2].slice(0, -1);
+											}
+
 
 
                       F.apply.call(allHandlers[i], console, argsForAll);

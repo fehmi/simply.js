@@ -200,19 +200,15 @@ function utils() {
 						let r= /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
 						if (r.test(settings.script)) {
 							if (!window.twind) {
-								console.log("yes, load twind for: ", settings);
+								// console.log("yes, load twind for: ", settings);
 								// loadJS("https://simply.js.org/style/twind.min.js", function() {
 								loadJS("https://root/simply/style/twind.min.js", function() {
 									console.log("loaded twind for: ", settings);
 									registerComponent(settings);
 								});
 							}
-							else {
-								console.log("wind already loaded for: ", settings);
-							}
 						}
 						else {
-							console.log("no twind for you: ", settings);
 							registerComponent(settings)
 						}
 					})
@@ -226,18 +222,18 @@ function utils() {
 					let r= /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
 					if (r.test(settings.script)) {
 						if (!window.twind) {
-							console.log("yes, load twind for: ", settings);
+							//console.log("yes, load twind for: ", settings);
 							loadJS("https://simply.js.org/style/twind.min.js", function() {
-								console.log("loaded twind for: ", settings);
+								// console.log("loaded twind for: ", settings);
 								registerComponent(settings);
 							});
 						}
 						else {
-							console.log("wind already loaded for: ", settings);
+							// console.log("wind already loaded for: ", settings);
 						}
 					}
 					else {
-						console.log("no twind for you: ", settings);
+						// console.log("no twind for you: ", settings);
 						registerComponent(settings)
 					}
 				})
