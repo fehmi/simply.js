@@ -213,7 +213,7 @@ function utils() {
 						}
 						else {
 							console.log("no twind for you: ", settings);
-							registerComponent(settings);
+							registerComponent(settings)
 						}
 					})
 				});
@@ -223,7 +223,6 @@ function utils() {
 			// console.log(path, name + " array değil");
 			loadAndParseComponent(path, name, function (component) {
 				getSettings(component, function (settings) {
-					registerComponent(settings);
 					let r= /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
 					if (r.test(settings.script)) {
 						if (!window.twind) {
@@ -239,8 +238,7 @@ function utils() {
 					}
 					else {
 						console.log("no twind for you: ", settings);
-
-						console.log("hay");
+						registerComponent(settings)
 					}
 				})
 			});
@@ -261,7 +259,6 @@ function utils() {
 				var ext = "html";
 			}
 		}
-
 
 		//request.responseType = 'document';
 
