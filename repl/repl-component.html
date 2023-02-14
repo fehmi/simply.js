@@ -684,6 +684,7 @@
 
           setTimeout(function() {
             dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
+						console.log("test");
           }, 0);
         });
       },
@@ -1043,7 +1044,6 @@
           event.target.value = "";
           result.postMessage({ action: "consoleEnter", code: code });
           dom.querySelector("input[name=consoleEntry]").focus();
-
         }
       },
       clearConsole(e) {

@@ -201,7 +201,8 @@ function utils() {
 						if (r.test(settings.script)) {
 							if (!window.twind) {
 								console.log("yes, load twind for: ", settings);
-								loadJS("https://simply.js.org/style/twind.min.js", function() {
+								// loadJS("https://simply.js.org/style/twind.min.js", function() {
+								loadJS("https://root/simply/style/twind.min.js", function() {
 									console.log("loaded twind for: ", settings);
 									registerComponent(settings);
 								});
@@ -212,7 +213,7 @@ function utils() {
 						}
 						else {
 							console.log("no twind for you: ", settings);
-							registerComponent(settings)
+							registerComponent(settings);
 						}
 					})
 				});
@@ -222,6 +223,7 @@ function utils() {
 			// console.log(path, name + " array değil");
 			loadAndParseComponent(path, name, function (component) {
 				getSettings(component, function (settings) {
+					registerComponent(settings);
 					let r= /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
 					if (r.test(settings.script)) {
 						if (!window.twind) {
@@ -237,7 +239,8 @@ function utils() {
 					}
 					else {
 						console.log("no twind for you: ", settings);
-						registerComponent(settings)
+
+						console.log("hay");
 					}
 				})
 			});
@@ -258,6 +261,7 @@ function utils() {
 				var ext = "html";
 			}
 		}
+
 
 		//request.responseType = 'document';
 
@@ -438,9 +442,9 @@ function utils() {
 							var parent;
 							var sheet;
 							var methods;
+							var twindSheet;
+							var tw;
 							var data = this.componentClass.data;
-
-
 
 							if (data) {
 								data.props = {};
@@ -457,17 +461,20 @@ function utils() {
 
 							if (window.twind) {
 								// Create separate CSSStyleSheet
-								let sheet = window.cssom(new CSSStyleSheet());
+								twindSheet = window.cssom(new CSSStyleSheet());
 
 								// Use sheet and config to create an twind instance. `tw` will
 								// append the right CSS to our custom stylesheet.
-								this.tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind(), window.presetRemToPx({baseValue: 16})]}, sheet);
+								tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind(), window.presetRemToPx({baseValue: 16})]}, twindSheet);
 
 								// link sheet target to shadow dom root
-								dom.adoptedStyleSheets = [sheet.target];
+								// dom.adoptedStyleSheets = [twindSheet.target];
 
+
+								this.twindSheet = twindSheet;
+								this.tw = tw;
 								// finally, observe using tw function
-								window.observe(this.tw, dom);
+
 							}
 
 							//this.dom.appendChild(style.cloneNode(true));
@@ -539,6 +546,7 @@ function utils() {
 				observeAttrChange(el, callback) {
 					var observer = new MutationObserver(function (mutations) {
 						mutations.forEach(function (mutation) {
+							console.log("attribute changed", mutation);
 							if (mutation.type === 'attributes') {
 								var newVal = mutation.target.getAttribute(mutation.attributeName);
 								callback(mutation.attributeName, newVal);
@@ -635,18 +643,12 @@ function utils() {
 					}
 
 					if (!this.rendered) {
+						var self = this;
 						var state = this.state;
 						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
 						if (style !== "") {
 							var parsedStyle = simply.parseStyle(style, this.data, this.state);
-							parsedTemplate = parsedTemplate + "<style simply-vars></style>";
-
-							const extraSheet = new CSSStyleSheet();
-							extraSheet.replaceSync(parsedStyle.style);
-
-							// Combine the existing sheets and new one
-							this.dom.adoptedStyleSheets = [extraSheet, ...this.dom.adoptedStyleSheets];
-							console.log(JSON.stringify(this.dom.adoptedStyleSheets));
+							parsedTemplate = parsedTemplate + "<style tw></style>" + "<style simply>" + parsedStyle.style + "</style><style simply-vars></style>";
 						}
 
 						if (typeof this.lifecycle !== "undefined") {
@@ -656,11 +658,46 @@ function utils() {
 								}
 							}
 						}
-						//this.dom = this.attachShadow({ mode: 'open' });
-						//this.dom.appendChild(style.cloneNode(true));
+
 						this.dom.innerHTML = parsedTemplate;
+
+						if (this.tw) {
+							// https://gourav.io/blog/tailwind-in-shadow-dom
+							window.observe(this.tw, this.dom);
+							handleTwStyle(this.twindSheet, this.tw, this.dom);
+							var classObserver;
+							function handleTwStyle(twindSheet, tw, dom) {
+								try {
+									console.log(classObserver);
+									classObserver.disconnect();
+								} catch (error) {
+
+								}
+								var cssRules = twindSheet.target.cssRules;
+								var twRules = "";
+								for (var i = 0; i < cssRules.length; i++) {
+									twRules += cssRules[i].cssText;
+								}
+								dom.querySelector("style[tw]").innerHTML = twRules;
+
+								classObserver = new MutationObserver(function(mutations) {
+									console.log("thank you", self);
+									handleTwStyle(self.twindSheet, self.tw, self.dom);
+								});
+
+								classObserver.observe(dom, {
+									attributes : true,
+									attributeFilter : ['class'],
+									childList: true,
+									subtree: true,
+									attributeOldValue: true
+								});
+							}
+						}
+
 						try {
 							this.sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
+
 							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
 
 							var vars = ":host {";
@@ -694,7 +731,7 @@ function utils() {
 						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
 						var parsedStyle = simply.parseStyle(style, this.data, this.state);
 
-						newDom.innerHTML = parsedTemplate + "<style></style><style simply-vars></style>";
+						newDom.innerHTML = parsedTemplate + "<style tw></style>" + "<style simply></style><style simply-vars></style>";
 
 						morphdom(this.dom, newDom, {
 							//childrenOnly: true,

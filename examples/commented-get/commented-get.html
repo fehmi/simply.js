@@ -1,5 +1,5 @@
 <template>
-	<h1 class="font-bold text(center white customclass 5xl pink-700 sm:gray-800 customclass">This is Twind!</h1>
+	<h1 class="font-bold text(center white 5xl) pink-700 sm:gray-800 customclass {data.dynaClass}">This is Twind!</h1>
 	<div class="border rounded-full cursor-pointer bg-red-400 h-[120px] w-[120px] hover:bg-blue-400">tesst</div>
 	<h1 class="text-gray-800">test</h1>
   <small>{state.user.name}</small>
@@ -45,7 +45,7 @@
     </each>
     {key}{index}
   </each>
-
+</div>
 </template>
 <style>
   p {
@@ -60,13 +60,18 @@
     color: "{data.color}";
   }
 	.text-white {
-		color: cyan;
+		color: "{data.color}";
+	}
+	.uyyy {
+		color: yellow;
 	}
 </style>
 <script>
   get("third-child.html");
   class {
     data = {
+			dynaClass: "uyyy",
+			color: "cyan",
       array: [
         1, 2, 3
       ],
@@ -84,7 +89,6 @@
         Gaming: "Aydı yılda bir",
         Sports: "Meeeh",
       },
-      color: "blue",
       ney: "neyney"
     };
 		twind = {
