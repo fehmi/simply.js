@@ -455,6 +455,21 @@ function utils() {
 
 							var dom = this.attachShadow({ mode: 'open' });
 
+							if (window.twind) {
+								// Create separate CSSStyleSheet
+								let sheet = window.cssom(new CSSStyleSheet());
+
+								// Use sheet and config to create an twind instance. `tw` will
+								// append the right CSS to our custom stylesheet.
+								this.tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind(), window.presetRemToPx({baseValue: 16})]}, sheet);
+
+								// link sheet target to shadow dom root
+								dom.adoptedStyleSheets = [sheet.target];
+
+								// finally, observe using tw function
+								window.observe(this.tw, dom);
+							}
+
 							//this.dom.appendChild(style.cloneNode(true));
 							dom.innerHTML = "";
 							this.dom = dom;
@@ -624,7 +639,14 @@ function utils() {
 						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
 						if (style !== "") {
 							var parsedStyle = simply.parseStyle(style, this.data, this.state);
-							parsedTemplate = parsedTemplate + "<style>" + parsedStyle.style + "</style><style simply-vars></style>";
+							parsedTemplate = parsedTemplate + "<style simply-vars></style>";
+
+							const extraSheet = new CSSStyleSheet();
+							extraSheet.replaceSync(parsedStyle.style);
+
+							// Combine the existing sheets and new one
+							this.dom.adoptedStyleSheets = [extraSheet, ...this.dom.adoptedStyleSheets];
+							console.log(JSON.stringify(this.dom.adoptedStyleSheets));
 						}
 
 						if (typeof this.lifecycle !== "undefined") {
@@ -739,40 +761,6 @@ function utils() {
 
 					}
 					this.rendered = true;
-
-						if (window.twind) {
-							// Create separate CSSStyleSheet
-							let sheet = window.cssom(new CSSStyleSheet());
-
-							// Use sheet and config to create an twind instance. `tw` will
-							// append the right CSS to our custom stylesheet.
-							const tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind()], 	finalize(rule) {
-								if (typeof rule.d !== "undefined") {
-									const unit = 'px';
-									return {
-										...rule,
-										// d: the CSS declaration body
-										// Based on https://github.com/TheDutchCoder/postcss-rem-to-px/blob/main/index.js
-										d: rule.d.replace(/"[^"]+"|'[^']+'|url\([^)]+\)|(-?\d*\.?\d+)rem/g, (match, p1) => {
-											if (p1 === undefined) return match
-											return `${p1 * 16}${p1 == 0 ? '' : unit}`
-										}),
-									}
-								}
-								else {
-									return rule;
-								}
-
-								}}, sheet);
-
-							// link sheet target to shadow dom root
-							this.dom.adoptedStyleSheets = [sheet.target];
-
-							// finally, observe using tw function
-							window.observe(tw, this.dom);
-						}
-
-
 				}
 				// Invoked each time the custom element is
 				// disconnected from the document's DOM.

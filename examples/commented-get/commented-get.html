@@ -1,5 +1,6 @@
 <template>
-	<h1 class="font-bold text(center white 5xl sm:gray-800 md:pink-700">This is Twind!</h1>    <div class="border rounded-full cursor-pointer bg-red-400 h-[120px] w-[120px] hover:bg-blue-400">tesst</div>
+	<h1 class="font-bold text(center white customclass 5xl pink-700 sm:gray-800 customclass">This is Twind!</h1>
+	<div class="border rounded-full cursor-pointer bg-red-400 h-[120px] w-[120px] hover:bg-blue-400">tesst</div>
 	<h1 class="text-gray-800">test</h1>
   <small>{state.user.name}</small>
   <h5>{state.volume.level}</h5>
@@ -58,6 +59,9 @@
     color: aquamarine;
     color: "{data.color}";
   }
+	.text-white {
+		color: cyan;
+	}
 </style>
 <script>
   get("third-child.html");
