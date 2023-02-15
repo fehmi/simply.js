@@ -1211,22 +1211,24 @@
         var fileTabs = dom.querySelector("#file-tabs");
         fileTabs.scrollLeft = fileTabs.scrollWidth;
 
-        var filenameInput = dom.querySelector("li[filename=" + filename.replace(/\./g, "\\.") + "] input");
         var template = "<template>\n\n</template>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>";
 
-
-        var target = dom.querySelector("ul#files");
-        component.methods.createNewCodemirror(filename, true, target, template);
-
-        filenameInput.click();
-        filenameInput.setSelectionRange(0, filenameInput.value.length);
+					var target = dom.querySelector("ul#files");
+					component.methods.createNewCodemirror(filename, true, target, template);
 
         dom.querySelector("#files .CodeMirror[selected=true]").setAttribute("selected", false);
         //component.editors[filename].setCursor({ line: 1, ch: 0 });
         component.files[filename] = {
-          filename: filename,
+					filename: filename,
           content: template
         }
+				setTimeout(() => {
+					var filenameInput = dom.querySelector("li[filename=" + filename.replace(/\./g, "\\.") + "] input");
+				filenameInput.click();
+
+				filenameInput.setSelectionRange(0, filenameInput.value.length);
+				}, 0);
+
         console.log(component.files);
       },
       createNewCodemirror(filename, selected, targetEl, text) {

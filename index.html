@@ -306,7 +306,7 @@
 		}
 
 		.docsify-pagination-container {
-			margin: 2em auto 1em auto!important;
+			margin: 2em auto 1em auto !important;
 		}
 
 		.pagination-item-subtitle {
@@ -343,8 +343,35 @@
 		}
 
 		body:not([data-page="docs/playground.md"]) section:not(.cover) repl-component {
-			width: calc(100% + 43%);
-			margin-left: -20%;
+			width: calc(100% + 50%);
+    	margin-left: calc(-25% - 5px);
+			margin-top: 50px;
+      margin-bottom: 50px;
+		}
+
+		.markdown-section pre {
+			padding: 0 1.4rem;
+			line-height: 1.5rem;
+			overflow: auto;
+			word-wrap: normal;
+			width: 90% !important;
+			margin-left: calc(5% - 5px) !important;
+			display: flex;
+			max-width: calc(100%) !important;
+			margin-top: 50px;
+      margin-bottom: 50px;
+			white-space: pre-wrap;
+			/* keday, arbital, lamiktal, abisol */
+		}
+
+		.markdown-section table {
+			width: 90% !important;
+			margin-left: calc(5% - 5px) !important;
+			max-width: calc(100%) !important;
+		}
+
+		code {
+			white-space: pre-wrap;
 		}
 	</style>
 </head>

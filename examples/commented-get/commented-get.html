@@ -92,7 +92,11 @@
       ney: "neyney"
     };
 		twind = {
-
+			presets: [
+				presetTailwind(),
+				presetAutoprefix(),
+				presetRemToPx({baseValue: 16})
+			]
 		}
     state = {
       volume: {

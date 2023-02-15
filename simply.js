@@ -130,7 +130,6 @@ window.simply = {
 	parseStyle: function (style, data, state) {
 		let variable = /(\"|\')(\{)([^{}\n]*)\}(\"|\')/;
 		var vars = {};
-
 		while ((m = variable.exec(style)) !== null) {
 			// This is necessary to avoid infinite loops with zero-width matches
 			if (m.index === variable.lastIndex) {
@@ -239,7 +238,6 @@ function utils() {
 				})
 			});
 		}
-
 	}
 	loadAndParseComponent = function (path, name, callback) {
 		if (typeof name == "undefined") {
@@ -422,6 +420,7 @@ function utils() {
 						if (script.trim().indexOf("class {") == 0) {
 							this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "//@ sourceURL=" + name + ".html");
 							this.lifecycle = this.componentClass.lifecycle;
+
 							if (typeof this.lifecycle !== "undefined") {
 								if (typeof this.lifecycle.beforeConstruct !== "undefined") {
 									this.lifecycle.beforeConstruct();
@@ -437,6 +436,7 @@ function utils() {
 							var methods;
 							var twindSheet;
 							var tw;
+
 							var data = this.componentClass.data;
 
 							if (data) {
@@ -453,21 +453,23 @@ function utils() {
 							var dom = this.attachShadow({ mode: 'open' });
 
 							if (window.twind) {
+								if (this.componentClass.twind) {
+									window.twindConfig = this.componentClass.twind;
+								}
+
 								// Create separate CSSStyleSheet
 								twindSheet = window.cssom(new CSSStyleSheet());
 
 								// Use sheet and config to create an twind instance. `tw` will
 								// append the right CSS to our custom stylesheet.
-								tw = window.twind({presets: [window.presetAutoprefix(), window.presetTailwind(), window.presetRemToPx({baseValue: 16})]}, twindSheet);
+								tw = window.twind(window.twindConfig, twindSheet);
 
 								// link sheet target to shadow dom root
 								// dom.adoptedStyleSheets = [twindSheet.target];
 
-
 								this.twindSheet = twindSheet;
 								this.tw = tw;
 								// finally, observe using tw function
-
 							}
 
 							//this.dom.appendChild(style.cloneNode(true));
@@ -475,8 +477,6 @@ function utils() {
 							this.dom = dom;
 							this.parent = this.getRootNode().host;
 							parent = this.parent;
-
-
 							// simply.components[this.uid] = this;
 
 							for (var i = 0; i < this.attributes.length; i++) {
@@ -639,10 +639,9 @@ function utils() {
 						var self = this;
 						var state = this.state;
 						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
-						if (style !== "") {
 							var parsedStyle = simply.parseStyle(style, this.data, this.state);
-							parsedTemplate = parsedTemplate + "<style tw></style>" + "<style simply>" + parsedStyle.style + "</style><style simply-vars></style>";
-						}
+
+						parsedTemplate = parsedTemplate + "<style tw></style>" + "<style simply>" + parsedStyle.style + "</style><style simply-vars></style>";
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
@@ -661,7 +660,6 @@ function utils() {
 							var classObserver;
 							function handleTwStyle(twindSheet, tw, dom) {
 								try {
-									console.log(classObserver);
 									classObserver.disconnect();
 								} catch (error) {
 
@@ -674,7 +672,7 @@ function utils() {
 								dom.querySelector("style[tw]").innerHTML = twRules;
 
 								classObserver = new MutationObserver(function(mutations) {
-									console.log("thank you", self);
+									// console.log("thank you", self);
 									handleTwStyle(self.twindSheet, self.tw, self.dom);
 								});
 
