@@ -336,7 +336,6 @@ function utils() {
 					}
 				};
 				request.onerror = function () {
-
 				};
 				request.send();
 			}
