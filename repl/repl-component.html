@@ -610,15 +610,15 @@
 				var indexContent = component.editors["index.html"].getValue();
 				var files = component.methods.rewriteGet("index.html", indexContent);
 
-				if (window.blobs) {
-					for (let index = 0; index < Object.keys(window.blobs).length; index++) {
-						let url = window.blobs[Object.keys(window.blobs)[index]].blobUrl;
+				if (component.blobs) {
+					for (let index = 0; index < Object.keys(component.blobs).length; index++) {
+						let url = component.blobs[Object.keys(component.blobs)[index]].blobUrl;
 						console.log(url);
 						URL.revokeObjectURL(url);
 					}
 				}
-
-				window.blobs = [];
+				component.blobs = [];
+				var blobs = component.blobs;
 
 				for (let index = 0; index < Object.keys(files).length; index++) {
 					var file = files[Object.keys(files).reverse()[index]];
