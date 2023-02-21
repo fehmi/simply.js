@@ -732,33 +732,28 @@ function utils() {
 								if (fromEl.tagName == "CHILD-COMPONENT") {
 									// console.log("dont again");
 								}
-
-								if (fromEl.tagName == "STYLE") {
+								else if (fromEl.tagName == "STYLE") {
 									return false;
 								}
-
-								if (toEl.hasAttribute("passive") === true) {
+								else if (toEl.hasAttribute("passive") === true) {
 									return false;
 								}
-
-								if (toEl.tagName === 'INPUT') {
-									toEl.value = fromEl.value;
+								else if (toEl.tagName === 'INPUT') {
+									if (toEl.type == 'radio' || toEl.type == 'CHECKBOX') {
+										return false;
+									}
+									else {
+										toEl.value = fromEl.value;
+									}
 								}
-
-								if (toEl.tagName === 'ROUTER') {
+								else if (toEl.tagName === 'ROUTER') {
 									// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 									return false;
 								}
-
-								if (toEl.type == 'radio' || toEl.type == 'checkbox') {
+								else if (toEl.tagName == 'LABEL') {
 									return false;
 								}
-
-								if (toEl.tagName == 'LABEL') {
-									return false;
-								}
-
-								if (toEl.tagName === 'OPTION') {
+								else if (toEl.tagName === 'OPTION') {
 									toEl.selected = fromEl.selected;
 								}
 								//console.log(toEl.tagName);
