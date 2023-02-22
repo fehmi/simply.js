@@ -162,23 +162,31 @@ function utils() {
 	(function (w) {
 		var loadJS = function (src, cb, ordered) {
 			"use strict";
-			var tmp;
-			var ref = w.document.getElementsByTagName("script")[0];
-			var script = w.document.createElement("script");
-
-			if (typeof (cb) === 'boolean') {
-				tmp = ordered;
-				ordered = cb;
-				cb = tmp;
+			if (document.querySelectorAll('[src="' + src + '"]').length > 0) {
+				console.log(src + "zaten load edilmiş, cb çalıştırılıyor...");
+				cb();
 			}
+			else {
+				console.log(src + " script ilk kez yükleniyor...");
+				var tmp;
+				var ref = w.document.getElementsByTagName("script")[0];
+				var script = w.document.createElement("script");
 
-			script.src = src;
-			script.async = !ordered;
-			ref.parentNode.insertBefore(script, ref);
+				if (typeof (cb) === 'boolean') {
+					tmp = ordered;
+					ordered = cb;
+					cb = tmp;
+				}
 
-			if (cb && typeof (cb) === "function") {
-				script.onload = cb;
+				script.src = src;
+				script.async = !ordered;
+				ref.parentNode.insertBefore(script, ref);
+
+				if (cb && typeof (cb) === "function") {
+					script.onload = cb;
+				}
 			}
+			// zaten load ise, sadece run cb
 			return script;
 		};
 		// commonjs

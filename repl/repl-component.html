@@ -613,7 +613,7 @@
 				if (component.blobs) {
 					for (let index = 0; index < Object.keys(component.blobs).length; index++) {
 						let url = component.blobs[Object.keys(component.blobs)[index]].blobUrl;
-						console.log(url);
+						// console.log(url);
 						URL.revokeObjectURL(url);
 					}
 				}
