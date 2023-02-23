@@ -1,6 +1,12 @@
-# Tailwind Integration
+# Iconify
+
+The icon component is a wrapper around beautiful Iconify web-component.
+
+
 
 You can enable [Tailwind](https://tailwindcss.com/docs/utility-first) support (thanks to [Twind](https://twind.style)) for your components and start to use all Tailwind utility classes and even more with Twind's delighful new approaches. To do that, just pass an [Twind config object](https://twind.dev/handbook/configuration.html) from any of your components like below.
+
+https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js
 
 ```html
 <script>

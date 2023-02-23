@@ -199,44 +199,27 @@ function utils() {
 	}(typeof global !== "undefined" ? global : this));
 
 	get = function (path, name) {
+		// multi
 		if (Array.isArray(path)) {
 			for (let i = 0; i < path.length; i++) {
-				var p = path[i];
-				loadAndParseComponent(p, name, function (component) {
-					getSettings(component, function (settings) {
-						let r= /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
-						if (r.test(settings.script)) {
-							if (!window.twind) {
-								// console.log("yes, load twind for: ", settings);
-								// loadJS("https://simply.js.org/style/twind.min.js", function() {
-								loadJS("https://root/simply/style/twind.min.js", function() {
-									console.log("loaded twind for: ", settings);
-									registerComponent(settings);
-								});
-							}
-						}
-						else {
-							registerComponent(settings)
-						}
-					})
-				});
+				addTwindAndContinue(path[i])
 			}
 		}
+		// single
 		else {
-			// console.log(path, name + " array değil");
-			loadAndParseComponent(path, name, function (component) {
+			addTwindAndContinue(path)
+		}
+		function addTwindAndContinue(p) {
+			loadAndParseComponent(p, name, function (component) {
 				getSettings(component, function (settings) {
-					let r= /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
+					let r = /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
 					if (r.test(settings.script)) {
 						if (!window.twind) {
-							//console.log("yes, load twind for: ", settings);
-							loadJS("https://simply.js.org/style/twind.min.js", function() {
+							// console.log("yes, load twind for: ", settings);
+							loadJS("https://simply.js.org/style/twind.min.js", function () {
 								// console.log("loaded twind for: ", settings);
 								registerComponent(settings);
 							});
-						}
-						else {
-							// console.log("wind already loaded for: ", settings);
 						}
 					}
 					else {
@@ -246,6 +229,9 @@ function utils() {
 				})
 			});
 		}
+	}
+	addTwind = function (path, name, callback) {
+
 	}
 	loadAndParseComponent = function (path, name, callback) {
 		if (typeof name == "undefined") {
@@ -646,7 +632,7 @@ function utils() {
 						var self = this;
 						var state = this.state;
 						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
-							var parsedStyle = simply.parseStyle(style, this.data, this.state);
+						var parsedStyle = simply.parseStyle(style, this.data, this.state);
 
 						parsedTemplate = parsedTemplate + "<style tw></style>" + "<style simply>" + parsedStyle.style + "</style><style simply-vars></style>";
 
@@ -678,14 +664,14 @@ function utils() {
 								}
 								dom.querySelector("style[tw]").innerHTML = twRules;
 
-								classObserver = new MutationObserver(function(mutations) {
+								classObserver = new MutationObserver(function (mutations) {
 									// console.log("thank you", self);
 									handleTwStyle(self.twindSheet, self.tw, self.dom);
 								});
 
 								classObserver.observe(dom, {
-									attributes : true,
-									attributeFilter : ['class'],
+									attributes: true,
+									attributeFilter: ['class'],
 									childList: true,
 									subtree: true,
 									attributeOldValue: true

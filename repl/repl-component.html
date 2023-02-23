@@ -607,22 +607,27 @@
 		}
 		methods = {
 			renderResult() {
+				// index.html'deki get'leri rewrite'a gönderiyor
 				var indexContent = component.editors["index.html"].getValue();
-				var files = component.methods.rewriteGet("index.html", indexContent);
+				var files = component.methods.getFiles("index.html", indexContent);
+				console.log(files);
 
+				// her render'dan önce önceki blob'ları siliyor
 				if (component.blobs) {
 					for (let index = 0; index < Object.keys(component.blobs).length; index++) {
 						let url = component.blobs[Object.keys(component.blobs)[index]].blobUrl;
-						// console.log(url);
 						URL.revokeObjectURL(url);
 					}
 				}
+
+				// yeni blob'lar için kap
 				component.blobs = [];
 				var blobs = component.blobs;
 
+				// burada getFiles'dan tüm dosyaların içindeki
+				// get(url) leri bloburl ile replace ediyoruz
 				for (let index = 0; index < Object.keys(files).length; index++) {
 					var file = files[Object.keys(files).reverse()[index]];
-
 					for (const filename in file) {
 						if (blobs[filename] == undefined) {
 							var newContent = file["content"];
@@ -634,14 +639,20 @@
 								if (m.index === regex.lastIndex) {
 									regex.lastIndex++;
 								}
-								if (m[3]) { // multi
+								if (m[3]) { // multi array
 									var filenames = m[4].replace(/((\\n)|[\\\s\"\[\]])/g, "");
 									var filenames = filenames.split(",");
 									var get = m[0];
 									var newGet = "";
 									for (let i = 0; i < filenames.length; i++) {
-										var fn = filenames[i].replace(/\'\"/g, '');;
-										newGet += "get('" + blobs[fn].blobUrl + "', '" + fn + "');";
+										var fn = filenames[i].replace(/\'\"/g, '');
+										if (component.files[fn]) {
+											newGet += "get('" + blobs[fn].blobUrl + "', '" + fn + "');";
+										}
+										else {
+											// real url in array
+											newGet += "get('" + fn + "');";
+										}
 									}
 									newContent = newContent.replace(get, newGet);
 								}
@@ -650,14 +661,29 @@
 									var fn = fileAndCustomName[0]
 									var cn = fileAndCustomName[1] + ".html";
 									var get = m[0];
-									var newGet = "get('" + blobs[fn].blobUrl + "', '" + cn + "');";
-									newContent = newContent.replace(get, newGet);
+
+									// virtual dosya ise
+									if (component.files[fn]) {
+										var newGet = "get('" + blobs[fn].blobUrl + "', '" + cn + "');";
+										newContent = newContent.replace(get, newGet);
+									}
+									else {
+										continue;
+									}
 								}
 								else { // single
 									var fn = m[4].slice(0, -1).replace(/((\\n)|[\\\s\"\[\]])/g, "");;
 									var get = m[0];
-									var newGet = "get('" + blobs[fn].blobUrl + "', '" + fn + "');";
-									newContent = newContent.replace(get, newGet);
+									console.log(fn);
+
+									// virtual dosya ise
+									if (component.files[fn]) {
+										var newGet = "get('" + blobs[fn].blobUrl + "', '" + fn + "');";
+										newContent = newContent.replace(get, newGet);
+									}
+									else {
+										continue;
+									}
 								}
 							}
 
@@ -695,7 +721,10 @@
 					}, 0);
 				});
 			},
-			rewriteGet(filename, content) {
+			getFiles(filename, content) {
+				// getFiles fonksiyonu recursive bir şeklilde
+				// tüm dosya isimlerini içerikleriyle beraber
+				// collect ediyor
 				var regex = /(?<!\/\/(\s+)?)get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm;
 				var regex2 = /(?<!\/\/(\s+)?)get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm;
 				var blobs = "";
@@ -706,49 +735,53 @@
 					component.files = [];
 				}
 
-				if (!component.files[i]) {
+				if (!component.files[filename]) {
 					component.files[filename] = {};
 				}
-
+				console.log(filename);
 				while ((m = regex.exec(content)) !== null) {
 					// This is necessary to avoid infinite loops with zero-width matches
 					if (m.index === regex.lastIndex) {
 						regex.lastIndex++;
 					}
+					// get array ise
 					if (m[3]) {
 						var f = m[4].replace(/((\\n)|[\\\s\"\[\]])/g, "");
 						var fns = f.split(",");
 						for (let i = 0; i < fns.length; i++) {
 							const fn = fns[i].replace(/\'\"/g, '');
-							var nestedComponentContent = component.editors[fn].getValue();
-
-							while ((mm = regex2.exec(content)) !== null) {
-								var nnestedComponentContent = component.editors[fn].getValue();;
-								component.methods.rewriteGet(fn, nnestedComponentContent);
-							}
+							if (isRealFile()) { continue; }
 						}
+						console.log("get array ise", m[3], f, fns);
 					}
-					else if (m[4].indexOf(",") > -1) { // custom name
+					// file with custom name
+					else if (m[4].indexOf(",") > -1) {
+						console.log("file with custom name ", m[4], fn);
 						var fn = m[4].replace(/((\\n)|[\\\s\"\[\]])/g, "").split(",")[0];
-
-						var nestedComponentContent = component.editors[fn].getValue();
-
-						while ((mm = regex2.exec(content)) !== null) {
-							var nnestedComponentContent = component.editors[fn].getValue();;
-							component.methods.rewriteGet(fn, nnestedComponentContent);
-						}
+						if (isRealFile()) { continue; }
 					}
+					// get sadece dosya adı ise
 					else {
 						var fn = m[4].slice(0, -1).replace(/((\\n)|[\\\s\"\[\]])/g, "");
-						var nestedComponentContent = component.editors[fn].getValue();
-
-						while ((mm = regex2.exec(content)) !== null) {
-							var nnestedComponentContent = component.editors[fn].getValue();;
-							component.methods.rewriteGet(fn, nnestedComponentContent);
-						}
+						console.log("get sadece dosya adı ise ", fn);
+						if (isRealFile()) { continue; }
 					}
 				}
-
+				function isRealFile() {
+					try {
+						var nestedComponentContent = component.editors[fn].getValue();
+						while ((mm = regex2.exec(content)) !== null) {
+							var nnestedComponentContent = component.editors[fn].getValue();
+							component.methods.getFiles(fn, nnestedComponentContent);
+						}
+					} catch (error) {
+						// bu dosyayı skip ediyoruz
+						// real path ile çekicez
+						console.log("haydi barııış", fn);
+						return true;
+					}
+				}
+				// burdan sonra hepsini toparlayıp tek seferde dönüyor
 				component.files[filename]["content"] = content;
 				component.files[filename]["filename"] = filename;
 				return component.files;
