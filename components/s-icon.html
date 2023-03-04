@@ -4,7 +4,16 @@
   </iconify-icon>
 </template>
 
-<style></style>
+<style>
+/*
+	prevent duplication
+	bcs we pass style attribute
+	to iconify
+*/
+:host {
+	all: unset!important;
+}
+</style>
 
 <script>
   class {

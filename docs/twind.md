@@ -122,4 +122,3 @@ Here are some links to help you to strengthen your Tailwind muscles:
 [Tailwind Home](https://tailwind.com)<br>
 [Tailwind Cheat Sheet](https://nerdcave.com/tailwind-cheat-sheet)<br>
 [Tailwind Color Palette](https://tailwindcss.com/docs/customizing-colors#color-palette-reference)
-

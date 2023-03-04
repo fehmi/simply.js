@@ -516,10 +516,21 @@ function utils() {
 								}
 							}
 							state = component.state;
+							parent = component.parent;
+							// we couldn't get state and parent
+							// bcs they are wrapped with router
+							// this is a fix for that
 							Object.defineProperty(this, 'state', {
 								get: function () { return state; },
 								set: function (v) {
 									state = v;
+									// print('Value changed! New value: ' + v);
+								}
+							});
+							Object.defineProperty(this, 'parent', {
+								get: function () { return parent; },
+								set: function (v) {
+									parent = v;
 									// print('Value changed! New value: ' + v);
 								}
 							});
@@ -532,7 +543,7 @@ function utils() {
 				observeAttrChange(el, callback) {
 					var observer = new MutationObserver(function (mutations) {
 						mutations.forEach(function (mutation) {
-							console.log("attribute changed", mutation);
+							// console.log("attribute changed", mutation);
 							if (mutation.type === 'attributes') {
 								var newVal = mutation.target.getAttribute(mutation.attributeName);
 								callback(mutation.attributeName, newVal);
@@ -631,6 +642,7 @@ function utils() {
 					if (!this.rendered) {
 						var self = this;
 						var state = this.state;
+						var parent = this.parent;
 						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
 						var parsedStyle = simply.parseStyle(style, this.data, this.state);
 
