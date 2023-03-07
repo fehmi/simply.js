@@ -41,10 +41,12 @@
 
 - <br>Integrations
 
+  - [Electron](docs/electron.md)
 	- [Tailwind](docs/twind.md)
+	- [Flowbite](docs/flowbite.md)
   - [Flow](docs/flow.md)
+  - [Nativescript](docs/nativescript.md)
   - [IPFS](docs/ipfs.md)
   - [p5.js](docs/p5.md)
   - [VR/AR](docs/vr.md)
-  - [Electron](docs/electron.md)
   - [tone.js](docs/tone.md)
