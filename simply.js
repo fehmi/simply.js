@@ -163,11 +163,11 @@ function utils() {
 		var loadJS = function (src, cb, ordered) {
 			"use strict";
 			if (document.querySelectorAll('[src="' + src + '"]').length > 0) {
-				console.log(src + "zaten load edilmiş, cb çalıştırılıyor...");
+				// console.log(src + "zaten load edilmiş, cb çalıştırılıyor...");
 				cb();
 			}
 			else {
-				console.log(src + " script ilk kez yükleniyor...");
+				// console.log(src + " script ilk kez yükleniyor...");
 				var tmp;
 				var ref = w.document.getElementsByTagName("script")[0];
 				var script = w.document.createElement("script");
@@ -230,9 +230,14 @@ function utils() {
 			});
 		}
 	}
-	addTwind = function (path, name, callback) {
 
+	jsdoc = function (str) {
+		return str.replace(/(\n[ \t]*\/\/\/[^\n]*)+/g, function ($) {
+			var replacement = '\n/**' + $.replace(/^[ \t]*\/\/\//mg, '').replace(/(\n$|$)/, '*/$1');
+			return replacement;
+		});
 	}
+
 	loadAndParseComponent = function (path, name, callback) {
 		if (typeof name == "undefined") {
 			var ext = path.split(".").pop();
@@ -373,6 +378,7 @@ function utils() {
 	}
 	registerComponent = function ({ template, style, name, script, docStr }) {
 		if (!customElements.get(name)) {
+
 			class UnityComponent extends HTMLElement {
 				constructor() {
 					// Always call super first in constructor
@@ -380,14 +386,15 @@ function utils() {
 
 					if (script !== "") {
 						var gets = "";
+
 						// class ile üst tarafı (getler) ayıralım
 						if (script.indexOf("class {") > -1) {
 							var scriptParts = script.split("class {");
 							gets = scriptParts[0];
-							script = "class {" + scriptParts[1];
+							var clss = "class {" + scriptParts[1];
 						}
 						else {
-							gets = script;
+							gets = clss;
 						}
 
 						var m;
@@ -410,8 +417,9 @@ function utils() {
 							lineBreaks += "\n"
 						}
 
-						if (script.trim().indexOf("class {") == 0) {
-							this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + script.trim() + "//@ sourceURL=" + name + ".html");
+
+						if (clss.trim().indexOf("class {") == 0) {
+							this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + clss.trim() + "//@ sourceURL=" + name + ".html");
 							this.lifecycle = this.componentClass.lifecycle;
 
 							if (typeof this.lifecycle !== "undefined") {
@@ -433,7 +441,9 @@ function utils() {
 							var data = this.componentClass.data;
 
 							if (data) {
-								data.props = {};
+								if (!data.props) {
+									data.props = {};
+								}
 							}
 
 							this.methods = this.componentClass.methods;
@@ -443,7 +453,14 @@ function utils() {
 							this.component = this;
 							this.comp = this;
 
-							var dom = this.attachShadow({ mode: 'open' });
+							// bu kısım global styles için
+							// to be continues
+							if (name == "s-style") {
+								var dom = this.attachShadow({ mode: 'closed' });
+							}
+							else {
+								var dom = this.attachShadow({ mode: 'open' });
+							}
 
 							if (window.twind) {
 								if (this.componentClass.twind) {
@@ -578,7 +595,6 @@ function utils() {
 					});
 
 					let self = this;
-
 					this.render();
 
 					function react(name, value, old, parents) {
@@ -624,7 +640,6 @@ function utils() {
 				}
 
 				render() {
-
 					let m;
 					let regex = /\s+on[a-z]+\=(\"|\')([^"\n]*)(\"|\')/gm;
 					while ((m = regex.exec(template)) !== null) {
@@ -693,20 +708,14 @@ function utils() {
 
 						try {
 							this.sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
-
 							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
-
 							var vars = ":host {";
 							for (var key in parsedStyle.vars) {
 								if (!parsedStyle.vars.hasOwnProperty(key)) continue;
 								vars += key + ":" + parsedStyle.vars[key] + ";";
 							}
-
 							this.sheet.insertRule(vars + "}", 0);
-
-						} catch (error) {
-
-						}
+						} catch (error) { }
 
 						setTimeout(() => {
 							if (typeof this.lifecycle !== "undefined") {
@@ -715,7 +724,6 @@ function utils() {
 								}
 							}
 						}, 0);
-
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -752,6 +760,7 @@ function utils() {
 										toEl.value = fromEl.value;
 									}
 								}
+
 								else if (toEl.tagName === 'ROUTER') {
 									// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 									return false;
@@ -774,9 +783,7 @@ function utils() {
 						for (var key in parsedStyle.vars) {
 							if (!parsedStyle.vars.hasOwnProperty(key)) continue;
 							//this.dom.getRootNode().host.style.setProperty(key, parsedStyle.vars[key])
-
 							this.sheet.cssRules[0].style.setProperty(key, parsedStyle.vars[key]);
-
 							//console.log(this.dom.getRootNode().querySelector("style[simply-vars]").sheet.cssRules[0]);
 							//this.dom.getRootNode().querySelector("style[simply-vars]").sheet.insertRule(":host {" + key + ":" + parsedStyle.vars[key] + ";}", 0);
 						}
@@ -786,12 +793,10 @@ function utils() {
 								this.lifecycle.afterRerender();
 							}
 						}
-
 					}
 					this.rendered = true;
 				}
-				// Invoked each time the custom element is
-				// disconnected from the document's DOM.
+				// Invoked each time the custom element is disconnected from the document's DOM.
 				disconnectedCallback() {
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.disconnected !== "undefined") {
@@ -799,22 +804,18 @@ function utils() {
 						}
 					}
 				}
-				// invoked when one of the custom element's attributes
-				// is added, removed, or changed.
+				// invoked when one of the custom element's attributes is added, removed, or changed.
 				attributeChangedCallback(name, oldValue, newValue) {
 					// if data.
 					// console.log(name, oldValue, newValue);
 				}
 				adoptedCallback() { }
-
-				_attachListeners() {
-				}
+				_attachListeners() { }
 			}
 			// return customElements.define(name, UnityComponent);
 			// twind eki için return'ü sildim. inş bi yer patlamaz
-			return customElements.define(name, UnityComponent);
-
-
+			customElements.define(name, UnityComponent);
+			// console.log(script);
 		}
 	}
 }

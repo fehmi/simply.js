@@ -1,0 +1,99 @@
+<html>
+
+<head>
+	<script src="https://root/simply/simply.min.js"></script>
+	<script type="module" src="https://unpkg.com/api-viewer-element?module"></script>
+
+	<link rel="shortcut icon" href="#">
+</head>
+
+<body>
+
+	<api-viewer section="demo">
+		<!-- <s-icon icon="cil:locomotive" height="100"></s-icon> -->
+		<template data-element="s-icon" data-target="knob" data-attr="height" data-type="string"  attribute-knobs="?test">
+			<input/>
+		</template>
+		<template data-target="host" data-element="s-icon">
+			<s-icon icon="cil:locomotive" height="100"></s-icon>
+		</template>
+	</api-viewer>
+
+
+	<script>
+		get("../s-icon.html", "s-icon");
+	</script>
+	<script type="module">
+				import { create, ts, litPlugin } from 'https://cdn.jsdelivr.net/npm/@custom-elements-manifest/analyzer@0.6.6/browser/index.js';
+
+				var test = function () {
+					/**
+						 * @attr {boolean} disabled - disables the element
+						 * @attribute {string} foo - description for foo
+						 *
+						 * @csspart bar - Styles the color of b
+						 *
+						 * @slot - This is a default/unnamed slot
+						 * @slot container - You can put some elements here
+						 *
+						 * @cssprop --text-color - Controls the color of f
+						 * @cssproperty [--background-color=red] - Controls the color of bar
+						 *
+						 * @prop {string} [data.props.icon=cil:locomotive] - some description
+						 * @fires {CustomEvent} animalfound-changed - Event fired when value is changed
+						 * @property {string} [data['props']['height']=100] - some description
+						 *
+						 * @fires custom-event - some description for custom-event
+						 * @fires {Event} typed-event - some description for typed-event
+						 * @event {CustomEvent} typed-custom-event - some description for typed-custom-event
+						 *
+						 * @summary This is MyElementttt
+						 *
+						 * @tag s-icon
+						 * @tagname ssss
+						*/
+					class UnityComponent extends HTMLElement { } customElements.define("s-icon", UnityComponent);
+				}
+				console.log(test.toString(), document.querySelector());
+
+		const modules = [ts.createSourceFile(
+			'my-element.js',
+			test.toString(),
+			ts.ScriptTarget.ES2015,
+			true
+		)];
+
+		const manifest = create({
+			plugins: [...litPlugin()],
+			modules,
+			context: { dev: false },
+		});
+
+		document.querySelector('api-viewer').manifest = manifest;
+
+		let _onPropChanged = function (e) {
+			console.log("naber iyi");
+    const target = e.composedPath()[0];
+    const { name, type } = target.dataset;
+    let value;
+    switch (type) {
+      case 'boolean':
+        value = target.checked;
+        break;
+      case 'number':
+        value = target.value === '' ? null : Number(target.value);
+        break;
+      default:
+        value = target.value;}
+
+    const { knob, custom } = this.getKnob(name);
+    if (knob) {
+      this.setKnobs(name, type, value, knob.attribute, custom);
+    }
+  }
+		var opc = customElements.get("api-demo-layout").prototype._onPropChanged = _onPropChanged;
+		console.log(manifest);
+	</script>
+</body>
+
+</html>

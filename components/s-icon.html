@@ -1,28 +1,53 @@
 <template>
-  <iconify-icon
-      <each data.props as prop, key (name)>{key}="{prop}"</each>>
-  </iconify-icon>
+	<iconify-icon <each data.props as prop, key (name)>{key}="{prop}"</each>>
+	</iconify-icon>
 </template>
 
 <style>
-/*
-	prevent duplication
-	bcs we pass style attribute
-	to iconify
-*/
-:host {
-	all: unset!important;
-}
+	/*
+		prevent duplication
+		bcs we pass style attribute
+		to iconify
+	*/
+	:host {
+		all: unset !important;
+	}
 </style>
 
 <script>
-  class {
-    data = {}
-    lifecycle = {
-      beforeFirstRender: function() {
-		    let iconifyURL = "https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js";
-		    loadJS(iconifyURL, function () {});
-      }
-    }
-  }
+	/**
+	 * @attr {boolean} disabled - disables the element
+	 * @attribute {string} foo - description for foo
+	 *
+	 * [link]{@link https://www.google.com}.
+	 *
+	 * @csspart bar - Styles the color of b
+	 *
+	 * @slot - This is a default/unnamed slot
+	 * @slot container - You can put some elements here
+	 *
+	 * @cssprop --text-color - Controls the color of f
+	 * @cssproperty [--background-color=red] - Controls the color of bar
+	 *
+	 * @prop {boolean} prop1 - some description
+	 * @property {number} prop2 - some description
+	 *
+	 * @fires custom-event - some description for custom-event
+	 * @fires {Event} typed-event - some description for typed-event
+	 * @event {CustomEvent} typed-custom-event - some description for typed-custom-event
+	 *
+	 * @summary This is MyElement
+	 *
+	 * @tag s-icon
+	 * @tagname s-icon
+	*/
+	class {
+		data = {}
+		lifecycle = {
+			beforeFirstRender: function () {
+				let iconifyURL = "https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js";
+				loadJS(iconifyURL, function () { });
+			}
+		}
+	}
 </script>

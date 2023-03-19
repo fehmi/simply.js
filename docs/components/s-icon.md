@@ -13,7 +13,10 @@ You can use all official attributes of Iconify component in the icon component l
 - flip, string flip icon. See icon transformations.
 - rotate, number | string rotates icon. See icon transformations.
 
-<iframe src="https://icones.js.org/" height="550px"></iframe>
+## Icon Browsers
+
+[Iconify](https://icon-sets.iconify.design/)
+[Icones](https://icones.js.org/)
 
 
 

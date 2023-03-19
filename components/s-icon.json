@@ -1,0 +1,115 @@
+{
+	"schemaVersion": "1.0.0",
+	"readme": "",
+	"modules": [
+		{
+			"kind": "javascript-module",
+			"path": "s-icon.html",
+			"declarations": [
+				{
+					"kind": "class",
+					"description": "",
+					"name": "UnityComponent",
+					"cssProperties": [
+						{
+							"description": "Controls the color of f",
+							"name": "--text-color"
+						},
+						{
+							"description": "Controls the color of bar",
+							"name": "--background-color",
+							"default": "red",
+							"value": "red"
+						}
+					],
+					"cssParts": [
+						{
+							"description": "Styles the color of b",
+							"name": "bar"
+						}
+					],
+					"slots": [
+						{
+							"description": "You can put some elements here",
+							"name": "container"
+						},
+						{
+							"description": "This is a default/unnamed slot",
+							"name": ""
+						}
+					],
+					"members": [
+						{
+							"type": {
+								"text": "boolean"
+							},
+							"description": "some description",
+							"name": "prop1",
+							"kind": "field"
+						},
+						{
+							"type": {
+								"text": "number"
+							},
+							"description": "some description",
+							"name": "prop2",
+							"kind": "field"
+						}
+					],
+					"events": [
+						{
+							"description": "some description for custom-event",
+							"name": "custom-event"
+						},
+						{
+							"type": {
+								"text": "Event"
+							},
+							"description": "some description for typed-event",
+							"name": "typed-event"
+						},
+						{
+							"type": {
+								"text": "CustomEvent"
+							},
+							"description": "some description for typed-custom-event",
+							"name": "typed-custom-event"
+						}
+					],
+					"attributes": [
+						{
+							"type": {
+								"text": "boolean"
+							},
+							"description": "disables the element",
+							"name": "disabled"
+						},
+						{
+							"type": {
+								"text": "string"
+							},
+							"description": "description for foo [link]{@link https://www.google.com}.",
+							"name": "foo"
+						}
+					],
+					"superclass": {
+						"name": "HTMLElement"
+					},
+					"tagName": "s-icon",
+					"summary": "This is MyElement",
+					"customElement": true
+				}
+			],
+			"exports": [
+				{
+					"kind": "custom-element-definition",
+					"name": "s-icon",
+					"declaration": {
+						"name": "UnityComponent",
+						"module": "s-icon.html"
+					}
+				}
+			]
+		}
+	]
+}
