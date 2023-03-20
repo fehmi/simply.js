@@ -2,7 +2,7 @@ utils();
 
 window.simply = {
 	components: {},
-	parseTemplate: function (template, data, state, parent, methods) {
+	parseTemplate: function (template, data, state, parent, methods, props) {
 		//console.time();
 		let ifStatement = /\<if(\s)(.*)(\>$)/;
 		let elseIfStatement = /\<else(\s)if(\s)(.*)(\/)?\>$/;
@@ -11,7 +11,12 @@ window.simply = {
 		let eachStatement = /\<each(\s)(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?\>$/;
 		let endEachStatement = /\<\/each\>$/;
 		// let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
-		let variable = /(\{)([^{}\n]*)\}$/;
+
+		// let variable = /(\{)([^{}\n]*)\}$/;
+		// https://regex101.com/r/gEKTHj/1
+		let variable = /(?<!([a-z]+\=\"\(function\s*\(\)\s*))(\{)(?<name>[^{}:`\n]*)\}$/;
+
+		//(?<!\=\')(\{)([^{}\n]*)\}$
 
 		let ifCount = 0;
 		let eachCount = 0;
@@ -25,9 +30,10 @@ window.simply = {
 			processedLetters += template[i];
 			bucket += template[i];
 
-
 			if ((m = variable.exec(bucket)) !== null) {
-				logic = "ht+=" + m[2] + ";";
+
+					logic = "ht+=" + m.groups.name + ";";
+
 				flag = true;
 			}
 			else if ((m = ifStatement.exec(bucket)) !== null) {
@@ -66,7 +72,7 @@ window.simply = {
 				try {
 					subject = eval(m[2]);
 				} catch (error) {
-					// console.log(lastM + "." + m[2]);
+					console.log(lastM + "." + m[2]);
 					subject = m[2];
 				}
 
@@ -117,6 +123,7 @@ window.simply = {
 		// for the last non-logical text
 		if (processedLetters.trimEnd() !== "") {
 			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			console.log(processedLettersRegex);
 			//bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
 			bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.trimEnd() + "`;")
 		}
@@ -127,7 +134,7 @@ window.simply = {
 		//console.timeEnd();
 		return ht;
 	},
-	parseStyle: function (style, data, state) {
+	parseStyle: function (style, data, state, props) {
 		let variable = /(\"|\')(\{)([^{}\n]*)\}(\"|\')/;
 		var vars = {};
 		while ((m = variable.exec(style)) !== null) {
@@ -344,6 +351,85 @@ function utils() {
 		}
 	}
 
+	function getAttribute(contentString) {
+		var type;
+		var value;
+		try {
+			// array, obj, boolean or number
+			//props[attrib.name] = JSON.parse(attrib.value);
+			try {
+				type = typeof JSON.parse(contentString.replaceAll("'", '"'));
+				value = JSON.parse(contentString.replaceAll("'", '"'));
+				if (Array.isArray(JSON.parse(contentString.replaceAll("'", '"')))) {
+					type = "array";
+				}
+				// '{"a": true}'
+				else if (type == "object") {
+
+				}
+				else if (type == "number" || type == "boolean") {
+
+				}
+				console.log(contentString);
+			}
+			catch (e) {
+				console.log("bu func olabülü");
+				// (function () {});
+				let func = contentString.replaceAll("'", '"');
+				func = eval(func);
+				if (typeof func == "function") {
+					type = "function";
+					value = eval("(" + func + ")");
+				}
+			}
+		}
+		catch (e) {
+			type = "string";
+			value = contentString;
+		}
+		return {
+			"type": type,
+			"value": value
+		}
+	}
+
+	function setAttribute(value) {
+		let type = typeof value;
+		if (Array.isArray(value) || type == "object" || type == "number" || type == "boolean") {
+			// çünkü attribute zaten "" arasına yazılıyor
+			return customStringify(value).replaceAll("\"", "'");
+		}
+		else if (type == "function") {
+			return value.toString().replaceAll("\"", "'");
+		}
+		else {
+			return value;
+		}
+	}
+
+	function customStringify(v) {
+		const cache = new Set();
+		return JSON.stringify(v, function (key, value) {
+			if (key !== "__c_" && key !== "__o_" && key !== "__p_") {
+				if (typeof value === 'object' && value !== null) {
+					if (cache.has(value)) {
+						// Circular reference found
+						try {
+							// If this value does not reference a parent it can be deduped
+							return JSON.parse(JSON.stringify(value));
+						}
+						catch (err) {
+							// discard key if value cannot be deduped
+							return;
+						}
+					}
+					// Store value in our set
+					cache.add(value);
+				}
+				return value;
+			}
+		});
+	};
 
 	getSettings = function ({ name, template, style, script, docStr }, callback) {
 		//const jsFile = new Blob([script.textContent], { type: 'application/javascript' });
@@ -438,13 +524,10 @@ function utils() {
 							var twindSheet;
 							var tw;
 
-							var data = this.componentClass.data;
-
-							if (data) {
-								if (!data.props) {
-									data.props = {};
-								}
-							}
+							var data = this.componentClass.data ? this.componentClass.data : {};
+							var props = this.componentClass.props ? this.componentClass.props : {};
+							this.data = data;
+							this.props = props;
 
 							this.methods = this.componentClass.methods;
 							methods = this.methods;
@@ -489,16 +572,12 @@ function utils() {
 							parent = this.parent;
 							// simply.components[this.uid] = this;
 
+							// atribute'ları proplara yazalım
 							for (var i = 0; i < this.attributes.length; i++) {
 								var attrib = this.attributes[i];
-								// array ya da obj ise stringify
-								try {
-									data.props[attrib.name] = JSON.parse(attrib.value);
-								} catch (e) {
-									data.props[attrib.name] = attrib.value;
-								}
+								// props[attrib.name] = attrib.value;
+								props[attrib.name] = getAttribute(attrib.value).value;
 							}
-							this.data = data;
 
 							// console.log("---------------------");
 							// console.log("--comp name: ", name);
@@ -579,16 +658,20 @@ function utils() {
 				}
 				connectedCallback() {
 					this.observeAttrChange(this, function (name, newValue) {
-						try {
-							newValue = JSON.parse(newValue);
-						} catch (e) {
-							newValue = newValue;
-						}
-						if (newValue !== self.data.props[name]) {
-							self.data.props[name] = newValue;
+
+						// value öncekiyle aynı değilse
+						console.log(name, newValue, self.props[name], newValue == setAttribute(self.props[name]));
+						if (newValue !== setAttribute(self.props[name])) {
+							try {
+								newValue = getAttribute(newValue).value;
+							} catch (e) {
+								// getattribute parse edemezse
+								newValue = newValue;
+							}
+							self.props[name] = newValue;
 							if (typeof self.lifecycle !== "undefined") {
 								if (typeof self.lifecycle.whenPropChange !== "undefined") {
-									self.lifecycle.whenPropChange(name, self.data.props[name], newValue);
+									self.lifecycle.whenPropChange(name, self.props[name], newValue);
 								}
 							}
 						}
@@ -597,7 +680,7 @@ function utils() {
 					let self = this;
 					this.render();
 
-					function react(name, value, old, parents) {
+					function react(name, value, old, parents, prop = false) {
 						// console.log("react TO", name);
 						setTimeout(function () {
 							if (typeof self.lifecycle !== "undefined") {
@@ -611,16 +694,14 @@ function utils() {
 
 							self.render();
 
-							// console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-							if (self.props) {
-								if (parents == "#-props") {
-									self.setAttribute(name, JSON.stringify(self.data.props[name]));
-								}
-								else {
-									name = parents.split("-")[2];
-									self.setAttribute(name, JSON.stringify(self.data.props[name]));
+							//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+							//console.log(name, value, old, parents);
+							if (prop) {
+								if (self.props) {
+									self.setAttribute(prop, setAttribute(self.props[prop]));
 								}
 							}
+
 							if (typeof self.watch !== "undefined") {
 								self.watch(name, value, old, parents);
 							}
@@ -630,6 +711,11 @@ function utils() {
 					if (this.data) {
 						obaa(this.data, function (name, value, old, parents) {
 							react(name, value, old, parents);
+						});
+					}
+					if (this.props) {
+						obaa(this.props, function (name, value, old, parents) {
+							react(name, value, old, parents, name);
 						});
 					}
 					if (this.state) {
@@ -657,9 +743,10 @@ function utils() {
 					if (!this.rendered) {
 						var self = this;
 						var state = this.state;
+						var props = this.props;
 						var parent = this.parent;
-						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
-						var parsedStyle = simply.parseStyle(style, this.data, this.state);
+						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods, this.props);
+						var parsedStyle = simply.parseStyle(style, this.data, this.state, this.props);
 
 						parsedTemplate = parsedTemplate + "<style tw></style>" + "<style simply>" + parsedStyle.style + "</style><style simply-vars></style>";
 
@@ -732,8 +819,8 @@ function utils() {
 							}
 						}
 						var newDom = document.createElement("div");
-						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods);
-						var parsedStyle = simply.parseStyle(style, this.data, this.state);
+						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods, this.props);
+						var parsedStyle = simply.parseStyle(style, this.data, this.state, this.props);
 
 						newDom.innerHTML = parsedTemplate + "<style tw></style>" + "<style simply></style><style simply-vars></style>";
 
@@ -806,6 +893,7 @@ function utils() {
 				}
 				// invoked when one of the custom element's attributes is added, removed, or changed.
 				attributeChangedCallback(name, oldValue, newValue) {
+					console.log("attr changed callback");
 					// if data.
 					// console.log(name, oldValue, newValue);
 				}

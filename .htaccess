@@ -1,7 +1,0 @@
-<FilesMatch ".+\.html$">
-SetHandler application/x-httpd-php5
-</FilesMatch>
-
-<FilesMatch ".+\.php$">
-	SetHandler application/x-httpd-php5
-	</FilesMatch>

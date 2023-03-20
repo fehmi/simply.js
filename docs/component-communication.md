@@ -8,7 +8,7 @@ Then you can access it in template section of the child component like this
 
 ```html
 <template>
-  {data.props.message}
+  {props.message}
 </template>
 ```
 
@@ -19,7 +19,7 @@ Or you access it from anywhere in the script section of the child component like
   class {
     lifecycle = {
       afterFirstRender() {
-        alert("The message from parent is " + data.props.message);
+        alert("The message from parent is " + props.message);
       }
     }
   }
@@ -75,3 +75,12 @@ component.parent.methods.functionName();
   sibling.data.message = "This changed by a sibling";
   sibling.methods.saySomething();
 ```
+
+You can use all kind of data (string, number, boolean, array, object and function) as props like this
+
+```js
+  <prop-test str="simply" booleanstring="true" boolean=false number="111" number2="222" obj="{'a': 'true'}" arr="[1,2,3, {'hey': 'hat'}]" func="(function() {console.log('test')})"></prop-test>
+```
+
+!> One rule: Please don't use double aposroph when writing arrays, objects and functions as props.
+

@@ -10,7 +10,6 @@
 <body>
 
 	<api-viewer section="demo">
-		<!-- <s-icon icon="cil:locomotive" height="100"></s-icon> -->
 		<template data-element="s-icon" data-target="knob" data-attr="height" data-type="string"  attribute-knobs="?test">
 			<input/>
 		</template>
@@ -26,35 +25,35 @@
 	<script type="module">
 				import { create, ts, litPlugin } from 'https://cdn.jsdelivr.net/npm/@custom-elements-manifest/analyzer@0.6.6/browser/index.js';
 
-				var test = function () {
-					/**
-						 * @attr {boolean} disabled - disables the element
-						 * @attribute {string} foo - description for foo
-						 *
-						 * @csspart bar - Styles the color of b
-						 *
-						 * @slot - This is a default/unnamed slot
-						 * @slot container - You can put some elements here
-						 *
-						 * @cssprop --text-color - Controls the color of f
-						 * @cssproperty [--background-color=red] - Controls the color of bar
-						 *
-						 * @prop {string} [data.props.icon=cil:locomotive] - some description
-						 * @fires {CustomEvent} animalfound-changed - Event fired when value is changed
-						 * @property {string} [data['props']['height']=100] - some description
-						 *
-						 * @fires custom-event - some description for custom-event
-						 * @fires {Event} typed-event - some description for typed-event
-						 * @event {CustomEvent} typed-custom-event - some description for typed-custom-event
-						 *
-						 * @summary This is MyElementttt
-						 *
-						 * @tag s-icon
-						 * @tagname ssss
-						*/
-					class UnityComponent extends HTMLElement { } customElements.define("s-icon", UnityComponent);
-				}
-				console.log(test.toString(), document.querySelector());
+		var test = function () {
+			/**
+				 * @attr {boolean} disabled - disables the element
+				 * @attribute {string} foo - description for foo
+				 *
+				 * @csspart bar - Styles the color of b
+				 *
+				 * @slot - This is a default/unnamed slot
+				 * @slot container - You can put some elements here
+				 *
+				 * @cssprop --text-color - Controls the color of f
+				 * @cssproperty [--background-color=red] - Controls the color of bar
+				 *
+				 * @prop {string} [data.props.icon=cil:locomotive] - some description
+				 * @fires {CustomEvent} animalfound-changed - Event fired when value is changed
+				 * @property {string} [data['props']['height']=100] - some description
+				 *
+				 * @fires custom-event - some description for custom-event
+				 * @fires {Event} typed-event - some description for typed-event
+				 * @event {CustomEvent} typed-custom-event - some description for typed-custom-event
+				 *
+				 * @summary This is MyElementttt
+				 *
+				 * @tag s-icon
+				 * @tagname ssss
+				*/
+			class UnityComponent extends HTMLElement { } customElements.define("s-icon", UnityComponent);
+		}
+		console.log(test.toString(), document.query);
 
 		const modules = [ts.createSourceFile(
 			'my-element.js',
