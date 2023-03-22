@@ -2,7 +2,7 @@ utils();
 
 window.simply = {
 	components: {},
-	parseTemplate: function (template, data, state, parent, methods, props) {
+	parseTemplate: function (template, data, state, parent, methods, props, component, dom, methods, lifecycle, watch) {
 		//console.time();
 		let ifStatement = /\<if(\s)(.*)(\>$)/;
 		let elseIfStatement = /\<else(\s)if(\s)(.*)(\/)?\>$/;
@@ -13,8 +13,9 @@ window.simply = {
 		// let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
 
 		// let variable = /(\{)([^{}\n]*)\}$/;
-		// https://regex101.com/r/gEKTHj/1
-		let variable = /(?<!([a-z]+\=\"\(function\s*\(\)\s*))(\{)(?<name>[^{}:`\n]*)\}$/;
+		// https://regex101.com/r/AAGBIE/1
+
+		let variable = /((\[[^\}]{3,})?\{s*[^\}\{]{3,}?:.*\}([^\{]+\])?)$/s;
 
 		//(?<!\=\')(\{)([^{}\n]*)\}$
 
@@ -26,14 +27,16 @@ window.simply = {
 		var capturedLogics = [];
 		var staticLetters = "";
 		var flag = false;
+		var curlyCount = 0;
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
 
-			if ((m = variable.exec(bucket)) !== null) {
+			if (template[i] == "{") { curlyCount += 1}
+			if (template[i] == "}") { curlyCount -= 1}
 
-					logic = "ht+=" + m.groups.name + ";";
-
+			if ((m = variable.exec(bucket)) !== null && curlyCount == 0) {
+				logic = "ht+=" + m[1] + ";";
 				flag = true;
 			}
 			else if ((m = ifStatement.exec(bucket)) !== null) {
@@ -72,7 +75,7 @@ window.simply = {
 				try {
 					subject = eval(m[2]);
 				} catch (error) {
-					console.log(lastM + "." + m[2]);
+					//console.log(lastM + "." + m[2]);
 					subject = m[2];
 				}
 
@@ -90,9 +93,11 @@ window.simply = {
 				else {
 					key = typeof m[11] !== "undefined" ? "let " + m[11] + " = " : "";
 
+					// obaa objelerini exclude et
+					// '__o_' || ii == '__c_' || ii == '__p_'
 					logic = "\
                     for (var ii in "+ m[2] + ") { \
-                      if (ii == '__o_' || typeof "+ m[2] + "[ii] == 'function') { continue; }\
+                      if (ii == '__o_' || ii == '__c_' || ii == '__p_' || ii == '__r_' || typeof "+ m[2] + "[ii] == 'function') { continue; }\
                       " + key + "Object.keys(" + m[2] + ").indexOf(ii); \
                       let " + m[7] + "= ii; \
                       let " + m[3] + "=" + m[2] + "[ii];";
@@ -123,7 +128,7 @@ window.simply = {
 		// for the last non-logical text
 		if (processedLetters.trimEnd() !== "") {
 			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-			console.log(processedLettersRegex);
+			//console.log(processedLettersRegex);
 			//bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
 			bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.trimEnd() + "`;")
 		}
@@ -134,7 +139,7 @@ window.simply = {
 		//console.timeEnd();
 		return ht;
 	},
-	parseStyle: function (style, data, state, props) {
+	parseStyle: function (style, data, state, props, parent, component, dom, methods, lifecycle, watch) {
 		let variable = /(\"|\')(\{)([^{}\n]*)\}(\"|\')/;
 		var vars = {};
 		while ((m = variable.exec(style)) !== null) {
@@ -154,15 +159,6 @@ window.simply = {
 	}
 }
 
-/*
-var app = new fjs({
-		component: "home",
-		target: "body",
-		data: {
-				name: "fehmi"
-		}
-});
-*/
 function utils() {
 
 	/*! loadJS: load a JS file asynchronously. [c]2014 @scottjehl, Filament Group, Inc. (Based on http://goo.gl/REQGQ by Paul Irish). Licensed MIT */
@@ -351,31 +347,22 @@ function utils() {
 		}
 	}
 
-	function getAttribute(contentString) {
-		var type;
-		var value;
+	function parseProp(contentString) {
+		var type, value, parsed, content;
+		content = contentString.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
 		try {
-			// array, obj, boolean or number
-			//props[attrib.name] = JSON.parse(attrib.value);
 			try {
-				type = typeof JSON.parse(contentString.replaceAll("'", '"'));
-				value = JSON.parse(contentString.replaceAll("'", '"'));
-				if (Array.isArray(JSON.parse(contentString.replaceAll("'", '"')))) {
+				parsed = JSON.parse(content);
+				// obj, number ya da boolean
+				// burada belli oluyor zaten
+				type = typeof parsed;
+				value = parsed;
+				if (Array.isArray(parsed)) {
 					type = "array";
 				}
-				// '{"a": true}'
-				else if (type == "object") {
-
-				}
-				else if (type == "number" || type == "boolean") {
-
-				}
-				console.log(contentString);
 			}
-			catch (e) {
-				console.log("bu func olabülü");
-				// (function () {});
-				let func = contentString.replaceAll("'", '"');
+			finally {
+				let func = content;
 				func = eval(func);
 				if (typeof func == "function") {
 					type = "function";
@@ -393,14 +380,21 @@ function utils() {
 		}
 	}
 
-	function setAttribute(value) {
+	/*
+		1) change attributes with devtools and check prop values
+			str, num, boo, (obj, arr, func) -> quote check
+		2) change props with = and check attributes
+			str, num, boo, (obj, arr, func) -> quote check
+		3) props template
+	*/
+	function prepareAttr(value) {
 		let type = typeof value;
 		if (Array.isArray(value) || type == "object" || type == "number" || type == "boolean") {
 			// çünkü attribute zaten "" arasına yazılıyor
-			return customStringify(value).replaceAll("\"", "'");
+			return customStringify(value).replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
 		}
 		else if (type == "function") {
-			return value.toString().replaceAll("\"", "'");
+			return value.toString().replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
 		}
 		else {
 			return value;
@@ -410,7 +404,7 @@ function utils() {
 	function customStringify(v) {
 		const cache = new Set();
 		return JSON.stringify(v, function (key, value) {
-			if (key !== "__c_" && key !== "__o_" && key !== "__p_") {
+			if (key !== "__c_" && key !== "__o_" && key !== "__p_" && key !== "__r_") {
 				if (typeof value === 'object' && value !== null) {
 					if (cache.has(value)) {
 						// Circular reference found
@@ -506,7 +500,9 @@ function utils() {
 
 						if (clss.trim().indexOf("class {") == 0) {
 							this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + clss.trim() + "//@ sourceURL=" + name + ".html");
+							var lifecycle;
 							this.lifecycle = this.componentClass.lifecycle;
+							lifecycle = this.lifecycle;
 
 							if (typeof this.lifecycle !== "undefined") {
 								if (typeof this.lifecycle.beforeConstruct !== "undefined") {
@@ -523,6 +519,9 @@ function utils() {
 							var methods;
 							var twindSheet;
 							var tw;
+							var lifecycle;
+							var methods;
+							var watch;
 
 							var data = this.componentClass.data ? this.componentClass.data : {};
 							var props = this.componentClass.props ? this.componentClass.props : {};
@@ -533,6 +532,8 @@ function utils() {
 							methods = this.methods;
 
 							this.watch = this.componentClass.watch;
+							watch = this.watch;
+
 							this.component = this;
 							this.comp = this;
 
@@ -576,9 +577,9 @@ function utils() {
 							for (var i = 0; i < this.attributes.length; i++) {
 								var attrib = this.attributes[i];
 								// props[attrib.name] = attrib.value;
-								props[attrib.name] = getAttribute(attrib.value).value;
+								props[attrib.name] = parseProp(attrib.value).value;
 							}
-
+							// console.log(props.id);
 							// console.log("---------------------");
 							// console.log("--comp name: ", name);
 							// console.log("--this: ", this.dom.host);
@@ -660,14 +661,15 @@ function utils() {
 					this.observeAttrChange(this, function (name, newValue) {
 
 						// value öncekiyle aynı değilse
-						console.log(name, newValue, self.props[name], newValue == setAttribute(self.props[name]));
-						if (newValue !== setAttribute(self.props[name])) {
+						console.log(name, newValue, self.props[name], newValue == prepareAttr(self.props[name]));
+						if (newValue !== prepareAttr(self.props[name])) {
 							try {
 								newValue = getAttribute(newValue).value;
 							} catch (e) {
 								// getattribute parse edemezse
 								newValue = newValue;
 							}
+
 							self.props[name] = newValue;
 							if (typeof self.lifecycle !== "undefined") {
 								if (typeof self.lifecycle.whenPropChange !== "undefined") {
@@ -692,19 +694,19 @@ function utils() {
 								}
 							}
 
-							self.render();
-
 							//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
 							//console.log(name, value, old, parents);
 							if (prop) {
 								if (self.props) {
-									self.setAttribute(prop, setAttribute(self.props[prop]));
+									self.setAttribute(prop, prepareAttr(self.props[prop]));
 								}
 							}
 
 							if (typeof self.watch !== "undefined") {
 								self.watch(name, value, old, parents);
 							}
+
+							self.render();
 						}, 0);
 					}
 
@@ -727,16 +729,27 @@ function utils() {
 
 				render() {
 					let m;
+					// tüm on.* atribute değerleri için
 					let regex = /\s+on[a-z]+\=(\"|\')([^"\n]*)(\"|\')/gm;
 					while ((m = regex.exec(template)) !== null) {
 						// This is necessary to avoid infinite loops with zero-width matches
 						if (m.index === regex.lastIndex) {
 							regex.lastIndex++;
 						}
+						// console.log(m);
 						if (m[2].indexOf("this.getRootNode().host") == -1) {
+							var builtinVars = ["methods.", "lifecycle.", "data.", "props.", "state.", "component."];
+
+							builtinVars.forEach(v => {
+								//template = template.split(v).join("this.getRootNode().host." + v)
+								let n = m[0].replaceAll(v, "this.getRootNode().host." + v);
+								template = template.replaceAll(m[0], n);
+							});
+
+
 							//template = template.replace(m[2], "this.getRootNode().host.methods." + m[2]);
 							//template = template.replace(new RegExp(escapeRegExp(m[2]), 'g'), "this.getRootNode().host.methods." + m[2]);
-							template = template.split(m[2]).join("this.getRootNode().host." + m[2])
+							//template = template.split(m[2]).join("this.getRootNode().host." + m[2])
 						}
 					}
 
@@ -745,10 +758,13 @@ function utils() {
 						var state = this.state;
 						var props = this.props;
 						var parent = this.parent;
-						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods, this.props);
-						var parsedStyle = simply.parseStyle(style, this.data, this.state, this.props);
-
+						var component = this.component;
+						var dom = this.dom;
+						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods, this.props, this.component, this.dom, this.methods, this.lifecycle, this.watch);
+						var parsedStyle = simply.parseStyle(style, this.data, this.state, this.props, this.parent, this.component, this.dom, this.methods, this.lifecycle, this.watch);
 						parsedTemplate = parsedTemplate + "<style tw></style>" + "<style simply>" + parsedStyle.style + "</style><style simply-vars></style>";
+
+
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
@@ -808,19 +824,25 @@ function utils() {
 							if (typeof this.lifecycle !== "undefined") {
 								if (typeof this.lifecycle.afterFirstRender !== "undefined") {
 									this.lifecycle.afterFirstRender();
+
+									setTimeout(() => {
+										console.log("ilk", component.getAttribute("str"));
+									}, 0);
+
 								}
 							}
 						}, 0);
 					}
 					else {
+
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeRerender !== "undefined") {
 								this.lifecycle.beforeRerender();
 							}
 						}
 						var newDom = document.createElement("div");
-						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods, this.props);
-						var parsedStyle = simply.parseStyle(style, this.data, this.state, this.props);
+						let parsedTemplate = simply.parseTemplate(template, this.data, this.state, this.parent, this.methods, this.props, this.component, this.dom, this.methods, this.lifecycle, this.watch);
+						var parsedStyle = simply.parseStyle(style, this.data, this.state, this.props, this.parent, this.component, this.dom, this.methods, this.lifecycle, this.watch);
 
 						newDom.innerHTML = parsedTemplate + "<style tw></style>" + "<style simply></style><style simply-vars></style>";
 
@@ -881,6 +903,7 @@ function utils() {
 							}
 						}
 					}
+
 					this.rendered = true;
 				}
 				// Invoked each time the custom element is disconnected from the document's DOM.
@@ -893,7 +916,7 @@ function utils() {
 				}
 				// invoked when one of the custom element's attributes is added, removed, or changed.
 				attributeChangedCallback(name, oldValue, newValue) {
-					console.log("attr changed callback");
+					// console.log("attr changed callback");
 					// if data.
 					// console.log(name, oldValue, newValue);
 				}

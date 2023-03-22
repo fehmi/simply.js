@@ -59,7 +59,7 @@
 					<!-- {data.urlHistory.length} - {data.currentUrlIndex} -->
 					<button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="methods.goBack(event);"></button>
 					<button {(data.currentUrlIndex> data.urlHistory.length - 1) ? "disabled" : ""}
-						onclick="goNext(event);"></button>
+						onclick="methods.goNext(event);"></button>
 					<input type="text" value="{data.url}" id="url" onchange="methods.changeURL(event)">
 				</div>
 			</if>
@@ -1443,7 +1443,6 @@ SOFTWARE.';
 					else if (props.id) {
 						var id = props.id;
 					}
-
 
 					var xhr = new XMLHttpRequest();
 					xhr.withCredentials = true;

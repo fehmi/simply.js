@@ -4,7 +4,7 @@ There is nothing special of writing DOM events in simply from Vanilla JS.
 
 ```html
 <template>
-  <div onclick="sayHello()">Say Hello!</div>
+  <div onclick="methods.sayHello()">Say Hello!</div>
 </template>
 
 <script>
@@ -28,6 +28,11 @@ There is nothing special of writing DOM events in simply from Vanilla JS.
 
 Source: [w3schools](https://www.w3schools.com/js/js_events.asp)<br>
 Full List of Events: [w3schools](https://www.w3schools.com/js/js_events.asp) / [MDN](https://developer.mozilla.org/en-US/docs/Web/Events)
+
+## Inline Self Executing Anonymous Functions
+```js
+ <button onclick="(function() { console.log('Hey i am calling') })()">hello</button></button>
+```
 
 ## Stop Propagation & Prevent Default
 
