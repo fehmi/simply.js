@@ -34,7 +34,58 @@ Of couse you can do some simple math with your variables using simple expression
 { data.variable.sub }
 { data.variable + 10 }
 { data.variable * (10 / 2) }
+{(function() {return 2 + 2})()}
+{file.filename.replace('.html', '')}
+{(data.currentUrlIndex < 2) ? "disabled" : "" }
+{(data.resize.x || data.resize.y) ? "resizing" : "" }
 ```
+
+```js
+// Call any component's built-in objects
+// like methods, parent, data, state, prop, methods
+{someFunction(data.name)}
+```
+<repl-component id="jkhvvwpormt56m6" download="true"></repl-component>
+
+## Go Wild
+Possibilities are endless with some imagination.
+```html
+<li class="{entry.method}">{entry.message}
+	<if entry.file>(<span class="debugLink"
+			onclick="methods.openFileGotoLine('{entry.char}')">GO!</span>)
+	</if>
+</li>
+```
+
+## Complex Code Blocks
+The thing is the code blocks must return something bcs it's in the rendering part of the component. For example this will not work.
+
+```html
+<template>
+  {
+  	if (methods.someFunction() == "Some message") {
+  		Yeah, the message is really Some message
+  	}
+  }
+</template>
+```
+
+But you have a workaorund with inline self executing anonymous functions like below:
+
+<repl-component id="jok4gkiokb28f07" download="true"></repl-component>
+
+It's not recommended though. If you need some complex process just write a function in the methods part of your component and call it from your template section like this.
+
+<repl-component id="v8nhz6ctqohmm35" download="true"></repl-component>
+
+
+## Escaping Delimiter Charactes
+If you need to press any of delimiter characters ("{" and "}") to the dom you must escape them with "\". Bcs they must be confusing for the template engine of simply.js.
+
+<repl-component id="m7o4oclai3aql0t" download="true"></repl-component>
+
+
+Actually you can any complex JavaScript code in the variable delimiters and return anything to put your dom.
 
 ## Variables in `each` loops
 
@@ -84,13 +135,13 @@ You can use your reactive data variables as a property value in style tag.
 
 It's totally acceptable to change variables in template. Just do like `{data.name = "marilyn monroe"}`. It will change and render the new value right away and trigger reactions. If you want to change the variable value wihout rendering it just comment it like `<!-- {data.name = "marilyn monroe"} -->`
 
-<repl-component id="86xhf51pxnmaa7j" download="true"></replcomponent>
+<repl-component id="86xhf51pxnmaa7j" download="true"></repl-component>
 
 ## Using variables from functions that returns values
 
 It can be useful when need a post processing for your data before showing them. Here is an example for it. You can write your return functions in data or methods. But please don't forget that the only reactive variables lives in `data` or `state`.
 
-<repl-component id="6c0w9k4em2ywkix" download="true"></replcomponent>
+<repl-component id="6c0w9k4em2ywkix" download="true"></repl-component>
 
-?> You can use your return values in conditionals and loops if you like.
+?> You can use your return values in your conditionals and loops if you like.
 

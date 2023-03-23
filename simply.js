@@ -10,13 +10,15 @@ window.simply = {
 		let elseStatement = /\<else\>$/;
 		let eachStatement = /\<each(\s)(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?\>$/;
 		let endEachStatement = /\<\/each\>$/;
+
+		// this will be deleted, what a mess :/
 		// let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
-
-		// let variable = /(\{)([^{}\n]*)\}$/;
+		//let variable = /(\{)([^{}\n]*)\}$/;
 		// https://regex101.com/r/AAGBIE/1
-
-		let variable = /((\[[^\}]{3,})?\{s*[^\}\{]{3,}?:.*\}([^\{]+\])?)$/s;
-
+		// let variable =  /(?<!([a-z]+\=\"\(function\s*\(\)\s*))(\{)(?<name>[^{}:`\n]*)\}$/g;
+		// let variable = /((\[[^\}]{3,})?\{s*[^\}\{]{3,}?:.*\}([^\{]+\])?)$/s;
+		//let variable = /(\{)(.*)(\})$/g;
+		// {if (component.getAttribute("str")) { return "hello"}}
 		//(?<!\=\')(\{)([^{}\n]*)\}$
 
 		let ifCount = 0;
@@ -28,15 +30,31 @@ window.simply = {
 		var staticLetters = "";
 		var flag = false;
 		var curlyCount = 0;
+		var curlyFlag = false;
+		var varBucket = "";
+
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
 
-			if (template[i] == "{") { curlyCount += 1}
-			if (template[i] == "}") { curlyCount -= 1}
+			// variable brace espace ise hiç skip
+			if (template[i-1] !== "\\" && template[i] == "{") {
+				curlyCount += 1;
+			}
+			if (curlyCount > 0 ) {
+				varBucket += template[i];
+			}
 
-			if ((m = variable.exec(bucket)) !== null && curlyCount == 0) {
-				logic = "ht+=" + m[1] + ";";
+			if (template[i-1] !== "\\" && template[i] == "}") {
+				curlyCount -= 1
+			}
+
+			if (curlyCount == 0 && varBucket !== "") {
+				// burayı regexp'ten arındırdık
+				// diğerlerine de uygulayacaz inş
+				varBucket = varBucket.trim();
+				let variable = varBucket.trim().substring(1, varBucket.length-1);
+				logic = "ht+=" + variable + ";";
 				flag = true;
 			}
 			else if ((m = ifStatement.exec(bucket)) !== null) {
@@ -114,7 +132,12 @@ window.simply = {
 			}
 
 			if (flag === true) {
-				capturedLogics.push(m[0]);
+				try {
+					capturedLogics.push(m[0]);
+				} catch (error) {
+					capturedLogics.push(varBucket);
+					varBucket = "";
+				}
 				let logicLine = capturedLogics[capturedLogics.length - 1];
 				let staticText = processedLetters.replace(logicLine, "");
 				let replaceThis = staticText + logicLine;
@@ -127,6 +150,7 @@ window.simply = {
 		}
 		// for the last non-logical text
 		if (processedLetters.trimEnd() !== "") {
+			console.log(processedLetters);
 			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			//console.log(processedLettersRegex);
 			//bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
@@ -361,7 +385,7 @@ function utils() {
 					type = "array";
 				}
 			}
-			finally {
+			catch(e) {
 				let func = content;
 				func = eval(func);
 				if (typeof func == "function") {
@@ -751,6 +775,10 @@ function utils() {
 							//template = template.replace(new RegExp(escapeRegExp(m[2]), 'g'), "this.getRootNode().host.methods." + m[2]);
 							//template = template.split(m[2]).join("this.getRootNode().host." + m[2])
 						}
+					}
+
+					if (template.indexOf(".querySelector(") > -1 || template.indexOf("dom.")) {
+						console.log("yes");
 					}
 
 					if (!this.rendered) {

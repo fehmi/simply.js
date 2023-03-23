@@ -17,6 +17,11 @@ There is nothing special of writing DOM events in simply from Vanilla JS.
 </script>
 ```
 
+## `event` and `this`
+You can pass them directly to your methods. Just keep in mind to use anyting other than `this` in your method's parameters. Bcs `this` will be using by the constructor of your components. You `el` or something else when needed like below:
+
+<repl-component id="mc35kc8i6yg33ge" download="true"></repl-component>
+
 ## Most Used DOM Events
 
 | Event   |      Description      |
