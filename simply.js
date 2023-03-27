@@ -32,28 +32,44 @@ window.simply = {
 		var curlyCount = 0;
 		var curlyFlag = false;
 		var varBucket = "";
+		var functionFlag = false;
 
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
 
+
+
+			if (bucket.substr(-"function".length) === "function") {
+				functionFlag = true;
+			}
+
 			// variable brace espace ise hiç skip
-			if (template[i-1] !== "\\" && template[i] == "{") {
+			if (template[i - 1] !== "\\" && template[i] == "{") {
 				curlyCount += 1;
 			}
-			if (curlyCount > 0 ) {
+
+			if (curlyCount > 0 && functionFlag === false) {
 				varBucket += template[i];
 			}
 
-			if (template[i-1] !== "\\" && template[i] == "}") {
-				curlyCount -= 1
+			if (template[i - 1] !== "\\" && template[i] == "}") {
+				curlyCount -= 1;
+				if (functionFlag === true) {
+					functionFlag = false;
+				}
 			}
 
 			if (curlyCount == 0 && varBucket !== "") {
 				// burayı regexp'ten arındırdık
 				// diğerlerine de uygulayacaz inş
 				varBucket = varBucket.trim();
-				let variable = varBucket.trim().substring(1, varBucket.length-1);
+				let variable = varBucket.trim().substring(1, varBucket.length - 1);
+
+				if (parseProp("{" + variable + "}").type == "object") {
+					variable = "\"" + varBucket.trim() + "\"";
+				}
+
 				logic = "ht+=" + variable + ";";
 				flag = true;
 			}
@@ -150,7 +166,6 @@ window.simply = {
 		}
 		// for the last non-logical text
 		if (processedLetters.trimEnd() !== "") {
-			console.log(processedLetters);
 			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			//console.log(processedLettersRegex);
 			//bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
@@ -187,11 +202,26 @@ function utils() {
 
 	/*! loadJS: load a JS file asynchronously. [c]2014 @scottjehl, Filament Group, Inc. (Based on http://goo.gl/REQGQ by Paul Irish). Licensed MIT */
 	(function (w) {
-		var loadJS = function (src, cb, ordered) {
+		var loadJS = function (src, cb, waitBeforeCb) {
 			"use strict";
 			if (document.querySelectorAll('[src="' + src + '"]').length > 0) {
 				// console.log(src + "zaten load edilmiş, cb çalıştırılıyor...");
-				cb();
+				if (!window[waitBeforeCb]) {
+					var tryAmount = 10;
+					var tryCount = 0;
+					var a = setInterval(() => {
+						if (!window[waitBeforeCb] && tryCount < tryAmount) {
+							tryCount += 1;
+						}
+						else {
+							cb();
+							clearInterval(a);
+						}
+					}, 50);
+				}
+				else {
+					cb();
+				}
 			}
 			else {
 				// console.log(src + " script ilk kez yükleniyor...");
@@ -199,14 +229,8 @@ function utils() {
 				var ref = w.document.getElementsByTagName("script")[0];
 				var script = w.document.createElement("script");
 
-				if (typeof (cb) === 'boolean') {
-					tmp = ordered;
-					ordered = cb;
-					cb = tmp;
-				}
-
 				script.src = src;
-				script.async = !ordered;
+				script.async = true;
 				ref.parentNode.insertBefore(script, ref);
 
 				if (cb && typeof (cb) === "function") {
@@ -371,36 +395,36 @@ function utils() {
 		}
 	}
 
-	function parseProp(contentString) {
+	parseProp = function (contentString) {
 		var type, value, parsed, content;
 		content = contentString.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
 		try {
-			try {
-				parsed = JSON.parse(content);
-				// obj, number ya da boolean
-				// burada belli oluyor zaten
-				type = typeof parsed;
-				value = parsed;
-				if (Array.isArray(parsed)) {
-					type = "array";
-				}
-			}
-			catch(e) {
-				let func = content;
-				func = eval(func);
-				if (typeof func == "function") {
-					type = "function";
-					value = eval("(" + func + ")");
-				}
+			parsed = JSON.parse(content);
+			// obj, number ya da boolean
+			// burada belli oluyor zaten
+			type = typeof parsed;
+			value = parsed;
+			if (Array.isArray(parsed)) {
+				type = "array";
 			}
 		}
 		catch (e) {
-			type = "string";
-			value = contentString;
+			let func = content;
+			func = eval(func);
+			if (typeof func == "function") {
+				type = "function";
+				value = eval("(" + func + ")");
+			}
 		}
-		return {
-			"type": type,
-			"value": value
+		finally {
+			if (type == undefined) {
+				type = "string";
+				value = contentString;
+			}
+			return {
+				"type": type,
+				"value": value
+			}
 		}
 	}
 
@@ -596,6 +620,22 @@ function utils() {
 							this.parent = this.getRootNode().host;
 							parent = this.parent;
 							// simply.components[this.uid] = this;
+							// component.props > template props > inline attributes
+
+
+							if (this.querySelector("script[type='props\\/json']")) {
+								var propsFromTemplate = this.querySelector("script[type=props\\/json]").innerHTML;
+								propsFromTemplate = propsFromTemplate.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
+								propsFromTemplate = JSON.parse(propsFromTemplate);
+
+								for (var k in propsFromTemplate) {
+									component.setAttribute(k, prepareAttr(propsFromTemplate[k]))
+								}
+							}
+
+							for (var k in props) {
+								component.setAttribute(k, prepareAttr(props[k]))
+							}
 
 							// atribute'ları proplara yazalım
 							for (var i = 0; i < this.attributes.length; i++) {
@@ -636,6 +676,7 @@ function utils() {
 									this.lifecycle.afterConstruct();
 								}
 							}
+
 							state = component.state;
 							parent = component.parent;
 							// we couldn't get state and parent
@@ -682,13 +723,15 @@ function utils() {
 					return observer;
 				}
 				connectedCallback() {
+
+
 					this.observeAttrChange(this, function (name, newValue) {
 
 						// value öncekiyle aynı değilse
 						console.log(name, newValue, self.props[name], newValue == prepareAttr(self.props[name]));
 						if (newValue !== prepareAttr(self.props[name])) {
 							try {
-								newValue = getAttribute(newValue).value;
+								newValue = parseProp(newValue).value;
 							} catch (e) {
 								// getattribute parse edemezse
 								newValue = newValue;
@@ -777,10 +820,6 @@ function utils() {
 						}
 					}
 
-					if (template.indexOf(".querySelector(") > -1 || template.indexOf("dom.")) {
-						console.log("yes");
-					}
-
 					if (!this.rendered) {
 						var self = this;
 						var state = this.state;
@@ -853,9 +892,7 @@ function utils() {
 								if (typeof this.lifecycle.afterFirstRender !== "undefined") {
 									this.lifecycle.afterFirstRender();
 
-									setTimeout(() => {
-										console.log("ilk", component.getAttribute("str"));
-									}, 0);
+									setTimeout(() => { }, 0);
 
 								}
 							}
