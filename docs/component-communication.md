@@ -84,7 +84,7 @@ Or you can access it from anywhere in the script section of the component like t
   </script>
 ```
 
-## Long Story Short About Props
+## Short Story Long About Props
 
 There are 4 ways to define them
 
@@ -124,5 +124,6 @@ This is the way about overriding. The last word is belong to the props block (1)
 
 !> One rule: Please don't use double aposroph when writing arrays, objects and functions as props.
 
-
-
+playground?s5d5vosj6d95joq
+playground?bc65fp04l1bvqn1
+playground?9i7n4mlcnh8rqrm

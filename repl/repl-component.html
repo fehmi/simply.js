@@ -1,4 +1,4 @@
-<template>
+<html>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/addon/fold/foldgutter.css" />
 	<header>
@@ -85,7 +85,7 @@
 		</div>
 	</if>
 
-</template>
+</html>
 
 <style>
 	:host {
@@ -1254,7 +1254,7 @@
 				var fileTabs = dom.querySelector("#file-tabs");
 				fileTabs.scrollLeft = fileTabs.scrollWidth;
 
-				var template = "<template>\n\n</template>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>";
+				var template = "<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>";
 
 				var target = dom.querySelector("ul#files");
 				component.methods.createNewCodemirror(filename, true, target, template);
