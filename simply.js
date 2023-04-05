@@ -360,6 +360,18 @@ simply = {
 			}
 		}
 	},
+	request: function (url, callback) {
+		var request = new XMLHttpRequest();
+		request.open('GET', url, false);
+		request.onload = function () {
+			if (this.status >= 200 && this.status < 400) {
+				if (callback) {
+					callback(this.response);
+				}
+			}
+		};
+		request.send();
+	},
 	splitComponent: function (string) {
 		// console.log({ string });
 		var txt = document.createElement("textarea");
@@ -612,17 +624,24 @@ simply = {
 						if (clss.trim().indexOf("class {") == 0) {
 							this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + clss.trim() + "//@ sourceURL=" + name + ".html");
 
-
-								// not s-component-api
-								if (this.querySelector("template[simply]")) {
-									// parent yok ise, request to location and parse
+							if (this.querySelector("template[simply]")) {
+								if (this.getRootNode().host) {
 									let templateContent = this.innerHTML;
 									templateContent = templateContent.replace(/\<template([^<>}]*)simply([^<>]*)>(\s+)?<!--/, "");
 									templateContent = templateContent.replace(/-->(\s+)?<\/template>/, "");
 									let inlineComponent = simply.splitComponent(templateContent)
 									console.log(name, inlineComponent);
 								}
-
+								else {
+									// parent yok ise, request to location and parse
+									// router için burada takla atıcaz
+									console.log(name, "no parent, poor comp", document.location);
+									console.log(this.outerHTML);
+									simply.request(document.location.href, function(response) {
+										console.log(response);
+									})
+								}
+							}
 
 							if (this.querySelector("script[prop]")) {
 								let propObjString = this.querySelector("script[prop]").innerHTML;

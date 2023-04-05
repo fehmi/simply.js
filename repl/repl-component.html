@@ -74,8 +74,14 @@
 			<div class="messages">
 				<ul>
 					<each data.console as entry>
-						<li class="{entry.method}">{entry.message} <if entry.file>(<span class="debugLink"
-									onclick="methods.openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}</span>)
+						<li class="{entry.method}">
+							{entry.message}
+							<if entry.file>
+								(
+								<span class="debugLink"
+									onclick="methods.openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}
+								</span>
+								)
 							</if>
 						</li>
 					</each>
