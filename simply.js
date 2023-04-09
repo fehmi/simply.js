@@ -2,6 +2,7 @@ simply = {
 	components: {},
 	parseTemplate: function (parsingArgs) {
 		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
+
 		/* old stagg
 		let ifStatement = /\<if(\s)(.*)(\>$)/;
 		let elseIfStatement = /\<else(\s)if(\s)(.*)(\/)?\>$/;
@@ -22,7 +23,7 @@ simply = {
 
 		// each https://regex101.com/r/yi5jzG/1
 		// https://regex101.com/r/gvHgOc/1
-		let eachStart = /\<each\s+of\=\"(?<of>[^"]*)\"\s+as\=\"(?<as>[^"]*)\"(\s+key\=\"(?<key>[^"]*)\")?(\s+index\=\"(?<index>[^"]*)\")?\>$/;
+		let eachStart = /\<each\s+of\=\"(?<of>[^"]*)\"\s+as\=\"(?<as>[^"]*)\"(\s+key\=\"(?<key>[^"]*)\")?(\s+index\=\"(?<index>[^"]*)\")?\>$/gm;
 		let eachEnd = /\<\/each\>$/;
 
 		// in tag var
@@ -152,6 +153,7 @@ simply = {
 					flag = true;
 				}								
 				else if ((m = eachStart.exec(bucket)) !== null) {
+					// console.log(m);
 					// if (eachCount > 0) {} //each içinde each
 					eachCount += 1;
 					try {
@@ -413,20 +415,19 @@ simply = {
 			txt.innerHTML = style.innerHTML;
 			style = txt.value;
 			dom.querySelector("style").remove();
+			string = string.replace(txt.value, "");
 		}
-
+		
 		var script = "";
 		if (dom.querySelector("script")) {
 			var script = dom.querySelector("script");
 			txt.innerHTML = script.innerHTML;
 			script = txt.value;
 			dom.querySelector("script").remove();
+			string = string.replace(txt.value, "");
 		}
 
-		let head = dom.querySelector("head").innerHTML;
-		let body =  dom.querySelector("body").innerHTML;
-		txt.innerHTML = head + body;
-		template = txt.value;
+		template = string.replace("<style></style>", "").replace("<script></script>", "");
 
 		return {
 			template,
@@ -559,7 +560,7 @@ simply = {
 	},
 	registerComponent: function ({ template, style, name, script, docStr }) {
 		if (!customElements.get(name)) {
-			class UnityComponent extends HTMLElement {
+			class simplyComponent extends HTMLElement {
 				constructor() {
 					// Always call super first in constructor
 					super();
@@ -643,7 +644,6 @@ simply = {
 							var methods;
 							var twindSheet;
 							var tw;
-							var lifecycle;
 							var methods;
 							var watch;
 
@@ -1062,9 +1062,9 @@ simply = {
 				adoptedCallback() { }
 				_attachListeners() { }
 			}
-			// return customElements.define(name, UnityComponent);
+			// return customElements.define(name, simplyComponent);
 			// twind eki için return'ü sildim. inş bi yer patlamaz
-			customElements.define(name, UnityComponent);
+			customElements.define(name, simplyComponent);
 			// console.log(script);
 		}
 	},

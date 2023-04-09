@@ -124,6 +124,8 @@ This is the way about overriding. The last word is belong to the props block (1)
 
 !> One rule: Please don't use double aposroph when writing arrays, objects and functions as props.
 
-playground?s5d5vosj6d95joq
-playground?bc65fp04l1bvqn1
-playground?9i7n4mlcnh8rqrm
+<repl-component id="dteguywmqzok0z8"></repl-component>
+
+<repl-component id="sieku4gvamxy86u"></repl-component>
+
+<repl-component id="of3xucyxzahimyz"></repl-component>
