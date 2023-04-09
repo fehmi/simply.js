@@ -2,14 +2,32 @@ simply = {
 	components: {},
 	parseTemplate: function (parsingArgs) {
 		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
-		//console.time();
+		/* old stagg
 		let ifStatement = /\<if(\s)(.*)(\>$)/;
 		let elseIfStatement = /\<else(\s)if(\s)(.*)(\/)?\>$/;
 		let endIfStatement = /\<\/if\>$/;
 		let elseStatement = /\<else\>$/;
 		let eachStatement = /\<each(\s)(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?\>$/;
 		let endEachStatement = /\<\/each\>$/;
+		*/
 		let simplyTemplate = /\<template([^<>]*)simply([^<>]*)>$/;
+
+		// condititionals
+		let ifStart = /\<if(\s+)cond=\"(.*)\"(\>$)/;
+		let ifEnd = /\<\/if\>$/;
+		let elsifStart = /\<elsif(\s+)cond=\"(.*)\"(\>$)/;
+		let elsifEnd = /\<\/elsif\>$/;
+		let elseStart = /\<else\>$/;
+		let elseEnd = /\<\/else\>$/;
+
+		// each https://regex101.com/r/yi5jzG/1
+		// https://regex101.com/r/gvHgOc/1
+		let eachStart = /\<each\s+of\=\"(?<of>[^"]*)\"\s+as\=\"(?<as>[^"]*)\"(\s+key\=\"(?<key>[^"]*)\")?(\s+index\=\"(?<index>[^"]*)\")?\>$/;
+		let eachEnd = /\<\/each\>$/;
+
+		// in tag var
+		// https://regex101.com/r/vzY75x/1
+		let inTagVar = /:="(?<l>[^"]*)"$/;
 
 		// this will be deleted, what a mess :/
 		// let variable = /{(\s+)?([a-zA-Z_\.\+\*\d\/\=\s\(\)]+)(\s+)?}$/;
@@ -45,8 +63,8 @@ simply = {
 				styleCount += 1;
 			}
 			else if (simplyTemplate.test(bucket)) {
-				bucket += "<!--";
-				processedLetters += "<!--";
+				//bucket += "<!--";
+				//processedLetters += "<!--";
 				simplyTemplateCount += 1;
 			}
 			// else if (bucket.substr(-"<template>".length) === "<template>") {
@@ -59,26 +77,25 @@ simply = {
 				styleCount -= 1;
 			}
 			// inline template skip
-			// we will look at construct
+			// we will look when construct
 			else if (bucket.substr(-"</template>".length) === "</template>") {
 				simplyTemplateCount -= 1;
-				bucket = bucket.replace(/<\/template>$/, "--></template>");
-				processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
+				//bucket = bucket.replace(/<\/template>$/, "--></template>");
+				//processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
 			}
 
 			if (simplyTemplateCount == 0 && styleCount == 0 && scriptCount == 0) {
+				/*
 				if (bucket.substr(-"function".length) === "function") {
 					ignoreFlag = true;
 				}
-
+				*/
 				if (template[i - 1] !== "\\" && template[i] == "{") {
 					curlyCount += 1;
 				}
-
 				if (curlyCount > 0 && ignoreFlag === false) {
 					varBucket += template[i];
 				}
-
 				if (template[i - 1] !== "\\" && template[i] == "}") {
 					curlyCount -= 1;
 					if (curlyCount == 0 && ignoreFlag === true) {
@@ -86,10 +103,12 @@ simply = {
 					}
 				}
 
+				// variable
 				if (curlyCount == 0 && varBucket !== "") {
 					// burayı regexp'ten arındırdık
 					// diğerlerine de uygulayacaz inş
 					varBucket = varBucket.trim();
+					// console.log(varBucket);
 					let variable = varBucket.trim().substring(1, varBucket.length - 1);
 
 					if (simply.parseProp("{" + variable + "}").type == "object") {
@@ -99,82 +118,82 @@ simply = {
 					logic = "ht+=" + variable + ";";
 					flag = true;
 				}
-				else if ((m = ifStatement.exec(bucket)) !== null) {
-					// https://stackoverflow.com/questions/28460473/how-do-i-match-a-single-equals-sign-with-regular-expressions
-					m[2] = m[2].replace(/(^|[^=])=($|[^=])/g, "$1==$2");
+				else if ((m = inTagVar.exec(bucket)) !== null) {
+					logic = "ht+=" +  m.groups.l + ";";
+					flag = true;
+				}				
+				else if ((m = ifStart.exec(bucket)) !== null) {
 					logic = unescape("if (" + m[2] + ") {");
 					//logic = (ifCount == 0 ? 'let ht = "";' + logic : logic);
 					ifCount += 1;
 					flag = true;
 				}
-				else if ((m = elseIfStatement.exec(bucket)) !== null) {
-					/* Use like this from now on
-						(?<name>...)
-						This capturing group can be referred to using the given name instead of a number.
-						Please note this feature is experimental in JavaScript and might not be supported by your browser.
-						/(?<name>Sally)/
-						Call me Sally.
-					*/
-					logic = unescape(m[3]); // bu niye 3 tü
-					logic = "}else if (" + logic + ") {";
+				else if ((m = elsifStart.exec(bucket)) !== null) {
+					logic = unescape(m[2]); // bu niye 3 tü
+					logic = "else if (" + logic + ") {";
 					flag = true;
 				}
-				else if ((m = elseStatement.exec(bucket)) !== null) {
-					logic = "}else {";
+				else if ((m = elseStart.exec(bucket)) !== null) {
+					logic = "else {";
 					flag = true;
 
 				}
-				else if ((m = endIfStatement.exec(bucket)) !== null) {
+				else if ((m = ifEnd.exec(bucket)) !== null) {
 					ifCount -= 1;
 					logic = "}";
 					flag = true;
 				}
-				else if ((m = eachStatement.exec(bucket)) !== null) {
+				else if ((m = elsifEnd.exec(bucket)) !== null) {
+					logic = "}";
+					flag = true;
+				}
+				else if ((m = elseEnd.exec(bucket)) !== null) {
+					logic = "}";
+					flag = true;
+				}								
+				else if ((m = eachStart.exec(bucket)) !== null) {
 					// if (eachCount > 0) {} //each içinde each
 					eachCount += 1;
 					try {
-						subject = eval(m[2]);
+						subject = eval(m.groups.of);
 					} catch (error) {
-						//console.log(lastM + "." + m[2]);
-						subject = m[2];
+						//console.log(lastM + "." + m.groups.of);
+						subject = m.groups.of;
 					}
-
+				
 					iiii = "s" + Math.random().toString(36).slice(-7);
-
 					if (Array.isArray(subject)) {
-						key = typeof m[7] !== "undefined" ? "let " + m[7] + " = " + iiii + ";" : "";
-						let index = typeof m[7] !== "undefined" ? "let " + m[11] + " = " + iiii + ";" : "";
-
-						logic = "for (" + iiii + " = 0; " + iiii + " < " + m[2] + ".length; " + iiii + "++) { \
+						key = typeof m.groups.key !== "undefined" ? "let " + m.groups.key + " = " + iiii + ";" : "";
+						let index = typeof m.groups.key !== "undefined" ? "let " + m.groups.index + " = " + iiii + ";" : "";
+				
+						logic = "for (" + iiii + " = 0; " + iiii + " < " + m.groups.of + ".length; " + iiii + "++) { \
 													" + key + "; \
 													" + index + "; \
-													let " + m[3] + "=" + m[2] + "[" + iiii + "];";
+													let " + m.groups.as + "=" + m.groups.of + "[" + iiii + "];";
 					}
 					else {
-						key = typeof m[11] !== "undefined" ? "let " + m[11] + " = " : "";
-
+						key = typeof m.groups.index !== "undefined" ? "let " + m.groups.index + " = " : "";
+				
 						// obaa objelerini exclude et
 						// '__o_' || ii == '__c_' || ii == '__p_'
 						logic = "\
-											for (var ii in "+ m[2] + ") { \
-												if (ii == '__o_' || ii == '__c_' || ii == '__p_' || ii == '__r_' || typeof "+ m[2] + "[ii] == 'function') { continue; }\
-												" + key + "Object.keys(" + m[2] + ").indexOf(ii); \
-												let " + m[7] + "= ii; \
-												let " + m[3] + "=" + m[2] + "[ii];";
+											for (var ii in "+ m.groups.of + ") { \
+												if (ii == '__o_' || ii == '__c_' || ii == '__p_' || ii == '__r_' || typeof "+ m.groups.of + "[ii] == 'function') { continue; }\
+												" + key + "Object.keys(" + m.groups.of + ").indexOf(ii); \
+												let " + m.groups.key + "= ii; \
+												let " + m.groups.as + "=" + m.groups.of + "[ii];";
 					}
 					flag = true;
-					lastM = m[2];
+					lastM = m.groups.of;
 					lasti = iiii;
 				}
 
-				else if ((m = endEachStatement.exec(bucket)) !== null) {
+				else if ((m = eachEnd.exec(bucket)) !== null) {
 					eachCount -= 1;
 					logic = "};";
 					flag = true;
 				}
 			}
-
-
 
 			if (flag === true) {
 				try {
@@ -184,9 +203,18 @@ simply = {
 					varBucket = "";
 				}
 				let logicLine = capturedLogics[capturedLogics.length - 1];
-				let staticText = processedLetters.replace(logicLine, "");
+				staticText = processedLetters.replace(logicLine, "");
+
 				let replaceThis = staticText + logicLine;
 				var withThis = "ht+=`" + staticText.replace(/\n/g, "") + "`;" + logic;
+
+				// if else arasına ht=""; girince hata fırlatıyordu
+				if (staticText.trim() == "") {
+					var withThis = logic;
+				}
+				else {
+					var withThis = "ht+=`" + staticText.replace(/\n/g, "") + "`;" + logic;
+				}
 				bucket = bucket.replace(replaceThis, withThis);
 				//console.log(replaceThis, withThis);
 				flag = false;
@@ -250,8 +278,8 @@ simply = {
 		else {
 			// console.log(src + " script ilk kez yükleniyor...");
 			var tmp;
-			var ref = w.document.getElementsByTagName("script")[0];
-			var script = w.document.createElement("script");
+			var ref = window.document.getElementsByTagName("script")[0];
+			var script = window.document.createElement("script");
 
 			script.src = src;
 			script.async = true;
@@ -282,7 +310,7 @@ simply = {
 					if (r.test(settings.script)) {
 						if (!window.twind) {
 							// console.log("yes, load twind for: ", settings);
-							loadJS("https://simply.js.org/style/twind.min.js", function () {
+							simply.loadJS("https://simply.js.org/style/twind.min.js", function () {
 								// console.log("loaded twind for: ", settings);
 								simply.registerComponent(settings);
 							});
@@ -377,72 +405,14 @@ simply = {
 		var txt = document.createElement("textarea");
 		var parser = new DOMParser();
 		var dom = parser.parseFromString(string, "text/html");
-		var htmlTag;
-
-		var template = "";
-		// template yerine <html></html> yazsak daha şık olur
-		// özellikle override ederken içiçe template hoş durmuyor
-
-		htmlTag = "html"
-
-		if (string.indexOf("<" + htmlTag + ">") > -1) {
-			//var templateOpenTag = /<template(.*)>/g;
-			var templateOpenTag = RegExp("<" + htmlTag + "(.*)>", "g");
-			// var templateCloseTag = /<\/template>/g;
-			var templateCloseTag = RegExp("<\/" + htmlTag + ">", "g");
-
-			var bucket = "";
-			var processedLetters = "";
-			var templateCount = 0;
-
-			for (var i = 0; i < string.length; i++) {
-				bucket += string[i];
-				if ((logic = templateOpenTag.exec(bucket)) !== null) {
-					templateCount += 1;
-					bucket = "";
-				}
-				else if ((logic = templateCloseTag.exec(bucket)) !== null) {
-					templateCount -= 1;
-					bucket = "";
-					if (templateCount == 0) { // done
-						template = processedLetters.replace(new RegExp("<\/" + htmlTag + ">" + '$'), '');
-						break;
-					}
-				}
-				if (templateCount > 0) {
-					processedLetters += string[i + 1];
-				}
-			}
-		}
-
-		/*
-		// dom parser ile patlıyor
-		// çünkü benim ifler each ler valid değil
-
-		<each for="{}"
-		 <each data.hobbies as hobby, key (index)>
-		 <each for="data.hobbies" as="hobby" key="index"></each>
-		 <if condition="data.who == 'Blue Bird'">
-		 asdasdas
-		 </else>
-		 bbbb
-		 </if>
-
-		if (dom.querySelector("template")) {
-			template = dom.querySelector("template").innerHTML;
-			// fix for innerhtml fucks simply template double quotes
-			// ="= > =="
-			// ="" > '' (delete)
-			template = template.replace(/\=\"\=/g, '=="');
-			template = template.replace(/\=\"\"/g, '');
-		}
-		*/
+		var template;
 
 		var style = "";
 		if (dom.querySelector("style")) {
 			style = dom.querySelector("style");
 			txt.innerHTML = style.innerHTML;
 			style = txt.value;
+			dom.querySelector("style").remove();
 		}
 
 		var script = "";
@@ -450,8 +420,14 @@ simply = {
 			var script = dom.querySelector("script");
 			txt.innerHTML = script.innerHTML;
 			script = txt.value;
+			dom.querySelector("script").remove();
 		}
-		// console.log("t,", { template });
+
+		let head = dom.querySelector("head").innerHTML;
+		let body =  dom.querySelector("body").innerHTML;
+		txt.innerHTML = head + body;
+		template = txt.value;
+
 		return {
 			template,
 			style,
@@ -466,7 +442,7 @@ simply = {
 
 		// convert to object
 		propsFromTemplate = Function("return " + propsFromTemplate)()
-		propsFromTemplate = customStringify(propsFromTemplate)
+		propsFromTemplate = simply.customStringify(propsFromTemplate)
 
 		propsFromTemplate = JSON.parse(propsFromTemplate);
 		return propsFromTemplate;
@@ -497,6 +473,7 @@ simply = {
 				type = "string";
 				value = contentString;
 			}
+
 			return {
 				"type": type,
 				"value": value
@@ -587,72 +564,66 @@ simply = {
 					// Always call super first in constructor
 					super();
 
+					function runGetsReturnClass(scr) {
+						var gets = "";
+						// class ile üst tarafı (getler) ayıralım
+						if (scr.indexOf("class {") > -1) {
+							var scriptParts = scr.split("class {");
+							gets = scriptParts[0];
+							var clss = "class {" + scriptParts[1];
+						}
+						else {
+							gets = clss;
+						}
+
+						var m;
+						var importRegex = /^\s*get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
+						while ((m = importRegex.exec(gets)) !== null) {
+							// This is necessary to avoid infinite loops with zero-width matches
+							var component = this;
+							eval(m[0]);
+							// pass param with eval
+							// window.eval.call(window, '(function (component) {' + m[0].replace(")", ", component )") + '})')(component);
+						}
+						return clss;
+					}					
+
+					if (this.querySelector("template[simply]")) {
+						let t = this.querySelector("template[simply]");
+						let tParts = simply.splitComponent(t.innerHTML);
+						console.log(tParts);
+						console.log(runGetsReturnClass(tParts.script));
+						// let inlineTemplate = this.querySelector("template[simply]");
+						// let scr = templateContent.querySelector("script");
+						// console.log(scr);
+						// templateContent = templateContent.replace(/\<template([^<>}]*)simply([^<>]*)>(\s+)?<!--/, "");
+						// templateContent = templateContent.replace(/-->(\s+)?<\/template>/, "");
+						// let inlineComponent = simply.splitComponent(templateContent)
+						// console.log(name, inlineComponent);
+					}
+
 					if (script !== "") {
-
-						function splitGetsAndClass() {
-							var gets = "";
-							// class ile üst tarafı (getler) ayıralım
-							if (script.indexOf("class {") > -1) {
-								var scriptParts = script.split("class {");
-								gets = scriptParts[0];
-								var clss = "class {" + scriptParts[1];
-							}
-							else {
-								gets = clss;
-							}
-
-							var m;
-							var importRegex = /^\s*get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
-							while ((m = importRegex.exec(gets)) !== null) {
-								// This is necessary to avoid infinite loops with zero-width matches
-								var component = this;
-								eval(m[0]);
-								// pass param with eval
-								// window.eval.call(window, '(function (component) {' + m[0].replace(")", ", component )") + '})')(component);
-							}
-							return clss;
-						}
-						var clss = splitGetsAndClass();
-
-						// to fix console line number
-						var lines = docStr.split('<script>')[0].split("\n");
-						var lineBreaks = "";
-						for (let index = 0; index < lines.length - 2; index++) {
-							lineBreaks += "\n"
-						}
+						var clss = runGetsReturnClass(script);
+						// // to fix console line number
+						// var lines = docStr.split('<script>')[0].split("\n");
+						// var lineBreaks = "";
+						// for (let index = 0; index < lines.length - 2; index++) {
+						// 	lineBreaks += "\n"
+						// }
 
 						if (clss.trim().indexOf("class {") == 0) {
-							this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + clss.trim() + "//@ sourceURL=" + name + ".html");
-
-							if (this.querySelector("template[simply]")) {
-								if (this.getRootNode().host) {
-									let templateContent = this.innerHTML;
-									templateContent = templateContent.replace(/\<template([^<>}]*)simply([^<>]*)>(\s+)?<!--/, "");
-									templateContent = templateContent.replace(/-->(\s+)?<\/template>/, "");
-									let inlineComponent = simply.splitComponent(templateContent)
-									console.log(name, inlineComponent);
-								}
-								else {
-									// parent yok ise, request to location and parse
-									// router için burada takla atıcaz
-									console.log(name, "no parent, poor comp", document.location);
-									console.log(this.outerHTML);
-									simply.request(document.location.href, function(response) {
-										console.log(response);
-									})
-								}
-							}
+							// this.componentClass = eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + clss.trim() + "//@ sourceURL=" + name + ".html");
+							this.componentClass = eval("//" + name + "//" + name + "\n\nnew " + clss.trim() + "//@ sourceURL=" + name + ".html");
 
 							if (this.querySelector("script[prop]")) {
 								let propObjString = this.querySelector("script[prop]").innerHTML;
 								let propObj = processPropTemplate(propObjString);
 								for (var k in propObj) {
-									component.setAttribute(k, prepareAttr(propObj[k]));
+									component.setAttribute(k, simply.prepareAttr(propObj[k]));
 								}
 							}
 
 							// data, state, props, methods, lifecycle, watch
-
 							var lifecycle;
 							this.lifecycle = this.componentClass.lifecycle;
 							lifecycle = this.lifecycle;
@@ -689,8 +660,6 @@ simply = {
 
 							this.component = this;
 							this.comp = this;
-
-
 
 							// bu kısım global styles için
 							// to be continues
@@ -815,8 +784,8 @@ simply = {
 				connectedCallback() {
 					this.observeAttrChange(this, function (name, newValue) {
 						// value öncekiyle aynı değilse
-						// console.log(name, newValue, self.props[name], newValue == prepareAttr(self.props[name]));
-						if (newValue !== prepareAttr(self.props[name])) {
+						// console.log(name, newValue, self.props[name], newValue == simply.prepareAttr(self.props[name]));
+						if (newValue !== simply.prepareAttr(self.props[name])) {
 							try {
 								newValue = simply.parseProp(newValue).value;
 							} catch (e) {
@@ -852,7 +821,7 @@ simply = {
 							//console.log(name, value, old, parents);
 							if (prop) {
 								if (self.props) {
-									self.setAttribute(prop, prepareAttr(self.props[prop]));
+									self.setAttribute(prop, simply.prepareAttr(self.props[prop]));
 								}
 							}
 

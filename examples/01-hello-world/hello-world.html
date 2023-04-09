@@ -1,41 +1,50 @@
-<template>
-  <div class="hello" onclick="bcd()">
-    { data.age * (2) }
-    <p onclick="methods.asd(); event.stopPropagation();">Hello, world! My name is <slot></slot>.</p>
-    <if self.count==0>
-      <h1>hahahha {name}</h1>
-      <h1>joker misin mübarek {name}</h1>
-
-      <else>
-        asdasdasd
-    </if>
-    <if data.name=="deneme">
-      <h1>hahahha {data.name} ddd</h1>
-      <h1>joker misin mübarek {data.name} ddd</h1>
-    </if>
-  </div>
-  <if data.name=="fehmi">
-    <h1>hahahha {data.name}</h1>
-    <h1>joker misin mübarek {data.name}</h1>
+<html>
+<div class="hello" onclick="bcd()">
+  { data.age * (2) }
+  <p onclick="methods.asd(); event.stopPropagation();">Hello, world! My name is <slot></slot>.</p>
+  <if cond="self.count == 1">
+    <h1>hahahha {name}</h1>
+    <h1>joker misin mübarek {name}</h1>
   </if>
-  <each data.personalities as personality, key (index)>
-    <each data.personalities as p, key (index)>
-      <if p=="Calm">
-        <h1>hay yaşa calm</h1>
-      </if>
-      {p}
-      {data.name}
-      <each data.hobbies as hobby, key (index)>
-        <each data.hobbies as hobbie, key (index)>
-          <li>{key}:{hobbie}:{index}</li>
-        </each>
-        <li>{hobby}{key}{index}</li>
-      </each>
-    </each>
-    {key}{index}
-  </each>
 
-</template>
+  <elsif cond="self.count==2">
+    zero fucks given
+  </elsif>
+
+  <else>
+    hamdiiiiii
+  </else>
+
+  <if cond="data.name == 'deneme'">
+    <h1>hahahha {data.name} ddd</h1>
+    <h1>joker misin mübarek {data.name} ddd</h1>
+  </if>
+
+</div>
+<if cond="data.name == 'fehmi'">
+  <h1>hahahha {data.name}</h1>
+  <h1>joker misin mübarek {data.name}</h1>
+</if>
+
+<each of="data.personalities" as="personality" key="key" index="index">
+  <each of="data.personalities" as="p" key="key" index="index">
+    <if cond="p == 'Calm'">
+      <h1>hay yaşa calm</h1>
+    </if>
+    {p}
+    {data.name}
+    <each of="data.hobbies" as="hobby" key="index">
+      <each of="data.hobbies" as="hobbie" key="index">
+        <li>{key}:{hobbie}:{index}</li>
+      </each>
+      <li>{hobby}{key}{index}</li>
+    </each>
+  </each>
+  {key}{index}
+</each>
+
+</html>
+
 <style>
   p {
     background: aquamarine;
@@ -49,6 +58,7 @@
     color: "{data.color}";
   }
 </style>
+
 <script>
   class {
     data = {
@@ -61,15 +71,7 @@
         Sports: "Meeeh",
       },
       color: "blue"
-    };
-    methods = {
-      asd(e) {
-        alert("asd function called");
-        console.log(event);
-      },
-      bcd() {
-        alert("bcd")
-      }
-    };
+    }
+
   }
 </script>

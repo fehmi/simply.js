@@ -2,7 +2,7 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/lib/codemirror.min.css" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/codemirror@5.62.0/addon/fold/foldgutter.css" />
 	<header>
-		<if props.title>
+		<if cond="props.title">
 			<div class="inputContainer">
 				<input class="title" value="{ props.title}" readonly onclick="methods.titleFocus(event);"
 					oninput="methods.titleInput(event);" onchange="methods.titleRename(event);"
@@ -11,13 +11,13 @@
 			</div>
 		</if>
 		<div class="buttons">
-			<if props.download==true>
+			<if cond="props.download==true">
 				<button onclick="methods.download()">Download</button>
 			</if>
-			<if props.save==true>
+			<if cond="props.save==true">
 				<button onclick="methods.save()">Save</button>
 			</if>
-			<if props.fullscreen==true>
+			<if cond="props.fullscreen==true">
 				<button onclick="methods.fullscreenToggle()">Fullscreen</button>
 			</if>
 		</div>
@@ -26,7 +26,7 @@
 	<div id="topArea">
 		<div id="editor">
 			<ul id="file-tabs">
-				<each data.files as file>
+				<each of="data.files" as="file">
 					<li filename="{file.filename}" selected="{ file.selected }" onclick="methods.changeSelectedFile(event);">
 						<div class="inputContainer">
 							<input class="filename" value="{file.filename.replace('.html', '')}" readonly
@@ -35,12 +35,12 @@
 							<div class="ghost-input">{file.filename.replace('.html', '')}</div>
 						</div>
 						<div class="extension">.html</div>
-						<if props.crud==true>
+						<if cond="props.crud==true">
 							<div class="delete" onclick="methods.deleteFile(event)">✕</div>
 						</if>
 					</li>
 				</each>
-				<if props.crud==true>
+				<if cond="props.crud==true">
 					<li class="add" onclick="methods.addFile()">+</li>
 				</if>
 			</ul>
@@ -54,29 +54,29 @@
 			<div id="result-header">
 				Result
 			</div>
-			<if props.addressbar==true>
+			<if cond="props.addressbar==true">
 				<div id="addressbar">
 					<!-- {data.urlHistory.length} - {data.currentUrlIndex} -->
-					<button {(data.currentUrlIndex < 2) ? "disabled" : "" } onclick="methods.goBack(event);"></button>
+					<button :="(data.currentUrlIndex < 2) ? 'disabled' : ''"> onclick="methods.goBack(event);"></button>
 					<button {(data.currentUrlIndex> data.urlHistory.length - 1) ? "disabled" : ""}
 						onclick="methods.goNext(event);"></button>
 					<input type="text" value="{data.url}" id="url" onchange="methods.changeURL(event)">
 				</div>
 			</if>
 
-			<iframe id="result" name="result" {(data.resize.x || data.resize.y) ? "resizing" : "" }></iframe>
+			<iframe id="result" name="result" :="(data.resize.x || data.resize.y) ? 'resizing' : ''"></iframe>
 		</div>
 	</div>
-	<if props.console==true>
+	<if cond="props.console==true">
 		<div class="h-resizer" onmousedown="methods.resize(event)"></div>
 		<div id="console">
 			<label>CONSOLE <a onclick="methods.clearConsole(event)">Clear</a></label>
 			<div class="messages">
 				<ul>
-					<each data.console as entry>
+					<each of="data.console" as="entry">
 						<li class="{entry.method}">
 							{entry.message}
-							<if entry.file>
+							<if cond="entry.file">
 								(
 								<span class="debugLink"
 									onclick="methods.openFileGotoLine('{entry.file}', '{entry.line}','{entry.char}')">{entry.file}:{entry.line}:{entry.char}

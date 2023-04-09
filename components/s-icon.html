@@ -1,7 +1,11 @@
-<template>
-	<iconify-icon <each props as prop, key (name)>{key}="{prop}"</each>>
+<html>
+	{p = ''}
+	<each of="props" as="prop" key="key">
+	  <!-- {p += key + '="' + prop + '" ';} -->
+	</each>	
+	<iconify-icon {p}>
 	</iconify-icon>
-</template>
+</html>
 
 <style>
 	/*
