@@ -244,7 +244,7 @@ simply = {
 		}
 
 		var ht = "";
-		// console.log(bucket);
+		// console.log(bucket); 
 		// console.log(capturedLogics);
 		eval(bucket);
 		//console.timeEnd();
