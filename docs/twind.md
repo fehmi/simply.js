@@ -22,11 +22,11 @@ You can enable [Tailwind](https://tailwindcss.com/docs/utility-first) support (t
 
 When simply.js see this Twind config object in any of your components, it will automaticaly load the Twind script from CDN and will apply the config if you provide some. Here are two working examples:
 
-<repl-component id="5yu28xjvnav6kos" download="true"></repl-component>
+<repl-component id="ebaubfeijmzscnw" download="true"></repl-component>
 
 After that Twind will be global. You will be able to access all Twind features in all your components. No need to pass that config again from your other components.
 
-<repl-component id="xhzt9oaqvf7zyvr" download="true"></repl-component>
+<repl-component id="dn3bdzhhszmj8pi" download="true"></repl-component>
 
 >! If you pass another Twind config object, It will replace the first one. (Not tested)
 
@@ -108,11 +108,11 @@ Presets need to be installed and added to the presets option of the Twind config
 ## Simply.js Styles
 You may be wondering what if you want to override some style of an element which you utilized with Tailwind classes earlier in the template section of your components. So, it's easy. Just write your normal CSS to the standard style section of your component. Utility classes are good but you have the right to say last word. For example, let's just simply override the `purple` with `blue` using our `<style>` tag:
 
-<repl-component id="fxl9fftbvy2g0yk" download="true"></repl-component>
+<repl-component id="s381vvcq2kixnd7" download="true"></repl-component>
 
 And last but not least; you can go wild with the combination of simply.js variables and Tailwind utility classes easyly.
 
-<repl-component id="10h4zxdvn7yag9f" download="true"></repl-component>
+<repl-component id="s3xe8kzsf4h5sz6" download="true"></repl-component>
 
 ## Sources
 Here are some links to help you to strengthen your Tailwind muscles:

@@ -124,8 +124,8 @@ This is the way about overriding. The last word is belong to the props block (1)
 
 !> One rule: Please don't use double aposroph when writing arrays, objects and functions as props.
 
+Prop set test
+<repl-component id="5hrudnqfoxzm2rj"></repl-component>
+
+Props from Template
 <repl-component id="dteguywmqzok0z8"></repl-component>
-
-<repl-component id="sieku4gvamxy86u"></repl-component>
-
-<repl-component id="of3xucyxzahimyz"></repl-component>
