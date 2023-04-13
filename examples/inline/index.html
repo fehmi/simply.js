@@ -1,0 +1,55 @@
+<html>
+
+<head>
+  <title>simply.js - Hello World!</title>
+</head>
+
+<body>
+  <hello-world>
+    <template simply>
+      <html>
+      yes sir {data.name}
+      <second-inline>
+        <template simply>
+          <html>
+          eheheehehehe
+          <select>
+            <each of="asdasd" as="asdasddd">
+              test
+            </each>
+          </select>
+          </html>
+        </template>
+      </second-inline>
+
+      </html>
+      <style>
+        :host {
+          background-color: yellow;
+          background: "{data.color}";
+          color: yellow;
+          font-size: 38px;
+        }
+      </style>
+      <script>
+        get("second-inline.html");
+        class {
+          data = {
+            name: "fehmii",
+            test: "mest1",
+            color: "blue"
+          }
+          props = {
+            deneme: "meneme"
+          }
+        }
+      </script>
+    </template>
+  </hello-world>
+  <script src="https://root/simply/simply.min.js"></script>
+  <script>
+    
+  </script>
+</body>
+
+</html>

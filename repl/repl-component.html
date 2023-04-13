@@ -617,7 +617,6 @@
 				// index.html'deki get'leri rewrite'a gönderiyor
 				var indexContent = component.editors["index.html"].getValue();
 				var files = component.methods.getFiles("index.html", indexContent);
-				// console.log(files);
 
 				// her render'dan önce önceki blob'ları siliyor
 				if (component.blobs) {
@@ -1521,9 +1520,6 @@ SOFTWARE.';
 			}
 		}
 		lifecycle = {
-			beforeConstruct() {
-
-			},
 			afterFirstRender() {
 				window.onerror = function (error, file, line, char) {
 					data.console = [];

@@ -1,0 +1,48 @@
+<html>
+  <h1>Hello World!</h1>
+  <p>Greetings from {data.name}</p>   
+  <override-test>
+    <template simply>
+      <html>2
+        hey
+      </html>
+      <style>
+        * {  
+        	background-color: yellow; 
+          background: "{data.name}"       
+        }
+      </style>
+      <script>
+        
+        class { 
+        	data = {
+              name: "fehmi",
+              namee:"test",
+              test: "mest2",
+              inline: "ehehe"
+            }
+        }
+      </script>
+    </template>
+  </override-test>  
+</html>
+
+<style>
+  :host {
+  	text-decoration: underline;
+    color: pink;
+  }
+  h1 {
+    font-family: Arial, Helvetica;  
+  	color: blue;
+  }
+</style>
+
+<script>
+  get("override-test.html");
+  class {
+    data = {
+      name: "simply.js"
+    }
+  }
+</script>
