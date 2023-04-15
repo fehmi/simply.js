@@ -725,6 +725,10 @@
 
 					setTimeout(function () {
 						dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
+
+						var textArea = document.createElement('textarea');
+    				textArea.innerHTML = blobs["index.html"].content;
+						dom.querySelector("iframe#result").contentWindow.document.querySelector("body").setAttribute("data-content", textArea.value);
 					}, 0);
 				});
 			},
@@ -820,6 +824,7 @@
 
 			},
 			runInResult() {
+				simply.setupInlineComps(document);
 				window.addEventListener('message', (event) => {
 					if (event.data.action == "consoleEnter") {
 						eval("console.log(" + JSON.stringify(event.data.code) + ");//@ sourceURL=console");
