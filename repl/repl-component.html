@@ -29,12 +29,12 @@
 				<each of="data.files" as="file">
 					<li filename="{file.filename}" selected="{ file.selected }" onclick="methods.changeSelectedFile(event);">
 						<div class="inputContainer">
-							<input class="filename" value="{file.filename.replace('.html', '')}" readonly
+							<input class="filename" value="{file.filename}" readonly
 								onclick="methods.focusFilename(event);" oninput="methods.inputFilename(event);"
-								onchange="methods.renameFilename(event);" onblur="methods.blurFilename(event)">
-							<div class="ghost-input">{file.filename.replace('.html', '')}</div>
+								onchange="methods.renameFilename(event);" onblur="methods.blurFilename(event)" onkeydown="methods.renameIfEnter(event)">
+							<div class="ghost-input">{file.filename}</div>
 						</div>
-						<div class="extension">.html</div>
+						<!--<div class="extension">.html</div>-->
 						<if cond="props.crud==true">
 							<div class="delete" onclick="methods.deleteFile(event)">✕</div>
 						</if>
@@ -1164,6 +1164,7 @@
 				component.editors[filename].focus();
 			},
 			focusFilename(e) {
+				console.log("focus filename");
 				if (props.crud == true) {
 					var selected = e.target.parentElement.parentElement.getAttribute("selected");
 					if (selected == "true") {
@@ -1179,14 +1180,19 @@
 				ghost.innerHTML = e.target.value;
 			},
 			renameFilename(e) {
+				console.log("rename");
 				var oldName = e.target.parentElement.parentElement.getAttribute("filename");
 				var newName = e.target.value;
-				if (newName !== "" && !component.editors[newName + ".html"]) {
+
+				if (newName == oldName) {
+					e.target.blur();
+				}
+				else if (newName !== "" && !component.editors[newName]) {
 					console.log("hem boş değil hem duplicate değil");
 					for (let i = 0; i < data.files.length; i++) {
 						const file = data.files[i];
 						if (file.filename == oldName) {
-							newName += ".html";
+							//newName += ".html";
 							file.filename = newName;
 							component.editors[newName] = component.editors[oldName];
 							delete component.editors[oldName];
@@ -1202,6 +1208,12 @@
 						e.target.focus();
 						return false;
 					}
+				}
+			},
+			renameIfEnter(e) {
+				var keycode = (e.keyCode ? e.keyCode : e.which);
+				if (keycode === 13 || e.key === 'Enter') { 
+					methods.renameFilename(e);
 				}
 			},
 			blurFilename(e) {
@@ -1220,15 +1232,14 @@
 					component.editors[filename].setOption("mode", "text/x-csrc");
 					component.editors[filename].getWrapperElement().remove();
 					delete component.editors[filename];
+					delete component.files[filename];
 
-					console.time();
 					for (let i = 0; i < data.files.length; i++) {
 						const file = data.files[i];
 						if (file.filename == filename) {
 							console.log(data.files, i);
 							delete data.files[i];
 							data.files = data.files.filter(Boolean);
-							console.timeEnd();
 							filename = data.files[i - 1].filename;
 							var filenameSelector = filename.replace(/\./g, "\\.");
 							var targetFile = dom.querySelector("#files .CodeMirror[selected=true]");
@@ -1245,12 +1256,11 @@
 				} else {
 					return false;
 				}
-
-
 			},
 			addFile() {
 				var i = 1;
-				var filename = "component-" + i + ".html";
+				var filename = "component-" + i;
+				console.log(component.editors);
 				while (component.editors["component-" + i + ".html"]) {
 					i = i + 1;
 				}
@@ -1265,7 +1275,6 @@
 				fileTabs.scrollLeft = fileTabs.scrollWidth;
 
 				var template = "<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>";
-
 				var target = dom.querySelector("ul#files");
 				component.methods.createNewCodemirror(filename, true, target, template);
 
@@ -1277,8 +1286,8 @@
 				}
 				setTimeout(() => {
 					var filenameInput = dom.querySelector("li[filename=" + filename.replace(/\./g, "\\.") + "] input");
+					
 					filenameInput.click();
-
 					filenameInput.setSelectionRange(0, filenameInput.value.length);
 				}, 0);
 
