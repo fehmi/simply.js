@@ -3,14 +3,6 @@ simply = {
 	parseTemplate: function (parsingArgs) {
 		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
 
-		/* old staff
-		let ifStatement = /\<if(\s)(.*)(\>$)/;
-		let elseIfStatement = /\<else(\s)if(\s)(.*)(\/)?\>$/;
-		let endIfStatement = /\<\/if\>$/;
-		let elseStatement = /\<else\>$/;
-		let eachStatement = /\<each(\s)(.*)\s+as\s+([a-zA-Z._]+)(\s+)?(,(\s+)?)?([a-zA-Z._]+)?(\s+)?(\()?(\s+)?([a-zA-Z._]+(\s+)?)?(\))?\>$/;
-		let endEachStatement = /\<\/each\>$/;
-		*/
 		let simplyTemplate = /\<template([^<>]*)simply([^<>]*)>$/;
 
 		// condititionals
