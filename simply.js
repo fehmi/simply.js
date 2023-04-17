@@ -361,7 +361,7 @@ simply = {
 					if (r.test(settings.script)) {
 						if (!window.twind) {
 							// console.log("yes, load twind for: ", settings);
-							simply.loadJS("https://simply.js.org/style/twind.min.js", function () {
+							simply.loadJS("style/twind.min.js", function () {
 								// console.log("loaded twind for: ", settings);
 								simply.registerComponent(settings);
 							});

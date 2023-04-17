@@ -1,0 +1,67 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hello World Example - simply</title>
+</head>
+
+<body>
+  <custom-meter></custom-meter>
+
+  <div class="stack btn" >
+    <div ma>
+      <div class="custom-shortcut custom-rule text-5xl fw100 animate-bounce-alt animate-count-infinite animate-duration-1s">
+        UnoCSS
+      </div>
+      <div class="custom-shortcut custom-rule">
+        The instant on-demand Atomic CSS engine.
+      </div>
+      <div m2 flex justify-center text-2xl op30 hover="op80">
+        <a
+          i-carbon-logo-github
+          text-inherit
+          href="https://github.com/unocss/unocss"
+          target="_blank"
+        ></a>
+      </div>
+    </div>
+  </div>
+  <div absolute bottom-5 right-0 left-0 text-center op30 fw300>
+    on-demand · instant · fully customizable
+  </div>
+
+  <hello-world></hello-world>
+
+  <script>
+    window.__unocss = {
+      shortcuts: [
+        // you could still have object style
+        {
+          btn: 'py-2 px-4 font-semibold rounded-lg shadow-md',
+        },
+      ],
+      rules: [
+        ['stack', {
+          color: 'green',
+          display: 'flex',
+          'flex-direction': 'column',
+        }],
+        ['line', {
+          display: 'flex',
+          'flex-direction': 'row',
+          'flex-wrap': 'nowrap',
+          'overflow-x': 'auto',
+        }],
+      ],
+    }
+  </script> 
+  <script src="https://cdn.jsdelivr.net/npm/@unocss/runtime/uno.global.js"></script>  
+
+  <script src="../../simply.js"></script>
+
+  <script>
+    get("hello-world.html");
+  </script>
+</body>
+
+</html>
