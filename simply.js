@@ -305,6 +305,34 @@ simply = {
 			}
 		}
 	},
+	getObject: function (string, name) {
+		var open = /uno(\s+)?\=(\s+)?{$/;
+		var bucket = "";
+		var capture = "";
+		var captureFlag = false;
+		count = 0;
+		for (var i = 0; i < string.length; i++) {
+			bucket += string[i];
+
+			if (open.test(bucket)) {
+				captureFlag = true;
+				count += 1;
+			}
+			else if (captureFlag && string[i] == "{") {
+				count += 1;
+			}
+			else if (captureFlag && string[i] == "}") {
+				count -= 1;
+			}
+			
+			if (captureFlag) {
+				capture += string[i];
+				if (count == 0) {
+					return capture;
+				}				
+			}
+		}
+	},
 	loadJS: function (src, cb, waitBeforeCb) {
 		/*! loadJS: load a JS file asynchronously. [c]2014 @scottjehl, Filament Group, Inc. (Based on http://goo.gl/REQGQ by Paul Irish). Licensed MIT */
 		if (document.querySelectorAll('[src="' + src + '"]').length > 0) {
@@ -347,30 +375,17 @@ simply = {
 		// multi
 		if (Array.isArray(path)) {
 			for (let i = 0; i < path.length; i++) {
-				addTwindAndContinue(path[i])
+				addUnoAndContinue(path[i])
 			}
 		}
 		// single
 		else {
-			addTwindAndContinue(path)
+			addUnoAndContinue(path)
 		}
-		function addTwindAndContinue(p) {
+		function addUnoAndContinue(p) {
 			simply.loadComponent(p, name, function (component) {
 				simply.getSettings(component, function (settings) {
-					let r = /class(\s+)?\{(.*)(?<twind>twind(\s+)?\=(\s+)?\{)/gms;
-					if (r.test(settings.script)) {
-						if (!window.twind) {
-							// console.log("yes, load twind for: ", settings);
-							simply.loadJS("style/twind.min.js", function () {
-								// console.log("loaded twind for: ", settings);
-								simply.registerComponent(settings);
-							});
-						}
-					}
-					else {
-						// console.log("no twind for you: ", settings);
-						simply.registerComponent(settings);
-					}
+					simply.registerComponent(settings);
 				})
 			});
 		}
@@ -631,6 +646,17 @@ simply = {
 				// for (let index = 0; index < lines.length - 2; index++) {
 				// 	lineBreaks += "\n"
 				// }			
+
+				// uno options'ı alıp string halinde 
+				// global bi değişkene yazıyoruz, çünkü
+				// uno.min.js henüz piyasada yok
+				// presets fonksyionları hata fırlatıyor
+				if (/uno(\s+)?\=(\s+)?{/.test(clss)) {
+					var uno = simply.getObject(clss, "uno");
+					clss = clss.replace(uno, "{}");
+					window.unoConfig = uno;
+				}
+
 				return "//" + compName + "//" + compName + "\n\nnew " + clss.trim() + "//@ sourceURL=" + compName + ".html";
 			}
 		} catch (error) {
@@ -646,6 +672,7 @@ simply = {
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
 					this.sfcClass = sfcClass ? sfcClass : {};
 					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
+					console.log(sfcClass);
 
 					// inline class varsa sfc class ile merge
 					if (this.querySelector("template[simply]")) {
@@ -712,15 +739,8 @@ simply = {
 					}
 
 					// tailwind instance setup
-					if (window.twind) {
-						if (this.sfcClass.twind) {
-							window.twindConfig = this.sfcClass.twind;
-						}
-
-						var twindSheet = window.cssom(new CSSStyleSheet());
-						var tw = window.twind(window.twindConfig, twindSheet);
-						this.twindSheet = twindSheet;
-						this.tw = tw;
+					if (this.sfcClass.uno) {
+						this.uno = this.sfcClass.uno;
 					}
 
 					// anadan babadan gelen state varsa
@@ -925,8 +945,7 @@ simply = {
 
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var parsedStyle = simply.parseStyle(parsingArgs);
-						parsedTemplate = parsedTemplate + "<style tw></style>" + "<style simply>" + parsedStyle.style + "</style><style simply-vars></style>";
-
+						parsedTemplate = parsedTemplate + "<style uno></style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
@@ -935,41 +954,47 @@ simply = {
 								}
 							}
 						}
-
 						this.dom.innerHTML = parsedTemplate;
 						simply.setupInlineComps(this.dom, docStr, template);
 
-						if (this.tw) {
-							// https://gourav.io/blog/tailwind-in-shadow-dom
-							window.observe(this.tw, this.dom);
-
+						if (window.unoConfig) {
+							this.component.setAttribute("hoak", true);
 							var classObserver;
-							var handleTwStyle = function (twindSheet, tw, dom) {
+							var handleUnoClasses = function (dom) {
 								try {
 									classObserver.disconnect();
 								} catch (error) {
-
+									console.log("erol");
 								}
-								var cssRules = twindSheet.target.cssRules;
-								var twRules = "";
-								for (var i = 0; i < cssRules.length; i++) {
-									twRules += cssRules[i].cssText;
+
+								if (!window.unoConfig.generate) {
+									window.unoConfig = createGenerator(eval("window.unoConfig="+window.unoConfig));
 								}
-								self.dom.querySelector("style[tw]").innerHTML = twRules;
+								
+								window.unoConfig.generate(dom.innerHTML).then(function (result) {
+									self.dom.querySelector("style[uno]").innerHTML = result.css;
 
-								classObserver = new MutationObserver(function (mutations) {
-									handleTwStyle(self.twindSheet, self.tw, self.dom);
+									classObserver = new MutationObserver(function (mutations) {
+										handleUnoClasses(self.dom);
+									});
+	
+									classObserver.observe(dom, {
+										attributes: true,
+										attributeFilter: ['class'],
+										childList: true,
+										subtree: true,
+										attributeOldValue: true
+									});									
 								});
+							}							
 
-								classObserver.observe(dom, {
-									attributes: true,
-									attributeFilter: ['class'],
-									childList: true,
-									subtree: true,
-									attributeOldValue: true
-								});
-							}
-							handleTwStyle(this.twindSheet, this.tw, this.dom);
+							simply.loadJS("https://root/simply/style/uno.min.js", function () {
+								handleUnoClasses(self.dom);
+								self.component.removeAttribute("hoak");
+							}, "createGenerator")								
+
+							// https://gourav.io/blog/tailwind-in-shadow-dom
+							// window.observe(this.tw, this.dom);
 						}
 
 						try {
@@ -1004,7 +1029,7 @@ simply = {
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var parsedStyle = simply.parseStyle(parsingArgs);
 
-						newDom.innerHTML = parsedTemplate + "<style tw></style>" + "<style simply></style><style simply-vars></style>";
+						newDom.innerHTML = parsedTemplate + "<style uno></style>" + "<style simply></style><style simply-vars></style>";
 
 						//childrenOnly: true,
 						simply.morphdom(this.dom, newDom, {
