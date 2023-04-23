@@ -9,6 +9,7 @@
   - [Template](docs/template.md)
   - [Style](docs/style.md)
   - [Script](docs/script.md)
+  - [Inline Components](docs/inline-components.md)  
 
 - <br>Template Engine
 
@@ -29,6 +30,10 @@
   - [State Management](docs/state.md)
   - [Load CSS/JS](docs/loadCSSJS.md)
 
+- <br>Style
+	- [Tailwind](docs/uno.md)
+  - [Design Tokens](docs/design-tokens.md)
+
 - <br>Router
 
   - [Router](docs/router.md)
@@ -42,8 +47,6 @@
 - <br>Integrations
 
   - [Electron](docs/electron.md)
-	- [Tailwind](docs/twind.md)
-	- [Flowbite](docs/flowbite.md)
   - [Flow](docs/flow.md)
   - [Nativescript](docs/nativescript.md)
   - [IPFS](docs/ipfs.md)

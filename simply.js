@@ -324,12 +324,12 @@ simply = {
 			else if (captureFlag && string[i] == "}") {
 				count -= 1;
 			}
-			
+
 			if (captureFlag) {
 				capture += string[i];
 				if (count == 0) {
 					return capture;
-				}				
+				}
 			}
 		}
 	},
@@ -435,7 +435,7 @@ simply = {
 						callback({
 							name,
 							template: parsed.template,
-							style: parsed.style,
+							styles: parsed.styles,
 							script: parsed.script,
 							docStr
 						});
@@ -467,19 +467,24 @@ simply = {
 		request.send();
 	},
 	splitComponent: function (string) {
-		// console.log({ string });
 		var txt = document.createElement("textarea");
 		var parser = new DOMParser();
 		var dom = parser.parseFromString(string, "text/html");
 		var template;
-
-		var style = "";
+		var styles = {};
 		if (dom.querySelector("style")) {
-			style = dom.querySelector("style");
-			txt.innerHTML = style.innerHTML;
-			style = txt.value;
-			dom.querySelector("style").remove();
-			string = string.replace(txt.value, "");
+			dom.querySelectorAll("style").forEach(styleEl => {
+				txt.innerHTML = styleEl.innerHTML;
+				style = txt.value;
+				string = string.replace(txt.value, "");
+				if (styleEl.getAttribute("global") !== null) {
+					styles["global"] = style;
+				}
+				else {
+					styles["local"] = style;
+				}
+				styleEl.remove();
+			});
 		}
 
 		var script = "";
@@ -490,17 +495,16 @@ simply = {
 			dom.querySelector("script").remove();
 			string = string.replace(txt.value, "");
 		}
-
-		template = string.replace("<style></style>", "").replace("<script></script>", "");
+		template = string.replace("<style></style>", "").replace("<style global></style>", "").replace("<script></script>", "");
 
 		return {
 			template,
-			style,
+			styles,
 			script
 		}
 	},
 	processPropTemplate: function (string) {
-		// clean up
+		// clean up  
 		var propsFromTemplate = string;
 		propsFromTemplate = propsFromTemplate.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
 		propsFromTemplate = propsFromTemplate.replace(/(?:\r\n|\r|\n)/g, ' ');
@@ -591,7 +595,7 @@ simply = {
 			}
 		});
 	},
-	getSettings: function ({ name, template, style, script, docStr }, callback) {
+	getSettings: function ({ name, template, styles, script, docStr }, callback) {
 		//const jsFile = new Blob([script.textContent], { type: 'application/javascript' });
 		//const jsURL = URL.createObjectURL(jsFile);
 		function getListeners(settings) {
@@ -615,7 +619,7 @@ simply = {
 			name: name, //module.default.name,
 			//      listeners,
 			template,
-			style,
+			styles,
 			script,
 			docStr
 			//settings
@@ -624,11 +628,13 @@ simply = {
 	},
 	runGetsReturnClass: function (scr, compName) {
 		var gets;
+		var classRegex = /class(\s+simply)?(\s+)?{/;
+		var classLine = classRegex.exec(scr);
 
-		if (scr.indexOf("class {") > -1) {
-			var scriptParts = scr.split("class {");
+		if (classLine) {
+			var scriptParts = scr.split(classLine[0]);
 			gets = scriptParts[0];
-			var clss = "class {" + scriptParts[1];
+			var clss = classLine[0] + scriptParts[1];
 		}
 		else {
 			gets = scr;
@@ -639,7 +645,7 @@ simply = {
 			eval(m[0]);
 		}
 		try {
-			if (clss.trim().indexOf("class {") == 0) {
+			if (clss.trim().indexOf(classLine[0]) == 0) {
 				// to fix console line number
 				// var lines = docStr.split('<script>')[0].split("\n");
 				// var lineBreaks = "";
@@ -663,7 +669,7 @@ simply = {
 			return false;
 		}
 	},
-	registerComponent: function ({ template, style, name, script, docStr, noFile }) {
+	registerComponent: function ({ template, styles, name, script, docStr, noFile }) {
 		if (!customElements.get(name)) {
 			class simplyComponent extends HTMLElement {
 				constructor() {
@@ -743,10 +749,17 @@ simply = {
 						this.uno = this.sfcClass.uno;
 					}
 
+					if (styles.global) {
+						this.globalStyle = styles.global;
+					}
+
 					// anadan babadan gelen state varsa
 					if (parent) {
 						if (typeof parent.state !== "undefined") {
 							this.state = parent.state;
+						}
+						if (typeof parent.globalStyle !== "undefined") {
+							this.globalStyle = parent.globalStyle;
 						}
 					}
 
@@ -915,19 +928,19 @@ simply = {
 						}
 
 						if (styleMethod == "replace" || noFile) {
-							style = this.inlineComp.style;
+							styles.local = this.inlineComp.styles.local;
 						}
 						else if (styleMethod == "prepend") {
-							style = this.inlineComp.style + style;
+							styles.local = this.inlineComp.styles.local + styles.local;
 						}
 						else {
-							style += this.inlineComp.style;
+							styles.local += this.inlineComp.styles.local;
 						}
 					}
 
 					let parsingArgs = {
 						template,
-						style,
+						style: styles.local,
 						data: this.data,
 						state: this.state,
 						parent: this.parent,
@@ -940,12 +953,29 @@ simply = {
 						watch: this.watch
 					}
 
+					if (this.globalStyle) {
+						var parsedGlobalStyle = simply.parseStyle({
+							template,
+							style: this.globalStyle,
+							data: this.data,
+							state: this.state,
+							parent: this.parent,
+							methods: this.methods,
+							props: this.props,
+							component: this.component,
+							dom: this.dom,
+							methods: this.methods,
+							lifecycle: this.lifecycle,
+							watch: this.watch
+						});
+						console.log(parsedGlobalStyle);
+					}
+
 					if (!this.rendered) {
 						var self = this;
-
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var parsedStyle = simply.parseStyle(parsingArgs);
-						parsedTemplate = parsedTemplate + "<style uno></style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
+						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
@@ -958,7 +988,7 @@ simply = {
 						simply.setupInlineComps(this.dom, docStr, template);
 
 						if (window.unoConfig) {
-							this.component.setAttribute("hoak", true);
+							//this.component.setAttribute("hoak", true);
 							var classObserver;
 							var handleUnoClasses = function (dom) {
 								try {
@@ -966,33 +996,28 @@ simply = {
 								} catch (error) {
 									console.log("erol");
 								}
-
+								// bi kere kafi
 								if (!window.unoConfig.generate) {
-									window.unoConfig = createGenerator(eval("window.unoConfig="+window.unoConfig));
+									window.unoConfig = createGenerator(eval("window.unoConfig=" + window.unoConfig));
 								}
-								
 								window.unoConfig.generate(dom.innerHTML).then(function (result) {
 									self.dom.querySelector("style[uno]").innerHTML = result.css;
 
 									classObserver = new MutationObserver(function (mutations) {
 										handleUnoClasses(self.dom);
 									});
-	
+
 									classObserver.observe(dom, {
 										attributes: true,
 										attributeFilter: ['class'],
 										childList: true,
 										subtree: true,
 										attributeOldValue: true
-									});									
+									});
 								});
-							}							
-
-							simply.loadJS("https://root/simply/style/uno.min.js", function () {
-								handleUnoClasses(self.dom);
-								self.component.removeAttribute("hoak");
-							}, "createGenerator")								
-
+							}
+							handleUnoClasses(self.dom);
+							//this.component.removeAttribute("hoak");
 							// https://gourav.io/blog/tailwind-in-shadow-dom
 							// window.observe(this.tw, this.dom);
 						}
@@ -1000,11 +1025,20 @@ simply = {
 						try {
 							this.sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
 							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
+
 							var vars = ":host {";
+							if (parsedGlobalStyle) {
+								for (var key in parsedGlobalStyle.vars) {
+									if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue;
+									vars += key + ":" + parsedGlobalStyle.vars[key] + ";";
+								}
+							}
+
 							for (var key in parsedStyle.vars) {
 								if (!parsedStyle.vars.hasOwnProperty(key)) continue;
 								vars += key + ":" + parsedStyle.vars[key] + ";";
 							}
+
 							this.sheet.insertRule(vars + "}", 0);
 						} catch (error) { }
 
@@ -1029,7 +1063,7 @@ simply = {
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var parsedStyle = simply.parseStyle(parsingArgs);
 
-						newDom.innerHTML = parsedTemplate + "<style uno></style>" + "<style simply></style><style simply-vars></style>";
+						newDom.innerHTML = parsedTemplate + "<style uno></style><style global></style>" + "<style simply></style><style simply-vars></style>";
 
 						//childrenOnly: true,
 						simply.morphdom(this.dom, newDom, {
@@ -1068,11 +1102,37 @@ simply = {
 								//console.log(toEl.tagName);
 							}
 						});
+
+						if (this.globalStyle) {
+							var parsedGlobalStyle = simply.parseStyle({
+								template,
+								style: this.globalStyle,
+								data: this.data,
+								state: this.state,
+								parent: this.parent,
+								methods: this.methods,
+								props: this.props,
+								component: this.component,
+								dom: this.dom,
+								methods: this.methods,
+								lifecycle: this.lifecycle,
+								watch: this.watch
+							});
+						}
+
+
+						console.log("heyt after parse:", name, parsedGlobalStyle);
+						if (parsedGlobalStyle) {
+							for (var key in parsedGlobalStyle.vars) {
+								if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue; 
+								this.sheet.cssRules[0].style.setProperty(key, parsedGlobalStyle.vars[key]);
+							}
+						}
+						// test
+						console.log("heyy", parsedStyle.vars);
 						for (var key in parsedStyle.vars) {
 							if (!parsedStyle.vars.hasOwnProperty(key)) continue;
 							this.sheet.cssRules[0].style.setProperty(key, parsedStyle.vars[key]);
-							//console.log(this.dom.getRootNode().querySelector("style[simply-vars]").sheet.cssRules[0]);
-							//this.dom.getRootNode().querySelector("style[simply-vars]").sheet.insertRule(":host {" + key + ":" + parsedStyle.vars[key] + ";}", 0);
 						}
 
 						if (typeof this.lifecycle !== "undefined") {
@@ -4024,19 +4084,20 @@ simply = {
 				if (!docStr) {
 					// for REPL
 					if (window.name == "result") {
-						tempContent = dom.querySelector("body").getAttribute("data-content");
+						tempContent = window.frameElement.contentWindow.dataContent;
 						string = tempContent;
-						var match = tempContent.match(regex);
+						console.log({ tempContent });
+						//var match = tempContent.match(regex);
 					}
 					// normal
 					else {
 						tempContent = dom.querySelector("body").innerHTML;
-						var match = tempContent.match(regex);
+						//var match = tempContent.match(regex);
 					}
 				}
 				// from inside a template
 				else {
-					var match = docStr.match(regex);
+					//var match = docStr.match(regex);
 					tempContent = docStr;
 					string = docStr;
 				}
@@ -4052,15 +4113,19 @@ simply = {
 				// or is it registered already
 				if (!check && !customElements.get(tag.toLowerCase())) {
 					console.log("get yok ya da register edilmemiş", tag);
+					// hee 
 					// for root (index.html etc)
 					// get raw content because innerhtml broke some simply tags
 					// for ex each or if in <select> tag
 					if (!string) {
+						debugger;
 						var request = new XMLHttpRequest();
+						console.log(window.document.location.href);
 						request.open('GET', window.document.location.href, false);
 						request.onload = function () {
 							if (this.status >= 200 && this.status < 400) {
 								string = this.responseText;
+								console.log({ string });
 							}
 						};
 						request.send();
@@ -4077,7 +4142,7 @@ simply = {
 					simply.registerComponent({
 						name: tag, //module.default.name,
 						template: parsed.template,
-						style: parsed.style,
+						styles: parsed.styles,
 						script: parsed.script,
 						docStr: string,
 						noFile: true

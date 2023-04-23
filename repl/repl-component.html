@@ -50,7 +50,7 @@
 		</ul>
 	</div>
 	<div class="v-resizer" onmousedown="methods.resize(event)"></div>
-	<div id="result">
+	<div id="result" status="{data.resultStatus}">
 		<div id="result-header">
 			Result
 		</div>
@@ -162,6 +162,57 @@
 		border-left: 2px solid #dddddd;
 		box-sizing: border-box;
 		flex: 1;
+	}
+
+	#result-header {
+		position: relative;
+	}
+
+	#result-header:after {
+		content: "";
+		display: block;
+		opacity: 0;
+		position: absolute;
+		width: 100%;
+		height: 4px;
+		left: 0;
+    background: linear-gradient(45deg, rgba(255, 0, 89, 1) 0%, rgba(0, 179, 255, 1) 33%, rgba(255, 0, 89, 1) 66%, rgba(0, 179, 255, 1) 100%);
+    background-size: 400% 400%;
+    -webkit-animation: errorBg 1s linear infinite;
+    -moz-animation: errorBg 1s linear infinite;
+    animation: errorBg 1s linear infinite;
+		transition: all ease 250ms;
+	}
+
+	@-webkit-keyframes errorBg {
+    0% {
+        background-position: 100% 0%
+    }
+    100% {
+        background-position: 15% 100%
+    }
+}
+
+@-moz-keyframes errorBg {
+    0% {
+        background-position: 100% 0%
+    }
+    100% {
+        background-position: 15% 100%
+    }
+}
+
+@keyframes errorBg {
+    0% {
+        background-position: 100% 0%
+    }
+    100% {
+        background-position: 15% 100%
+    }
+}
+
+	#result[status=loading] #result-header:after {
+		opacity: 1;
 	}
 
 	.v-resizer {
@@ -607,6 +658,7 @@
 			},
 			editorWidth: "65%",
 			topAreaHeight: "120px",
+			resultStatus: "init",
 			URLShortening: {
 				short: "https://typop.net/short/shorten/",
 				redirect: "https://typop.net/short/redirect/?url="
@@ -637,7 +689,6 @@
 					for (const filename in file) {
 						if (blobs[filename] == undefined) {
 							var newContent = file["content"];
-							console.log(newContent);
 							var m;
 							var regex = /(?<!\/\/(\s+)?)get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm;
 							var cssImport = /@import\s+(\"|\')(.*)(\"|\');/gm;
@@ -746,7 +797,6 @@
 								blobUrl: blobUrl,
 								content: newContent
 							};
-							console.log(blobs);
 						}
 					}
 				}
@@ -766,11 +816,12 @@
 					data.console = [];
 
 					setTimeout(function () {
-						dom.querySelector("iframe#result").contentWindow.document.write(blobs["index.html"].content);
-
 						var textArea = document.createElement('textarea');
 						textArea.innerHTML = blobs["index.html"].content;
-						dom.querySelector("iframe#result").contentWindow.document.querySelector("body").setAttribute("data-content", textArea.value);
+						dom.querySelector("iframe#result").contentWindow.dataContent = textArea.value;
+						dom.querySelector("iframe#result").contentWindow.document.write(textArea.value);
+						//dom.querySelector("iframe#result").contentWindow.document.querySelector("body").setAttribute("data-content", textArea.value);
+						data.resultStatus = "loaded";
 					}, 0);
 				});
 			},
@@ -1276,7 +1327,7 @@
 							}
 							else if (newName.substring(newName.length - ".html".length) == ".html") {
 								component.editors[newName].setOption("mode", "htmlmixed");
-								component.editors[newName].setValue('<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>');
+								component.editors[newName].setValue('<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass simply \{\n\n\}\n<\/script>');
 							}
 							else if (newName.substring(newName.length - ".js".length) == ".js") {
 								component.editors[newName].setOption("mode", "javascript");
@@ -1359,7 +1410,7 @@
 				var fileTabs = dom.querySelector("#file-tabs");
 				fileTabs.scrollLeft = fileTabs.scrollWidth;
 
-				var template = "<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass \{\n\n\}\n<\/script>";
+				var template = "<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass simply \{\n\n\}\n<\/script>";
 				var target = dom.querySelector("ul#files");
 				component.methods.createNewCodemirror(filename, true, target, template);
 
@@ -1388,7 +1439,7 @@
 				}
 				else {
 					mode = "htmlmixed";
-				}				
+				}
 				return mode;
 			},
 			createNewCodemirror(filename, selected, targetEl, text) {
@@ -1414,12 +1465,14 @@
 				});
 				var render;
 				component.editors[filename].on("changes", function (a, b, c, d) {
+					data.resultStatus = "loading";
 					try {
 						clearTimeout(render);
 					} catch (error) { }
 
 					render = setTimeout(function () {
 						component.methods.renderResult();
+
 					}, 1000); // How long do you want the delay to be (in milliseconds)?
 				});
 
