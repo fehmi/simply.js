@@ -1,4 +1,11 @@
+
+
 # About
+<p>
+<img src="https://img.shields.io/badge/License-MIT-green">
+<img src="https://img.shields.io/badge/Gzipped-20KB-green">
+<img src="https://img.shields.io/github/commit-activity/m/fehmi/simply.js?label=Commits">
+</p>
 
 ## What is simply.js
 
