@@ -372,6 +372,7 @@ simply = {
 		return script;
 	},
 	get: function (path, name) {
+		console.log("get", path, name);
 		// multi
 		if (Array.isArray(path)) {
 			for (let i = 0; i < path.length; i++) {
@@ -678,7 +679,6 @@ simply = {
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
 					this.sfcClass = sfcClass ? sfcClass : {};
 					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
-					console.log(sfcClass);
 
 					// inline class varsa sfc class ile merge
 					if (this.querySelector("template[simply]")) {
@@ -822,6 +822,7 @@ simply = {
 					return observer;
 				}
 				connectedCallback() {
+					console.log("cc", name);
 					this.observeAttrChange(this, function (name, newValue) {
 						// value öncekiyle aynı değilse
 						// console.log(name, newValue, self.props[name], newValue == simply.prepareAttr(self.props[name]));
@@ -1120,8 +1121,6 @@ simply = {
 							});
 						}
 
-
-						console.log("heyt after parse:", name, parsedGlobalStyle);
 						if (parsedGlobalStyle) {
 							for (var key in parsedGlobalStyle.vars) {
 								if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue; 
@@ -1129,7 +1128,6 @@ simply = {
 							}
 						}
 						// test
-						console.log("heyy", parsedStyle.vars);
 						for (var key in parsedStyle.vars) {
 							if (!parsedStyle.vars.hasOwnProperty(key)) continue;
 							this.sheet.cssRules[0].style.setProperty(key, parsedStyle.vars[key]);

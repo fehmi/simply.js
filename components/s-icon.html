@@ -27,14 +27,14 @@
 	 *
 	 * @csspart bar - Styles the color of b
 	 *
-	 * @slot - This is a default/unnamed slot
-	 * @slot container - You can put some elements here
-	 *
 	 * @cssprop --text-color - Controls the color of f
 	 * @cssproperty [--background-color=red] - Controls the color of bar
 	 *
-	 * @prop {boolean} prop123 - some description
-	 * @property {number} prop2 - some description
+ 	 * @property {string} icon - Icon code
+ 	 * @property {string} flip - Horizontal / Vertical
+	 * @property {number} height - Height of the icon
+ 	 * @property {string} rotate - Degree 
+ 	 * @property {boolean} inline - Vertical alignment
 	 *
 	 * @fires custom-event - some description for custom-event
 	 * @fires {Event} typed-event - some description for typed-event
@@ -47,6 +47,13 @@
 	*/
 	class {
 		data = {}
+		props = {
+			"icon": "cil:locomotive",
+			"height": 64,
+			"flip": "",
+			"rotate": "",
+			"inline": false
+		}
 		lifecycle = {
 			beforeConstruct: function () {
 				// let iconifyURL = "https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js";

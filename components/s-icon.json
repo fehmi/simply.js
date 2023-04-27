@@ -27,31 +27,45 @@
                             "name": "bar"
                         }
                     ],
-                    "slots": [
-                        {
-                            "description": "This is a default\/unnamed slot",
-                            "name": ""
-                        },
-                        {
-                            "description": "You can put some elements here",
-                            "name": "container"
-                        }
-                    ],
                     "members": [
                         {
                             "type": {
-                                "text": "boolean"
+                                "text": "string"
                             },
-                            "description": "some description",
-                            "name": "prop123",
+                            "description": "Icon code",
+                            "name": "icon",
+                            "kind": "field"
+                        },
+                        {
+                            "type": {
+                                "text": "string"
+                            },
+                            "description": "Horizontal \/ Vertical",
+                            "name": "flip",
                             "kind": "field"
                         },
                         {
                             "type": {
                                 "text": "number"
                             },
-                            "description": "some description",
-                            "name": "prop2",
+                            "description": "Height of the icon",
+                            "name": "height",
+                            "kind": "field"
+                        },
+                        {
+                            "type": {
+                                "text": "string"
+                            },
+                            "description": "Degree",
+                            "name": "rotate",
+                            "kind": "field"
+                        },
+                        {
+                            "type": {
+                                "text": "boolean"
+                            },
+                            "description": "Vertical alignment",
+                            "name": "inline",
                             "kind": "field"
                         }
                     ],
