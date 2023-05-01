@@ -1,45 +1,20 @@
 # Style
 
-Encapsulated style definitions only affect the elements inside the template tag of the component. But there is one exception. The inherited styles of the document can affect all child components. For example, when you define `color` property of `body` as `red` in the document then texts of all components inside the document will be `red` if you don't define otherwise inside the style tag of a component.
+Encapsulated style definitions only affect the elements inside the template tag of the component. But there is one exception. The inherited styles of the document can affect all child components. For example, when you define `color` property of `body` as `red` in the root document (index.html), then texts of all components inside the document will be `red` if you don't define otherwise inside the style tag of a component. Here is an example about it:
+
+<repl-component id="56ezen3ypsn2w7v" download="true"></repl-component>
 
 ### Styling Component Container
 
 When you want to style the component itself inside the component you can use `:host` selector. Also you can define your CSS variables in it.
 
-```html
-<style>
-  :host {
-    --my-blue: lightblue;
-    border: 2px solid cyan;
-  }
-</style>
-```
+<repl-component id="bzr1zokh1i7udmw" download="true"></repl-component>
 
 ### Link a CSS file
 
-You can link a CSS file inside the template tag of the component like this.
+You can link a CSS file inside the template tag of the component like this. Because there are CSS variables in :host{} part of the external CSS file you imported, they will be all available in the current component and all its childs. It's a good approach to maintain your design tokens. 
 
-```html
-<template>
-  <link rel="stylesheet" href="mystyle.css">
-  <div>Test</div>
-</template>
-```
-
-### Import a CSS file
-
-An other option to add a CSS file to the component is `@import`. It brings a style sheet into a component like this.
-
-?> Be sure to use import statement at the top of your style tag. Otherwise it doesn't work.
-
-```html
-<style>
-  @import "styleguide.css";
-  p {
-    color: coral;
-  }
-</style>
-```
+<repl-component id="xugiyk48m90e56s" download="true"></repl-component>
 
 ### JavaScript Variables
 
@@ -47,4 +22,8 @@ The best thing about styling is you can use reactive JS variables in style tag. 
 
 ?> Just don't forget to write variable name between apostrophes like `"{data.color}"`
 
-<repl-component id="Q" download="true"></repl-component>
+<repl-component id="udiuc37epe5li8u" download="true"></repl-component>
+
+### Tailwind
+You also have the ability to use Tailwind magic in your components. See more at [Style section](tailwind.md)
+

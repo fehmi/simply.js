@@ -372,7 +372,6 @@ simply = {
 		return script;
 	},
 	get: function (path, name) {
-		console.log("get", path, name);
 		// multi
 		if (Array.isArray(path)) {
 			for (let i = 0; i < path.length; i++) {
@@ -636,17 +635,21 @@ simply = {
 			var scriptParts = scr.split(classLine[0]);
 			gets = scriptParts[0];
 			var clss = classLine[0] + scriptParts[1];
+			//console.log(clss);
 		}
 		else {
 			gets = scr;
 		}
 		var m;
-		var importRegex = /^\s*get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
+		var importRegex = /\s*get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
 		while ((m = importRegex.exec(gets)) !== null) {
+			console.log(m[0]);
 			eval(m[0]);
 		}
 		try {
 			if (clss.trim().indexOf(classLine[0]) == 0) {
+				// fix for "class simply {" usage
+				clss = clss = clss.replace(classRegex, "class {");
 				// to fix console line number
 				// var lines = docStr.split('<script>')[0].split("\n");
 				// var lineBreaks = "";
@@ -678,6 +681,7 @@ simply = {
 
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
 					this.sfcClass = sfcClass ? sfcClass : {};
+					console.log(sfcClass);
 					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
 
 					// inline class varsa sfc class ile merge
@@ -822,7 +826,6 @@ simply = {
 					return observer;
 				}
 				connectedCallback() {
-					console.log("cc", name);
 					this.observeAttrChange(this, function (name, newValue) {
 						// value öncekiyle aynı değilse
 						// console.log(name, newValue, self.props[name], newValue == simply.prepareAttr(self.props[name]));
@@ -899,12 +902,15 @@ simply = {
 							regex.lastIndex++;
 						}
 						if (m[2].indexOf("this.getRootNode().host") == -1) {
-							var builtinVars = ["methods.", "lifecycle.", "data.", "props.", "state.", "component.", "dom."];
+							var builtinVars = ["parent.", "methods.", "lifecycle.", "data.", "props.", "state.", "component.", "dom."];
 
 							builtinVars.forEach(v => {
 								//template = template.split(v).join("this.getRootNode().host." + v)
 								let n = m[0].replaceAll(v, "this.getRootNode().host." + v);
-								template = template.replaceAll(m[0], n);
+								let nn = n.replaceAll(".this.getRootNode().host", "");
+
+								
+								template = template.replaceAll(m[0], nn);
 							});
 						}
 					}

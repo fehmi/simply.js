@@ -1,35 +1,25 @@
 <html>
-{p = ""}
-<each of="props" as="prop" key="key">
-  <!-- {p += key + '="' + prop + '" ';} -->
-</each>
+  {p = ""}
+  <each of="props" as="prop" key="key">
+    <!-- {p += key + '="' + prop + '" ';} -->
+  </each>
 
-<api-viewer :="p">
-  <template data-element="intl-currency" data-target="prefix">
-    <em>
-      Shipping:
-    </em>
-  </template>
-</api-viewer>
-
+  <api-viewer :="p">
+    <template data-element="intl-currency" data-target="prefix">
+      <em>
+        Shipping:
+      </em>
+    </template>
+  </api-viewer>
 </html>
 
-<style>
-  ::host {}
-</style>
-
 <script>
-
   // rollup browser index.js
   // listen attribute and prop changes
   // nested components 
-  class {
-    props = {
-      // component: "components/s-icon.html"
-    }
+  class simply {
     lifecycle = {
-      beforeFirstRender: function () {
-        console.log("before first render", props.component, props);
+      afterConstruct: function () {
         get(props.component);
         let compName = props.component.split(/[\\\/]/).pop().replace(".html", "");
 
@@ -50,7 +40,6 @@
           // burada component tag'i içindeki prop template'i inline'a dönüştürüp
           // replace edeceğuk 
           dom.querySelector("api-viewer").innerHTML = insideOfComp.innerHTML;
-
           let script = simply.components[compName].script;
           const regex = /^(?<jsdoc>(\s+)?\/\*\*.*\*\/)(\s+)class/gms;
           let m;
@@ -60,8 +49,8 @@
             if (m.groups.jsdoc) {
               // bu mecbur (apiviewerelement)
 
-              import('https://jspm.dev/api-viewer-element');
-              // import('https://cdn.jsdelivr.net/npm/api-viewer-element@1.0.0-pre.7/+esm');
+              //import('https://cdn.skypack.dev/api-viewer-element');
+              import('https://cdn.jsdelivr.net/npm/api-viewer-element@1.0.0-pre.7/+esm');
               var jsdoc = m.groups.jsdoc;
               var manifest;
 
@@ -96,7 +85,7 @@
                   request.onreadystatechange = function () {
                     if (this.readyState === 4) {
                       if (this.status >= 200 && this.status < 400) {
-                        console.log(this.response);
+                        // console.log(this.response);
                       }
                       else {
                         // erol
@@ -109,11 +98,10 @@
 
               // devimde localimdeyse convert and save 
               if (document.location.host == "root" || document.location.host == "localhost") {
-                console.log("dev local");
                 loadManifest(true);
               }
               else { // online ise
-                console.log("online");
+                // console.log("online");
                 var request = new XMLHttpRequest();
                 request.open('GET', "components/ss-icon.json", true);
                 request.onreadystatechange = function () {
@@ -147,7 +135,8 @@
           }
 
           const { name, type } = target.dataset;
-          let comp = dom.querySelector("api-viewer").shadowRoot.querySelector("[part='demo-output'] > *");
+          var apiViewer = this.getRootNode().host;
+          let comp = apiViewer.shadowRoot.querySelector("[part='demo-output'] > *");
 
           let value;
           switch (type) {
@@ -168,7 +157,6 @@
               this.setKnobs(name, "boolean", false, knob.attribute, custom);
             }
             else {
-              console.log(name, type, value, knob.attribute, custom);
               this.setKnobs(name, type, value, knob.attribute, custom);
             }
           }
@@ -177,36 +165,28 @@
         function fillInputs() {
           customElements.get("api-demo-layout").prototype.initKnobs = function (component) {
             var apiViewer = this.getRootNode().host;
-            console.log("fill inputs", apiViewer, component);
-            //let knobs = apiViewer.shadowRoot.querySelector("#api-viewer-panel-1");
             let knobs = apiViewer.shadowRoot.querySelectorAll("api-viewer-panel")[1];
-            // console.log(knobs, knobs2);
             for (const prop in component.props) {
               try {
                 let e = knobs.querySelector("input[data-name='" + prop + "']");
-                console.log(e);
                 e.value = component.props[prop];
                 if (e.value !== "") {
-                  // bu source tab'ını güncelliyor
                   apiViewer.shadowRoot.querySelector("api-demo-layout")._onPropChanged(e)
                 }
                 else { }
               }
-              catch (e) { 
-                console.log("erol", e);
-              }
+              catch (e) { }
             }
           }
         }
 
         if (customElements.get('api-demo-layout')) {
           var opc = customElements.get("api-demo-layout").prototype._onPropChanged = _onPropChanged;
-          console.log("custom element defined");
+
           fillInputs();
         }
         else {
           customElements.whenDefined('api-demo-layout').then(() => {
-            console.log("api demo layout when defined");
             var opc = customElements.get("api-demo-layout").prototype._onPropChanged = _onPropChanged;
             fillInputs();
           });

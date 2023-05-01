@@ -11,7 +11,7 @@ You can add simply.js to your app via `<script>` tag to start using it. Just be 
 
 ## Create a Component
 
-Now our page is ready to interact with simply.js components. The components in simply.js have three sections; `template`, `style` and `script`. You can learn more about them from the [component structure](https://root/simply/#/docs/component-structure) section later but we want to quickly jump in right now. So create a `hello-world.html` file with the content below and save it to the same folder with the app you added simply.js in it at the first step.
+Now our page is ready to interact with simply.js components. The components in simply.js have three sections; `template`, `style` and `script`. You can learn more about them from the [component structure](#/docs/component-structure) section later but we want to quickly jump in right now. So create a `hello-world.html` file with the content below and save it to the same folder with the app you added simply.js in it at the first step.
 
 ```html
 <html>
@@ -54,6 +54,13 @@ After getting your component, the filename without extension will be your custom
 Now you have two files and they are look like below. You can just click to download to have them in your local for fastest start if you don't want to create these files manually.
 
 <repl-component download="true" id="10fcijpwru4j34e"></repl-component>
+
+## Inline Components
+You can also define and use your component while writing them inline without a need of an external file. 
+<repl-component download="true" id="nvrh9n07asl89ed"></repl-component>
+
+This method also can be used to manipulate after loading single file components. See [inline components](#/docs/inline-components)
+
 
 ## Preview Your App
 

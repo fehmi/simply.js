@@ -23,6 +23,9 @@ var child = component.dom.querySelector("child-component");
 cchild.querySelector("grand-child").methods.functionName();
 ```
 
+Here is a working example:
+<repl-component id="4g6y3ikfl9ihlgb" donwload="true"></repl-component>
+
 ## Child to Parent
 
 It is possible to communicate with parent sdirectly.
@@ -33,8 +36,9 @@ component.parent.data.name = "This changed by a child component";
 
 // To call a method in parent's methods
 component.parent.methods.functionName();
-
 ```
+
+<repl-component id="n12menua0kfi0k7" donwload="true"></repl-component>
 
 ## Child to grand parents
 ```js
@@ -44,6 +48,8 @@ component.parent.methods.functionName();
   grandParent.methods.saySomething();
 ```
 
+<repl-component id="v5owc8geudzz349" donwload="true"></repl-component>
+
 ## Child to siblings
 ```js
   // Communicate with grand parents directly
@@ -51,6 +57,8 @@ component.parent.methods.functionName();
   sibling.data.message = "This changed by a sibling";
   sibling.methods.saySomething();
 ```
+
+<repl-component id="fgtv259ejp0bguh" donwload="true"></repl-component>
 
 ## Props
 ```html
@@ -125,7 +133,7 @@ This is the way about overriding. The last word is belong to the props block (1)
 !> One rule: Please don't use double aposroph when writing arrays, objects and functions as props.
 
 Prop set test
-<repl-component id="5hrudnqfoxzm2rj"></repl-component>
+<repl-component id="b7exk0pco4ueeox"></repl-component>
 
 Props from Template
-<repl-component id="dteguywmqzok0z8"></repl-component>
+<repl-component id="mz6b2i2zj96fm8q"></repl-component>

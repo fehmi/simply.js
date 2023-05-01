@@ -6,7 +6,7 @@
 - <br>Component Syntax
 
   - [Structure](docs/component-structure.md)
-  - [Template](docs/template.md)
+  - [HTML](docs/html.md)
   - [Style](docs/style.md)
   - [Script](docs/script.md)
   - [Inline Components](docs/inline-components.md)  
@@ -37,19 +37,10 @@
 - <br>Router
 
   - [Router](docs/router.md)
+  - [Electron](docs/electron.md)
 
 - <br>Components
   - [Combobox](docs/components/combo.md)
   - [Button](docs/components/button.md)
   - [Input](docs/components/input.md)
   - [Icon](docs/components/s-icon.md)
-
-- <br>Integrations
-
-  - [Electron](docs/electron.md)
-  - [Flow](docs/flow.md)
-  - [Nativescript](docs/nativescript.md)
-  - [IPFS](docs/ipfs.md)
-  - [p5.js](docs/p5.md)
-  - [VR/AR](docs/vr.md)
-  - [tone.js](docs/tone.md)

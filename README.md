@@ -42,14 +42,6 @@ While you are working with simply.js, everything will run in the browser of the 
 
 The REPL of simply.js is at the [Playground](playground) section. This is the fastest way to get started using simply.js. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
 
-## Tutorial
-
-~~For step by step guide to making the first steps of using simply.js, you can visit the [Tutorial](tutorial) section. Then you can come back to the documentation to dive deep.~~
-
-## Examples
-
-~~You can reach all examples used in the documentation via the [Examples](examples) section. All examples are editable, sharable and downloadable. This is one of the fastest ways to start using simply.js.~~
-
 <hr>
 
 Made with :heart: in Istanbul

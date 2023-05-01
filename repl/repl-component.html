@@ -692,7 +692,6 @@
 				// index.html'deki get'leri rewrite'a gönderiyor
 				var indexContent = component.editors["index.html"].getValue();
 				var files = component.methods.getFiles("index.html", indexContent);
-				console.log(files);
 				// her render'dan önce önceki blob'ları siliyor
 				if (component.blobs) {
 					for (let index = 0; index < Object.keys(component.blobs).length; index++) {
@@ -884,7 +883,6 @@
 						component.files[m[2]].content = component.editors[m[2]].getValue();
 						component.files[m[2]].filename = fn;
 					}
-
 				}
 
 				// console.log(filename);
@@ -898,7 +896,7 @@
 						var f = m[4].replace(/((\\n)|[\\\s\"\[\]])/g, "");
 						var fns = f.split(",");
 						for (let i = 0; i < fns.length; i++) {
-							const fn = fns[i].replace(/\'\"/g, '');
+							var fn = fns[i].replace(/\'\"/g, '');
 							if (isRealFile()) { continue; }
 						}
 						console.log("get array ise", m[3], f, fns);
@@ -1350,7 +1348,7 @@
 							}
 							else if (newName.substring(newName.length - ".html".length) == ".html") {
 								component.editors[newName].setOption("mode", "htmlmixed");
-								component.editors[newName].setValue('<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass simply \{\n\n\}\n<\/script>');
+								component.editors[newName].setValue('<html>\n\n</html>\n\n<style>\n\t:host {\n\n\t}\n</style>\n\n<script>\n\tclass simply \{\n\n\t}\n<\/script>');
 							}
 							else if (newName.substring(newName.length - ".js".length) == ".js") {
 								component.editors[newName].setOption("mode", "javascript");
@@ -1433,7 +1431,7 @@
 				var fileTabs = dom.querySelector("#file-tabs");
 				fileTabs.scrollLeft = fileTabs.scrollWidth;
 
-				var template = "<html>\n\n</html>\n\n<style>\n::host {\n\n}\n</style>\n\n<script>\nclass simply \{\n\n\}\n<\/script>";
+				var template = "<html>\n\n</html>\n\n<style>\n\t:host {\n\n\t}\n</style>\n\n<script>\n\tclass simply \{\n\n\t}\n<\/script>";
 				var target = dom.querySelector("ul#files");
 				component.methods.createNewCodemirror(filename, true, target, template);
 
@@ -1477,6 +1475,7 @@
 					autoRefresh: { delay: 0 },
 					lineNumbers: true,
 					gutter: true,
+					tabSize: 2,
 					smartIndent: true,
 					autofocus: autofocus,
 					mode: mode,

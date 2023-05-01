@@ -15,13 +15,15 @@ You can define your variables on the data section in your component like this.
 Then you will be able to use them in your template like this.
 
 ```html
-<template>
+<html>
   <p>
     Hello, my name is {data.name}<br>
     and I am {data.age} years old.
   </p>
-</template>
+</html>
 ```
+
+<repl-component id="05loeqiinqkt8pb" download="true"></repl-component>
 
 ?> It is necessary to use dot notation with `data` prefix when reaching variables. The only exception is for `each` loop. When you are in a loop, you can directly reach current subjects.
 
@@ -49,10 +51,11 @@ Of couse you can do some simple math with your variables using simple expression
 
 ## Go Wild
 Possibilities are endless with some imagination.
+
 ```html
-<li class="{entry.method}">{entry.message}
-	<if entry.file>(<span class="debugLink"
-			onclick="methods.openFileGotoLine('{entry.char}')">GO!</span>)
+<li class="{entry.method}">
+	<if cond="entry.file">
+    <span onclick="methods.openFile('{entry.char}')">GO!</span>
 	</if>
 </li>
 ```
@@ -60,14 +63,14 @@ Possibilities are endless with some imagination.
 ## Complex Code Blocks
 The thing is the code blocks must return something bcs it's in the rendering part of the component. For example this will not work.
 
-```html
-<template>
+```js
+<html>
   {
   	if (methods.someFunction() == "Some message") {
   		Yeah, the message is really Some message
   	}
   }
-</template>
+</html>
 ```
 
 But you have a workaorund with inline self executing anonymous functions like below:
@@ -91,21 +94,13 @@ Actually you can any complex JavaScript code in the variable delimiters and retu
 
 If you decide to use `key` and `index` when you define `each` loop. You can reach them directly without using a dot notation.
 
-```html
-  <each data.hobbies as hobbie, key (index)>
-    <li>{key}:{hobbie}:{index}</li>
-  </each>
-```
+<repl-component id="c0u41ol2ph7rgt8" download="true"></repl-component>
 
 ## Reactivity of Variables
 
 All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
 
-```html
-  <each data.hobbies as hobbie, key (index)>
-    <li>{key}:{hobbie}:{index}</li>
-  </each>
-```
+<repl-component id="6rus94eoal01kbk" download="true"></repl-component>
 
 ## Variables in style tag
 
@@ -131,7 +126,9 @@ You can use your reactive data variables as a property value in style tag.
 </script>
 ```
 
-## Changing variable values in `<template>`
+<repl-component id="x9bgcdct6jlvr0r" download="true"></repl-component>
+
+## Changing variable values in `<html>`
 
 It's totally acceptable to change variables in template. Just do like `{data.name = "marilyn monroe"}`. It will change and render the new value right away and trigger reactions. If you want to change the variable value wihout rendering it just comment it like `<!-- {data.name = "marilyn monroe"} -->`
 
@@ -148,4 +145,6 @@ It can be useful when need a post processing for your data before showing them. 
 ```html
 <input :="variableName">
 ```
+
+<repl-component id="hedq9svhen4ssz3" download="true"></repl-component>
 

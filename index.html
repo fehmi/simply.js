@@ -345,9 +345,9 @@
 
 		body:not([data-page="docs/playground.md"]) section:not(.cover) repl-component {
 			width: calc(100% + 50%);
-    	margin-left: calc(-25% - 5px);
+			margin-left: calc(-25% - 5px);
 			margin-top: 50px;
-      margin-bottom: 50px;
+			margin-bottom: 50px;
 		}
 
 		.markdown-section pre {
@@ -377,6 +377,20 @@
 
 		.markdown-section table {
 			display: inline-table;
+		}
+
+		.search .matching-post {
+			border-bottom: 1px solid #eee;
+			color: white;
+		}
+
+		.search a:hover {
+			color: white;
+			/* background-color: white; */
+		}
+
+		.search .search-keyword {
+			color: cyan;
 		}
 	</style>
 </head>

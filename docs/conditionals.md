@@ -1,105 +1,39 @@
 # Conditionals
 
-We are defining conditional statemens as special html tags like `<if>`, `<else if>`, `<else>`. This way helps our IDE to easyly colorize syntax and format the code without and issue.
+We are defining conditional statemens as special html tags like `<if>`, `<elsif>`, `<else>`. This way helps our IDE to easyly colorize syntax and format the code without and issue.
 
 ## If
 
-```html
-<template>
-  <if data.who == "Blue Bird">
-    Hello Blue Bird!
-  </if>
-<template>
-
-<script>
-  class {
-    data = {
-      who: "Blue Bird"
-    }
-  }
-</script>
-```
+<repl-component id="th73bi8vvx8q32v" download="true"></repl-component>
 
 ?> Please remember that every if statement must be closed with an `</if>`
 
-## Else If
+## Elsif
 
 It works just like an `<if>` but just after an `<if>` as you know.
 
-```html
-<template>
-  <if data.who == "Blue Bird">
-    Hello Blue Bird!
-  <else if data.who == "Red Bird">
-    Hello Red Bird!
-  </if>  
-<template>
-
-<script>
-  class {
-    data = {
-      who: "Red Bird"
-    }
-  }
-</script>
-```
+<repl-component id="4te0gtxxiq2u9b1" download="true"></repl-component>
 
 ## Else
 
-```html
-<template>
-  <if data.who == "Blue Bird">
-    Hello Blue Bird!
-  <else if data.who == "Red Bird">
-    Hello Red Bird!
-  <else>
-    Hello Green Bird!
-  </if>  
-<template>
-
-<script>
-  class {
-    data = {
-      who: "Green Bird"
-    }
-  }
-</script>
-```
+<repl-component id="lfkku59utqdlyix" download="true"></repl-component>
 
 ## Nested Conditionals
 
 All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
 
-```html
-<template>
-  <if data.who == "Red Bird">
-    Hello Blue Bird!
-    <if data.age == 3>
-      You are 3 years old.
-    </if>
-  </if>  
-<template>
+<repl-component id="erexq0k102v6bbz" donwload="true"></repl-component>
 
-<script>
-  class {
-    data = {
-      who: "Red Bird",
-      age: 3
-    }
-  }
-</script>
-```
-
-?> You can write any if statement that you can write with Vanilla JS.
+?> You can write any if statement that you can write with Vanilla JS like below.
 
 ```html
 
-  <if data.who == "Red Bird" && data.age == 3>
+  <if cond="data.who == 'Red Bird' && data.age == 3">
     ...
   </if>  
 
-  <if (data.a + 1) > 5 || data.a < 12>
+  <if cond="(data.a + 1) > 5 || data.a < 12">
     ...
-  </if>      
+  </if>
 
 ```
