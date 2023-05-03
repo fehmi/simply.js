@@ -18,26 +18,4 @@
 
 ## Usage Example
 
-```html
-<script>
-  class {
-    data = {
-      // ...
-    }
-    methods = {
-      // ...
-    }
-    lifecycle = {
-      whenDataChange(name, value, old, parents) {  
-        console.log("whenDataChange", name, value, old, parents);
-      },
-      whenPropChange(name, oldValue, newValue) {  
-        console.log("PROP", a,b,c);
-      },
-      disconnected() {  
-        console.log("disconnected");
-      }                      
-    }
-  }
-</script>
-```
+<repl-component id="ugyr2hpkpqeithx" donwload="true"></repl-component>

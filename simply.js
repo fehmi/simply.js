@@ -681,7 +681,6 @@ simply = {
 
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
 					this.sfcClass = sfcClass ? sfcClass : {};
-					console.log(sfcClass);
 					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
 
 					// inline class varsa sfc class ile merge
@@ -793,6 +792,9 @@ simply = {
 						get: function () { return parent; },
 						set: function (v) {
 							parent = v;
+							if (typeof parent.globalStyle !== "undefined") {
+								component.globalStyle = parent.globalStyle;
+							}							
 						}
 					});
 
@@ -975,7 +977,6 @@ simply = {
 							lifecycle: this.lifecycle,
 							watch: this.watch
 						});
-						console.log(parsedGlobalStyle);
 					}
 
 					if (!this.rendered) {
@@ -1860,6 +1861,7 @@ simply = {
 			/* istanbul ignore next: coverage is calculated in Chrome, this code is for IE */
 
 			if (isIE && !isFunction(window.PopStateEvent)) {
+				
 				window.PopStateEvent = function (inType, params) {
 					params = params || {};
 					var e = document.createEvent('Event');
@@ -1875,7 +1877,7 @@ simply = {
 				if (event.state === 'router-ignore') {
 					return;
 				}
-
+				
 				var _window$location = window.location,
 					pathname = _window$location.pathname,
 					search = _window$location.search,
@@ -3155,6 +3157,13 @@ simply = {
 					 * @param {?RouterOptions} options
 					 */
 					function Router(outlet, options) {
+						// there is a router and it's living in a REPL ;)
+						if (window.frameElement.getAttribute("name") == "result") {
+							window.parent.postMessage({
+								action: "routerOn"
+							}, event);							
+						}
+
 						routerGlobalOptionsVar = options;
 						var _this;
 
@@ -3454,13 +3463,12 @@ simply = {
 										if (context === previousContext) {
 											return _this2.location;
 										}
-
 										_this2.location = createLocation(context);
 										fireRouterEvent('location-changed', {
 											router: _this2,
 											location: _this2.location
 										});
-
+										
 										if (shouldUpdateHistory) {
 											_this2.__updateBrowserHistory(context, context.redirectFrom);
 										}
@@ -3572,7 +3580,7 @@ simply = {
 						value: function __amendWithOnBeforeCallbacks(contextWithFullChain) {
 							var _this5 = this;
 
-
+							console.log(contextWithFullChain);
 							return this.__runOnBeforeCallbacks(contextWithFullChain).then(function (amendedContext) {
 								if (amendedContext === _this5.__previousContext || amendedContext === contextWithFullChain) {
 									return amendedContext;
@@ -3591,12 +3599,14 @@ simply = {
 							var newChain = newContext.chain;
 							var callbacks = Promise.resolve();
 
-							if (_this6.hooks.before) {
-								var beforeRoute = _this6.hooks.before(_this6, newContext, previousContext);
-								if (beforeRoute === false) {
-									return callbacks.then(function (amendmentResult) {
-										return _this6.__previousContext;
-									});
+							if (_this6.hooks) {
+								if (_this6.hooks.before) {
+									var beforeRoute = _this6.hooks.before(_this6, newContext, previousContext);
+									if (beforeRoute === false) {
+										return callbacks.then(function (amendmentResult) {
+											return _this6.__previousContext;
+										});
+									}
 								}
 							}
 
@@ -3683,7 +3693,8 @@ simply = {
 							if (typeof routerGlobalOptionsVar.enableHash !== "undefined") {
 								var path = _ref2.pathname;
 								path = path.replace(router.baseUrl.replace(document.location.origin, ""), "");
-
+								
+								
 								// home ise skip et
 								if (path == "" && window.location.hash == "") {
 									//console.log("home?");
@@ -3706,11 +3717,11 @@ simply = {
 							}
 							else {
 								var pathname = _ref2.pathname,
-									_ref2$search = _ref2.search,
-									search = _ref2$search === void 0 ? '' : _ref2$search,
-									_ref2$hash = _ref2.hash,
-									hash = _ref2$hash === void 0 ? '' : _ref2$hash;
-
+								_ref2$search = _ref2.search,
+								search = _ref2$search === void 0 ? '' : _ref2$search,
+								_ref2$hash = _ref2.hash,
+								hash = _ref2$hash === void 0 ? '' : _ref2$hash;
+								
 								if (window.location.pathname !== pathname || window.location.search !== search || window.location.hash !== hash) {
 									var changeState = replace ? 'replaceState' : 'pushState';
 
@@ -3721,14 +3732,13 @@ simply = {
 											}
 										}
 									}
-
 									window.history[changeState](null, document.title, pathname + search + hash);
+									console.log("haydar");
 									window.dispatchEvent(new PopStateEvent('popstate', {
 										state: 'router-ignore'
 									}));
 								}
 							}
-
 						}
 					}, {
 						key: "__addAppearingContent",
@@ -3825,9 +3835,11 @@ simply = {
 					}, {
 						key: "__runOnAfterEnterCallbacks",
 						value: function __runOnAfterEnterCallbacks(currentContext) {
-
-							if (this.hooks.after) {
-								var afterRoute = this.hooks.after(this);
+							console.log("after");
+							if (this.hooks) {
+								if (this.hooks.after) {
+									var afterRoute = this.hooks.after(this);
+								}
 							}
 
 							// forward iteration: from A to Z

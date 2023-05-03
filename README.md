@@ -1,4 +1,5 @@
 <p>
+<img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release">
 <img src="https://img.shields.io/badge/License-MIT-green">
 <img src="https://img.shields.io/badge/Gzipped-20KB-green">
 <img src="https://img.shields.io/github/commit-activity/m/fehmi/simply.js?label=Commits">
@@ -7,8 +8,6 @@
 # About
 
 ## What is simply.js
-
-!> This project is in an alpha state and non-production ready.
 
 Simply.js is a web-component library for developing user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions of design systems. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
 

@@ -28,7 +28,6 @@
   - [Watch Event](docs/watch.md)
   - [Reactivity](docs/reactivity.md)
   - [State Management](docs/state.md)
-  - [Load CSS/JS](docs/loadCSSJS.md)
 
 - <br>Style
 	- [Tailwind](docs/uno.md)

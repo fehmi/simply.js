@@ -81,8 +81,18 @@ router.hooks = {
 ?> Sometimes when you have a deep base path, you may need to play with the path options if you want navigate with JS.
 
 ```js
-Router.go(router.baseUrl.replace(document.location.origin, "") + "/users");
+simply.Router.go(router.baseUrl.replace(document.location.origin, "") + "/users");
 ```
+
+<repl-component id="tmsnjymg4frkdu3" donwload="true"></repl-component>
+
+## Use uno with router
+
+<repl-component id="m5i3gdr0onxdzb2" donwload="true"></repl-component>
+
+## Using global styles in router
+
+<repl-component id="e634gz1758urupc" donwload="true"></repl-component>
 
 Vaadin docs[Vaadin docs](https://vaadin.github.io/router/vaadin-router/#/classes/Router)<br>
 Demos [Demos](https://vaadin.github.io/router/vaadin-router/#/classes/Router/demos/demo/index.html)

@@ -1,5 +1,4 @@
 <style>
-
   repl-component:not(.fullscreen) {
     position: fixed;
     width: 100%;
@@ -14,5 +13,3 @@
   </style>
 
 <repl-component id="10fcijpwru4j34e" download="true" save="true" console="true" crud="true" focus="true"></replcomponent>
-
-<!-- //cdn.jsdelivr.net/gh/fehmi/simply.js/simply.min.js -->
