@@ -1,4 +1,4 @@
-<img src="docs/images/logo.png" width="250px">
+<img src="docs/images/logo.png" width="250px"><br>
 Simple web-component library<br>for simple web-apps.
 
 <center>
