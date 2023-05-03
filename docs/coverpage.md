@@ -1,5 +1,5 @@
 <img src="docs/images/logo.png" width="250px">
-> Simple web-component library<br>for simple web-apps.
+Simple web-component library<br>for simple web-apps.
 
 <center>
     <repl-component id="pxen71pu7juv1ie" download="false"></replcomponent>
