@@ -883,7 +883,7 @@ simply = {
 						simply.obaa(this.data, function (name, value, old, parents) {
 							react(name, value, old, parents);
 						});
-					}
+					}			
 					if (this.props) {
 						simply.obaa(this.props, function (name, value, old, parents) {
 							react(name, value, old, parents, name);
@@ -894,6 +894,25 @@ simply = {
 							react(name, value, old, parents);
 						});
 					}
+					// parent değişkenleri değişince
+					// velet de tepki versin diye
+					if (this.parent) {
+						if (this.parent.data) {
+							simply.obaa(this.parent.data, function (name, value, old, parents) {
+								react(name, value, old, parents);
+							});
+						}
+						if (this.parent.props) {
+							simply.obaa(this.props, function (name, value, old, parents) {
+								react(name, value, old, parents, name);
+							});
+						}
+						if (this.parent.state) {
+							simply.obaa(this.state, function (name, value, old, parents) {
+								react(name, value, old, parents);
+							});
+						}
+					}							
 				}
 				render() {
 					let m;
@@ -1127,7 +1146,7 @@ simply = {
 								watch: this.watch
 							});
 						}
-
+						
 						if (parsedGlobalStyle) {
 							for (var key in parsedGlobalStyle.vars) {
 								if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue; 
