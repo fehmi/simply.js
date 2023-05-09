@@ -1004,6 +1004,7 @@ simply = {
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
+						
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
 								if (typeof this.lifecycle.beforeFirstRender(parsedTemplate) !== "undefined") {
@@ -1090,12 +1091,17 @@ simply = {
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var parsedStyle = simply.parseStyle(parsingArgs);
 
-						newDom.innerHTML = parsedTemplate + "<style uno></style><style global></style>" + "<style simply></style><style simply-vars></style>";
+						newDom.innerHTML = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
+						
+						
 						//childrenOnly: true,
 						simply.morphdom(this.dom, newDom, {
-							onBeforeElUpdated: function (fromEl, toEl) {
+							onBeforeElUpdated: function (fromEl, toEl) {							
 								// console.log("onBeforeMorphEl");
+							},
+							onBeforeNodeDiscarded: function(node) {
+									
 							},
 							onBeforeElChildrenUpdated: function (fromEl, toEl) {
 								if (fromEl.tagName == "CHILD-COMPONENT") {
