@@ -784,7 +784,6 @@
 								var fn = m[2];
 								// virtual dosya ise
 								if (component.files[fn]) {
-									console.log("var");
 									var newImport = "@import '" + blobs[fn].blobUrl + "';";;
 									newContent = newContent.replace(m[0], newImport);
 								}
@@ -803,7 +802,6 @@
 								var fn = m[2];
 								// virtual dosya ise
 								if (component.files[fn]) {
-									console.log("var");
 									var newLink = "<link rel='stylesheet' href='" + blobs[fn].blobUrl + "'";
 									newContent = newContent.replace(m[0], newLink);
 								}
@@ -850,10 +848,6 @@
 						dom.querySelector("iframe#result").contentWindow.document.write(textArea.value);
 						//dom.querySelector("iframe#result").contentWindow.document.querySelector("body").setAttribute("data-content", textArea.value);
 						data.resultStatus = "loaded";
-
-						setTimeout(() => {
-							console.log("hey", dom.querySelector("iframe#result").contentWindow.window.router);
-						}, 100);
 					}, 0);
 				});
 			},

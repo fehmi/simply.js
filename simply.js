@@ -100,15 +100,14 @@ simply = {
 
 				// variable
 				if (curlyCount == 0 && varBucket !== "") {
-
 					varBucket = varBucket.trim();
 					// console.log(varBucket);
 					let variable = varBucket.trim().substring(1, varBucket.length - 1);
-
+					
 					if (simply.parseProp("{" + variable + "}").type == "object") {
 						variable = "\"" + varBucket.trim() + "\"";
 					}
-
+					
 					logic = "ht+=" + variable + ";";
 					flag = true;
 				}
@@ -190,7 +189,9 @@ simply = {
 				}
 			}
 
+
 			if (flag === true) {
+
 				try {
 					capturedLogics.push(m[0]);
 				} catch (error) {
@@ -198,8 +199,8 @@ simply = {
 					varBucket = "";
 				}
 				let logicLine = capturedLogics[capturedLogics.length - 1];
-
-
+				
+				
 
 				// staticText = processedLetters.replace(logicLine, "");
 				// logicline'ın last occurance'ını siliyore
@@ -874,7 +875,6 @@ simply = {
 							if (typeof self.watch !== "undefined") {
 								self.watch(name, value, old, parents);
 							}
-
 							self.render();
 						}, 0);
 					}
@@ -915,6 +915,8 @@ simply = {
 					}							
 				}
 				render() {
+
+					
 					let m;
 					// tüm on.* atribute değerleri için
 					let regex = /\s+on[a-z]+\=(\"|\')([^"\n]*)(\"|\')/gm;
@@ -1087,19 +1089,21 @@ simply = {
 								this.lifecycle.beforeRerender();
 							}
 						}
-						var newDom = document.createElement("div");
+
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
+						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
 						var parsedStyle = simply.parseStyle(parsingArgs);
-
-						newDom.innerHTML = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
-
-						
+						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 						
 						//childrenOnly: true,
-						simply.morphdom(this.dom, newDom, {
-							onBeforeElUpdated: function (fromEl, toEl) {							
-								// console.log("onBeforeMorphEl");
-							},
+						simply.morphdom(this.dom, "<div>" + newDom + "</div>", {
+							onBeforeElUpdated: function(fromEl, toEl) {
+								// spec - https://dom.spec.whatwg.org/#concept-node-equals
+								if (fromEl.isEqualNode(toEl)) {
+										return false
+								}
+								return true
+						},
 							onBeforeNodeDiscarded: function(node) {
 									
 							},
@@ -4202,7 +4206,6 @@ simply = {
 		window.get = this.get;
 		document.onreadystatechange = function () {
 			if (document.readyState == "complete") {
-				console.log("ready pretty");
 				simply.setupInlineComps(document);
 			}
 		}
