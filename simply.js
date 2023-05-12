@@ -919,7 +919,7 @@ simply = {
 					
 					let m;
 					// tüm on.* atribute değerleri için
-					let regex = /\s+on[a-z]+\=(\"|\')([^"\n]*)(\"|\')/gm;
+					let regex = /\s+on[a-z]+\s+?\=\s+?(\"|\')([^"\n]*)(\"|\')/gm;
 					while ((m = regex.exec(template)) !== null) {
 						if (m.index === regex.lastIndex) {
 							regex.lastIndex++;
