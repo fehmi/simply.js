@@ -1,6 +1,7 @@
 simply = {
 	components: {},
 	parseTemplate: function (parsingArgs) {
+		
 		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
 
 		let simplyTemplate = /\<template([^<>]*)simply([^<>]*)>$/;
@@ -44,11 +45,10 @@ simply = {
 		var templateCount = 0;
 		var simplyTemplateCount = 0;
 		var ignoreFlag = false;
-
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
-
+			
 			if (bucket.substr(-"<script".length) === "<script") {
 				scriptCount += 1;
 			}
@@ -61,9 +61,9 @@ simply = {
 				simplyTemplateCount += 1;
 			}
 			// else if (bucket.substr(-"<template>".length) === "<template>") {
-			// 	templateCount += 1;
-			// }
-			else if (bucket.substr(-"</script>".length) === "</script>") {
+				// 	templateCount += 1;
+				// }
+				else if (bucket.substr(-"</script>".length) === "</script>") {
 				scriptCount -= 1;
 			}
 			else if (bucket.substr(-"</style>".length) === "</style>") {
@@ -76,6 +76,7 @@ simply = {
 				//bucket = bucket.replace(/<\/template>$/, "--></template>");
 				//processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
 			}
+			
 
 			if (simplyTemplateCount == 0 && styleCount == 0 && scriptCount == 0) {
 				// attribute içindeki fonksyion ise skip
@@ -104,10 +105,19 @@ simply = {
 					// console.log(varBucket);
 					let variable = varBucket.trim().substring(1, varBucket.length - 1);
 					
-					if (simply.parseProp("{" + variable + "}").type == "object") {
-						variable = "\"" + varBucket.trim() + "\"";
+					// if (simply.parseProp("{" + variable.toString() + "}").type == "object") {
+					// 	variable = "\"" + varBucket.trim() + "\"";
+					// }
+					// no bubble for me today
+					try {
+						if (typeof JSON.parse("{" + variable.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'") + "}") == "object") {
+							variable = "\"" + varBucket.trim() + "\"";
+						}											
+					} catch (error) {
+						
 					}
-					
+
+
 					logic = "ht+=" + variable + ";";
 					flag = true;
 				}
@@ -519,7 +529,15 @@ simply = {
 	},
 	parseProp: function (contentString) {
 		var type, value, parsed, content;
-		content = contentString.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
+
+		// atrribute'dan alıp parse edip obj çıkacak
+		// escape edilmemiş single quote'ları double yapıyor
+		// escape edilmiş single quote'ları kurtarıyor
+		content = contentString.replace(/(?<!\\)'/g, '"');
+		content = content.replace(/\\\'/g, "'");
+		
+		
+		
 		try {
 			parsed = JSON.parse(content);
 			// obj, number ya da boolean
@@ -531,7 +549,9 @@ simply = {
 			}
 		}
 		catch (e) {
+			// console.log({e, contentString, content});
 			let func = content;
+			
 			func = eval(func);
 			if (typeof func == "function") {
 				type = "function";
@@ -543,25 +563,21 @@ simply = {
 				type = "string";
 				value = contentString;
 			}
-
 			return {
 				"type": type,
-				"value": value
+				"value": value,
+				"str": content
 			}
 		}
 	},
 	prepareAttr: function (value) {
-		/*
-			1) change attributes with devtools and check prop values
-				str, num, boo, (obj, arr, func) -> quote check
-			2) change props with = and check attributes
-				str, num, boo, (obj, arr, func) -> quote check
-			3) props template
-		*/
+
 		let type = typeof value;
 		if (Array.isArray(value) || type == "object" || type == "number" || type == "boolean") {
-			// çünkü attribute zaten "" arasına yazılıyor
-			return simply.customStringify(value).replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
+			// attribute'a yazacak, onun için hazırlık
+			// önce bütün single quote'ları escape ediyor
+			// escape edilmemiş tüm double quote'ları single ile replace ediyor
+			return simply.customStringify(value).replace(/(?<!\\)'/g, "\\'").replace(/(?<!\\)"/g, "'").replace(/\"/g, "\'");
 		}
 		else if (type == "function") {
 			return value.toString().replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
@@ -644,7 +660,6 @@ simply = {
 		var m;
 		var importRegex = /\s*get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
 		while ((m = importRegex.exec(gets)) !== null) {
-			console.log(m[0]);
 			eval(m[0]);
 		}
 		try {
@@ -709,7 +724,7 @@ simply = {
 							else if (key == "props") {
 								for (var propKey in inlineCompClass["props"]) {
 									let attrValue = simply.prepareAttr(inlineCompClass["props"][propKey]);
-									this.setAttribute(propKey, attrValue);
+									//this.setAttribute(propKey, attrValue);
 								}
 							}
 						}
@@ -745,6 +760,7 @@ simply = {
 					// atribute'ları proplara yazalım
 					for (var i = 0; i < this.attributes.length; i++) {
 						var attrib = this.attributes[i];
+						// console.log("yaz balam ay balam", simply.parseProp(attrib.value));
 						props[attrib.name] = simply.parseProp(attrib.value).value;
 					}
 
@@ -853,30 +869,32 @@ simply = {
 					this.render();
 
 					function react(name, value, old, parents, prop = false) {
-						// console.log("react TO", name);
-						setTimeout(function () {
-							if (typeof self.lifecycle !== "undefined") {
-								if (typeof self.lifecycle.whenDataChange !== "undefined") {
-									//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-									if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
-										return false;
-									};
+						if (old !== value) {
+							// console.log("react TO", name);
+							setTimeout(function () {
+								if (typeof self.lifecycle !== "undefined") {
+									if (typeof self.lifecycle.whenDataChange !== "undefined") {
+										//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
+										if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
+											return false;
+										};
+									}
 								}
-							}
 
-							//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-							//console.log(name, value, old, parents);
-							if (prop) {
-								if (self.props) {
-									self.setAttribute(prop, simply.prepareAttr(self.props[prop]));
+								//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+								//console.log(name, value, old, parents);
+								if (prop) {
+									if (self.props) {
+										//self.setAttribute(prop, simply.prepareAttr(self.props[prop]));
+									}
 								}
-							}
 
-							if (typeof self.watch !== "undefined") {
-								self.watch(name, value, old, parents);
-							}
-							self.render();
-						}, 0);
+								if (typeof self.watch !== "undefined") {
+									self.watch(name, value, old, parents);
+								}
+								self.render();
+							}, 0);
+						}
 					}
 
 					if (this.data) {
@@ -919,13 +937,13 @@ simply = {
 					
 					let m;
 					// tüm on.* atribute değerleri için
-					let regex = /\s+on[a-z]+\s+?\=\s+?(\"|\')([^"\n]*)(\"|\')/gm;
+					let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
 					while ((m = regex.exec(template)) !== null) {
 						if (m.index === regex.lastIndex) {
 							regex.lastIndex++;
 						}
-						if (m[2].indexOf("this.getRootNode().host") == -1) {
-							var builtinVars = ["parent.", "methods.", "lifecycle.", "data.", "props.", "state.", "component.", "dom."];
+						if (m.groups["match"].indexOf("this.getRootNode().host") == -1) {
+							var builtinVars = [ "state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
 
 							builtinVars.forEach(v => {
 								//template = template.split(v).join("this.getRootNode().host." + v)
@@ -1016,7 +1034,6 @@ simply = {
 						}
 						this.dom.innerHTML = parsedTemplate;
 						simply.setupInlineComps(this.dom, docStr, template);
-
 						if (window.unoConfig) {
 							//this.component.setAttribute("hoak", true);
 							var classObserver;
@@ -1076,9 +1093,7 @@ simply = {
 							if (typeof this.lifecycle !== "undefined") {
 								if (typeof this.lifecycle.afterFirstRender !== "undefined") {
 									this.lifecycle.afterFirstRender();
-
 									setTimeout(() => { }, 0);
-
 								}
 							}
 						}, 0);
@@ -4163,7 +4178,6 @@ simply = {
 					// get raw content because innerhtml broke some simply tags
 					// for ex each or if in <select> tag
 					if (!string) {
-						debugger;
 						var request = new XMLHttpRequest();
 						console.log(window.document.location.href);
 						request.open('GET', window.document.location.href, false);
