@@ -384,15 +384,17 @@ simply = {
 	},
 	get: function (path, name) {
 		simply.gets = simply.gets ? simply.gets : [];
-		simply.gets.push(path);
+		
 		// multi
 		if (Array.isArray(path)) {
 			for (let i = 0; i < path.length; i++) {
+				simply.gets.push(path[i]);
 				addUnoAndContinue(path[i])
 			}
 		}
 		// single
 		else {
+			simply.gets.push(path);
 			addUnoAndContinue(path)
 		}
 		function addUnoAndContinue(p) {
@@ -1005,9 +1007,6 @@ simply = {
 						methods: this.methods,
 						lifecycle: this.lifecycle,
 						watch: this.watch
-					}
-					if (name == "tuner-comp") {
-						console.log(this.props);
 					}
 					
 					if (this.globalStyle) {
@@ -4176,13 +4175,12 @@ simply = {
 					simply.gets.push(m[0]);
 				}
 				let check = simply.gets.filter(e => e.includes(tag)); // true
-				console.log(check, tag);
+				console.log(simply.gets[1], check.length, tag);
 
 				// is there a get for it in the array
 				// or is it registered already
-				if (!check && !customElements.get(tag.toLowerCase())) {
-					console.log("get yok ya da register edilmemiş", tag);
-					// hee 
+				if (check.length == 0 && !customElements.get(tag.toLowerCase())) {
+					// console.log("get yok ya da register edilmemiş", tag);
 					// for root (index.html etc)
 					// get raw content because innerhtml broke some simply tags
 					// for ex each or if in <select> tag
