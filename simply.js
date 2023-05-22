@@ -383,6 +383,8 @@ simply = {
 		return script;
 	},
 	get: function (path, name) {
+		simply.gets = simply.gets ? simply.gets : [];
+		simply.gets.push(path);
 		// multi
 		if (Array.isArray(path)) {
 			for (let i = 0; i < path.length; i++) {
@@ -711,7 +713,7 @@ simply = {
 
 						// data|state|methods|lifecycle
 						for (var key in inlineCompClass) {
-							if (key.match("data|state|methods|lifecycle")) {
+							if (key.match("data|state|methods|lifecycle|props")) {
 								for (var childKey in inlineCompClass[key]) {
 									if (!this.sfcClass[key]) {
 										this.sfcClass[key] = {};
@@ -721,12 +723,17 @@ simply = {
 								}
 							}
 							// inline prop'ları attribute'lara yaz
-							else if (key == "props") {
-								for (var propKey in inlineCompClass["props"]) {
-									let attrValue = simply.prepareAttr(inlineCompClass["props"][propKey]);
+							//else if (key == "props") {
+							//	for (var propKey in inlineCompClass[key]) {
+							//		if (!this.sfcClass[key]) {
+							//			this.sfcClass[key] = {};
+							//			let value = inlineCompClass[key][propKey];
+							//			this.sfcClass[key][propKey] = value;										
+							//		}									
+									//let attrValue = simply.prepareAttr(inlineCompClass["props"][propKey]);
 									//this.setAttribute(propKey, attrValue);
-								}
-							}
+								//}
+							//}
 						}
 					}
 
@@ -755,7 +762,6 @@ simply = {
 					this.methods = methods;
 					this.watch = watch;
 					this.parent = parent;
-					this.props = props;
 
 					// atribute'ları proplara yazalım
 					for (var i = 0; i < this.attributes.length; i++) {
@@ -1000,7 +1006,10 @@ simply = {
 						lifecycle: this.lifecycle,
 						watch: this.watch
 					}
-
+					if (name == "tuner-comp") {
+						console.log(this.props);
+					}
+					
 					if (this.globalStyle) {
 						var parsedGlobalStyle = simply.parseStyle({
 							template,
@@ -4161,12 +4170,12 @@ simply = {
 					tempContent = docStr;
 					string = docStr;
 				}
-
+				
 				// push all gets to a global var to check below if block
 				while ((m = allGets.exec(tempContent)) !== null) {
 					simply.gets.push(m[0]);
 				}
-				let check = simply.gets.some(e => e.includes(tag)); // true
+				let check = simply.gets.filter(e => e.includes(tag)); // true
 				console.log(check, tag);
 
 				// is there a get for it in the array
