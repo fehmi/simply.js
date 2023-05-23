@@ -973,14 +973,12 @@ simply = {
 							template = this.inlineComp.template;
 						}
 						else if (htmlMethod == "prepend") {
-							let mergedTemp = template.replace("<html>", "<html>" + this.inlineComp.template);
-							template = mergedTemp;
+							var mergedTemp = template.replace("<html>", "<html>" + this.inlineComp.template);
 						}
 						else {
 							template = template.trim();
 
-							let mergedTemp = template.replace(/<\/html>$/s, this.inlineComp.template.trim() + "</html>");
-							template = mergedTemp;
+							var mergedTemp = template.replace(/<\/html>$/s, this.inlineComp.template.trim() + "</html>");
 						}
 
 						if (styleMethod == "replace" || noFile) {
@@ -994,8 +992,10 @@ simply = {
 						}
 					}
 
+					var tmpl = mergedTemp ? mergedTemp : template;
+
 					let parsingArgs = {
-						template,
+						template: tmpl,
 						style: styles.local,
 						data: this.data,
 						state: this.state,
@@ -4154,7 +4154,7 @@ simply = {
 					if (window.name == "result") {
 						tempContent = window.frameElement.contentWindow.dataContent;
 						string = tempContent;
-						console.log({ tempContent });
+						// console.log({ tempContent });
 						//var match = tempContent.match(regex);
 					}
 					// normal
@@ -4175,7 +4175,7 @@ simply = {
 					simply.gets.push(m[0]);
 				}
 				let check = simply.gets.filter(e => e.includes(tag)); // true
-				console.log(simply.gets[1], check.length, tag);
+				// console.log(simply.gets[1], check.length, tag);
 
 				// is there a get for it in the array
 				// or is it registered already
@@ -4215,7 +4215,7 @@ simply = {
 					});
 				}
 				else {
-					console.log("get var ya da register edilmiş", comp.tagName);
+					// console.log("get var ya da register edilmiş", comp.tagName);
 				}
 			});
 		}
