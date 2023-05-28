@@ -469,13 +469,19 @@ simply = {
 			}
 		}
 	},
-	request: function (url, callback) {
+	request: function (url, callback, async = false) {
 		var request = new XMLHttpRequest();
-		request.open('GET', url, false);
+		request.open('GET', url, async);
 		request.onload = function () {
 			if (this.status >= 200 && this.status < 400) {
+				try {
+					response = JSON.parse(this.responseText);      
+				}
+				catch(err) {
+					response = this.responseText;
+				}				
 				if (callback) {
-					callback(this.response);
+					callback(response);
 				}
 			}
 		};
@@ -764,6 +770,24 @@ simply = {
 					this.methods = methods;
 					this.watch = watch;
 					this.parent = parent;
+					
+					
+					var geval = eval;
+					for (var key in sfcClass) {
+						if (!key.match("data|state|methods|lifecycle|props|dom|component|watch|parent") ) {
+							var val = sfcClass[key];
+							if (typeof val == "object") {
+								val = simply.customStringify(val);
+							}
+							else if (typeof val == "function") {
+								val = val.toString();
+							}
+							else if (typeof val == "string") {
+								val = "'" + val + "'";
+							}
+							geval("var " + key + "=" + val + ";");
+						}
+					}
 
 					// atribute'ları proplara yazalım
 					for (var i = 0; i < this.attributes.length; i++) {
@@ -953,14 +977,12 @@ simply = {
 						if (m.groups["match"].indexOf("this.getRootNode().host") == -1) {
 							var builtinVars = [ "state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
 
+							var newValue = m[0];
 							builtinVars.forEach(v => {
-								//template = template.split(v).join("this.getRootNode().host." + v)
-								let n = m[0].replaceAll(v, "this.getRootNode().host." + v);
-								let nn = n.replaceAll(".this.getRootNode().host", "");
-
-								
-								template = template.replaceAll(m[0], nn);
+								newValue = newValue.replaceAll(v, "this.getRootNode().host." + v);
+								newValue = newValue.replaceAll(".this.getRootNode().host", "");								
 							});
+							template = template.replaceAll(m[0], newValue);
 						}
 					}
 					// template & style modification from inline comp
