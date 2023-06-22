@@ -110,7 +110,7 @@ simply = {
 					// }
 					// no bubble for me today
 					try {
-						if (typeof JSON.parse("{" + variable.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'") + "}") == "object") {
+						if (typeof JSON.parse("{" + variable.replace(/[^\\]'/g, '"').replace(/\\'/g, "'") + "}") == "object") {
 							variable = "\"" + varBucket.trim() + "\"";
 						}											
 					} catch (error) {
@@ -527,7 +527,7 @@ simply = {
 	processPropTemplate: function (string) {
 		// clean up  
 		var propsFromTemplate = string;
-		propsFromTemplate = propsFromTemplate.replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
+		propsFromTemplate = propsFromTemplate.replace(/[^\\]'/g, '"').replace(/\\'/g, "'");
 		propsFromTemplate = propsFromTemplate.replace(/(?:\r\n|\r|\n)/g, ' ');
 
 		// convert to object
@@ -543,10 +543,8 @@ simply = {
 		// atrribute'dan alıp parse edip obj çıkacak
 		// escape edilmemiş single quote'ları double yapıyor
 		// escape edilmiş single quote'ları kurtarıyor
-		content = contentString.replace(/(?<!\\)'/g, '"');
+		content = contentString.replace(/[^\\]'/g, '"');
 		content = content.replace(/\\\'/g, "'");
-		
-		
 		
 		try {
 			parsed = JSON.parse(content);
@@ -587,10 +585,10 @@ simply = {
 			// attribute'a yazacak, onun için hazırlık
 			// önce bütün single quote'ları escape ediyor
 			// escape edilmemiş tüm double quote'ları single ile replace ediyor
-			return simply.customStringify(value).replace(/(?<!\\)'/g, "\\'").replace(/(?<!\\)"/g, "'").replace(/\"/g, "\'");
+			return simply.customStringify(value).replace(/[^\\]'/g, "\\'").replace(/[^\\]"/g, "'").replace(/\"/g, "\'");
 		}
 		else if (type == "function") {
-			return value.toString().replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
+			return value.toString().replace(/[^\\]'/g, '"').replace(/\\'/g, "'");
 		}
 		else {
 			return value;
@@ -616,7 +614,7 @@ simply = {
 					cache.add(value);
 				}
 				else if (typeof value == "function") {
-					return value.toString().replace(/(?<!\\)'/g, '"').replace(/\\'/g, "'");
+					return value.toString().replace(/[^\\]'/g, '"').replace(/\\'/g, "'");
 				}
 				return value;
 			}
