@@ -39,7 +39,4 @@
   - [Electron](docs/electron.md)
 
 - <br>Components
-  - [Combobox](docs/components/combo.md)
-  - [Button](docs/components/button.md)
-  - [Input](docs/components/input.md)
   - [Icon](docs/components/s-icon.md)

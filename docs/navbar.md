@@ -1,6 +1,4 @@
 * [<img src="docs/images/logo.png">](/)
 - [Documentation](docs/)
-- [Tutorial](tutorial.md)
-- [Examples](examples.md)
 - [Playground](playground.md)
 - [Github](https://github.com/fehmi/simply.js)
