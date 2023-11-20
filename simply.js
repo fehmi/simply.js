@@ -3654,7 +3654,7 @@ simply = {
 						value: function __amendWithOnBeforeCallbacks(contextWithFullChain) {
 							var _this5 = this;
 
-							console.log(contextWithFullChain);
+							// console.log(contextWithFullChain);
 							return this.__runOnBeforeCallbacks(contextWithFullChain).then(function (amendedContext) {
 								if (amendedContext === _this5.__previousContext || amendedContext === contextWithFullChain) {
 									return amendedContext;
@@ -3807,7 +3807,6 @@ simply = {
 										}
 									}
 									window.history[changeState](null, document.title, pathname + search + hash);
-									console.log("haydar");
 									window.dispatchEvent(new PopStateEvent('popstate', {
 										state: 'router-ignore'
 									}));
@@ -3909,7 +3908,7 @@ simply = {
 					}, {
 						key: "__runOnAfterEnterCallbacks",
 						value: function __runOnAfterEnterCallbacks(currentContext) {
-							console.log("after");
+							// console.log("after");
 							if (this.hooks) {
 								if (this.hooks.after) {
 									var afterRoute = this.hooks.after(this);
