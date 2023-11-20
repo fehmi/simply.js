@@ -3230,10 +3230,12 @@ simply = {
 					 */
 					function Router(outlet, options) {
 						// there is a router and it's living in a REPL ;)
-						if (window.frameElement.getAttribute("name") == "result") {
-							window.parent.postMessage({
-								action: "routerOn"
-							}, event);							
+						if (window.frameElement) {
+							if (window.frameElement.getAttribute("name") == "result") {
+								window.parent.postMessage({
+									action: "routerOn"
+								}, event);							
+							}
 						}
 
 						routerGlobalOptionsVar = options;
