@@ -117,7 +117,6 @@ simply = {
 						
 					}
 
-
 					logic = "ht+=" + variable + ";";
 					flag = true;
 				}
