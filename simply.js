@@ -45,6 +45,9 @@ simply = {
 		var templateCount = 0;
 		var simplyTemplateCount = 0;
 		var ignoreFlag = false;
+
+		template = template.replace(/\$\{/g, 'minyeli{');
+
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
@@ -248,6 +251,7 @@ simply = {
 		var ht = "";
 		// console.log(bucket); 
 		// console.log(capturedLogics); 
+		bucket = bucket.replace(/minyeli/g, '$');
 		eval(bucket);
 		//console.timeEnd();
 		return ht;
