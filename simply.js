@@ -847,7 +847,9 @@ simply = {
 					// after construct event
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.afterConstruct !== "undefined") {
-							this.lifecycle.afterConstruct();
+							setTimeout(() => {
+								this.lifecycle.afterConstruct();
+							}, 0);
 						}
 					}
 				}
