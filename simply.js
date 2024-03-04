@@ -1240,7 +1240,7 @@ simply = {
 					}
 				}
 			}
-			console.log(simplyComponent);
+			console.log("name", simplyComponent);
 			customElements.define(name, simplyComponent);
 		}
 	},
