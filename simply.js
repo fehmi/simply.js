@@ -693,7 +693,7 @@ simply = {
 					clss = clss.replace(uno, "{}");
 					window.unoConfig = uno;
 				}
-
+				console.log("helele", "//" + compName + "//" + compName + "\n\nnew " + clss.trim() + "//@ sourceURL=" + compName + ".html")
 				return "//" + compName + "//" + compName + "\n\nnew " + clss.trim() + "//@ sourceURL=" + compName + ".html";
 			}
 		} catch (error) {
