@@ -701,6 +701,7 @@ simply = {
 		}
 	},
 	registerComponent: function ({ template, styles, name, script, docStr, noFile }) {
+		debugger;
 		if (!customElements.get(name)) {
 			class simplyComponent extends HTMLElement {
 				constructor() {
