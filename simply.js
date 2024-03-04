@@ -674,7 +674,7 @@ simply = {
 			eval(m[0]);
 		}
 		try {
-			console.log("selam", clss.trim().indexOf(classLine[0]))
+			console.log("selam")
 			if (clss.trim().indexOf(classLine[0]) == 0) {
 				console.log("melam");
 				// fix for "class simply {" usage
