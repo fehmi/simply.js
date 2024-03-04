@@ -709,8 +709,9 @@ simply = {
 			console.log("daha önce register edilmemiş");
 			class simplyComponent extends HTMLElement {
 				constructor() {
-					console.log("bunu patlatıyor");
 					super();
+					console.debug("aaaa");
+					console.log("bunu patlatıyor");
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
 					console.log("stdClass", sfcClass);
 					this.sfcClass = sfcClass ? sfcClass : {};
