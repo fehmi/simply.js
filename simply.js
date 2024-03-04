@@ -710,7 +710,7 @@ simply = {
 			class simplyComponent extends HTMLElement {
 				constructor() {
 					super();
-
+					console.log("bunu patlatıyor", script, name);
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
 					console.log("stdClass", sfcClass);
 					this.sfcClass = sfcClass ? sfcClass : {};
