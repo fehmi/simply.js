@@ -709,7 +709,7 @@ simply = {
 			console.log("daha önce register edilmemiş");
 			class simplyComponent extends HTMLElement {
 				constructor() {
-					console.log("bunu patlatıyor", script, name);
+					console.log("bunu patlatıyor");
 					super();
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
 					console.log("stdClass", sfcClass);
