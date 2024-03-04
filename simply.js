@@ -1239,6 +1239,7 @@ simply = {
 					}
 				}
 			}
+			console.log(simplyComponent);
 			customElements.define(name, simplyComponent);
 		}
 	},
