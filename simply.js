@@ -704,12 +704,15 @@ simply = {
 		}
 	},
 	registerComponent: function ({ template, styles, name, script, docStr, noFile }) {
+		console.log("register", {template, script, style});
 		if (!customElements.get(name)) {
+			console.log("daha önce register edilmemiş");
 			class simplyComponent extends HTMLElement {
 				constructor() {
 					super();
 
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
+					console.log("stdClass", sfcClass);
 					this.sfcClass = sfcClass ? sfcClass : {};
 					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
 
