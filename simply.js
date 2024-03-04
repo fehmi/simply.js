@@ -674,7 +674,9 @@ simply = {
 			eval(m[0]);
 		}
 		try {
+			console.log("selam", clss.trim().indexOf(classLine[0]))
 			if (clss.trim().indexOf(classLine[0]) == 0) {
+				console.log("melam");
 				// fix for "class simply {" usage
 				clss = clss = clss.replace(classRegex, "class {");
 				// to fix console line number
@@ -702,7 +704,6 @@ simply = {
 	},
 	registerComponent: function ({ template, styles, name, script, docStr, noFile }) {
 		if (!customElements.get(name)) {
-			debugger;
 			class simplyComponent extends HTMLElement {
 				constructor() {
 					super();
