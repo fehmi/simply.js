@@ -655,6 +655,7 @@ simply = {
 		//});
 	},
 	runGetsReturnClass: function (scr, compName) {
+		console.log("selam");
 		var gets;
 		var classRegex = /class(\s+simply)?(\s+)?{/;
 		var classLine = classRegex.exec(scr);
@@ -674,7 +675,7 @@ simply = {
 			eval(m[0]);
 		}
 		try {
-			console.log("selam")
+			
 			if (clss.trim().indexOf(classLine[0]) == 0) {
 				console.log("melam");
 				// fix for "class simply {" usage
