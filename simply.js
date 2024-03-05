@@ -655,7 +655,6 @@ simply = {
 		//});
 	},
 	runGetsReturnClass: function (scr, compName) {
-		console.log("selam");
 		var gets;
 		var classRegex = /class(\s+simply)?(\s+)?{/;
 		var classLine = classRegex.exec(scr);
@@ -675,9 +674,7 @@ simply = {
 			eval(m[0]);
 		}
 		try {
-			
 			if (clss.trim().indexOf(classLine[0]) == 0) {
-				console.log("melam");
 				// fix for "class simply {" usage
 				clss = clss = clss.replace(classRegex, "class {");
 				// to fix console line number
@@ -696,7 +693,7 @@ simply = {
 					clss = clss.replace(uno, "{}");
 					window.unoConfig = uno;
 				}
-				console.log("helele", "//" + compName + "//" + compName + "\n\nnew " + clss.trim() + "//@ sourceURL=" + compName + ".html")
+
 				return "//" + compName + "//" + compName + "\n\nnew " + clss.trim() + "//@ sourceURL=" + compName + ".html";
 			}
 		} catch (error) {
@@ -704,16 +701,12 @@ simply = {
 		}
 	},
 	registerComponent: function ({ template, styles, name, script, docStr, noFile }) {
-		console.log("register", {template, script, style});
 		if (!customElements.get(name)) {
-			console.log("daha önce register edilmemiş");
 			class simplyComponent extends HTMLElement {
 				constructor() {
 					super();
-					console.debug("aaaa");
-					console.log("bunu patlatıyor");
+
 					let sfcClass = eval(simply.runGetsReturnClass(script, name));
-					console.log("stdClass", sfcClass);
 					this.sfcClass = sfcClass ? sfcClass : {};
 					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
 
@@ -1240,7 +1233,6 @@ simply = {
 					}
 				}
 			}
-			console.log("name", simplyComponent);
 			customElements.define(name, simplyComponent);
 		}
 	},
