@@ -1074,9 +1074,8 @@ simply = {
 								try {
 									classObserver.disconnect();
 								} catch (error) {
-									console.log("erol");
 								}
-								// bi kere kafi
+								// bi kere kafi 
 								if (!window.unoConfig.generate) {
 									window.unoConfig = createGenerator(eval("window.unoConfig=" + window.unoConfig));
 								}
