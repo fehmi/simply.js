@@ -1,7 +1,7 @@
 simply = {
 	components: {},
 	parseTemplate: function (parsingArgs) {
-		
+
 		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
 
 		let simplyTemplate = /\<template([^<>]*)simply([^<>]*)>$/;
@@ -51,7 +51,7 @@ simply = {
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
-			
+
 			if (bucket.substr(-"<script".length) === "<script") {
 				scriptCount += 1;
 			}
@@ -64,9 +64,9 @@ simply = {
 				simplyTemplateCount += 1;
 			}
 			// else if (bucket.substr(-"<template>".length) === "<template>") {
-				// 	templateCount += 1;
-				// }
-				else if (bucket.substr(-"</script>".length) === "</script>") {
+			// 	templateCount += 1;
+			// }
+			else if (bucket.substr(-"</script>".length) === "</script>") {
 				scriptCount -= 1;
 			}
 			else if (bucket.substr(-"</style>".length) === "</style>") {
@@ -79,7 +79,7 @@ simply = {
 				//bucket = bucket.replace(/<\/template>$/, "--></template>");
 				//processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
 			}
-			
+
 
 			if (simplyTemplateCount == 0 && styleCount == 0 && scriptCount == 0) {
 				// attribute içindeki fonksyion ise skip
@@ -107,7 +107,7 @@ simply = {
 					varBucket = varBucket.trim();
 					// console.log(varBucket);
 					let variable = varBucket.trim().substring(1, varBucket.length - 1);
-					
+
 					// if (simply.parseProp("{" + variable.toString() + "}").type == "object") {
 					// 	variable = "\"" + varBucket.trim() + "\"";
 					// }
@@ -115,9 +115,9 @@ simply = {
 					try {
 						if (typeof JSON.parse("{" + variable.replace(/[^\\]'/g, '"').replace(/\\'/g, "'") + "}") == "object") {
 							variable = "\"" + varBucket.trim() + "\"";
-						}											
+						}
 					} catch (error) {
-						
+
 					}
 
 					logic = "ht+=" + variable + ";";
@@ -211,8 +211,8 @@ simply = {
 					varBucket = "";
 				}
 				let logicLine = capturedLogics[capturedLogics.length - 1];
-				
-				
+
+
 
 				// staticText = processedLetters.replace(logicLine, "");
 				// logicline'ın last occurance'ını siliyore
@@ -387,7 +387,7 @@ simply = {
 	},
 	get: function (path, name) {
 		simply.gets = simply.gets ? simply.gets : [];
-		
+
 		// multi
 		if (Array.isArray(path)) {
 			for (let i = 0; i < path.length; i++) {
@@ -478,11 +478,11 @@ simply = {
 		request.onload = function () {
 			if (this.status >= 200 && this.status < 400) {
 				try {
-					response = JSON.parse(this.responseText);      
+					response = JSON.parse(this.responseText);
 				}
-				catch(err) {
+				catch (err) {
 					response = this.responseText;
-				}				
+				}
 				if (callback) {
 					callback(response);
 				}
@@ -548,7 +548,7 @@ simply = {
 		// escape edilmiş single quote'ları kurtarıyor
 		content = contentString.replace(/[^\\]'/g, '"');
 		content = content.replace(/\\\'/g, "'");
-		
+
 		try {
 			parsed = JSON.parse(content);
 			// obj, number ya da boolean
@@ -562,7 +562,7 @@ simply = {
 		catch (e) {
 			// console.log({e, contentString, content});
 			let func = content;
-			
+
 			func = eval(func);
 			if (typeof func == "function") {
 				type = "function";
@@ -739,9 +739,9 @@ simply = {
 							//			let value = inlineCompClass[key][propKey];
 							//			this.sfcClass[key][propKey] = value;										
 							//		}									
-									//let attrValue = simply.prepareAttr(inlineCompClass["props"][propKey]);
-									//this.setAttribute(propKey, attrValue);
-								//}
+							//let attrValue = simply.prepareAttr(inlineCompClass["props"][propKey]);
+							//this.setAttribute(propKey, attrValue);
+							//}
 							//}
 						}
 					}
@@ -771,11 +771,11 @@ simply = {
 					this.methods = methods;
 					this.watch = watch;
 					this.parent = parent;
-					
-					
+
+
 					var geval = eval;
 					for (var key in sfcClass) {
-						if (!key.match("data|state|methods|lifecycle|props|dom|component|watch|parent") ) {
+						if (!key.match("data|state|methods|lifecycle|props|dom|component|watch|parent")) {
 							var val = sfcClass[key];
 							if (typeof val == "object") {
 								val = simply.customStringify(val);
@@ -844,7 +844,7 @@ simply = {
 							parent = v;
 							if (typeof parent.globalStyle !== "undefined") {
 								component.globalStyle = parent.globalStyle;
-							}							
+							}
 						}
 					});
 
@@ -936,7 +936,7 @@ simply = {
 						simply.obaa(this.data, function (name, value, old, parents) {
 							react(name, value, old, parents);
 						});
-					}			
+					}
 					if (this.props) {
 						simply.obaa(this.props, function (name, value, old, parents) {
 							react(name, value, old, parents, name);
@@ -956,20 +956,20 @@ simply = {
 							});
 						}
 						if (this.parent.props) {
-							simply.obaa(this.props, function (name, value, old, parents) {
+							simply.obaa(this.parent.props, function (name, value, old, parents) {
 								react(name, value, old, parents, name);
 							});
 						}
 						if (this.parent.state) {
-							simply.obaa(this.state, function (name, value, old, parents) {
+							simply.obaa(this.parent.state, function (name, value, old, parents) {
 								react(name, value, old, parents);
 							});
 						}
-					}							
+					}
 				}
 				render() {
 
-					
+
 					let m;
 					// tüm on.* atribute değerleri için
 					let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
@@ -978,12 +978,12 @@ simply = {
 							regex.lastIndex++;
 						}
 						if (m.groups["match"].indexOf("this.getRootNode().host") == -1) {
-							var builtinVars = [ "state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
+							var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
 
 							var newValue = m[0];
 							builtinVars.forEach(v => {
 								newValue = newValue.replaceAll(v, "this.getRootNode().host." + v);
-								newValue = newValue.replaceAll(".this.getRootNode().host", "");								
+								newValue = newValue.replaceAll(".this.getRootNode().host", "");
 							});
 							template = template.replaceAll(m[0], newValue);
 						}
@@ -1033,7 +1033,7 @@ simply = {
 						lifecycle: this.lifecycle,
 						watch: this.watch
 					}
-					
+
 					if (this.globalStyle) {
 						var parsedGlobalStyle = simply.parseStyle({
 							template,
@@ -1057,7 +1057,7 @@ simply = {
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
-						
+
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
 								if (typeof this.lifecycle.beforeFirstRender(parsedTemplate) !== "undefined") {
@@ -1142,18 +1142,18 @@ simply = {
 						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
-						
+
 						//childrenOnly: true,
 						simply.morphdom(this.dom, "<div>" + newDom + "</div>", {
-							onBeforeElUpdated: function(fromEl, toEl) {
+							onBeforeElUpdated: function (fromEl, toEl) {
 								// spec - https://dom.spec.whatwg.org/#concept-node-equals
 								if (fromEl.isEqualNode(toEl)) {
-										return false
+									return false
 								}
 								return true
-						},
-							onBeforeNodeDiscarded: function(node) {
-									
+							},
+							onBeforeNodeDiscarded: function (node) {
+
 							},
 							onBeforeElChildrenUpdated: function (fromEl, toEl) {
 								if (fromEl.tagName == "CHILD-COMPONENT") {
@@ -1206,10 +1206,10 @@ simply = {
 								watch: this.watch
 							});
 						}
-						
+
 						if (parsedGlobalStyle) {
 							for (var key in parsedGlobalStyle.vars) {
-								if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue; 
+								if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue;
 								this.sheet.cssRules[0].style.setProperty(key, parsedGlobalStyle.vars[key]);
 							}
 						}
@@ -1228,6 +1228,12 @@ simply = {
 					this.rendered = true;
 				}
 				disconnectedCallback() {
+					simply.obaa.disable(this.state)
+					simply.obaa.disable(this.data);
+					simply.obaa.disable(this.props);
+					simply.obaa.disable(this.parent.state)
+					simply.obaa.disable(this.parent.data);
+					simply.obaa.disable(this.parent.props);					
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.disconnected !== "undefined") {
 							this.lifecycle.disconnected();
@@ -1254,6 +1260,7 @@ simply = {
 
 		(function () {
 			function obaa(target, arr, callback) {
+				if (target.__disabled) return;
 
 				var eventPropArr = []
 				if (isArray(target)) {
@@ -1529,6 +1536,20 @@ simply = {
 				obj[prop] = "__deleted__";
 				watch(obj, prop, obj.__o_, obj.__o_)
 			}
+
+			// Add a new method to disable watching changes for a state
+			obaa.disable = function (state) {
+				if (state) {
+					state.__disabled = true;
+				}
+			};
+
+			// Add a new method to enable watching changes for a state
+			obaa.enable = function (state) {
+				if (state) {
+					state.__disabled = false;
+				}
+			};
 
 			Array.prototype.size = function (length) {
 				this.length = length
@@ -1940,7 +1961,7 @@ simply = {
 			/* istanbul ignore next: coverage is calculated in Chrome, this code is for IE */
 
 			if (isIE && !isFunction(window.PopStateEvent)) {
-				
+
 				window.PopStateEvent = function (inType, params) {
 					params = params || {};
 					var e = document.createEvent('Event');
@@ -1956,7 +1977,7 @@ simply = {
 				if (event.state === 'router-ignore') {
 					return;
 				}
-				
+
 				var _window$location = window.location,
 					pathname = _window$location.pathname,
 					search = _window$location.search,
@@ -3241,7 +3262,7 @@ simply = {
 							if (window.frameElement.getAttribute("name") == "result") {
 								window.parent.postMessage({
 									action: "routerOn"
-								}, event);							
+								}, event);
 							}
 						}
 
@@ -3549,7 +3570,7 @@ simply = {
 											router: _this2,
 											location: _this2.location
 										});
-										
+
 										if (shouldUpdateHistory) {
 											_this2.__updateBrowserHistory(context, context.redirectFrom);
 										}
@@ -3774,8 +3795,8 @@ simply = {
 							if (typeof routerGlobalOptionsVar.enableHash !== "undefined") {
 								var path = _ref2.pathname;
 								path = path.replace(router.baseUrl.replace(document.location.origin, ""), "");
-								
-								
+
+
 								// home ise skip et
 								if (path == "" && window.location.hash == "") {
 									//console.log("home?");
@@ -3798,11 +3819,11 @@ simply = {
 							}
 							else {
 								var pathname = _ref2.pathname,
-								_ref2$search = _ref2.search,
-								search = _ref2$search === void 0 ? '' : _ref2$search,
-								_ref2$hash = _ref2.hash,
-								hash = _ref2$hash === void 0 ? '' : _ref2$hash;
-								
+									_ref2$search = _ref2.search,
+									search = _ref2$search === void 0 ? '' : _ref2$search,
+									_ref2$hash = _ref2.hash,
+									hash = _ref2$hash === void 0 ? '' : _ref2$hash;
+
 								if (window.location.pathname !== pathname || window.location.search !== search || window.location.hash !== hash) {
 									var changeState = replace ? 'replaceState' : 'pushState';
 
@@ -4197,7 +4218,7 @@ simply = {
 					tempContent = docStr;
 					string = docStr;
 				}
-				
+
 				// push all gets to a global var to check below if block
 				while ((m = allGets.exec(tempContent)) !== null) {
 					simply.gets.push(m[0]);
