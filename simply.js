@@ -752,7 +752,8 @@ simply = {
 							this.sfcClass.lifecycle.beforeConstruct();
 						}
 					}
-
+					
+					var uid = "id" + Math.random().toString(16).slice(2)
 					var component = this;
 					var dom = this.attachShadow({ mode: 'open' });
 					var parent = this.getRootNode().host;
@@ -771,7 +772,7 @@ simply = {
 					this.methods = methods;
 					this.watch = watch;
 					this.parent = parent;
-
+					this.uid = uid;
 
 					var geval = eval;
 					for (var key in sfcClass) {
@@ -903,73 +904,69 @@ simply = {
 					let self = this;
 					this.render();
 
-					function react(name, value, old, parents, prop = false) {
+					this.react = function (name, value, old, parents, prop = false) {
 						if (old !== value) {
 							// console.log("react TO", name);
 							setTimeout(function () {
-								if (typeof self.lifecycle !== "undefined") {
-									if (typeof self.lifecycle.whenDataChange !== "undefined") {
-										//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-										if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
-											return false;
-										};
+								if (self.data) {
+									if (typeof self.lifecycle !== "undefined") {
+										if (typeof self.lifecycle.whenDataChange !== "undefined") {
+											//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
+											if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
+												return false;
+											};
+										}
 									}
-								}
 
-								//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-								//console.log(name, value, old, parents);
-								if (prop) {
-									if (self.props) {
-										//self.setAttribute(prop, simply.prepareAttr(self.props[prop]));
+									//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+									//console.log(name, value, old, parents);
+									if (prop) {
+										if (self.props) {
+											//self.setAttribute(prop, simply.prepareAttr(self.props[prop]));
+										}
 									}
-								}
 
-								if (typeof self.watch !== "undefined") {
-									self.watch(name, value, old, parents);
+									if (typeof self.watch !== "undefined") {
+										self.watch(name, value, old, parents);
+									}
+									self.render();
 								}
-								self.render();
 							}, 0);
 						}
 					}
 
 					if (this.data) {
 						simply.obaa(this.data, function (name, value, old, parents) {
-							react(name, value, old, parents);
-						});
+								self.react(name, value, old, parents);
+						}, self.uid, name);
 					}
 					if (this.props) {
 						simply.obaa(this.props, function (name, value, old, parents) {
-							react(name, value, old, parents, name);
-						});
+								self.react(name, value, old, parents, name);
+						}, self.uid, name);
 					}
 					if (this.state) {
-						simply.obaa(this.state, function (name, value, old, parents) {
-							react(name, value, old, parents);
-						});
+							simply.obaa(this.state, function (name, value, old, parents) {
+								self.react(name, value, old, parents);
+							}, self.uid, name);
 					}
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
 					if (this.parent) {
 						if (this.parent.data) {
 							simply.obaa(this.parent.data, function (name, value, old, parents) {
-								react(name, value, old, parents);
-							});
+									self.react(name, value, old, parents);
+							}, self.uid, name);
 						}
 						if (this.parent.props) {
 							simply.obaa(this.parent.props, function (name, value, old, parents) {
-								react(name, value, old, parents, name);
-							});
+									self.react(name, value, old, parents, name);
+							}, self.uid, name);
 						}
-						if (this.parent.state) {
-							simply.obaa(this.parent.state, function (name, value, old, parents) {
-								react(name, value, old, parents);
-							});
-						}
+
 					}
 				}
 				render() {
-
-
 					let m;
 					// tüm on.* atribute değerleri için
 					let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
@@ -1228,12 +1225,32 @@ simply = {
 					this.rendered = true;
 				}
 				disconnectedCallback() {
-					simply.obaa.disable(this.state)
-					simply.obaa.disable(this.data);
-					simply.obaa.disable(this.props);
-					simply.obaa.disable(this.parent.state)
-					simply.obaa.disable(this.parent.data);
-					simply.obaa.disable(this.parent.props);					
+					var compId = this.uid;
+					var compName = name;
+					var state = this.state;
+					var parent = this.parent;
+
+					this.state.__c_.forEach(function(cb, i) {
+						if (cb.id == compId) {
+							// console.log("bunu silem aga", cb, compName, i);
+							state.__c_.splice(i, 1);
+						}
+					});
+
+					this.parent.data.__c_.forEach(function(cb, i) {
+						if (cb.id == compId) {
+							// console.log("bunu silem aga", cb, compName, i);
+							parent.data.__c_.splice(i, 1);
+						}
+					});
+					
+					this.parent.props.__c_.forEach(function(cb, i) {
+						if (cb.id == compId) {
+							// console.log("bunu silem aga", cb, compName, i);
+							parent.props.__c_.splice(i, 1);
+						}
+					});						
+
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.disconnected !== "undefined") {
 							this.lifecycle.disconnected();
@@ -1259,7 +1276,7 @@ simply = {
 		// __p_: path
 
 		(function () {
-			function obaa(target, arr, callback) {
+			function obaa(target, callback, uid, name) {
 				if (target.__disabled) return;
 
 				var eventPropArr = []
@@ -1278,7 +1295,7 @@ simply = {
 				}
 				for (var prop in target) {
 					if (target.hasOwnProperty(prop)) {
-						if (callback) {
+						if (0 == 1) {
 							if (isArray(arr) && isInArray(arr, prop)) {
 								eventPropArr.push(prop)
 								watch(target, prop, null, target)
@@ -1295,12 +1312,15 @@ simply = {
 				if (!target.__c_) {
 					target.__c_ = []
 				}
-				var propChanged = callback ? callback : arr
+				var propChanged = callback
 				target.__c_.push({
+					id: uid,
+					comp: name,
 					all: !callback,
 					propChanged: propChanged,
 					eventPropArr: eventPropArr
 				})
+				return this;
 			}
 
 			var triggerStr = [
@@ -4269,6 +4289,7 @@ simply = {
 			});
 		}
 	},
+
 	init: function () {
 		this.Router();
 		this.obaa();
