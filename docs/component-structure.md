@@ -9,3 +9,5 @@ In the example above, "S" letter exists in DOM, because it is defined in templat
 ?> All of those there tags are optional. For example, your component can contains only a `<script>` tag or only a `<html>` tag or only a `<style>` tag.
 
 <repl-component id="9yl7k6gtgkucjmw"></repl-component>
+
+?> If you don't like shadow dom or you may need to serialize your form or something, you can always use your component as `<your-componen open>` This way your component adopt parent styles and reachable via JS from anywhere. And the best part you can create your custom form element components and easyly serialize them before sending to back-end.

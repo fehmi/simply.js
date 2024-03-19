@@ -752,11 +752,30 @@ simply = {
 							this.sfcClass.lifecycle.beforeConstruct();
 						}
 					}
-					
+					var open = false;
+					if (this.getAttribute("open") !== null) {
+						open = true;
+					}
+
 					var uid = "id" + Math.random().toString(16).slice(2)
 					var component = this;
-					var dom = this.attachShadow({ mode: 'open' });
-					var parent = this.getRootNode().host;
+
+					if (!open) {
+						var dom = this.attachShadow({ mode: 'open' });
+						var parent = this.getRootNode().host;
+						if (!parent) {
+							parent = simply.findShadowRootOrCustomElement(this);
+						}
+					}
+					else {
+						var dom = this;
+						var parent = simply.findShadowRootOrCustomElement(this);
+					}
+
+					if (name == "home-comp") {
+						console.log("ehem", parent);
+					}
+
 					var data = this.sfcClass.data ? this.sfcClass.data : {};
 					var props = this.sfcClass.props ? this.sfcClass.props : {};
 					var methods = this.sfcClass.methods;
@@ -773,6 +792,9 @@ simply = {
 					this.watch = watch;
 					this.parent = parent;
 					this.uid = uid;
+					this.open = open;
+
+					// console.log(name, open);
 
 					var geval = eval;
 					for (var key in sfcClass) {
@@ -974,13 +996,19 @@ simply = {
 						if (m.index === regex.lastIndex) {
 							regex.lastIndex++;
 						}
-						if (m.groups["match"].indexOf("this.getRootNode().host") == -1) {
+						if (this.open) {
+							var match = "simply.findShadowRootOrCustomElement(this)";
+						}
+						else {
+							var match = "this.getRootNode().host";
+						}
+						if (m.groups["match"].indexOf(match) == -1) {
 							var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
 
 							var newValue = m[0];
 							builtinVars.forEach(v => {
-								newValue = newValue.replaceAll(v, "this.getRootNode().host." + v);
-								newValue = newValue.replaceAll(".this.getRootNode().host", "");
+								newValue = newValue.replaceAll(v, match + "." + v);
+								newValue = newValue.replaceAll("." + match, "");
 							});
 							template = template.replaceAll(m[0], newValue);
 						}
@@ -1100,7 +1128,15 @@ simply = {
 						}
 
 						try {
-							this.sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
+							if (!this.open) {
+								//console.log("not open", this);
+								this.sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
+							}
+							else {
+								//console.log("open", this);
+								this.sheet = this.querySelector("style[simply-vars]").sheet;
+							}
+							
 							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
 
 							var vars = ":host {";
@@ -1141,51 +1177,79 @@ simply = {
 						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
 						//childrenOnly: true,
-						simply.morphdom(this.dom, "<div>" + newDom + "</div>", {
-							onBeforeElUpdated: function (fromEl, toEl) {
-								// spec - https://dom.spec.whatwg.org/#concept-node-equals
-								if (fromEl.isEqualNode(toEl)) {
-									return false
-								}
-								return true
-							},
-							onBeforeNodeDiscarded: function (node) {
+						
+						if (this.open) {
+							var newDomAsString = "<"+name+" open>" + newDom + "</"+name+">";
+							morphIt(this.dom);
+						}
+						else {
+							var newDomAsString = "<"+name+">" + newDom + "</"+name+">";
+							morphIt(this.dom);
+						}
 
-							},
-							onBeforeElChildrenUpdated: function (fromEl, toEl) {
-								if (fromEl.tagName == "CHILD-COMPONENT") {
-									// console.log("dont again");
-								}
-								else if (fromEl.tagName == "STYLE") {
-									return false;
-								}
-								else if (toEl.hasAttribute("passive") === true) {
-									return false;
-								}
-								else if (toEl.tagName === 'INPUT') {
-									if (toEl.type == 'RADIO' || toEl.type == 'CHECKBOX') {
+						function morphIt(dom) {
+							simply.morphdom(dom, newDomAsString, {
+								childrenOnly: true,
+								onBeforeElUpdated: function (fromEl, toEl) {
+									// spec - https://dom.spec.whatwg.org/#concept-node-equals
+									
+
+									if (fromEl.isSameNode(toEl)) {
 										return false;
 									}
-									else {
-										toEl.value = fromEl.value;
-									}
-								}
-
-								else if (toEl.tagName === 'ROUTER') {
-									// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
-									return false;
-								}
-								else if (toEl.tagName == 'LABEL') {
 									if (fromEl.isEqualNode(toEl)) {
+										return false
+									}
+									return true
+								},
+								onBeforeNodeDiscarded: function (node) {
+								},
+								onBeforeElChildrenUpdated: function (fromEl, toEl) {
+									// bu custom element'leri skip etmek için
+									// shadowdom olanlara zaten dokunamıyor da
+									// shadow'suz custom elementleri her seferinde render ediyor yoksa
+									if (customElements.get(fromEl.tagName.toLowerCase())) {
+										return false;
+									}									
+									if (fromEl.isSameNode(toEl)) {
+										return false;
+									}								
+									if (fromEl.tagName == "CHILD-COMPONENT") {
+										// console.log("dont again");
+									}
+									else if (fromEl.tagName == "STYLE") {
 										return false;
 									}
+									else if (toEl.hasAttribute("passive") === true) {
+										return false;
+									}
+									else if (toEl.tagName === 'INPUT') {
+										if (toEl.type == 'RADIO' || toEl.type == 'CHECKBOX') {
+											return false;
+										}
+										else {
+											toEl.value = fromEl.value;
+										}
+									}
+	
+									else if (toEl.tagName === 'ROUTER') {
+										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
+										return false;
+									}
+									else if (toEl.tagName == 'LABEL') {
+										if (fromEl.isEqualNode(toEl)) {
+											return false;
+										}
+									}
+									else if (toEl.tagName === 'OPTION') {
+										toEl.selected = fromEl.selected;
+									}
+									//console.log(toEl.tagName);
 								}
-								else if (toEl.tagName === 'OPTION') {
-									toEl.selected = fromEl.selected;
-								}
-								//console.log(toEl.tagName);
-							}
-						});
+							});
+						}
+
+
 
 						if (this.globalStyle) {
 							var parsedGlobalStyle = simply.parseStyle({
@@ -1230,26 +1294,21 @@ simply = {
 					var state = this.state;
 					var parent = this.parent;
 
-					this.state.__c_.forEach(function(cb, i) {
-						if (cb.id == compId) {
-							// console.log("bunu silem aga", cb, compName, i);
-							state.__c_.splice(i, 1);
-						}
-					});
+// Remove items from this.state.__c_
+this.state.__c_ = this.state.__c_.filter(function(cb) {
+	return cb.id !== compId;
+});
 
-					this.parent.data.__c_.forEach(function(cb, i) {
-						if (cb.id == compId) {
-							// console.log("bunu silem aga", cb, compName, i);
-							parent.data.__c_.splice(i, 1);
-						}
-					});
-					
-					this.parent.props.__c_.forEach(function(cb, i) {
-						if (cb.id == compId) {
-							// console.log("bunu silem aga", cb, compName, i);
-							parent.props.__c_.splice(i, 1);
-						}
-					});						
+// Remove items from this.parent.data.__c_
+this.parent.data.__c_ = this.parent.data.__c_.filter(function(cb) {
+	return cb.id !== compId;
+});
+
+// Remove items from this.parent.props.__c_
+this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
+	return cb.id !== compId;
+});
+
 
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.disconnected !== "undefined") {
@@ -3135,11 +3194,19 @@ simply = {
 
 				// simply.js state & parent fix
 				let outlet = context.resolver.__outlet;
+				
 				if (outlet.getRootNode().host) {
 					let parent = outlet.getRootNode().host;
 					element.parent = parent;
 					let state = parent.state;
 					element.state = state;
+				}
+				else {
+					let parent = document.querySelector("reframer-app");;
+					element.parent = parent;
+					let state = parent.state;
+					element.state = state;					
+					//console.log(element);
 				}
 				return element;
 			}
@@ -4289,7 +4356,38 @@ simply = {
 			});
 		}
 	},
+	findShadowRootOrCustomElement: function(element) {
+		let parent = element.parentNode;
 
+		while (parent !== null) {
+				// Check if the parent is a shadow root
+				if (parent instanceof ShadowRoot) {
+						// console.log("Found shadow root:", parent);
+						return parent.host;
+				}
+				console.log(element, parent);
+				// Check if the parent is a custom element
+				// console.log(parent.tagName, customElements.get(parent.tagName));
+				if (parent.tagName) {
+					if (parent.tagName.includes('-') && customElements.get(parent.tagName.toLowerCase()) !== undefined) {
+							// console.log("Found custom element:", parent);
+							return parent;
+					}
+				}
+				else {
+					console.log("hi doc", parent);
+					return undefined
+				}
+
+
+				// Move to the next parent
+				parent = parent.parentNode;
+		}
+
+		// If no shadow root or custom element is found
+		console.log("No shadow root or custom element found.");
+		return null;
+	},
 	init: function () {
 		this.Router();
 		this.obaa();
