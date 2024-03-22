@@ -743,6 +743,7 @@
 										}
 									}
 									newContent = newContent.replace(get, newGet);
+									
 								}
 								else if (m[4].indexOf(",") > -1) { // custom name
 									var fileAndCustomName = m[4].replace(/((\\n)|[\\\s\"\[\]])/g, "").split(",");
@@ -818,6 +819,7 @@
 							if (document.location.host == "root") {// dev env
 								newContent = newContent.replace("https://simply.js.org/simply.min.js", "//root/simply/simply.min.js");
 							}
+
 							blobs[file["filename"]] = {
 								filename: file["filename"],
 								blobUrl: blobUrl,
@@ -934,6 +936,7 @@
 						return true;
 					}
 				}
+
 
 				// burdan sonra hepsini toparlayıp tek seferde dönüyor
 				component.files[filename]["content"] = content;
@@ -1747,6 +1750,11 @@ SOFTWARE.';
 									filename: file.filename,
 									selected: file.selected
 								});
+								
+								if (document.location.origin == "https://simply.js.org") {
+									file.content = file.content.replace('baseUrl: "https://root/simply/"', 'baseUrl: "https://simply.js.org/"');
+								}
+
 								component.methods.createNewCodemirror(file.filename, file.selected, targetEl, file.content);
 							}
 							props.title = project.title;

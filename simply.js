@@ -772,10 +772,6 @@ simply = {
 						var parent = simply.findShadowRootOrCustomElement(this);
 					}
 
-					if (name == "home-comp") {
-						console.log("ehem", parent);
-					}
-
 					var data = this.sfcClass.data ? this.sfcClass.data : {};
 					var props = this.sfcClass.props ? this.sfcClass.props : {};
 					var methods = this.sfcClass.methods;
@@ -1155,14 +1151,11 @@ simply = {
 							this.sheet.insertRule(vars + "}", 0);
 						} catch (error) { }
 
-						setTimeout(() => {
 							if (typeof this.lifecycle !== "undefined") {
 								if (typeof this.lifecycle.afterFirstRender !== "undefined") {
 									this.lifecycle.afterFirstRender();
-									setTimeout(() => { }, 0);
 								}
 							}
-						}, 0);
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -3768,6 +3761,7 @@ this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
 						key: "__amendWithOnBeforeCallbacks",
 						value: function __amendWithOnBeforeCallbacks(contextWithFullChain) {
 							var _this5 = this;
+							console.log("hele");
 
 							// console.log(contextWithFullChain);
 							return this.__runOnBeforeCallbacks(contextWithFullChain).then(function (amendedContext) {
@@ -4365,7 +4359,6 @@ this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
 						// console.log("Found shadow root:", parent);
 						return parent.host;
 				}
-				console.log(element, parent);
 				// Check if the parent is a custom element
 				// console.log(parent.tagName, customElements.get(parent.tagName));
 				if (parent.tagName) {
@@ -4375,17 +4368,16 @@ this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
 					}
 				}
 				else {
-					console.log("hi doc", parent);
+					//console.log("hi doc", parent);
 					return undefined
 				}
-
 
 				// Move to the next parent
 				parent = parent.parentNode;
 		}
 
 		// If no shadow root or custom element is found
-		console.log("No shadow root or custom element found.");
+		// console.log("No shadow root or custom element found.");
 		return null;
 	},
 	init: function () {
