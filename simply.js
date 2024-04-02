@@ -955,30 +955,30 @@ simply = {
 
 					if (this.data) {
 						simply.obaa(this.data, function (name, value, old, parents) {
-								self.react(name, value, old, parents);
+							self.react(name, value, old, parents);
 						}, self.uid, name);
 					}
 					if (this.props) {
 						simply.obaa(this.props, function (name, value, old, parents) {
-								self.react(name, value, old, parents, name);
+							self.react(name, value, old, parents, name);
 						}, self.uid, name);
 					}
 					if (this.state) {
-							simply.obaa(this.state, function (name, value, old, parents) {
-								self.react(name, value, old, parents);
-							}, self.uid, name);
+						simply.obaa(this.state, function (name, value, old, parents) {
+							self.react(name, value, old, parents);
+						}, self.uid, name);
 					}
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
 					if (this.parent) {
 						if (this.parent.data) {
 							simply.obaa(this.parent.data, function (name, value, old, parents) {
-									self.react(name, value, old, parents);
+								self.react(name, value, old, parents);
 							}, self.uid, name);
 						}
 						if (this.parent.props) {
 							simply.obaa(this.parent.props, function (name, value, old, parents) {
-									self.react(name, value, old, parents, name);
+								self.react(name, value, old, parents, name);
 							}, self.uid, name);
 						}
 
@@ -1132,7 +1132,7 @@ simply = {
 								//console.log("open", this);
 								this.sheet = this.querySelector("style[simply-vars]").sheet;
 							}
-							
+
 							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
 
 							var vars = ":host {";
@@ -1151,11 +1151,11 @@ simply = {
 							this.sheet.insertRule(vars + "}", 0);
 						} catch (error) { }
 
-							if (typeof this.lifecycle !== "undefined") {
-								if (typeof this.lifecycle.afterFirstRender !== "undefined") {
-									this.lifecycle.afterFirstRender();
-								}
+						if (typeof this.lifecycle !== "undefined") {
+							if (typeof this.lifecycle.afterFirstRender !== "undefined") {
+								this.lifecycle.afterFirstRender();
 							}
+						}
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -1169,23 +1169,19 @@ simply = {
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
-						//childrenOnly: true,
-						
 						if (this.open) {
-							var newDomAsString = "<"+name+" open>" + newDom + "</"+name+">";
+							var newDomAsString = "<" + name + " open>" + newDom + "</" + name + ">";
 							morphIt(this.dom);
 						}
 						else {
-							var newDomAsString = "<"+name+">" + newDom + "</"+name+">";
+							var newDomAsString = "<" + name + ">" + newDom + "</" + name + ">";
 							morphIt(this.dom);
 						}
-
 						function morphIt(dom) {
 							simply.morphdom(dom, newDomAsString, {
 								childrenOnly: true,
 								onBeforeElUpdated: function (fromEl, toEl) {
 									// spec - https://dom.spec.whatwg.org/#concept-node-equals
-									
 
 									if (fromEl.isSameNode(toEl)) {
 										return false;
@@ -1203,10 +1199,10 @@ simply = {
 									// shadow'suz custom elementleri her seferinde render ediyor yoksa
 									if (customElements.get(fromEl.tagName.toLowerCase())) {
 										return false;
-									}									
+									}
 									if (fromEl.isSameNode(toEl)) {
 										return false;
-									}								
+									}
 									if (fromEl.tagName == "CHILD-COMPONENT") {
 										// console.log("dont again");
 									}
@@ -1224,7 +1220,7 @@ simply = {
 											toEl.value = fromEl.value;
 										}
 									}
-	
+
 									else if (toEl.tagName === 'ROUTER') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
@@ -1287,20 +1283,30 @@ simply = {
 					var state = this.state;
 					var parent = this.parent;
 
-// Remove items from this.state.__c_
-this.state.__c_ = this.state.__c_.filter(function(cb) {
-	return cb.id !== compId;
-});
+					if (this.state) {
+						// Remove items from this.state.__c_
+						this.state.__c_ = this.state.__c_.filter(function (cb) {
+							return cb.id !== compId;
+						});
+					}
 
-// Remove items from this.parent.data.__c_
-this.parent.data.__c_ = this.parent.data.__c_.filter(function(cb) {
-	return cb.id !== compId;
-});
+					if (this.parent) {
+						if (this.parent.data) {
+							// Remove items from this.parent.data.__c_
+							this.parent.data.__c_ = this.parent.data.__c_.filter(function (cb) {
+								return cb.id !== compId;
+							});
+						}
+						if (this.parent.props) {
+							// Remove items from this.parent.props.__c_
+							this.parent.props.__c_ = this.parent.props.__c_.filter(function (cb) {
+								return cb.id !== compId;
+							});
+						}
+					}
 
-// Remove items from this.parent.props.__c_
-this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
-	return cb.id !== compId;
-});
+
+
 
 
 					if (typeof this.lifecycle !== "undefined") {
@@ -3187,7 +3193,7 @@ this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
 
 				// simply.js state & parent fix
 				let outlet = context.resolver.__outlet;
-				
+
 				if (outlet.getRootNode().host) {
 					let parent = outlet.getRootNode().host;
 					element.parent = parent;
@@ -3198,7 +3204,7 @@ this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
 					let parent = document.querySelector("reframer-app");;
 					element.parent = parent;
 					let state = parent.state;
-					element.state = state;					
+					element.state = state;
 					//console.log(element);
 				}
 				return element;
@@ -3761,8 +3767,7 @@ this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
 						key: "__amendWithOnBeforeCallbacks",
 						value: function __amendWithOnBeforeCallbacks(contextWithFullChain) {
 							var _this5 = this;
-							console.log("hele");
-
+							
 							// console.log(contextWithFullChain);
 							return this.__runOnBeforeCallbacks(contextWithFullChain).then(function (amendedContext) {
 								if (amendedContext === _this5.__previousContext || amendedContext === contextWithFullChain) {
@@ -4350,30 +4355,30 @@ this.parent.props.__c_ = this.parent.props.__c_.filter(function(cb) {
 			});
 		}
 	},
-	findShadowRootOrCustomElement: function(element) {
+	findShadowRootOrCustomElement: function (element) {
 		let parent = element.parentNode;
 
 		while (parent !== null) {
-				// Check if the parent is a shadow root
-				if (parent instanceof ShadowRoot) {
-						// console.log("Found shadow root:", parent);
-						return parent.host;
+			// Check if the parent is a shadow root
+			if (parent instanceof ShadowRoot) {
+				// console.log("Found shadow root:", parent);
+				return parent.host;
+			}
+			// Check if the parent is a custom element
+			// console.log(parent.tagName, customElements.get(parent.tagName));
+			if (parent.tagName) {
+				if (parent.tagName.includes('-') && customElements.get(parent.tagName.toLowerCase()) !== undefined) {
+					// console.log("Found custom element:", parent);
+					return parent;
 				}
-				// Check if the parent is a custom element
-				// console.log(parent.tagName, customElements.get(parent.tagName));
-				if (parent.tagName) {
-					if (parent.tagName.includes('-') && customElements.get(parent.tagName.toLowerCase()) !== undefined) {
-							// console.log("Found custom element:", parent);
-							return parent;
-					}
-				}
-				else {
-					//console.log("hi doc", parent);
-					return undefined
-				}
+			}
+			else {
+				//console.log("hi doc", parent);
+				return undefined
+			}
 
-				// Move to the next parent
-				parent = parent.parentNode;
+			// Move to the next parent
+			parent = parent.parentNode;
 		}
 
 		// If no shadow root or custom element is found

@@ -125,15 +125,5 @@ There are 4 ways to define them
 
 This is the way about overriding. The last word is belong to the props block (1) of your component class. The props in there will override the inline (2) and other props in the props template (3). Just remember that if you define props with same name in multiple places accidentally.
 
-
-```js
-  <prop-test str="simply" booleanstring="true" boolean=false number="111" number2="222" obj="{'a': 'true'}" arr="[1,2,3, {'hey': 'hat'}]" func="(function() {console.log('test')})"></prop-test>
-```
-
-!> One rule: Please don't use double aposroph when writing arrays, objects and functions as props.
-
-Prop set test
-<repl-component id="b7exk0pco4ueeox"></repl-component>
-
 Props from Template
 <repl-component id="mz6b2i2zj96fm8q"></repl-component>

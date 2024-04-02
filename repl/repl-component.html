@@ -948,8 +948,10 @@
 				event.stopPropagation();
 				var filename = event.currentTarget.getAttribute("filename");
 				var filenameSelector = filename.replace(/\./g, "\\.");
+				console.log(filename, filenameSelector);
 
 				for (let i = 0; i < data.files.length; i++) {
+					console.log(fn, filename);
 					var fn = data.files[i]["filename"];
 					if (filename == fn) {
 						data.files[i]["selected"] = true;
@@ -958,6 +960,9 @@
 						data.files[i]["selected"] = false;
 					}
 				}
+
+				dom.querySelector("#file-tabs > li[selected=true]").setAttribute("selected", false);
+				event.currentTarget.setAttribute("selected", true);
 
 				var targetFile = dom.querySelector("#files .CodeMirror[selected=true]");
 				var fileItself = dom.querySelector("#files .CodeMirror[filename='" + filenameSelector + "']");
@@ -1578,7 +1583,6 @@
 						return type == "tag" && />$/.test(content) || /^</.test(textAfter);
 					}
 				});
-
 				component.data.files.forEach(element => {
 					if (element.selected) {
 						var editor = component.editors[element.filename];
@@ -1750,6 +1754,8 @@ SOFTWARE.';
 									filename: file.filename,
 									selected: file.selected
 								});
+
+								console.log(data.files);
 								
 								if (document.location.origin == "https://simply.js.org") {
 									file.content = file.content.replace('baseUrl: "https://root/simply/"', 'baseUrl: "https://simply.js.org/"');
