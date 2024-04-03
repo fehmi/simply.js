@@ -867,6 +867,18 @@ simply = {
 						}
 					});
 
+					this.setData = function (newValue) {
+						data = newValue;
+					};
+
+					this.setProps = function (newValue) {
+						props = newValue;
+					};
+
+					this.setState = function (newValue) {
+						state = newValue;
+					};
+
 					// after construct event
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.afterConstruct !== "undefined") {
@@ -881,7 +893,7 @@ simply = {
 				observeAttrChange(el, callback) {
 					var observer = new MutationObserver(function (mutations) {
 						mutations.forEach(function (mutation) {
-							// console.log("attribute changed", mutation);
+							console.log("attribute changed", mutation);
 							if (mutation.type === 'attributes') {
 								var newVal = mutation.target.getAttribute(mutation.attributeName);
 								callback(mutation.attributeName, newVal);
@@ -920,17 +932,16 @@ simply = {
 					});
 
 					let self = this;
-					this.render();
 
-					this.react = function (name, value, old, parents, prop = false) {
-						if (old !== value) {
+
+					this.react = function (name, value, prop = false) {
 							// console.log("react TO", name);
 							setTimeout(function () {
 								if (self.data) {
 									if (typeof self.lifecycle !== "undefined") {
 										if (typeof self.lifecycle.whenDataChange !== "undefined") {
 											//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-											if (self.lifecycle.whenDataChange(name, value, old, parents) === false) {
+											if (self.lifecycle.whenDataChange(name, value) === false) {
 												return false;
 											};
 										}
@@ -939,50 +950,126 @@ simply = {
 									//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
 									//console.log(name, value, old, parents);
 									if (prop) {
+										console.log("heee");
 										if (self.props) {
-											//self.setAttribute(prop, simply.prepareAttr(self.props[prop]));
+											self.setAttribute(name, simply.prepareAttr(self.props[name]));
 										}
 									}
 
 									if (typeof self.watch !== "undefined") {
-										self.watch(name, value, old, parents);
+										self.watch(name, value);
 									}
 									self.render();
 								}
 							}, 0);
-						}
 					}
 
+					if (this.data) {
+						let handler = {
+							set: function (target, prop, value, receiver) {
+								for (const [key, value] of Object.entries(target.cb)) {
+									value(prop, value);
+									//console.log(`${key}: ${value}`);
+								}
+								return Reflect.set(...arguments); // Pass through the operation
+							}
+						};
+						this.data.cb = {}
+						this.data.cb[this.uid] = function (prop, value) { self.react(prop, value) };
+						this.data = new Proxy(this.data, handler);
+						this.setData(this.data);
+					}
+					if (this.props) {
+						let handler = {
+							set: function (target, prop, value, receiver) {
+								for (const [key, value] of Object.entries(target.cb)) {
+									value(prop, value);
+									//console.log(`${key}: ${value}`);
+								}
+								return Reflect.set(...arguments); // Pass through the operation
+							}
+						};
+						this.props.cb = {}
+						this.props.cb[this.uid] = function (prop, value) { self.react(prop, value, true) };
+						this.props = new Proxy(this.props, handler);
+						this.setProps(this.props);
+					}					
+					/*
+					if (this.props) {
+						let handler = {
+							set: function (target, prop, value, receiver) {
+								self.react(prop, value);
+								return Reflect.set(...arguments); // Pass through the operation
+							}
+						};
+						this.props = new Proxy(this.props, handler);
+						this.setProps(this.props);
+						console.log(this.props);
+					}
+					*/
+					if (this.state) {
+						if (!this.state.cb) {
+							let handler = {
+								set: function (target, prop, value, receiver) {
+									for (const [key, value] of Object.entries(target.cb)) {
+										value(prop, value);
+										//console.log(`${key}: ${value}`);
+									}
+									return Reflect.set(...arguments); // Pass through the operation
+								}
+							};
+							this.state.cb = {}
+							this.state.cb[this.uid] = function (prop, value) { self.react(prop, value) };
+							this.state = new Proxy(this.state, handler);
+						}
+						else {
+							this.state.cb[this.uid] = function (prop, value) { self.react(prop, value) };
+						}
+						this.setState(this.state);
+					}
+
+					/*
 					if (this.data) {
 						simply.obaa(this.data, function (name, value, old, parents) {
 							self.react(name, value, old, parents);
 						}, self.uid, name);
-					}
+					}*/
+					/*
 					if (this.props) {
 						simply.obaa(this.props, function (name, value, old, parents) {
 							self.react(name, value, old, parents, name);
 						}, self.uid, name);
 					}
+					*/
+					/*
 					if (this.state) {
 						simply.obaa(this.state, function (name, value, old, parents) {
 							self.react(name, value, old, parents);
 						}, self.uid, name);
 					}
+					*/
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
+					
 					if (this.parent) {
 						if (this.parent.data) {
-							simply.obaa(this.parent.data, function (name, value, old, parents) {
-								self.react(name, value, old, parents);
-							}, self.uid, name);
+							this.parent.data.cb[this.uid] = function (prop, value) { self.react(prop, value) };
+							this.parent.setData = this.parent.data;
 						}
+						if (this.parent.props) {
+							this.parent.props.cb[this.uid] = function (prop, value) { self.react(prop, value) };
+							this.parent.setprops = this.parent.props;
+						}						
+						/*
 						if (this.parent.props) {
 							simply.obaa(this.parent.props, function (name, value, old, parents) {
 								self.react(name, value, old, parents, name);
 							}, self.uid, name);
 						}
-
+						*/
 					}
+					
+					this.render();
 				}
 				render() {
 					let m;
@@ -1278,35 +1365,9 @@ simply = {
 					this.rendered = true;
 				}
 				disconnectedCallback() {
-					var compId = this.uid;
-					var compName = name;
-					var state = this.state;
-					var parent = this.parent;
-
-					if (this.state) {
-						// Remove items from this.state.__c_
-						this.state.__c_ = this.state.__c_.filter(function (cb) {
-							return cb.id !== compId;
-						});
+					if (this.state.cb) {
+						delete this.state.cb[this.uid]
 					}
-
-					if (this.parent) {
-						if (this.parent.data) {
-							// Remove items from this.parent.data.__c_
-							this.parent.data.__c_ = this.parent.data.__c_.filter(function (cb) {
-								return cb.id !== compId;
-							});
-						}
-						if (this.parent.props) {
-							// Remove items from this.parent.props.__c_
-							this.parent.props.__c_ = this.parent.props.__c_.filter(function (cb) {
-								return cb.id !== compId;
-							});
-						}
-					}
-
-
-
 
 
 					if (typeof this.lifecycle !== "undefined") {
@@ -3767,7 +3828,7 @@ simply = {
 						key: "__amendWithOnBeforeCallbacks",
 						value: function __amendWithOnBeforeCallbacks(contextWithFullChain) {
 							var _this5 = this;
-							
+
 							// console.log(contextWithFullChain);
 							return this.__runOnBeforeCallbacks(contextWithFullChain).then(function (amendedContext) {
 								if (amendedContext === _this5.__previousContext || amendedContext === contextWithFullChain) {
