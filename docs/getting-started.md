@@ -11,7 +11,7 @@ You can add simply.js to your app via `<script>` tag to start using it. Just be 
 
 ## Create a Component
 
-Now our page is ready to interact with simply.js components. The components in simply.js have three sections; `template`, `style` and `script`. You can learn more about them from the [component structure](#/docs/component-structure) section later but we want to quickly jump in right now. So create a `hello-world.html` file with the content below and save it to the same folder with the app you added simply.js in it at the first step.
+Now our page is ready to interact with simply.js components. The components in simply.js have three sections; `template`, `style` and `script`. You can learn more about them from the [component structure](docs/component-structure) section later but we want to quickly jump in right now. So create a `hello-world.html` file with the content below and save it to the same folder with the app you added simply.js in it at the first step.
 
 ```html
 <html>

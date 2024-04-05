@@ -72,13 +72,11 @@ Then you can access it in template section of the child component like this
 </template>
 ```
 
-You can put any kind of values to the attributes. `Object`, `Array`, `String`, `Boolean`, `Number` and even `Function` are supported. In simply.js attributes and properties are automaticaly synced. So, if you define or change an attribute value the prop will be defined or changed too. When you set an attribute value with `dom.setAttribute("name", "{'a': 'b'}")`, you need to set the value as string. This is a limitation of HTML standart. But don't even worry, simply.js will detect its type while syncing attributes with props. Or if you don't want to stringify it, you can use the prepareAttr() function of simply.js like this: `setAttribute("name", prepareAttr({"a": "b"}))`
+You can put any kind of values to the attributes. `Object`, `Array`, `String`, `Boolean`, `Number` and even `Function` are supported. In simply.js attributes synced to props. So, if you define an attribute value the prop will be defined too. 
 
-Just remember that, if you manually write object, array or function props as attribute values directly to your component, dont use double quotes inside of them (you may need them for objects, arrays or functions) bcs html attributes already starts and ends with double quotes. Use single quote instead or just escape double quotes with an `\`. So, if you use double quotes inside the value of your attributes, it will break the execution of the template engine.
+!> Don't change attributes directly with `setAttribute`. It breaks morphing algorithm of DOM.
 
-Otherwise, you can be free when you define them with property template tag or doing it programmaticaly with setAttrbute(name, value) or component.props.name = value.
-
-Or you can access it from anywhere in the script section of the component like this.
+Or you can access your predefined attributes as props from anywhere in the script section of the component like this.
 
 ```html
 <script>
@@ -98,9 +96,9 @@ There are 4 ways to define them
 
 1. Inside of a component class `class { props = {"myProp": "myValue"} }`.
 2. As an inline attribute direcly with
-<br> `<my-app myProp='myValue'>` or  `myApp.setAttribute("propName", "propValue")`. You may to stringify the value if you want to store objects, arrays etc with this way.
+<br> `<my-app myProp='myValue'>`You may to stringify the value if you want to store objects, arrays etc with this way.
 3. Inside component's logic part (methods/lifecycle etc.)<br>`props.myPprop = "myValue"`
-4. With a props template like below (You may need it when you want to init some complex data)
+4. With inline components see: [Inline Components](docs/inline-components)
 
 
 ```js
