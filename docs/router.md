@@ -94,6 +94,11 @@ simply.Router.go(router.baseUrl.replace(document.location.origin, "") + "/users"
 
 <repl-component id="e634gz1758urupc" donwload="true"></repl-component>
 
+## Visual transition between routes
+
+<repl-component id="eqh33t4dur68bc9" donwload="true"></repl-component>
+
+
 Vaadin docs[Vaadin docs](https://vaadin.github.io/router/vaadin-router/#/classes/Router)<br>
 Demos [Demos](https://vaadin.github.io/router/vaadin-router/#/classes/Router/demos/demo/index.html)
 
