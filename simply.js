@@ -912,7 +912,7 @@ simply = {
 						mutations.forEach(function (mutation) {
 							if (mutation.type === 'attributes') {
 								var newVal = mutation.target.getAttribute(mutation.attributeName);
-									console.log(mutation.attributeName, "attribute changed to", newVal);
+									//console.log(mutation.attributeName, "attribute changed to", newVal);
 									callback(mutation.attributeName, newVal);
 
 							}
@@ -990,29 +990,59 @@ simply = {
 
 					}
 					
+					var proxies = new WeakMap();
+
 					if (this.data) {
 						let handler = {
-							get: function (obj, prop, r) {				
+							get: function (obj, prop, r) {		
+								
 								// If the property is an array or object
-								if (typeof obj[prop] === 'object' && !obj[prop]._isProxy) {
-									return new Proxy(obj[prop], handler);
+								if (typeof obj[prop] === 'object') {
+									//console.log(proxies, obj[prop], r);
+									if (proxies.has(obj[prop]))		{
+										//console.log("uyy proxy daaa", obj[prop]);
+										return proxies.get(obj[prop]);
+									}
+									else {
+										//console.log("obje proxy'e dönüştürüldü", obj, prop);
+										let proxy = new Proxy(obj[prop], handler);
+										//proxies.add(proxy);
+										proxies.set(obj[prop], proxy);
+										return proxy;
+									}
+
 								}
 								else {
+									//console.log("normal get", obj, prop);
 									return obj[prop];
 								}
 							},						
 							set: function (target, prop, value, receiver) {
+								/*
+								if (window.ttt && !window.count) {
+									window.count = 1;
+									console.log(name);
+								}	
+								else if (window.ttt && window.count) {
+									window.tt = performance.now();
+									alert(`Call to doSomething took ${window.tt - window.ttt} milliseconds.`);							
+								}
+								*/
+								if (target[prop] !== value) {
+									let old = target[prop];
+									//console.log(prop, "changed from ", target[prop], "to", value);								
 									for (const [key, cb] of Object.entries(self.cb.data)) {
-										cb(prop, value);
+										cb(prop, value, old);
 										//console.log(`${key}: ${value}`);
 									}
+								}
 
 								return Reflect.set(...arguments); // Pass through the operation
 							},
 							deleteProperty: function (target, prop) {
 								if (prop in target) {
 									delete target[prop];
-									console.log(`property removed: ${prop}`);
+									//console.log(`property removed: ${prop}`);
 									return true;
 									// Expected output: "property removed: texture"
 								}
@@ -1052,7 +1082,7 @@ simply = {
 							deleteProperty: function (target, prop) {
 								if (prop in target) {
 									delete target[prop];
-									console.log(`property removed: ${prop}`);
+									//console.log(`property removed: ${prop}`);
 									// Expected output: "property removed: texture"
 								}
 								for (const [key, cb] of Object.entries(self.cb.props)) {
@@ -1089,7 +1119,7 @@ simply = {
 								deleteProperty: function (target, prop) {
 									if (prop in target) {
 										delete target[prop];
-										console.log(`property removed: ${prop}`);
+										//console.log(`property removed: ${prop}`);
 										// Expected output: "property removed: texture"
 									}		
 									for (const [key, cb] of Object.entries(self.cb.state)) {
@@ -1346,7 +1376,6 @@ simply = {
 							var newDomAsString = "<" + name + ">" + newDom + "</" + name + ">";
 							morphIt(this.dom);
 						}
-
 
 
 						function morphIt(dom) {
@@ -2967,7 +2996,6 @@ simply = {
 			};
 
 			function animate(elem, className) {
-				console.log(className);
 				elem.classList.add(className);
 				return new Promise(function (resolve) {
 					if (willAnimate(elem)) {
@@ -4944,7 +4972,7 @@ simply = {
 						request.onload = function () {
 							if (this.status >= 200 && this.status < 400) {
 								string = this.responseText;
-								console.log({ string });
+								//console.log({ string });
 							}
 						};
 						request.send();

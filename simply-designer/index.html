@@ -1,0 +1,142 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <style>
+    .sd-selected {
+      outline: 1px solid red;
+      user-select: none;
+    }
+
+    #sd-placeholder {
+      display: block;
+      width: 100%;
+      height: 0px;
+      outline: 2px solid red;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    div
+    <p>p in a div</p>
+  </div>
+  <p>paragraph</p>
+  <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png">
+
+  <div>drop here</div>
+
+  <script>
+    var mousePositionX, mousePositionY, dragging;
+    document.addEventListener("mousedown", function (e) {
+      try {
+        document.querySelector(".sd-selected").classList.remove("sd-selected");
+      } catch (e) { }
+
+      e.target.classList.add("sd-selected");
+      e.target.setAttribute("draggable", true);
+    });
+
+    document.addEventListener("mouseup", function (e) {
+      console.log("mouseup");
+      dragging = false;
+      e.target.setAttribute("draggable", false);
+    });
+
+    document.addEventListener("dragstart", dragstartHandler);
+
+    function dragstartHandler(ev) {
+      var id = "id" + Math.random().toString(16).slice(2)
+      ev.target.setAttribute("id", id);
+      ev.dataTransfer.setData("text/plain", "#" + id);
+      ev.dataTransfer.dropEffect = "move";
+      dragging = true;
+    }
+
+    document.addEventListener('drag', function (e) {
+      // mouse'un konumu bir önceki konumdan farklıysa, yani gerçekten hareket ettiyse
+      if (e.clientX !== mousePositionX || e.clientY !== mousePositionY) {
+        // karşılaştırma için son mouse konumunu kaydet
+        mousePositionX = e.clientX;
+        mousePositionY = e.clientY;
+        // mouse'un hangi element üzerinde olduğunu bul
+        hoveredElement = document.elementFromPoint(e.clientX, e.clientY);
+        // sürüklenen element kendi üzerinde değilse
+        if (!hoveredElement.classList.contains('sd-selected')) {
+          // a div cannot move to its children
+          /*
+            aşağıdaki taglar içine taşınamaz
+            <area> <base> <br> <col> <embed> <hr> <img> <input> <link> <meta> <param> <source> <track> <wbr>
+          */
+
+          // body ise
+          if (hoveredElement.tagName.toLowerCase() == "body") {
+            console.log("drag, dört bir yanı tara", countElementsInsideOf(hoveredElement));
+          }
+          else {
+            if (!hoveredElement.classList.contains('sd-dragover')) {
+              try {
+                document.querySelector('#sd-placeholder').remove();
+              }
+              catch(e) {}
+              try {
+                document.querySelector('.sd-dragover').classList.remove('sd-dragover');
+              }
+              catch(e) {}
+              
+              hoveredElement.classList.add("sd-dragover");
+              // hover element'e dragover ve drop eventlerini ekliyoruz
+              // daha önce başka elemente atanmışsa onları siliyoruz
+              previousDropEl = document.querySelector("[ondrop^=canvasD]");
+              if (previousDropEl && previousDropEl !== hoveredElement) {
+                previousDropEl.removeAttribute("ondrop")
+                previousDropEl.removeAttribute("ondragover");
+              }
+              hoveredElement.setAttribute("ondrop", "canvasDropHandler(event)");
+              hoveredElement.setAttribute("ondragover", "canvasDragoverHandler(event)");
+              const placeholder = document.createElement("div");
+              placeholder.id = "sd-placeholder";
+              hoveredElement.append(placeholder);
+
+              console.log("drag", e.clientX, e.clientY, hoveredElement);
+            }
+          }
+        }
+      }
+    });
+
+    function canvasDragoverHandler(ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      //const placeholder = document.createElement("div")
+      //placeholder.id = "placeholder"
+      //ev.target.appendChild(placeholder)
+      console.log("dragover", ev.target)
+    }
+    function canvasDropHandler(ev) {
+      console.log("drop", ev.target);
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData("text/plain");
+      const el = document.querySelector(id);
+      const placeholder = document.querySelector("#sd-placeholder");
+      console.log(id, document.querySelector(id))
+      // ev.target.appendChild(document.querySelector(id));
+
+      placeholder.parentElement.insertBefore(el, placeholder);
+    }
+
+    function countElementsInsideOf(el) {
+      const elementCount = Array.from(el.children).filter(element => {
+        return (
+          element.tagName.toLowerCase() !== 'script' &&
+          element.tagName.toLowerCase() !== 'iframe'
+        );
+      }).length;
+      return elementCount;
+    }    
+  </script>
+</body>
+
+</html>
