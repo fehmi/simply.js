@@ -12,7 +12,7 @@ simply = {
 		let elsifStart = /\<elsif(\s+)cond=\"(.*)\"(\>$)/;
 		let elsifEnd = /\<\/elsif\>$/;
 		let elseStart = /\<else\>$/;
-		let elseEnd = /\<\/else\>$/;
+		let elseEnd = /\<\/else\>$/; 
 
 		// each https://regex101.com/r/yi5jzG/1
 		// https://regex101.com/r/gvHgOc/1
@@ -951,10 +951,11 @@ simply = {
 
 					var self = this;
 
-
+					var bub = undefined;
 					this.react = function (name, value, prop = false) {
-							// console.log("react TO", name);
-							setTimeout(() => {
+
+							
+							console.log("react TO", name);
 								if (self.data) {
 									if (typeof self.lifecycle !== "undefined") {
 										if (typeof self.lifecycle.whenDataChange !== "undefined") {
@@ -986,7 +987,6 @@ simply = {
 									}
 									self.render();
 								}
-							});
 
 					}
 					
@@ -1028,13 +1028,16 @@ simply = {
 									alert(`Call to doSomething took ${window.tt - window.ttt} milliseconds.`);							
 								}
 								*/
+								
 								if (target[prop] !== value) {
+									Reflect.set(...arguments); // Pass through the operation
 									let old = target[prop];
 									//console.log(prop, "changed from ", target[prop], "to", value);								
 									for (const [key, cb] of Object.entries(self.cb.data)) {
 										cb(prop, value, old);
 										//console.log(`${key}: ${value}`);
 									}
+									return true
 								}
 
 								return Reflect.set(...arguments); // Pass through the operation
@@ -1073,11 +1076,12 @@ simply = {
 								}
 							},									
 							set: function (target, prop, value, receiver) {
+								Reflect.set(...arguments);
 								for (const [key, cb] of Object.entries(self.cb.props)) {
 									cb(prop, value);
 									//console.log(`${key}: ${value}`);
 								}
-								return Reflect.set(...arguments); // Pass through the operation
+								return true; // Pass through the operation
 							},
 							deleteProperty: function (target, prop) {
 								if (prop in target) {
@@ -1110,11 +1114,12 @@ simply = {
 									}
 								},										
 								set: function (target, prop, value, receiver) {
+									Reflect.set(...arguments);
 									for (const [key, cb] of Object.entries(self.cb.state)) {
 										cb(prop, value);
 										//console.log(`${key}: ${value}`);
 									}
-									return Reflect.set(...arguments); // Pass through the operation
+									return true; // Pass through the operation
 								},
 								deleteProperty: function (target, prop) {
 									if (prop in target) {
@@ -1356,6 +1361,7 @@ simply = {
 						}
 					}
 					else {
+						console.log("render", this.data.name);
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeRerender !== "undefined") {
 								this.lifecycle.beforeRerender();
@@ -1380,6 +1386,7 @@ simply = {
 
 						function morphIt(dom) {
 							simply.morphdom(dom, newDomAsString, {
+								
 								childrenOnly: true,						
 								onBeforeElUpdated: function (fromEl, toEl) {
 									// spec - https://dom.spec.whatwg.org/#concept-node-equals							
