@@ -955,7 +955,6 @@ simply = {
 					this.react = function (name, value, prop = false) {
 
 							
-							console.log("react TO", name);
 								if (self.data) {
 									if (typeof self.lifecycle !== "undefined") {
 										if (typeof self.lifecycle.whenDataChange !== "undefined") {
@@ -1356,12 +1355,13 @@ simply = {
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterFirstRender !== "undefined") {
-								this.lifecycle.afterFirstRender();
+								setTimeout(() => {
+									this.lifecycle.afterFirstRender();
+								}, 0);
 							}
 						}
 					}
 					else {
-						console.log("render", this.data.name);
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeRerender !== "undefined") {
 								this.lifecycle.beforeRerender();
@@ -1487,7 +1487,9 @@ simply = {
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterRerender !== "undefined") {
-								this.lifecycle.afterRerender();
+								setTimeout(() => {
+									this.lifecycle.afterRerender();
+								}, 0);
 							}
 						}
 					}

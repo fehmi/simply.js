@@ -2,5 +2,5 @@
 Simple web-component library<br>for simple web-apps.<br><br>
 
 <center>
-    <repl-component id="pxen71pu7juv1ie" download="false"></replcomponent>
+    <repl-component id="tcx9uti2kw4gbdp" download="false"></replcomponent>
 </center>
