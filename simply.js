@@ -996,7 +996,7 @@ simply = {
 							get: function (obj, prop, r) {
 
 								// If the property is an array or object
-								if (typeof obj[prop] === 'object') {
+								if (isObjectWithoutTriggeringGetter(obj, prop)) {
 									//console.log(proxies, obj[prop], r);
 									if (proxies.has(obj[prop])) {
 										//console.log("uyy proxy daaa", obj[prop]);
@@ -1060,10 +1060,39 @@ simply = {
 						this.setData(this.data);
 						this.setCbData(this.cb.data);
 					}
+
+					function isObjectWithoutTriggeringGetter(obj, prop) {
+						const descriptor = Object.getOwnPropertyDescriptor(obj, prop);
+						if (descriptor && 'value' in descriptor) {
+							const value = descriptor.value;
+							return value !== null && typeof value === 'object' && !Array.isArray(value);
+						}
+						return false;
+					}
+
 					if (this.props) {
 						let handler = {
 							get: function (obj, prop) {
+								// If the property is an array or object
+								if (isObjectWithoutTriggeringGetter(obj, prop) ) {
+									console.log(proxies, obj[prop], r);
+									if (proxies.has(obj[prop])) {
+										// console.log("uyy proxy daaa", obj[prop]);
+										return proxies.get(obj[prop]);
+									}
+									else {
+										// console.log("obje proxy'e dönüştürüldü", obj, prop);
+										let proxy = new Proxy(obj[prop], handler);
+										//proxies.add(proxy);
+										proxies.set(obj[prop], proxy);
+										return proxy;
+									}
+
+								}
+								else {
+									// console.log("normal get", obj, prop);
 									return obj[prop];
+								}
 							},
 							set: function (target, prop, value, receiver) {
 								if (target[prop] !== value) {
@@ -1098,13 +1127,26 @@ simply = {
 						if (!this.cb.state) {
 							let handler = {
 								get: function (obj, prop) {
-									// If the property is an array or object
-									if (typeof obj[prop] === 'object' && !obj[prop]._isProxy) {
-										return new Proxy(obj[prop], handler);
+								// If the property is an array or object
+								if (isObjectWithoutTriggeringGetter(obj, prop)) {
+									//console.log(proxies, obj[prop], r);
+									if (proxies.has(obj[prop])) {
+										//console.log("uyy proxy daaa", obj[prop]);
+										return proxies.get(obj[prop]);
 									}
 									else {
-										return obj[prop];
+										//console.log("obje proxy'e dönüştürüldü", obj, prop);
+										let proxy = new Proxy(obj[prop], handler);
+										//proxies.add(proxy);
+										proxies.set(obj[prop], proxy);
+										return proxy;
 									}
+
+								}
+								else {
+									//console.log("normal get", obj, prop);
+									return obj[prop];
+								}
 								},
 								set: function (target, prop, value, receiver) {
 									if (target[prop] !== value) {
