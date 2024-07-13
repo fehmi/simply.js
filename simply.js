@@ -1033,7 +1033,9 @@ simply = {
 									let old = target[prop];
 									//console.log(prop, "changed from ", target[prop], "to", value);								
 									for (const [key, cb] of Object.entries(self.cb.data)) {
-										cb(prop, value, old);
+										if (cb) {
+											cb(prop, value, old);
+										}
 										//console.log(`${key}: ${value}`);
 									}
 								}
@@ -1049,7 +1051,9 @@ simply = {
 									// Expected output: "property removed: texture"
 								}
 								for (const [key, cb] of Object.entries(self.cb.data)) {
-									cb(prop, null);
+									if (cb) {
+										cb(prop, null);
+									}
 									//console.log(`${key}: ${value}`);
 								}
 							}
@@ -1090,7 +1094,7 @@ simply = {
 
 								}
 								else {
-									// console.log("normal get", obj, prop);
+									//console.log("normal get", obj, prop);
 									return obj[prop];
 								}
 							},
@@ -1098,7 +1102,11 @@ simply = {
 								if (target[prop] !== value) {
 									Reflect.set(...arguments);
 									for (const [key, cb] of Object.entries(self.cb.props)) {
-										cb(prop, value);
+											if (cb) {
+
+												cb(prop, value);
+											}
+										
 										//console.log(`${key}: ${value}`);
 									}
 								}
@@ -1152,7 +1160,9 @@ simply = {
 									if (target[prop] !== value) {
 										Reflect.set(...arguments);
 										for (const [key, cb] of Object.entries(self.cb.state)) {
-											cb(prop, value);
+											if (cb) {
+												cb(prop, value);
+											}
 											//console.log(`${key}: ${value}`);
 										}
 									}
@@ -1166,7 +1176,9 @@ simply = {
 										// Expected output: "property removed: texture"
 									}
 									for (const [key, cb] of Object.entries(self.cb.state)) {
-										cb(prop, null);
+										if (cb) {
+											cb(prop, null);
+										}
 									}
 								}
 							};
@@ -1182,31 +1194,11 @@ simply = {
 						this.setCbState(this.cb.state);
 					}
 
-					/*
-					if (this.data) {
-						simply.obaa(this.data, function (name, value, old, parents) {
-							self.react(name, value, old, parents);
-						}, self.uid, name);
-					}*/
-					/*
-					if (this.props) {
-						simply.obaa(this.props, function (name, value, old, parents) {
-							self.react(name, value, old, parents, name);
-						}, self.uid, name);
-					}
-					*/
-					/*
-					if (this.state) {
-						simply.obaa(this.state, function (name, value, old, parents) {
-							self.react(name, value, old, parents);
-						}, self.uid, name);
-					}
-					*/
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
 
 					if (this.parent) {
-						/*
+						
 						if (this.parent.data) {
 							this.parent.cb.data[this.uid] = function (prop, value) { self.react(prop, value) };
 							this.parent.setData = this.parent.data;
@@ -1215,14 +1207,6 @@ simply = {
 							this.parent.cb.props[this.uid] = function (prop, value) { self.react(prop, value) };
 							this.parent.setprops = this.parent.props;
 						}	
-						*/
-						/*
-						if (this.parent.props) {
-							simply.obaa(this.parent.props, function (name, value, old, parents) {
-								self.react(name, value, old, parents, name);
-							}, self.uid, name);
-						}
-						*/
 					}
 
 					this.render();
@@ -1536,21 +1520,25 @@ simply = {
 					// console.log("disconnector", this.uid);
 					if (this.cb.state) {
 						this.cb.state[this.uid] = null;
-						Reflect.deleteProperty(this.cb.state, this.uid); // true
+						// bu biraz yavaşlatıyor diye commentledim
+						// Reflect.deleteProperty(this.cb.state, this.uid); // true
 					}
 					if (this.parent) {
 						if (this.parent.cb) {
 							if (this.parent.cb.data) {
 								this.parent.cb.data[this.uid] = null;
-								Reflect.deleteProperty(this.parent.cb.data, this.uid); // true							
+								// bu biraz yavaşlatıyor diye commentledim
+								// Reflect.deleteProperty(this.parent.cb.data, this.uid); // true							
 							}
 							if (this.parent.cb.state) {
 								this.parent.cb.state[this.uid] = null;
-								Reflect.deleteProperty(this.parent.cb.state, this.uid); // true							
+								// bu biraz yavaşlatıyor diye commentledim
+								// Reflect.deleteProperty(this.parent.cb.state, this.uid); // true							
 							}
 							if (this.parent.cb.props) {
 								this.parent.cb.props[this.uid] = null;
-								Reflect.deleteProperty(this.parent.cb.props, this.uid); // true							
+								// bu biraz yavaşlatıyor diye commentledim
+								// Reflect.deleteProperty(this.parent.cb.props, this.uid); // true							
 							}
 						}
 					}
