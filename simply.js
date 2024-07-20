@@ -832,10 +832,18 @@ simply = {
 
 					// anadan babadan gelen state varsa
 					if (parent) {
-						if (typeof parent.state !== "undefined") {
-							this.state = parent.state;
-							this.cb.state = parent.cb.state;
+						if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
+							let current = parent;
+							while (current) {
+									if (current.state) {
+											this.state = current.state;
+											this.cb.state = parent.cb.state;
+											break;
+									}
+									current = current.parent;
+							}
 						}
+						
 						if (typeof parent.globalStyle !== "undefined") {
 							this.globalStyle = parent.globalStyle;
 						}
@@ -1136,6 +1144,7 @@ simply = {
 							let handler = {
 								get: function (obj, prop) {
 								// If the property is an array or object
+								// console.log(template, script, style);
 								if (isObjectWithoutTriggeringGetter(obj, prop)) {
 									//console.log(proxies, obj[prop], r);
 									if (proxies.has(obj[prop])) {
@@ -1182,21 +1191,32 @@ simply = {
 									}
 								}
 							};
-							this.cb.state = {}
-							this.cb.state[this.uid] = function (prop, value) { self.react(prop, value) };
-							this.state = new Proxy(this.state, handler);
+							// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
+							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
+								this.cb.state = {}
+								this.cb.state[this.uid] = function (prop, value) { self.react(prop, value) };
+								this.state = new Proxy(this.state, handler);
+							}
+
 
 						}
 						else {
-							this.cb.state[this.uid] = function (prop, value) { self.react(prop, value) };
+							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
+								// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
+								this.cb.state[this.uid] = function (prop, value) { self.react(prop, value) };
+							}
 						}
 						this.setState(this.state);
-						this.setCbState(this.cb.state);
+						if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
+							// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
+							this.setCbState(this.cb.state);
+						}
 					}
 
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
 
+					/*
 					if (this.parent) {
 						
 						if (this.parent.data) {
@@ -1208,6 +1228,7 @@ simply = {
 							this.parent.setprops = this.parent.props;
 						}	
 					}
+					*/
 
 					this.render();
 				}
@@ -3119,7 +3140,7 @@ simply = {
 					element.state = state;
 				}
 				else {
-					let parent = document.querySelector("reframer-app");;
+					let parent = outlet.parentNode; // aka reframer-app component
 					element.parent = parent;
 					let state = parent.state;
 					element.state = state;
