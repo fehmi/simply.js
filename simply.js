@@ -1005,6 +1005,7 @@ simply = {
 
 								// If the property is an array or object
 								if (isObjectWithoutTriggeringGetter(obj, prop)) {
+									console.log(obj, prop);
 									//console.log(proxies, obj[prop], r);
 									if (proxies.has(obj[prop])) {
 										//console.log("uyy proxy daaa", obj[prop]);
@@ -1066,18 +1067,23 @@ simply = {
 								}
 							}
 						};
-						this.cb.data = {}
-						this.cb.data[this.uid] = function (prop, value) { self.react(prop, value) };
-						this.data = new Proxy(this.data, handler);
-						this.setData(this.data);
-						this.setCbData(this.cb.data);
+
+						if (template.indexOf("data.") > -1 || script.indexOf("data.") > -1) {
+							this.cb.data = {}
+							this.cb.data[this.uid] = function (prop, value) { self.react(prop, value) };
+							this.data = new Proxy(this.data, handler);
+							this.setData(this.data);
+							this.setCbData(this.cb.data);
+						}
+
 					}
 
 					function isObjectWithoutTriggeringGetter(obj, prop) {
 						const descriptor = Object.getOwnPropertyDescriptor(obj, prop);
 						if (descriptor && 'value' in descriptor) {
 							const value = descriptor.value;
-							return value !== null && typeof value === 'object' && !Array.isArray(value);
+							return value !== null && typeof value === 'object';
+							//return value !== null && typeof value === 'object' && !Array.isArray(value);
 						}
 						return false;
 					}
@@ -1085,7 +1091,11 @@ simply = {
 					if (this.props) {
 						let handler = {
 							get: function (obj, prop) {
-								// If the property is an array or object
+
+								// props can contain only key: value not key: object
+								// so no need to proxify child nodes
+
+								/*
 								if (isObjectWithoutTriggeringGetter(obj, prop) ) {
 									console.log(proxies, obj[prop], r);
 									if (proxies.has(obj[prop])) {
@@ -1105,6 +1115,8 @@ simply = {
 									//console.log("normal get", obj, prop);
 									return obj[prop];
 								}
+								*/
+								return obj[prop];
 							},
 							set: function (target, prop, value, receiver) {
 								if (target[prop] !== value) {
@@ -1132,11 +1144,15 @@ simply = {
 								}
 							}
 						};
-						this.cb.props = {}
-						this.cb.props[this.uid] = function (prop, value) { self.react(prop, value, true) };
-						this.props = new Proxy(this.props, handler);
-						this.setProps(this.props);
-						this.setCbProps(this.cb.props);
+
+						if (template.indexOf("props.") > -1 || script.indexOf("props.") > -1) {
+							this.cb.props = {}
+							this.cb.props[this.uid] = function (prop, value) { self.react(prop, value, true) };
+							this.props = new Proxy(this.props, handler);
+							this.setProps(this.props);
+							this.setCbProps(this.cb.props);
+						}
+
 					}
 
 					if (this.state) {
