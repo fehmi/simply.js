@@ -17,3 +17,14 @@ You can disable reactivity for specific elements in your template like below. Th
 It can be helpful for performance reasons. In that scenario, do your changes withot triggering reaction and then render manually when you finish.
 
 <repl-component id="t509ixnfmmbk0n5" donwload="true"></repl-component>
+
+You can also use built-in method to set data without triggering render. Then you can render manually for increasing performance.
+```js
+simply.setWithoutRender(data, {
+  total: response.response.headers["X-WP-Total"],
+  offset: data.offset + data.perPage,
+  themes: response.meta.themes,
+  meta: response.meta
+});
+component.render();  // or component.react()
+```

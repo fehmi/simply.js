@@ -835,15 +835,15 @@ simply = {
 						if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
 							let current = parent;
 							while (current) {
-									if (current.state) {
-											this.state = current.state;
-											this.cb.state = parent.cb.state;
-											break;
-									}
-									current = current.parent;
+								if (current.state) {
+									this.state = current.state;
+									this.cb.state = parent.cb.state;
+									break;
+								}
+								current = current.parent;
 							}
 						}
-						
+
 						if (typeof parent.globalStyle !== "undefined") {
 							this.globalStyle = parent.globalStyle;
 						}
@@ -1005,18 +1005,20 @@ simply = {
 
 								// If the property is an array or object
 								if (isObjectWithoutTriggeringGetter(obj, prop)) {
-									console.log(obj, prop);
+									// console.log(obj, prop);
 									//console.log(proxies, obj[prop], r);
 									if (proxies.has(obj[prop])) {
 										//console.log("uyy proxy daaa", obj[prop]);
 										return proxies.get(obj[prop]);
 									}
 									else {
-										//console.log("obje proxy'e dönüştürüldü", obj, prop);
-										let proxy = new Proxy(obj[prop], handler);
-										//proxies.add(proxy);
-										proxies.set(obj[prop], proxy);
-										return proxy;
+
+												//console.log("obje proxy'e dönüştürüldü", obj, prop);
+												let proxy = new Proxy(obj[prop], handler);
+												//proxies.add(proxy);
+												proxies.set(obj[prop], proxy);
+												return proxy;
+
 									}
 
 								}
@@ -1122,11 +1124,11 @@ simply = {
 								if (target[prop] !== value) {
 									Reflect.set(...arguments);
 									for (const [key, cb] of Object.entries(self.cb.props)) {
-											if (cb) {
+										if (cb) {
 
-												cb(prop, value);
-											}
-										
+											cb(prop, value);
+										}
+
 										//console.log(`${key}: ${value}`);
 									}
 								}
@@ -1159,27 +1161,27 @@ simply = {
 						if (!this.cb.state) {
 							let handler = {
 								get: function (obj, prop) {
-								// If the property is an array or object
-								// console.log(template, script, style);
-								if (isObjectWithoutTriggeringGetter(obj, prop)) {
-									//console.log(proxies, obj[prop], r);
-									if (proxies.has(obj[prop])) {
-										//console.log("uyy proxy daaa", obj[prop]);
-										return proxies.get(obj[prop]);
+									// If the property is an array or object
+									// console.log(template, script, style);
+									if (isObjectWithoutTriggeringGetter(obj, prop)) {
+										//console.log(proxies, obj[prop], r);
+										if (proxies.has(obj[prop])) {
+											//console.log("uyy proxy daaa", obj[prop]);
+											return proxies.get(obj[prop]);
+										}
+										else {
+											//console.log("obje proxy'e dönüştürüldü", obj, prop);
+											let proxy = new Proxy(obj[prop], handler);
+											//proxies.add(proxy);
+											proxies.set(obj[prop], proxy);
+											return proxy;
+										}
+
 									}
 									else {
-										//console.log("obje proxy'e dönüştürüldü", obj, prop);
-										let proxy = new Proxy(obj[prop], handler);
-										//proxies.add(proxy);
-										proxies.set(obj[prop], proxy);
-										return proxy;
+										//console.log("normal get", obj, prop);
+										return obj[prop];
 									}
-
-								}
-								else {
-									//console.log("normal get", obj, prop);
-									return obj[prop];
-								}
 								},
 								set: function (target, prop, value, receiver) {
 									if (target[prop] !== value) {
@@ -1590,6 +1592,17 @@ simply = {
 			}
 			customElements.define(name, simplyComponent);
 		}
+	},
+	setWithoutRender: function(target, props) {
+		Object.defineProperties(target, Object.keys(props).reduce((descriptors, key) => {
+			descriptors[key] = {
+				value: props[key],
+				writable: true,
+				enumerable: true,
+				configurable: true
+			};
+			return descriptors;
+		}, {}));
 	},
 	Router: function () {
 		(function () {
