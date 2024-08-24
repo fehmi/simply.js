@@ -181,7 +181,7 @@ simply = {
 						logic = "}";
 						flag = true;
 					}
-					else if (recentBucket.test(recentBucket)) {
+					else if (recentBucket.includes("<each")) {
 						const tt0 = performance.now();
 						m = recentBucket.match(/\<each[^\>]*\>$/)
 						m.groups = parseEachTag(m[0]);
@@ -226,6 +226,7 @@ simply = {
 						const tt1 = performance.now();
 						console.log(`parseeach took ${tt1 - tt0} milliseconds.`);
 					}
+	
 					else if ((m = eachEnd.exec(recentBucket)) !== null) {
 						eachCount -= 1;
 						logic = "};";
