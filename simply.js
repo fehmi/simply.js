@@ -8,16 +8,20 @@ simply = {
 
 		// condititionals
 		let ifStart = /\<if(\s+)cond=\"(.*)\"(\>$)/;
-		let ifEnd = /\<\/if\>$/;
 		let elsifStart = /\<elsif(\s+)cond=\"(.*)\"(\>$)/;
+		
+		let ifEnd = /\<\/if\>$/;
 		let elsifEnd = /\<\/elsif\>$/;
 		let elseStart = /\<else\>$/;
 		let elseEnd = /\<\/else\>$/;
+		let eachEnd = /\<\/each\>$/;
+
+		const MAX_LENGTH = 150;
 
 		// each https://regex101.com/r/yi5jzG/1
 		// https://regex101.com/r/gvHgOc/1
 		let eachStart = /\<each\s+of\=\"(?<of>[^"]*)\"\s+as\=\"(?<as>[^"]*)\"(\s+key\=\"(?<key>[^"]*)\")?(\s+index\=\"(?<index>[^"]*)\")?\>$/gm;
-		let eachEnd = /\<\/each\>$/;
+		
 
 		// in tag var
 		// https://regex101.com/r/vzY75x/1
@@ -46,19 +50,24 @@ simply = {
 		var simplyTemplateCount = 0;
 		var ignoreFlag = false;
 
-		template = template.replace(/\$\{/g, 'minyeli{');
+		if (template.includes('${')) {
+			template = template.replace(/\$\{/g, 'minyeli{');
+		}
+		const t0 = performance.now();
 
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
+			let recentBucket = bucket.slice(-MAX_LENGTH); // Get the last MAX_LENGTH characters
 
-			if (bucket.substr(-"<script".length) === "<script") {
+			/* 1ms */
+			if (bucket.endsWith("<script")) {
 				scriptCount += 1;
 			}
-			else if (bucket.substr(-"<style".length) === "<style") {
+			else if (bucket.endsWith("<style")) {
 				styleCount += 1;
 			}
-			else if (simplyTemplate.test(bucket)) {
+			else if (bucket.endsWith("<template simply>")) {
 				//bucket += "<!--";
 				//processedLetters += "<!--";
 				simplyTemplateCount += 1;
@@ -66,20 +75,20 @@ simply = {
 			// else if (bucket.substr(-"<template>".length) === "<template>") {
 			// 	templateCount += 1;
 			// }
-			else if (bucket.substr(-"</script>".length) === "</script>") {
+			else if (bucket.endsWith("</script>")) {
 				scriptCount -= 1;
 			}
-			else if (bucket.substr(-"</style>".length) === "</style>") {
+			else if (bucket.endsWith("</style>")) {
 				styleCount -= 1;
 			}
 			// inline template skip
 			// we will look when construct
-			else if (bucket.substr(-"</template>".length) === "</template>") {
+			else if (bucket.endsWith("</template>")) {
 				simplyTemplateCount -= 1;
 				//bucket = bucket.replace(/<\/template>$/, "--></template>");
 				//processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
 			}
-
+			/* / 1ms */
 
 			if (simplyTemplateCount == 0 && styleCount == 0 && scriptCount == 0) {
 				// attribute içindeki fonksyion ise skip
@@ -111,96 +120,133 @@ simply = {
 					// if (simply.parseProp("{" + variable.toString() + "}").type == "object") {
 					// 	variable = "\"" + varBucket.trim() + "\"";
 					// }
+					
 					// no bubble for me today
-					try {
-						if (typeof JSON.parse("{" + variable.replace(/[^\\]'/g, '"').replace(/\\'/g, "'") + "}") == "object") {
-							variable = "\"" + varBucket.trim() + "\"";
-						}
-					} catch (error) {
+					/* 3ms */
+					//try {
+					//	if (typeof JSON.parse("{" + variable.replace(/[^\\]'/g, '"').replace(/\\'/g, "'") + "}") == "object") {
+					//		variable = "\"" + varBucket.trim() + "\"";
+					//	}
+					//} catch (error) {
+					//
+					//}
+					/* / 3ms */
 
+					// 1ms Simple check for object-like patterns
+					function isObjectString(str) {
+						return /^\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))+\}))*\}$/.test(str);
+					}
+
+					// Usage in your code
+					if (isObjectString(variable)) {
+						variable = "\"" + varBucket.trim() + "\"";
 					}
 
 					logic = "ht+=" + variable + ";";
 					flag = true;
 				}
-				else if ((m = inTagVar.exec(bucket)) !== null) {
-					logic = "ht+=" + m.groups.l + ";";
-					flag = true;
-				}
-				else if ((m = ifStart.exec(bucket)) !== null) {
-					logic = unescape("if (" + m[2] + ") {");
-					//logic = (ifCount == 0 ? 'let ht = "";' + logic : logic);
-					ifCount += 1;
-					flag = true;
-				}
-				else if ((m = elsifStart.exec(bucket)) !== null) {
-					logic = unescape(m[2]); // bu niye 3 tü
-					logic = "else if (" + logic + ") {";
-					flag = true;
-				}
-				else if ((m = elseStart.exec(bucket)) !== null) {
-					logic = "else {";
-					flag = true;
+				else if ((m = inTagVar.exec(recentBucket)) !== null) {
 
+						logic = "ht+=" + m.groups.l + ";";
+						flag = true;
+					
 				}
-				else if ((m = ifEnd.exec(bucket)) !== null) {
-					ifCount -= 1;
-					logic = "}";
-					flag = true;
-				}
-				else if ((m = elsifEnd.exec(bucket)) !== null) {
-					logic = "}";
-					flag = true;
-				}
-				else if ((m = elseEnd.exec(bucket)) !== null) {
-					logic = "}";
-					flag = true;
-				}
-				else if ((m = eachStart.exec(bucket)) !== null) {
-					// console.log(m);
-					// if (eachCount > 0) {} //each içinde each
-					eachCount += 1;
-					try {
-						subject = eval(m.groups.of);
-					} catch (error) {
-						//console.log(lastM + "." + m.groups.of);
-						subject = m.groups.of;
+				if (recentBucket.endsWith(">")) {
+					if ((m = ifStart.exec(recentBucket)) !== null) {
+						logic = unescape("if (" + m[2] + ") {");
+						//logic = (ifCount == 0 ? 'let ht = "";' + logic : logic);
+						ifCount += 1;
+						flag = true;
 					}
-
-					iiii = "s" + Math.random().toString(36).slice(-7);
-					if (Array.isArray(subject)) {
-						key = typeof m.groups.key !== "undefined" ? "let " + m.groups.key + " = " + iiii + ";" : "";
-						let index = typeof m.groups.key !== "undefined" ? "let " + m.groups.index + " = " + iiii + ";" : "";
-
-						logic = "for (" + iiii + " = 0; " + iiii + " < " + m.groups.of + ".length; " + iiii + "++) { \
-													" + key + "; \
-													" + index + "; \
-													let " + m.groups.as + "=" + m.groups.of + "[" + iiii + "];";
+					else if ((m = elsifStart.exec(recentBucket)) !== null) {
+						logic = unescape(m[2]); // bu niye 3 tü
+						logic = "else if (" + logic + ") {";
+						flag = true;
 					}
-					else {
-						key = typeof m.groups.index !== "undefined" ? "let " + m.groups.index + " = " : "";
-
-						// obaa objelerini exclude et
-						// '__o_' || ii == '__c_' || ii == '__p_'
-						logic = "\
-											for (var ii in "+ m.groups.of + ") { \
-												if (ii == '__o_' || ii == '__c_' || ii == '__p_' || ii == '__r_' || typeof "+ m.groups.of + "[ii] == 'function') { continue; }\
-												" + key + "Object.keys(" + m.groups.of + ").indexOf(ii); \
-												let " + m.groups.key + "= ii; \
-												let " + m.groups.as + "=" + m.groups.of + "[ii];";
+					else if ((m = elseStart.exec(recentBucket)) !== null) {
+						logic = "else {";
+						flag = true;
+	
 					}
-					flag = true;
-					lastM = m.groups.of;
-					lasti = iiii;
+					else if ((m = ifEnd.exec(recentBucket)) !== null) {
+						ifCount -= 1;
+						logic = "}";
+						flag = true;
+					}
+					else if ((m = elsifEnd.exec(recentBucket)) !== null) {
+						logic = "}";
+						flag = true;
+					}
+					else if ((m = elseEnd.exec(recentBucket)) !== null) {
+						logic = "}";
+						flag = true;
+					}
+					else if (recentBucket.test(recentBucket)) {
+						const tt0 = performance.now();
+						m = recentBucket.match(/\<each[^\>]*\>$/)
+						m.groups = parseEachTag(m[0]);
+						
+	
+	
+						// console.log(m);
+						// if (eachCount > 0) {} //each içinde each
+						eachCount += 1;
+						try {
+							subject = eval(m.groups.of);
+						} catch (error) {
+							//console.log(lastM + "." + m.groups.of);
+							subject = m.groups.of;
+						}
+	
+						iiii = "s" + Math.random().toString(2).slice(-7);
+						if (Array.isArray(subject)) {
+							key = m.groups.key ? "let " + m.groups.key + " = " + iiii + ";" : "";
+							let index = m.groups.key ? "let " + m.groups.index + " = " + iiii + ";" : "";
+	
+							logic = "for (" + iiii + " = 0; " + iiii + " < " + m.groups.of + ".length; " + iiii + "++) { \
+														" + key + "; \
+														" + index + "; \
+														let " + m.groups.as + "=" + m.groups.of + "[" + iiii + "];";
+						}
+						else {
+							key = m.groups.index ? "let " + m.groups.index + " = " : "";
+	
+							// obaa objelerini exclude et
+							// '__o_' || ii == '__c_' || ii == '__p_'
+							logic = "\
+												for (var ii in "+ m.groups.of + ") { \
+													if (typeof "+ m.groups.of + "[ii] == 'function') { continue; }\
+													" + key + "Object.keys(" + m.groups.of + ").indexOf(ii); \
+													let " + m.groups.key + "= ii; \
+													let " + m.groups.as + "=" + m.groups.of + "[ii];";
+						}
+						flag = true;
+						lastM = m.groups.of;
+						lasti = iiii;
+						const tt1 = performance.now();
+						console.log(`parseeach took ${tt1 - tt0} milliseconds.`);
+					}
+					else if ((m = eachEnd.exec(recentBucket)) !== null) {
+						eachCount -= 1;
+						logic = "};";
+						flag = true;
+					}
 				}
 
-				else if ((m = eachEnd.exec(bucket)) !== null) {
-					eachCount -= 1;
-					logic = "};";
-					flag = true;
-				}
 			}
-
+			function parseEachTag(eachTag) {
+				let ofMatch = eachTag.match(/of="([^"]+)"/);
+				let asMatch = eachTag.match(/as="([^"]+)"/);
+				let keyMatch = eachTag.match(/key="([^"]+)"/);
+				let indexMatch = eachTag.match(/index="([^"]+)"/);
+		
+				let of = ofMatch ? ofMatch[1] : undefined;
+				let as = asMatch ? asMatch[1] : undefined;
+				let key = keyMatch ? keyMatch[1] : undefined;
+				let index = indexMatch ? indexMatch[1] : undefined;
+		
+				return { of, as, key, index };
+		}
 
 			if (flag === true) {
 
@@ -240,6 +286,8 @@ simply = {
 				processedLetters = "";
 			}
 		}
+		const t1 = performance.now();
+console.log(`for loop took ${t1 - t0} milliseconds.`);
 		// for the last non-logical text
 		if (processedLetters.trimEnd() !== "") {
 			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -252,6 +300,8 @@ simply = {
 		// console.log(bucket); 
 		// console.log(capturedLogics); 
 		bucket = bucket.replace(/minyeli/g, '$');
+		
+
 		eval(bucket);
 
 		//console.timeEnd();
@@ -961,7 +1011,7 @@ simply = {
 					var hamdi = name;
 					var bub = undefined;
 					this.react = function (name, value, prop = false) {
-						// console.log("react to ", name, value, hamdi);
+						console.log("react to ", name, value, hamdi);
 
 						if (self.data) {
 							if (typeof self.lifecycle !== "undefined") {
@@ -1012,12 +1062,19 @@ simply = {
 										return proxies.get(obj[prop]);
 									}
 									else {
+										const regex = new RegExp(`(\\.|\\[(\"|\\'))${prop}(\\.|(\"|\\')\\])(\\[)?`, "g");
 
-												//console.log("obje proxy'e dönüştürüldü", obj, prop);
-												let proxy = new Proxy(obj[prop], handler);
-												//proxies.add(proxy);
-												proxies.set(obj[prop], proxy);
-												return proxy;
+
+										if (regex.test(script)) {
+											console.log("obje proxy'e dönüştürüldü", obj, prop);
+											let proxy = new Proxy(obj[prop], handler);
+											//proxies.add(proxy);
+											proxies.set(obj[prop], proxy);
+											return proxy;
+										}
+										else {
+											return obj[prop];
+										}
 
 									}
 
@@ -1432,11 +1489,15 @@ simply = {
 							}
 						}
 
+						const t0 = performance.now();
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
+						const t1 = performance.now();
+						console.log(`parseTemplate took ${t1 - t0} milliseconds.`);
+
 						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
-
+						console.log("morfingen");
 						if (this.open) {
 							var newDomAsString = "<" + name + " open>" + newDom + "</" + name + ">";
 
@@ -1593,7 +1654,7 @@ simply = {
 			customElements.define(name, simplyComponent);
 		}
 	},
-	setWithoutRender: function(target, props) {
+	setWithoutRender: function (target, props) {
 		Object.defineProperties(target, Object.keys(props).reduce((descriptors, key) => {
 			descriptors[key] = {
 				value: props[key],
