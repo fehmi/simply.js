@@ -7,8 +7,8 @@ simply = {
 		let simplyTemplate = /\<template([^<>]*)simply([^<>]*)>$/;
 
 		// condititionals
-		let ifStart = /\<if(\s+)cond=\"(.*)\"(\>$)/;
-		let elsifStart = /\<elsif(\s+)cond=\"(.*)\"(\>$)/;
+		let ifStart = /\<if(\s)cond=\"(.*)\"(\>$)/;
+		let elsifStart = /\<elsif(\s)cond=\"(.*)\"(\>$)/;
 		
 		let ifEnd = /\<\/if\>$/;
 		let elsifEnd = /\<\/elsif\>$/;
@@ -53,12 +53,12 @@ simply = {
 		if (template.includes('${')) {
 			template = template.replace(/\$\{/g, 'minyeli{');
 		}
-		const t0 = performance.now();
 
 		for (var i = 0; i < template.length; i++) {
 			processedLetters += template[i];
 			bucket += template[i];
 			let recentBucket = bucket.slice(-MAX_LENGTH); // Get the last MAX_LENGTH characters
+			let recentBucket2 = bucket.slice(-8); // Get the last MAX_LENGTH characters
 
 			/* 1ms */
 			if (bucket.endsWith("<script")) {
@@ -92,11 +92,9 @@ simply = {
 
 			if (simplyTemplateCount == 0 && styleCount == 0 && scriptCount == 0) {
 				// attribute içindeki fonksyion ise skip
-				if (bucket.substr(-'="function'.length) === '="function' ||
-					bucket.substr(-'="(function'.length) === '="(function'
-				) {
+				if (bucket.endsWith('="function') || bucket.endsWith('="(function')) {
 					ignoreFlag = true;
-				}
+			}
 
 				if (template[i - 1] !== "\\" && template[i] == "{") {
 					curlyCount += 1;
@@ -134,7 +132,7 @@ simply = {
 
 					// 1ms Simple check for object-like patterns
 					function isObjectString(str) {
-						return /^\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))+\}))*\}$/.test(str);
+						return /^\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))+\}))*\}$/.exec(str);
 					}
 
 					// Usage in your code
@@ -146,43 +144,40 @@ simply = {
 					flag = true;
 				}
 				else if ((m = inTagVar.exec(recentBucket)) !== null) {
-
 						logic = "ht+=" + m.groups.l + ";";
 						flag = true;
-					
 				}
 				if (recentBucket.endsWith(">")) {
-					if ((m = ifStart.exec(recentBucket)) !== null) {
+					if (recentBucket.includes('<if ') && (m = ifStart.exec(recentBucket)) !== null) {
 						logic = unescape("if (" + m[2] + ") {");
 						//logic = (ifCount == 0 ? 'let ht = "";' + logic : logic);
 						ifCount += 1;
 						flag = true;
 					}
-					else if ((m = elsifStart.exec(recentBucket)) !== null) {
+					else if (recentBucket.includes('<elsif ') && (m = elsifStart.exec(recentBucket)) !== null) {
 						logic = unescape(m[2]); // bu niye 3 tü
 						logic = "else if (" + logic + ") {";
 						flag = true;
 					}
-					else if ((m = elseStart.exec(recentBucket)) !== null) {
+					else if ((m = elseStart.exec(recentBucket2)) !== null) {
 						logic = "else {";
 						flag = true;
 	
 					}
-					else if ((m = ifEnd.exec(recentBucket)) !== null) {
+					else if ((m = ifEnd.exec(recentBucket2)) !== null) {
 						ifCount -= 1;
 						logic = "}";
 						flag = true;
 					}
-					else if ((m = elsifEnd.exec(recentBucket)) !== null) {
+					else if ((m = elsifEnd.exec(recentBucket2)) !== null) {
 						logic = "}";
 						flag = true;
 					}
-					else if ((m = elseEnd.exec(recentBucket)) !== null) {
+					else if ((m = elseEnd.exec(recentBucket2)) !== null) {
 						logic = "}";
 						flag = true;
 					}
 					else if (recentBucket.includes("<each")) {
-						const tt0 = performance.now();
 						m = recentBucket.match(/\<each[^\>]*\>$/)
 						m.groups = parseEachTag(m[0]);
 						
@@ -223,11 +218,10 @@ simply = {
 						flag = true;
 						lastM = m.groups.of;
 						lasti = iiii;
-						const tt1 = performance.now();
-						console.log(`parseeach took ${tt1 - tt0} milliseconds.`);
+
 					}
 	
-					else if ((m = eachEnd.exec(recentBucket)) !== null) {
+					else if ((m = eachEnd.exec(recentBucket2)) !== null) {
 						eachCount -= 1;
 						logic = "};";
 						flag = true;
@@ -287,8 +281,7 @@ simply = {
 				processedLetters = "";
 			}
 		}
-		const t1 = performance.now();
-console.log(`for loop took ${t1 - t0} milliseconds.`);
+
 		// for the last non-logical text
 		if (processedLetters.trimEnd() !== "") {
 			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1012,7 +1005,7 @@ console.log(`for loop took ${t1 - t0} milliseconds.`);
 					var hamdi = name;
 					var bub = undefined;
 					this.react = function (name, value, prop = false) {
-						console.log("react to ", name, value, hamdi);
+						// console.log("react to ", name, value, hamdi);
 
 						if (self.data) {
 							if (typeof self.lifecycle !== "undefined") {
@@ -1067,7 +1060,7 @@ console.log(`for loop took ${t1 - t0} milliseconds.`);
 
 
 										if (regex.test(script)) {
-											console.log("obje proxy'e dönüştürüldü", obj, prop);
+											// console.log("obje proxy'e dönüştürüldü", obj, prop);
 											let proxy = new Proxy(obj[prop], handler);
 											//proxies.add(proxy);
 											proxies.set(obj[prop], proxy);
@@ -1498,7 +1491,7 @@ console.log(`for loop took ${t1 - t0} milliseconds.`);
 						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
-						console.log("morfingen");
+						//console.log("morfingen");
 						if (this.open) {
 							var newDomAsString = "<" + name + " open>" + newDom + "</" + name + ">";
 
