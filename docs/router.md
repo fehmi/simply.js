@@ -1,5 +1,7 @@
 ## Router
 
+!> The router module is deprecated and will be deleted on upcoming releases. Use [AWC router](docs/awc-router) instead.
+
 Add your site path as base href.
 
 ```html

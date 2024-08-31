@@ -9,10 +9,12 @@ Simply.js provides several methods for design token management. Just choose one 
 <repl-component id="st5t6rasly8yim6"></repl-component>
 
 ## Tokens in a global state object
+
 ?> Only use `state` variables in a global style tag. variables in `data` object cannot pass to children.
+
 <repl-component id="3ar1za5hmuy5fal"></repl-component>
 
-## CSS variable in :host
+## CSS variable in ':host'
 <repl-component id="vi3k3uspqvsrvfl"></repl-component>
 
 ## Manage all with UNO!

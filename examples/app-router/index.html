@@ -1,0 +1,37 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Router Example - simply</title>
+	<base href="/simply/examples/app-router/">
+</head>
+
+
+<a href="">Home</a>
+<a href="hello1">Page 1</a>
+<a href="hello1/c">Page 1 c</a>
+<a href="hello2">Page 2</a>
+<a href="hello3">Page 3</a>
+
+
+<web-app></web-app>
+
+<body>
+
+	<script src="/simply/simply.js"></script>
+
+
+	<script>
+		get('web-app.html', "web-app");
+		get('home-page.html', "home-page");
+		get('hello-world1.html', "hello-world1");
+		get('hello-world2.html', "hello-world2");
+		get('hello-world3.html', "hello-world3");
+		get('nested-default.html', "nested-default");
+		get('a-page.html', "a-page");
+		get('b-page.html', "b-page");
+		get('c-page.html', "c-page");
+	</script>
+</body>
+
+</html>

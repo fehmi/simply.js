@@ -1,0 +1,59 @@
+<html>
+hello world 1 {data.hobbies.Gaming} {state.name}
+
+<a href="hello1">a</a>
+<a href="hello1/a">a</a>
+<a href="hello1/b">b</a>
+<a href="hello1/c">c</a>
+
+<a-router  style="display: block;">
+	<a-outlet>
+    <nested-default></nested-default>
+  </a-outlet>
+	<a-route path="/a" element="a-page"></a-route>
+	<a-route path="/b" element="b-page"></a-route>
+	<a-route path="/c" element="c-page"></a-route>
+</a-router>
+</html>
+<style>
+  p {
+    background: aquamarine;
+    border-radius: 30px;
+    padding: 20px;
+    font-size: 20px;
+    text-align: center;
+    width: 300px;
+    margin: 0 auto;
+    color: aquamarine;
+    color: "{data.color}";
+  }
+</style>
+<script>
+  class {
+    data = {
+      name: "fehmi",
+      age: 37,
+      personalities: ["Calm", "Creative", "Passionate"],
+      hobbies: {
+        "Music Producing": "Kırk yılda bir",
+        Gaming: "Aydı yılda bir",
+        Sports: "Meeeh",
+      },
+      color: "blue"
+    };
+    methods = {
+      asd(e) {
+        alert("asd function called");
+        console.log(event);
+      },
+      bcd() {
+        alert("bcd")
+      }
+    };
+    lifecycle = {
+      afterConstruct() {
+        console.log("construct of hello1");
+      }
+    }
+  }
+</script>

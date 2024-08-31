@@ -1,0 +1,58 @@
+<html>
+
+<a-router  style="display: block;">
+	<a-outlet></a-outlet>
+	<a-route path="/" element="home-page"></a-route>
+	<a-route path="/hello1" element="hello-world1"></a-route>
+	<a-route path="/hello2" element="hello-world2"></a-route>
+	<a-route path="/hello3" element="hello-world3"></a-route>
+</a-router>
+
+</html>
+<style>
+  p {
+    background: aquamarine;
+    border-radius: 30px;
+    padding: 20px;
+    font-size: 20px;
+    text-align: center;
+    width: 300px;
+    margin: 0 auto;
+    color: aquamarine;
+    color: "{data.color}";
+  }
+</style>
+<script>
+  class {
+    state = {
+      name: "new router"
+    }
+    data = {
+      name: "fehmi",
+      age: 37,
+      personalities: ["Calm", "Creative", "Passionate"],
+      hobbies: {
+        "Music Producing": "Kırk yılda bir",
+        Gaming: "Aydı yılda bir",
+        Sports: "Meeeh",
+      },
+      color: "blue"
+    };
+    methods = {
+      asd(e) {
+        alert("asd function called");
+        console.log(event);
+      },
+      bcd() {
+        alert("bcd")
+      }
+    };
+    lifecycle = {
+      beforeFirstRender() {
+        setTimeout(() => {
+          state.name = "hamdi"
+        }, 2000);
+      }
+    }
+  }
+</script>

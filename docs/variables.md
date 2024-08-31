@@ -130,9 +130,7 @@ You can use your reactive data variables as a property value in style tag.
 
 ## Changing variable values in `<html>`
 
-It's totally acceptable to change variables in template. Just do like `{data.name = "marilyn monroe"}`. It will change and render the new value right away and trigger reactions. If you want to change the variable value wihout rendering it just comment it like `<!-- {data.name = "marilyn monroe"} -->`
-
-<repl-component id="pg5njqyn1pyud0g" download="true"></repl-component>
+!> It's totally unacceptable to change variables in template like `{data.name = "marilyn monroe"}` or `<!-- {data.name = "marilyn monroe"} -->`. It will cause infinite reaction/render loop. So, simply just don't do it.
 
 ## Using variables from functions that returns values
 
