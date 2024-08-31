@@ -1021,7 +1021,7 @@ simply = {
 									if (typeof self.lifecycle.whenPropChange !== "undefined") {
 										if (self.lifecycle.whenPropChange(property, newValue, previousValue) === false) {
 											return false;
-										};	
+										};
 									}
 								}
 								else if (typeof self.lifecycle.whenDataChange !== "undefined") {
@@ -1099,8 +1099,7 @@ simply = {
 					}
 
 					if (this.stateToObserve) {
-						if (!this.cb.state && !this.stateToObserve.__isProxy) {
-							console.log(this.stateToObserve.__isProxy, templateName);
+						if (!this.stateToObserve.__isProxy) {
 							this.state = ObservableSlim.create(this.stateToObserve, true, function (changes) {
 								console.log(changes, templateName);
 								if (self.cb.state) {
@@ -1114,28 +1113,52 @@ simply = {
 									}
 								}
 							});
-							// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
+							this.cb.state = {}
+							this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+							this.setCbState(this.cb.state);
+							console.log("bu bi kere çalışır");
+							// this.state = new Proxy(this.state, handler);
+
+						}
+						else {
+							console.log(this.parent.state);
+							this.state = this.parent.state
 							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
-								this.cb.state = {}
-								this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+								var p = findElementWithCB(this.parent);
+								console.log("ppp", p, this.parent, templateName);
+								p.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
 								// this.state = new Proxy(this.state, handler);
 							}
 						}
-						else {
-							this.state = this.stateToObserve;
-							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
-								console.log(this.cb);
-								this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+						// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
+
+
+
+						this.setState(this.state);
+
+					}
+					function findElementWithCB(element) {
+						let current = element;
+
+						while (current) {
+							if (current.cb) {
+								if (current.cb.state) {
+									return current;
+								}
+							}
+
+							// Move up to the parent node, checking if we're in a shadow DOM
+							if (current.parentNode) {
+								current = current.parentNode;
+							} else if (current.host) {
+								current = current.host; // Move to the host of the shadow root
+							} else {
+								current = null;
 							}
 						}
 
-						this.setState(this.state);
-						if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
-							// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
-							this.setCbState(this.cb.state);
-						}
+						return null; // No element with `cb` found
 					}
-
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
 
@@ -5209,17 +5232,37 @@ simply = {
 						});
 						this._currentMatch = match;
 						const outletElement = this.getOutletElement();
-						
+
 						// simply.js
 						// state, parent, and callback support for simply.js						
 
 						// Function to set content properties and render
 						async function setContentAndRender(content) {
-							const parent = outletElement.parentElement.getRootNode().host || outletElement.parentElement.parentNode;
-							content.parent = parent;
-							content.stateToObserve = parent.state;
-							content.cb = { state: parent.cb.state };
-							outletElement.renderOutletContent(content);
+							const findParentWithState = (element) => {
+								let parent = element.parentElement;
+								while (parent) {
+									// If the parent is within a shadow DOM, get the host element
+									const rootNode = parent.getRootNode ? parent.getRootNode().host : null;
+									// Update the parent to the next element to check
+									parent = rootNode || parent.parentElement;
+									// If a parent with `state` is found, return it
+									if (parent && parent.state) {
+										return parent;
+									}
+								}
+								return null; // Return null if no parent with `state` is found
+							};
+
+							const parent = findParentWithState(outletElement);
+							if (parent) {
+								content.parent = parent;
+								content.stateToObserve = parent.state;
+								outletElement.renderOutletContent(content);
+							} else {
+								outletElement.renderOutletContent(content);
+								// no need to do anything
+								// console.error("No parent with state found.");
+							}
 						}
 
 						if (!match.useCache || match.url === url) {
