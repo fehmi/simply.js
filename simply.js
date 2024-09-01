@@ -829,7 +829,7 @@ simply = {
 					this.dom = dom;
 					this.lifecycle = lifecycle;
 
-					this.propsToObserve = props;
+					this.props = props;
 
 					this.dataToObserve = data;
 					this.data;
@@ -968,7 +968,7 @@ simply = {
 						mutations.forEach(function (mutation) {
 							if (mutation.type === 'attributes') {
 								var newVal = mutation.target.getAttribute(mutation.attributeName);
-								//console.log(mutation.attributeName, "attribute changed to", newVal);
+								console.log(mutation.attributeName, "attribute changed to", newVal);
 								callback(mutation.attributeName, newVal);
 
 							}
@@ -990,23 +990,27 @@ simply = {
 				}
 				connectedCallback() {
 					this.observeAttrChange(this, function (name, newValue) {
+						console.log("hee");
 						// value öncekiyle aynı değilse
 						// console.log(name, newValue, self.props[name], newValue == simply.prepareAttr(self.props[name]));
-						if (newValue !== simply.prepareAttr(self.props[name])) {
-							try {
-								newValue = simply.parseProp(newValue).value;
-							} catch (e) {
-								// getattribute parse edemezse
-								newValue = newValue;
-							}
-
-							self.props[name] = newValue;
-							if (typeof self.lifecycle !== "undefined") {
-								if (typeof self.lifecycle.whenPropChange !== "undefined") {
-									console.log("propchange");
-									self.lifecycle.whenPropChange(name, self.props[name], newValue);
+						if (self.props[name]) {
+							if (newValue !== simply.prepareAttr(self.props[name])) {
+								try {
+									newValue = simply.parseProp(newValue).value;
+								} catch (e) {
+									// getattribute parse edemezse
+									newValue = newValue;
 								}
-							}
+	
+								self.props[name] = newValue;
+								if (typeof self.lifecycle !== "undefined") {
+									if (typeof self.lifecycle.whenPropChange !== "undefined") {
+										console.log("propchange");
+										self.lifecycle.whenPropChange(name, self.props[name], newValue);
+									}
+								}
+						}
+
 						}
 					});
 
@@ -1075,33 +1079,77 @@ simply = {
 						}
 					}
 
-					if (this.propsToObserve) {
-						this.props = ObservableSlim.create(this.propsToObserve, true, function (changes) {
-							for (const [key, cb] of Object.entries(self.cb.props)) {
-								if (cb) {
-									changes.forEach(function (change, key) {
-										if (change.newValue !== change.previousValue) {
-											changes.forEach(function (change, key) {
-												cb(change.property, change.newValue, change.previousValue, true);
-											});
+					if (this.props) {
+						let handler = {
+							get: function (obj, prop) {
+
+								// props can contain only key: value not key: object
+								// so no need to proxify child nodes
+
+								/*
+								if (isObjectWithoutTriggeringGetter(obj, prop) ) {
+									console.log(proxies, obj[prop], r);
+									if (proxies.has(obj[prop])) {
+										// console.log("uyy proxy daaa", obj[prop]);
+										return proxies.get(obj[prop]);
+									}
+									else {
+										// console.log("obje proxy'e dönüştürüldü", obj, prop);
+										let proxy = new Proxy(obj[prop], handler);
+										//proxies.add(proxy);
+										proxies.set(obj[prop], proxy);
+										return proxy;
+									}
+
+								}
+								else {
+									//console.log("normal get", obj, prop);
+									return obj[prop];
+								}
+								*/
+								return obj[prop];
+							},
+							set: function (target, prop, value, receiver) {
+								if (target[prop] !== value) {
+									Reflect.set(...arguments);
+									for (const [key, cb] of Object.entries(self.cb.props)) {
+										if (cb) {
+
+											cb(prop, value);
 										}
-									})
+
+										//console.log(`${key}: ${value}`);
+									}
+								}
+								return true; // Pass through the operation
+							},
+							deleteProperty: function (target, prop) {
+								if (prop in target) {
+									delete target[prop];
+									//console.log(`property removed: ${prop}`);
+									// Expected output: "property removed: texture"
+								}
+								for (const [key, cb] of Object.entries(self.cb.props)) {
+									cb(prop, null);
+									//console.log(`${key}: ${value}`);
 								}
 							}
-						});
+						};
 
 						if (template.indexOf("props.") > -1 || script.indexOf("props.") > -1) {
 							this.cb.props = {}
-							this.cb.props[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue, true) };
+							this.cb.props[this.uid] = function (prop, value) { self.react(prop, value, true) };
+							this.props = new Proxy(this.props, handler);
 							this.setProps(this.props);
 							this.setCbProps(this.cb.props);
 						}
+
 					}
 
 					if (this.stateToObserve) {
 						if (!this.stateToObserve.__isProxy) {
 							this.state = ObservableSlim.create(this.stateToObserve, true, function (changes) {
-								console.log(changes, templateName);
+								// console.log(changes, templateName);
 								if (self.cb.state) {
 									for (const [key, cb] of Object.entries(self.cb.state)) {
 										if (cb) {
@@ -1116,16 +1164,15 @@ simply = {
 							this.cb.state = {}
 							this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
 							this.setCbState(this.cb.state);
-							console.log("bu bi kere çalışır");
+							//console.log("bu bi kere çalışır");
 							// this.state = new Proxy(this.state, handler);
 
 						}
 						else {
-							console.log(this.parent.state);
 							this.state = this.parent.state
 							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
 								var p = findElementWithCB(this.parent);
-								console.log("ppp", p, this.parent, templateName);
+								// console.log("ppp", p, this.parent, templateName);
 								p.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
 								// this.state = new Proxy(this.state, handler);
 							}
