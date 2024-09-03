@@ -8,6 +8,9 @@
 | **beforeFirstRender** | Before component rendered to the DOM at the first time |
 | **afterFirstRender** | After component rendered to the DOM at the first time |
 |||
+| **beforeRender** | Before every render |
+| **afterRender** | After every render |
+|||
 | **beforeRerender** | Before component rerendered/updated on the DOM |
 | **afterRerender** | After component rerendered/updated on the DOM |
 |||
@@ -15,6 +18,8 @@
 | **whenPropChange** | After a prop is is changed |
 |||
 | **disconnected** | Triggered when the component is removed from the DOM |
+
+!> DOM and state variables is not available in "construct". You can only reach them in "render" events, especially if you are using routers.
 
 ## Usage Example
 

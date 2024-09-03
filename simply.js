@@ -193,14 +193,16 @@ simply = {
 							subject = m.groups.of;
 						}
 
-						iiii = "s" + Math.random().toString(2).slice(-7);
+						var iiii = "s" + Math.random().toString(16).slice(2);
+
 						if (Array.isArray(subject)) {
 							key = m.groups.key ? "let " + m.groups.key + " = " + iiii + ";" : "";
-							let index = m.groups.key ? "let " + m.groups.index + " = " + iiii + ";" : "";
+							index = m.groups.index ? "let " + m.groups.index + " = " + iiii + ";" : "";
 
 							logic = "for (" + iiii + " = 0; " + iiii + " < " + m.groups.of + ".length; " + iiii + "++) { \
-														" + key + "; \
-														" + index + "; \
+								if (!"+ m.groups.of + "["+iiii+"]) { continue; }\
+														" + key + " \
+														" + index + " \
 														let " + m.groups.as + "=" + m.groups.of + "[" + iiii + "];";
 						}
 						else {
@@ -237,10 +239,13 @@ simply = {
 
 				let of = ofMatch ? ofMatch[1] : undefined;
 				let as = asMatch ? asMatch[1] : undefined;
-				let key = keyMatch ? keyMatch[1] : undefined;
-				let index = indexMatch ? indexMatch[1] : undefined;
-
-				return { of, as, key, index };
+			
+				// Create the result object and conditionally add key and index if they exist
+				let result = { of, as };
+				if (keyMatch) result.key = keyMatch[1];
+				if (indexMatch) result.index = indexMatch[1];
+			
+				return result;
 			}
 
 			if (flag === true) {
@@ -829,7 +834,7 @@ simply = {
 					this.dom = dom;
 					this.lifecycle = lifecycle;
 
-					this.props = props;
+					this.propsToObserve = props;
 
 					this.dataToObserve = data;
 					this.data;
@@ -840,6 +845,8 @@ simply = {
 					this.uid = uid;
 					this.open = open;
 					this.cb = cb;
+
+					var self = this;
 
 					// console.log(name, open);
 
@@ -865,7 +872,7 @@ simply = {
 						var attrib = this.attributes[i];
 						// console.log("yaz balam ay balam", simply.parseProp(attrib.value));
 						if (attrib.name !== "cb") {
-							props[attrib.name] = simply.parseProp(attrib.value).value;
+							self.propsToObserve[attrib.name] = simply.parseProp(attrib.value).value;
 						}
 					}
 
@@ -937,6 +944,13 @@ simply = {
 						cb.data = newValue;
 					};
 
+					this.setState = function (newValue) {
+						state = newValue;
+					};
+					this.setCbState = function (newValue) {
+						cb.state = newValue;
+					};					
+
 					this.setProps = function (newValue) {
 						props = newValue;
 					};
@@ -944,19 +958,95 @@ simply = {
 						cb.props = newValue;
 					};
 
-					this.setState = function (newValue) {
-						state = newValue;
-					};
-					this.setCbState = function (newValue) {
-						cb.state = newValue;
-					};
+					this.react = function (property, newValue, previousValue, prop = false) {
+						// console.log("react to ", property, previousValue, newValue, templateName);
+
+						if (self.data) {
+							if (typeof self.lifecycle !== "undefined") {
+								if (prop) {
+									if (typeof self.lifecycle.whenPropChange !== "undefined") {
+										if (self.lifecycle.whenPropChange(property, newValue, previousValue) === false) {
+											return false;
+										};
+									}
+								}
+								else if (typeof self.lifecycle.whenDataChange !== "undefined") {
+									//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
+									if (self.lifecycle.whenDataChange(property, newValue, previousValue) === false) {
+										return false;
+									};
+								}
+							}
+
+							//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
+							//console.log(name, value, old, parents);
+							// prop değişikliklerini attributes'a yazmak
+							// parent render olurken morph işini bozuyor 
+							// o yüzden sadece one-way (attr -> prop) ile devam
+							/*
+							if (prop) {
+								if (self.props) {
+									console.log("name", name);
+									if (self.props[name]) {
+										//self.setAttribute(name, simply.prepareAttr(self.props[name]));
+									}
+								}
+							}
+							*/
+
+							if (typeof self.watch !== "undefined") {
+								self.watch(property, newValue);
+							}
+							self.render();
+						}
+
+					}			
+
+					
+
+
+					if (this.dataToObserve) {
+						this.data = ObservableSlim.create(this.dataToObserve, false, function (changes) {
+							for (const [key, cb] of Object.entries(self.cb.data)) {
+								if (cb) {
+									changes.forEach(function (change, key) {
+										cb(change.property, change.newValue, change.previousValue);
+									})
+								}
+							}
+						});
+
+						if (template.indexOf("data.") > -1 || script.indexOf("data.") > -1) {
+							this.cb.data = {}
+							this.cb.data[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+							this.setData(this.data);
+							this.setCbData(this.cb.data);
+						}
+					}
+
+
+					if (this.propsToObserve) {
+						this.props = ObservableSlim.create(this.propsToObserve, false, function (changes) {
+							for (const [key, cb] of Object.entries(self.cb.props)) {
+								if (cb) {
+									changes.forEach(function (change, key) {
+										cb(change.property, change.newValue, change.previousValue);
+									})
+								}
+							}
+						});
+
+						if (template.indexOf("props.") > -1 || script.indexOf("props.") > -1) {
+							this.cb.props = {}
+							this.cb.props[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+						}
+					}					
+
 
 					// after construct event
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.afterConstruct !== "undefined") {
-							setTimeout(() => {
 								this.lifecycle.afterConstruct();
-							}, 0);
 						}
 					}
 				}
@@ -1016,196 +1106,7 @@ simply = {
 
 					var self = this;
 					var templateName = name;
-					this.react = function (property, newValue, previousValue, prop = false) {
-						// console.log("react to ", property, previousValue, newValue, templateName);
 
-						if (self.data) {
-							if (typeof self.lifecycle !== "undefined") {
-								if (prop) {
-									if (typeof self.lifecycle.whenPropChange !== "undefined") {
-										if (self.lifecycle.whenPropChange(property, newValue, previousValue) === false) {
-											return false;
-										};
-									}
-								}
-								else if (typeof self.lifecycle.whenDataChange !== "undefined") {
-									//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-									if (self.lifecycle.whenDataChange(property, newValue, previousValue) === false) {
-										return false;
-									};
-								}
-							}
-
-							//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-							//console.log(name, value, old, parents);
-							// prop değişikliklerini attributes'a yazmak
-							// parent render olurken morph işini bozuyor 
-							// o yüzden sadece one-way (attr -> prop) ile devam
-							/*
-							if (prop) {
-								if (self.props) {
-									console.log("name", name);
-									if (self.props[name]) {
-										//self.setAttribute(name, simply.prepareAttr(self.props[name]));
-									}
-								}
-							}
-							*/
-
-							if (typeof self.watch !== "undefined") {
-								self.watch(property, newValue);
-							}
-							self.render();
-						}
-
-					}
-
-					if (this.dataToObserve) {
-						this.data = ObservableSlim.create(this.dataToObserve, true, function (changes) {
-							for (const [key, cb] of Object.entries(self.cb.data)) {
-								if (cb) {
-									changes.forEach(function (change, key) {
-										cb(change.property, change.newValue, change.previousValue);
-									})
-								}
-							}
-						});
-
-						if (template.indexOf("data.") > -1 || script.indexOf("data.") > -1) {
-							this.cb.data = {}
-							this.cb.data[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-							this.setData(this.data);
-							this.setCbData(this.cb.data);
-						}
-					}
-
-					if (this.props) {
-						let handler = {
-							get: function (obj, prop) {
-
-								// props can contain only key: value not key: object
-								// so no need to proxify child nodes
-
-								/*
-								if (isObjectWithoutTriggeringGetter(obj, prop) ) {
-									console.log(proxies, obj[prop], r);
-									if (proxies.has(obj[prop])) {
-										// console.log("uyy proxy daaa", obj[prop]);
-										return proxies.get(obj[prop]);
-									}
-									else {
-										// console.log("obje proxy'e dönüştürüldü", obj, prop);
-										let proxy = new Proxy(obj[prop], handler);
-										//proxies.add(proxy);
-										proxies.set(obj[prop], proxy);
-										return proxy;
-									}
-
-								}
-								else {
-									//console.log("normal get", obj, prop);
-									return obj[prop];
-								}
-								*/
-								return obj[prop];
-							},
-							set: function (target, prop, value, receiver) {
-								if (target[prop] !== value) {
-									Reflect.set(...arguments);
-									for (const [key, cb] of Object.entries(self.cb.props)) {
-										if (cb) {
-
-											cb(prop, value);
-										}
-
-										//console.log(`${key}: ${value}`);
-									}
-								}
-								return true; // Pass through the operation
-							},
-							deleteProperty: function (target, prop) {
-								if (prop in target) {
-									delete target[prop];
-									//console.log(`property removed: ${prop}`);
-									// Expected output: "property removed: texture"
-								}
-								for (const [key, cb] of Object.entries(self.cb.props)) {
-									cb(prop, null);
-									//console.log(`${key}: ${value}`);
-								}
-							}
-						};
-
-						if (template.indexOf("props.") > -1 || script.indexOf("props.") > -1) {
-							this.cb.props = {}
-							this.cb.props[this.uid] = function (prop, value) { self.react(prop, value, true) };
-							this.props = new Proxy(this.props, handler);
-							this.setProps(this.props);
-							this.setCbProps(this.cb.props);
-						}
-
-					}
-
-					if (this.stateToObserve) {
-						if (!this.stateToObserve.__isProxy) {
-							this.state = ObservableSlim.create(this.stateToObserve, true, function (changes) {
-								// console.log(changes, templateName);
-								if (self.cb.state) {
-									for (const [key, cb] of Object.entries(self.cb.state)) {
-										if (cb) {
-											changes.forEach(function (change, key) {
-												cb(change.property, change.newValue, change.previousValue);
-											})
-										}
-										//console.log(`${key}: ${value}`);
-									}
-								}
-							});
-							this.cb.state = {}
-							this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-							this.setCbState(this.cb.state);
-							//console.log("bu bi kere çalışır");
-							// this.state = new Proxy(this.state, handler);
-
-						}
-						else {
-							this.state = this.parent.state
-							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
-								var p = findElementWithCB(this.parent);
-								// console.log("ppp", p, this.parent, templateName);
-								p.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-								// this.state = new Proxy(this.state, handler);
-							}
-						}
-						// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
-
-
-
-						this.setState(this.state);
-
-					}
-					function findElementWithCB(element) {
-						let current = element;
-
-						while (current) {
-							if (current.cb) {
-								if (current.cb.state) {
-									return current;
-								}
-							}
-
-							// Move up to the parent node, checking if we're in a shadow DOM
-							if (current.parentNode) {
-								current = current.parentNode;
-							} else if (current.host) {
-								current = current.host; // Move to the host of the shadow root
-							} else {
-								current = null;
-							}
-						}
-
-						return null; // No element with `cb` found
-					}
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
 
@@ -1230,6 +1131,68 @@ simply = {
 						
 					}
 					*/
+
+					if (this.stateToObserve) {
+						if (!this.stateToObserve.__isProxy) {
+							this.state = ObservableSlim.create(this.stateToObserve, false, function (changes) {
+								// console.log(changes, templateName);
+								if (self.cb.state) {
+									for (const [key, cb] of Object.entries(self.cb.state)) {
+										if (cb) {
+											changes.forEach(function (change, key) {
+												cb(change.property, change.newValue, change.previousValue);
+											})
+										}
+										//console.log(`${key}: ${value}`);
+									}
+								}
+							});
+							this.cb.state = {}
+							this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+							//this.setCbState(this.cb.state);
+							//console.log("bu bi kere çalışır");
+							// this.state = new Proxy(this.state, handler);
+
+						}
+						else {
+							this.state = this.parent.state
+							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
+								var p = findElementWithCB(this.parent);
+								// console.log("ppp", p, this.parent, templateName);
+								p.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+								// this.state = new Proxy(this.state, handler);
+							}
+						}
+						// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
+
+
+
+			
+
+					}			
+					
+					function findElementWithCB(element) {
+						let current = element;
+
+						while (current) {
+							if (current.cb) {
+								if (current.cb.state) {
+									return current;
+								}
+							}
+
+							// Move up to the parent node, checking if we're in a shadow DOM
+							if (current.parentNode) {
+								current = current.parentNode;
+							} else if (current.host) {
+								current = current.host; // Move to the host of the shadow root
+							} else {
+								current = null;
+							}
+						}
+
+						return null; // No element with `cb` found
+					}					
 
 					this.render();
 				}
@@ -1322,13 +1285,23 @@ simply = {
 					}
 
 
+
 					if (!this.rendered) {
+						this.rendered = true;
 						var self = this;
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
+						
 
+						if (typeof this.lifecycle !== "undefined") {
+							if (typeof this.lifecycle.beforeRender !== "undefined") {
+								if (typeof this.lifecycle.beforeRender(parsedTemplate) !== "undefined") {
+									parsedTemplate = this.lifecycle.beforeRender(parsedTemplate);
+								}
+							}
+						}
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeFirstRender !== "undefined") {
 								if (typeof this.lifecycle.beforeFirstRender(parsedTemplate) !== "undefined") {
@@ -1336,6 +1309,9 @@ simply = {
 								}
 							}
 						}
+
+
+
 						this.dom.innerHTML = parsedTemplate;
 						simply.setupInlineComps(this.dom, docStr, template);
 						if (window.unoConfig) {
@@ -1403,11 +1379,10 @@ simply = {
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterFirstRender !== "undefined") {
-								setTimeout(() => {
 									this.lifecycle.afterFirstRender();
-								}, 0);
 							}
 						}
+						
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -1416,11 +1391,28 @@ simply = {
 							}
 						}
 
+
+						// var ddd = this.data;
+						// parsingArgs.data = JSON.parse(JSON.stringify(ddd));
 						const t0 = performance.now();
+						/*
+						try {
+							console.log(parsingArgs.data.browser.length);
+						}
+						catch(e) {
+
+						}
+						*/
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						const t1 = performance.now();
 						// console.log(`parseTemplate took ${t1 - t0} milliseconds.`);
-
+						/*
+						if (parsedTemplate.indexOf('level="1"') == -1 && name == "browser-comp") {
+							console.log("yakalarım hatayı");
+							console.log(JSON.stringify(this.data.browser));
+							console.log(parsedTemplate);
+						}
+						*/
 						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
@@ -1439,7 +1431,7 @@ simply = {
 
 
 						function morphIt(dom) {
-							// console.log("morphing");
+							//console.log("morphing");
 
 							simply.morphdom(dom, newDomAsString, {
 
@@ -1535,13 +1527,17 @@ simply = {
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterRerender !== "undefined") {
-								setTimeout(() => {
 									this.lifecycle.afterRerender();
-								}, 0);
 							}
 						}
 					}
-					this.rendered = true;
+					if (typeof this.lifecycle !== "undefined") {
+						if (typeof this.lifecycle.afterRender !== "undefined") {
+								this.lifecycle.afterRender();
+							
+						}
+					}					
+					
 				}
 				disconnectedCallback() {
 					// console.log("disconnector", this.uid);
