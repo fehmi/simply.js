@@ -135,7 +135,6 @@ simply = {
 						return /^\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))+\}))*\}$/.exec(str);
 					}
 
-					// Usage in your code
 					if (isObjectString(variable)) {
 						variable = "\"" + varBucket.trim() + "\"";
 					}
@@ -194,6 +193,7 @@ simply = {
 						}
 
 						var iiii = "s" + Math.random().toString(16).slice(2);
+						//var iiii = "s" + Math.random().toString(2).slice(-7);
 
 						if (Array.isArray(subject)) {
 							key = m.groups.key ? "let " + m.groups.key + " = " + iiii + ";" : "";
@@ -1004,13 +1004,16 @@ simply = {
 
 					
 
-
+					
 					if (this.dataToObserve) {
-						this.data = ObservableSlim.create(this.dataToObserve, false, function (changes) {
+						this.data = ObservableSlim.create(this.dataToObserve, .1, function (changes) {
 							for (const [key, cb] of Object.entries(self.cb.data)) {
 								if (cb) {
+									// console.log(key, cb);
+									// console.log(changes);
+									cb(changes[0].property);
 									changes.forEach(function (change, key) {
-										cb(change.property, change.newValue, change.previousValue);
+										// cb(change.property, change.newValue, change.previousValue);
 									})
 								}
 							}
@@ -1019,7 +1022,7 @@ simply = {
 						if (template.indexOf("data.") > -1 || script.indexOf("data.") > -1) {
 							this.cb.data = {}
 							this.cb.data[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-							this.setData(this.data);
+							data = this.data;
 							this.setCbData(this.cb.data);
 						}
 					}
@@ -1027,20 +1030,82 @@ simply = {
 
 					if (this.propsToObserve) {
 						this.props = ObservableSlim.create(this.propsToObserve, false, function (changes) {
-							for (const [key, cb] of Object.entries(self.cb.props)) {
-								if (cb) {
-									changes.forEach(function (change, key) {
-										cb(change.property, change.newValue, change.previousValue);
-									})
+							if (self.cb.props) {
+								for (const [key, cb] of Object.entries(self.cb.props)) {
+									if (cb) {
+										changes.forEach(function (change, key) {
+											cb(change.property, change.newValue, change.previousValue);
+										})
+									}
 								}
 							}
+
 						});
 
 						if (template.indexOf("props.") > -1 || script.indexOf("props.") > -1) {
 							this.cb.props = {}
 							this.cb.props[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
 						}
-					}					
+					}		
+					
+					if (this.stateToObserve) {
+						if (!this.stateToObserve.__isProxy) {
+							
+							this.state = ObservableSlim.create(this.stateToObserve, false, function (changes) {
+								// console.log(changes, templateName);
+								if (self.cb.state) {
+									for (const [key, cb] of Object.entries(self.cb.state)) {
+										if (cb) {
+											changes.forEach(function (change, key) {
+												cb(change.property, change.newValue, change.previousValue);
+											})
+										}
+										//console.log(`${key}: ${value}`);
+									}
+								}
+							});
+							this.cb.state = {}
+							this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+							//this.setCbState(this.cb.state);
+							//console.log("bu bi kere çalışır");
+							// this.state = new Proxy(this.state, handler);
+
+						}
+						else {
+							this.state = this.stateToObserve; // bu daha hızlıdır muhtemelen
+							// this.state = simply.findParentWithState(this).state;
+							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
+								var p = findElementWithCB(this.parent);
+								// console.log("ppp", p, this.parent, templateName);
+								p.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
+								// this.state = new Proxy(this.state, handler);
+							}
+						}
+						// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
+					}			
+					
+					function findElementWithCB(element) {
+						let current = element;
+
+						while (current) {
+							if (current.cb) {
+								if (current.cb.state) {
+									return current;
+								}
+							}
+
+							// Move up to the parent node, checking if we're in a shadow DOM
+							if (current.parentNode) {
+								current = current.parentNode;
+							} else if (current.host) {
+								current = current.host; // Move to the host of the shadow root
+							} else {
+								current = null;
+							}
+						}
+
+						return null; // No element with `cb` found
+					}								
 
 
 					// after construct event
@@ -1058,7 +1123,7 @@ simply = {
 						mutations.forEach(function (mutation) {
 							if (mutation.type === 'attributes') {
 								var newVal = mutation.target.getAttribute(mutation.attributeName);
-								console.log(mutation.attributeName, "attribute changed to", newVal);
+								// console.log(mutation.attributeName, "attribute changed to", newVal, callback);
 								callback(mutation.attributeName, newVal);
 
 							}
@@ -1080,10 +1145,9 @@ simply = {
 				}
 				connectedCallback() {
 					this.observeAttrChange(this, function (name, newValue) {
-						console.log("hee");
+						//console.log("hee");
 						// value öncekiyle aynı değilse
 						// console.log(name, newValue, self.props[name], newValue == simply.prepareAttr(self.props[name]));
-						if (self.props[name]) {
 							if (newValue !== simply.prepareAttr(self.props[name])) {
 								try {
 									newValue = simply.parseProp(newValue).value;
@@ -1091,21 +1155,27 @@ simply = {
 									// getattribute parse edemezse
 									newValue = newValue;
 								}
-	
-								self.props[name] = newValue;
+
+								if (newValue) {
+									self.props[name] = newValue;
+								}
+								else {
+									delete self.props[name];
+								}
+
 								if (typeof self.lifecycle !== "undefined") {
 									if (typeof self.lifecycle.whenPropChange !== "undefined") {
-										console.log("propchange");
+										//console.log("propchange");
 										self.lifecycle.whenPropChange(name, self.props[name], newValue);
 									}
 								}
-						}
+						
 
 						}
 					});
 
 					var self = this;
-					var templateName = name;
+					self.templateName = name;
 
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
@@ -1132,67 +1202,7 @@ simply = {
 					}
 					*/
 
-					if (this.stateToObserve) {
-						if (!this.stateToObserve.__isProxy) {
-							this.state = ObservableSlim.create(this.stateToObserve, false, function (changes) {
-								// console.log(changes, templateName);
-								if (self.cb.state) {
-									for (const [key, cb] of Object.entries(self.cb.state)) {
-										if (cb) {
-											changes.forEach(function (change, key) {
-												cb(change.property, change.newValue, change.previousValue);
-											})
-										}
-										//console.log(`${key}: ${value}`);
-									}
-								}
-							});
-							this.cb.state = {}
-							this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-							//this.setCbState(this.cb.state);
-							//console.log("bu bi kere çalışır");
-							// this.state = new Proxy(this.state, handler);
-
-						}
-						else {
-							this.state = this.parent.state
-							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
-								var p = findElementWithCB(this.parent);
-								// console.log("ppp", p, this.parent, templateName);
-								p.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-								// this.state = new Proxy(this.state, handler);
-							}
-						}
-						// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
-
-
-
-			
-
-					}			
-					
-					function findElementWithCB(element) {
-						let current = element;
-
-						while (current) {
-							if (current.cb) {
-								if (current.cb.state) {
-									return current;
-								}
-							}
-
-							// Move up to the parent node, checking if we're in a shadow DOM
-							if (current.parentNode) {
-								current = current.parentNode;
-							} else if (current.host) {
-								current = current.host; // Move to the host of the shadow root
-							} else {
-								current = null;
-							}
-						}
-
-						return null; // No element with `cb` found
-					}					
+		
 
 					this.render();
 				}
@@ -1549,7 +1559,7 @@ simply = {
 					if (this.parent) {
 						if (this.parent.cb) {
 							if (this.parent.cb.data) {
-								this.parent.cb.data[this.uid] = null;
+								// this.parent.cb.data[this.uid] = null;
 								// bu biraz yavaşlatıyor diye commentledim
 								// Reflect.deleteProperty(this.parent.cb.data, this.uid); // true							
 							}
@@ -1559,7 +1569,7 @@ simply = {
 								// Reflect.deleteProperty(this.parent.cb.state, this.uid); // true							
 							}
 							if (this.parent.cb.props) {
-								this.parent.cb.props[this.uid] = null;
+								// this.parent.cb.props[this.uid] = null;
 								// bu biraz yavaşlatıyor diye commentledim
 								// Reflect.deleteProperty(this.parent.cb.props, this.uid); // true							
 							}
@@ -2008,7 +2018,6 @@ simply = {
 				if (event.state === 'router-ignore') {
 					return;
 				}
-				console.log("pop state of vaadin");
 				var _window$location = window.location,
 					pathname = _window$location.pathname,
 					search = _window$location.search,
@@ -3158,8 +3167,7 @@ simply = {
 					element.parent = parent;
 					let state = parent.state;
 					element.state = state;
-					let cb = parent.cb;
-					element.cb = cb;
+
 					//console.log(element);
 				}
 				return element;
@@ -4520,6 +4528,7 @@ simply = {
 					 * @property {Object} details - The event details
 					 * @property {RouteElement} details.route - The RouteElement that performed the match.
 					 */
+					newRoute.prev = document.location.pathname;
 					const canLeaveEvent = new CustomEvent('onRouteLeave', {
 						bubbles: true,
 						cancelable: true,
@@ -4731,16 +4740,25 @@ simply = {
 						};
 						this.hasMatch = false;
 					}
+					// simply.js edit
+					// i need to update url before rendering component
+					// because i need updated url in afterConstruct event
+					// console.log(url, shortUrl);
+					if (!skipHistory) {
+						RouterElement.updateHistory(url); // i extract this line from the next if
+					}
 					if ((await RouterElement.performMatchOnRouters(shortUrl, RouterElement._routers)) && skipHistory !== true) {
-						RouterElement.updateHistory(url);
 						RouterElement.updateAnchorsStatus();
 					}
 				}
 
 				/** Updates the location history with the new href */
 				static updateHistory(href) {
+
+					/*
 					const urlState = RouterElement.getUrlState();
 					let url = urlState;
+
 					if (url.length === 2) {
 						url = href;
 					} else if (url === '/') {
@@ -4748,18 +4766,22 @@ simply = {
 					} else {
 						url = document.baseURI + url;
 					}
+					*/
+					// simply.js edit: above commented, below added
+					let url = href;
 
 					// Need to use a full URL in case the containing page has a base URI.
 					const fullNewUrl = new URL(url, `${window.location.protocol}//${window.location.host}`).href;
-					const oldRoute = RouterElement._route;
-					const now = window.performance.now();
-					const shouldReplace = oldRoute._lastChangedAt + RouterElement._dwellTime > now;
-					oldRoute._lastChangedAt = now;
-					if (shouldReplace) {
-						window.history.replaceState(window.history.state, '', fullNewUrl);
-					} else {
+					//const oldRoute = RouterElement._route;
+					//const now = window.performance.now();
+					//const shouldReplace = oldRoute._lastChangedAt + RouterElement._dwellTime > now;
+					//oldRoute._lastChangedAt = now;
+					//if (shouldReplace) {
+					//	window.history.replaceState(window.history.state, '', fullNewUrl);
+					//} else {
 						window.history.pushState(window.history.state, '', fullNewUrl);
-					}
+						console.log(fullNewUrl);
+					//}
 				}
 
 				/**
@@ -5310,7 +5332,8 @@ simply = {
 
 						if (!match.useCache || match.url === url) {
 							const content = await routeElement.getContent(match.data);
-							setContentAndRender(content);
+							outletElement.renderOutletContent(content);
+							// setContentAndRender(content);
 						}
 
 						if (this._routers && match.remainder) {
@@ -5826,9 +5849,12 @@ simply = {
 					} = this;
 
 					if (!content) {
-
 						const importAttr = this.getAttribute('import');
 						const tagName = this.getAttribute('element');
+						// simply.js edit
+						// sadece string olarak component'in tag'ini erken dönüyorum
+						// böylelikle parent'taki state'i almak için taklaya gerek kalmıyor
+						return "<" + tagName + "></" + tagName + ">"; 
 						await NamedRouting.importCustomElement(importAttr, tagName);
 						if (tagName) {
 							// TODO support if tagName is a function that is called and will return the content
@@ -7621,8 +7647,29 @@ simply = {
 		// Export in a try catch to prevent this from erroring out on older browsers
 		try { module.exports = ObservableSlim; } catch (err) { };
 	},
+	go: function(path) {
+		window.dispatchEvent(
+			new CustomEvent(
+					'navigate', {
+							detail: {
+									href: path }}));		
+	},
+	findParentWithState: function(element) {
+		let parent = element.parentElement;
+		while (parent) {
+			// If the parent is within a shadow DOM, get the host element
+			const rootNode = parent.getRootNode ? parent.getRootNode().host : null;
+			// Update the parent to the next element to check
+			parent = rootNode || parent.parentElement;
+			// If a parent with `state` is found, return it
+			if (parent && parent.state) {
+				return parent;
+			}
+		}
+		return null; // Return null if no parent with `state` is found
+	},
 	init: function () {
-		this.Router();
+		// this.Router();
 		this.wcRouter();
 		this.morphdom();
 		this.observableSlim();
