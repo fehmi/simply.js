@@ -200,7 +200,7 @@ simply = {
 							index = m.groups.index ? "let " + m.groups.index + " = " + iiii + ";" : "";
 
 							logic = "for (" + iiii + " = 0; " + iiii + " < " + m.groups.of + ".length; " + iiii + "++) { \
-								if (!"+ m.groups.of + "["+iiii+"]) { continue; }\
+								if (!"+ m.groups.of + "[" + iiii + "]) { continue; }\
 														" + key + " \
 														" + index + " \
 														let " + m.groups.as + "=" + m.groups.of + "[" + iiii + "];";
@@ -239,12 +239,12 @@ simply = {
 
 				let of = ofMatch ? ofMatch[1] : undefined;
 				let as = asMatch ? asMatch[1] : undefined;
-			
+
 				// Create the result object and conditionally add key and index if they exist
 				let result = { of, as };
 				if (keyMatch) result.key = keyMatch[1];
 				if (indexMatch) result.index = indexMatch[1];
-			
+
 				return result;
 			}
 
@@ -949,7 +949,7 @@ simply = {
 					};
 					this.setCbState = function (newValue) {
 						cb.state = newValue;
-					};					
+					};
 
 					this.setProps = function (newValue) {
 						props = newValue;
@@ -1000,11 +1000,11 @@ simply = {
 							self.render();
 						}
 
-					}			
+					}
 
-					
 
-					
+
+
 					if (this.dataToObserve) {
 						this.data = ObservableSlim.create(this.dataToObserve, .1, function (changes) {
 							for (const [key, cb] of Object.entries(self.cb.data)) {
@@ -1046,11 +1046,11 @@ simply = {
 							this.cb.props = {}
 							this.cb.props[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
 						}
-					}		
-					
+					}
+
 					if (this.stateToObserve) {
 						if (!this.stateToObserve.__isProxy) {
-							
+
 							this.state = ObservableSlim.create(this.stateToObserve, false, function (changes) {
 								// console.log(changes, templateName);
 								if (self.cb.state) {
@@ -1082,8 +1082,8 @@ simply = {
 							}
 						}
 						// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
-					}			
-					
+					}
+
 					function findElementWithCB(element) {
 						let current = element;
 
@@ -1105,13 +1105,13 @@ simply = {
 						}
 
 						return null; // No element with `cb` found
-					}								
+					}
 
 
 					// after construct event
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.afterConstruct !== "undefined") {
-								this.lifecycle.afterConstruct();
+							this.lifecycle.afterConstruct();
 						}
 					}
 				}
@@ -1148,28 +1148,28 @@ simply = {
 						//console.log("hee");
 						// value öncekiyle aynı değilse
 						// console.log(name, newValue, self.props[name], newValue == simply.prepareAttr(self.props[name]));
-							if (newValue !== simply.prepareAttr(self.props[name])) {
-								try {
-									newValue = simply.parseProp(newValue).value;
-								} catch (e) {
-									// getattribute parse edemezse
-									newValue = newValue;
-								}
+						if (newValue !== simply.prepareAttr(self.props[name])) {
+							try {
+								newValue = simply.parseProp(newValue).value;
+							} catch (e) {
+								// getattribute parse edemezse
+								newValue = newValue;
+							}
 
-								if (newValue) {
-									self.props[name] = newValue;
-								}
-								else {
-									delete self.props[name];
-								}
+							if (newValue) {
+								self.props[name] = newValue;
+							}
+							else {
+								delete self.props[name];
+							}
 
-								if (typeof self.lifecycle !== "undefined") {
-									if (typeof self.lifecycle.whenPropChange !== "undefined") {
-										//console.log("propchange");
-										self.lifecycle.whenPropChange(name, self.props[name], newValue);
-									}
+							if (typeof self.lifecycle !== "undefined") {
+								if (typeof self.lifecycle.whenPropChange !== "undefined") {
+									//console.log("propchange");
+									self.lifecycle.whenPropChange(name, self.props[name], newValue);
 								}
-						
+							}
+
 
 						}
 					});
@@ -1202,7 +1202,7 @@ simply = {
 					}
 					*/
 
-		
+
 
 					this.render();
 				}
@@ -1303,7 +1303,7 @@ simply = {
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
-						
+
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeRender !== "undefined") {
@@ -1389,10 +1389,10 @@ simply = {
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterFirstRender !== "undefined") {
-									this.lifecycle.afterFirstRender();
+								this.lifecycle.afterFirstRender();
 							}
 						}
-						
+
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -1537,17 +1537,17 @@ simply = {
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterRerender !== "undefined") {
-									this.lifecycle.afterRerender();
+								this.lifecycle.afterRerender();
 							}
 						}
 					}
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.afterRender !== "undefined") {
-								this.lifecycle.afterRender();
-							
+							this.lifecycle.afterRender();
+
 						}
-					}					
-					
+					}
+
 				}
 				disconnectedCallback() {
 					// console.log("disconnector", this.uid);
@@ -4612,8 +4612,7 @@ simply = {
 				 * Should be called if the user changes the URL via the URL bar or navigating history
 				 * @return {Promise<boolean>} true if the new url was dispatched to the top level RouterElement
 				 */
-				static async changeUrl() {
-
+				static async changeUrl(onpopstate = false) {
 					const hash = RouterElement._getHash();
 					const path = decodeURIComponent(window.location.pathname);
 					const query = window.location.search.substring(1);
@@ -4626,7 +4625,7 @@ simply = {
 						return false;
 					}
 					const newUrl = RouterElement._getUrl(window.location);
-					await RouterElement.dispatch(newUrl, true);
+					await RouterElement.dispatch(newUrl, true, onpopstate);
 					return true;
 				}
 
@@ -4702,13 +4701,20 @@ simply = {
 				 * @param {boolean} [skipHistory]
 				 * @fires RouterElement#onRouteCancelled
 				 */
-				static async dispatch(url, skipHistory) {
-					// console.info('dispatch: ' + url);
+				static async dispatch(url, skipHistory, onpopstate = false) {
 					const basePath = RouterElement.baseUrlSansHost();
 					const shortUrl = url.substr(basePath.length);
 					RouterElement._route = {
-						url: shortUrl
+						url: shortUrl,
+						// simply.js edit, add if onpopstate or not info
+						onpopstate: onpopstate
 					};
+
+					// simply.js edit, prevent two times firing at init
+					RouterElement._activeRouters = RouterElement._activeRouters.filter((value, index, self) => {
+						// Filter out duplicate routes based on URL or any other unique identifier
+						return index === self.findIndex(r => r.route.baseUrl === value.route.baseUrl && r.route.lastMatch.url === value.route.lastMatch.url);
+					});
 
 					// Check if all current routes wil let us navigate away
 					if (RouterElement._activeRouters.length && RouterElement._activeRouters.every(r => r.route.canLeave(RouterElement._route)) === false) {
@@ -4779,8 +4785,7 @@ simply = {
 					//if (shouldReplace) {
 					//	window.history.replaceState(window.history.state, '', fullNewUrl);
 					//} else {
-						window.history.pushState(window.history.state, '', fullNewUrl);
-						console.log(fullNewUrl);
+					window.history.pushState(window.history.state, '', fullNewUrl);
 					//}
 				}
 
@@ -5130,7 +5135,10 @@ simply = {
 						RouterElement._initialized = true;
 						// RouterElement.whiteListRegEx = this.getAttribute('base-white-list') || '';
 
-						window.addEventListener('popstate', RouterElement.changeUrl, false);
+						window.addEventListener('popstate', (event) => {
+							RouterElement.changeUrl(true);
+						}, false);
+
 						window.addEventListener('click', RouterElement.navigate, false);
 
 						// Listen for top level routers being added
@@ -5854,7 +5862,7 @@ simply = {
 						// simply.js edit
 						// sadece string olarak component'in tag'ini erken dönüyorum
 						// böylelikle parent'taki state'i almak için taklaya gerek kalmıyor
-						return "<" + tagName + "></" + tagName + ">"; 
+						return "<" + tagName + "></" + tagName + ">";
 						await NamedRouting.importCustomElement(importAttr, tagName);
 						if (tagName) {
 							// TODO support if tagName is a function that is called and will return the content
@@ -7647,14 +7655,16 @@ simply = {
 		// Export in a try catch to prevent this from erroring out on older browsers
 		try { module.exports = ObservableSlim; } catch (err) { };
 	},
-	go: function(path) {
+	go: function (path) {
 		window.dispatchEvent(
 			new CustomEvent(
-					'navigate', {
-							detail: {
-									href: path }}));		
+				'navigate', {
+				detail: {
+					href: path
+				}
+			}));
 	},
-	findParentWithState: function(element) {
+	findParentWithState: function (element) {
 		let parent = element.parentElement;
 		while (parent) {
 			// If the parent is within a shadow DOM, get the host element

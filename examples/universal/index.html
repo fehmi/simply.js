@@ -1,0 +1,88 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Universal Router Example - simply</title>
+  <base href="/simply/examples/universal/" />
+</head>
+
+<body>
+  <nav>
+    <a href="">home<span>testo</span></a>
+    <a href="posts">posts</a>
+    <a href="posts/11">posts 11</a>
+  </nav>
+
+  <router></router>
+
+  <script src="../../simply.js"></script>
+  <script src="universal-router-9.2.0.js"></script>
+
+  <script>
+    get("home-component.html");
+    get("posts-component.html");
+
+    const routes = [
+      {
+        path: '/', // optional
+        component: "home-component",
+        action: () => console.log('home'),
+        title: "Home"
+      },
+      {
+        path: '/posts',
+        action: () => console.log('checking child routes for /posts'),
+        component: "posts-component",
+        children: [
+          {
+            path: '/:id',
+            component: "post-detail",
+            action: (context) => `<h1>Post #${context.params.id}</h1>`,
+          },
+        ],
+      },
+    ]
+
+    const router = new UniversalRouter(routes)
+
+    document.addEventListener('click', handleLinkClick);
+
+    function handleLinkClick(event) {
+      event.preventDefault();
+      let target = event.target;
+      console.log("click handle");
+
+          var path = target.getAttribute("href");
+          // Push new state to history
+          render("/" + path);
+          history.pushState({ path: "/" + path }, '', path);
+
+    }
+
+    function render(path) {
+      console.log("render", path);
+      router.resolve(path);
+    }
+
+    if (document.querySelector("base")) {
+      var currentPath = document.location.pathname;
+      var base = document.querySelector("base").getAttribute("href");
+      var targetRoute = currentPath.replace(base, "");
+      var url = "/" + targetRoute;
+      render(url);
+    }
+
+    function PopStateEventHandler(event, path) {
+      var path = path ? path : event.state.path;
+      console.log("poppi poppi poppi", path);
+      render(path);
+      window._lastVisitedPath = path;
+    }
+
+    window.addEventListener('popstate', PopStateEventHandler);
+
+
+  </script>
+</body>
+
+</html>
