@@ -4,6 +4,16 @@ simply = {
 
 		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
 
+		/*
+    let cacheKey =  JSON.stringify({template, data, state, props});
+
+		// Check if the cache has this key
+		if (simply.cache.has(cacheKey)) {
+				console.log("Cache hit! Returning cached template");
+				return simply.cache.get(cacheKey);
+		}
+		*/
+
 		let simplyTemplate = /\<template([^<>]*)simply([^<>]*)>$/;
 
 		// condititionals
@@ -299,9 +309,9 @@ simply = {
 		// console.log(bucket); 
 		// console.log(capturedLogics); 
 		bucket = bucket.replace(/minyeli/g, '$');
-
-
+		
 		eval(bucket);
+		// simply.cache.set(cacheKey, ht);
 
 		//console.timeEnd();
 		return ht;
@@ -994,10 +1004,10 @@ simply = {
 							}
 							*/
 
+							self.render();
 							if (typeof self.watch !== "undefined") {
 								self.watch(property, newValue);
 							}
-							self.render();
 						}
 
 					}
@@ -1323,6 +1333,7 @@ simply = {
 
 
 						this.dom.innerHTML = parsedTemplate;
+
 						simply.setupInlineComps(this.dom, docStr, template);
 						if (window.unoConfig) {
 							//this.component.setAttribute("hoak", true);
@@ -1392,7 +1403,7 @@ simply = {
 								this.lifecycle.afterFirstRender();
 							}
 						}
-
+						this.renderingDone = true;
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -4716,6 +4727,8 @@ simply = {
 						return index === self.findIndex(r => r.route.baseUrl === value.route.baseUrl && r.route.lastMatch.url === value.route.lastMatch.url);
 					});
 
+					console.log(RouterElement._activeRouters);
+
 					// Check if all current routes wil let us navigate away
 					if (RouterElement._activeRouters.length && RouterElement._activeRouters.every(r => r.route.canLeave(RouterElement._route)) === false) {
 						/**
@@ -5255,7 +5268,7 @@ simply = {
 						// eslint-disable-next-line no-await-in-loop
 						match = await this.performMatchOnRoute(url, routeElement);
 						if (match != null) {
-							// console.info('route matched -> ', routeElement.getAttribute('path'));
+							console.info('route matched -> ', routeElement.getAttribute('path'));
 							i += 1;
 							break;
 						}
@@ -5337,11 +5350,16 @@ simply = {
 								// console.error("No parent with state found.");
 							}
 						}
-
 						if (!match.useCache || match.url === url) {
 							const content = await routeElement.getContent(match.data);
 							outletElement.renderOutletContent(content);
+							console.log("hey hey");
 							// setContentAndRender(content);
+						}
+						else {
+							// aynı route olsa dahi render için
+							const content = await routeElement.getContent(match.data);
+							outletElement.renderOutletContent(content);
 						}
 
 						if (this._routers && match.remainder) {
@@ -5981,7 +5999,7 @@ simply = {
 				 */
 				renderOutletContent(content) {
 					this.innerHTML = '';
-					// console.info('outlet rendered: ' + this.outletName, content);
+					console.info('outlet rendered: ' + this.outletName, content);
 					if (typeof content === 'string') {
 						this.innerHTML = content;
 					} else {
@@ -6008,6 +6026,7 @@ simply = {
 					// If same tag name then just set the data
 					if (this.children && this.children[0] && this.children[0].tagName.toLowerCase() === details.elementTag) {
 						RouteElement.setData(this.children[0], data);
+
 						this.dispatchOutletUpdated();
 						return;
 					}
@@ -6028,6 +6047,7 @@ simply = {
 					 * @type CustomEvent
 					 * @property {any} - Currently no information is passed in the event.
 					 */
+					console.log("dis dis");
 					this.dispatchEvent(new CustomEvent('onOutletUpdated', {
 						bubbles: true,
 						composed: true,
@@ -7528,7 +7548,27 @@ simply = {
 						}
 					};
 				},
+				/*
+							Remove observer
+										params: proxy object and observer function
+				*/
+				observerRemove: function (proxy, observer) {
+					var i = observables.length;
+					while (i--) {
+						if (observables[i].parentProxy === proxy) {
+							var b = observables[i].observers.length;
+							while (b--) {
+								// console.log(observables[i].observers[b], observer);
+								if (observables[i].observers[b] === observer) {
+									observables[i].observers.splice(b, 1);
+									break;
+								}
+							}
+							break;
+						}
+					};
 
+				},
 				/**
 				 * Prevent any observer functions from being invoked when a change occurs to a proxy.
 				 * @param {ProxyConstructor} proxy An ES6 `Proxy` created by the `create()` method.
@@ -7678,8 +7718,10 @@ simply = {
 		}
 		return null; // Return null if no parent with `state` is found
 	},
+	cache: new Map(), // Using Map for easier comparison
 	init: function () {
 		// this.Router();
+		
 		this.wcRouter();
 		this.morphdom();
 		this.observableSlim();
