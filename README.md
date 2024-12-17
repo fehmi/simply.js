@@ -15,7 +15,6 @@ It has a built-in super-fast declarative template engine that coded from scratch
 
 Long story short, simply.js is the name of the brand new template engine and the bridge between the adopted tools.
 
-
 ## How it works
 
 You will need to have basic understanding with [HTML](https://www.w3schools.com/html/default.asp), [CSS](https://www.w3schools.com/css/default.asp) and [JavaScript](https://www.w3schools.com/js/default.asp) to develop with simply.js. They are relatively easy to learn languages when you think Super Mario was [hand-written](https://gist.github.com/1wErt3r/4048722) with 6502 assembly 40 years ago by Toshihiko Nakago. So, don't worry about to jump in to learn them. [W3Schools](https://www.w3schools.com/) is a great stating point. You don't have to learn every details. The big part of programming is to know how to search things on Google and ChatGPT nowadays :)
@@ -40,6 +39,11 @@ While you are working with simply.js, everything will run in the browser of the 
 ## Playground
 
 The REPL of simply.js is at the [Playground](playground) section. This is the fastest way to get started using simply.js. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
+
+## simply.js in the wild
+
+- [Reframer - Framer Marketplace](https://reframer.net)
+- [Port FM](https://port.fm)
 
 <hr>
 
