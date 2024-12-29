@@ -5351,9 +5351,14 @@ simply = {
 							}
 						}
 						if (!match.useCache || match.url === url) {
-							const content = await routeElement.getContent(match.data);
+							var content = await routeElement.getContent(match.data);
+							if (routeElement.hasAttribute("open")) {
+								content = content.replace("><", " open><")
+								console.log("hee");
+							}							
 							outletElement.renderOutletContent(content);
-							console.log("hey hey");
+							console.log("hey hey", content, match, routeElement);
+
 							// setContentAndRender(content);
 						}
 						else {
