@@ -5642,7 +5642,11 @@ export const simply = {
 			RouterElement._anchors = [];
 			RouterElement._encodeSpaceAsPlusInQuery = false;
 			RouterElement.assignedOutlets = {};
-			window.customElements.define('a-router', RouterElement);
+      try {
+
+        window.customElements.define('a-router', RouterElement);
+      }
+      catch(e) {}
 
 			/** */
 			class RouterLinkElement extends HTMLAnchorElement {
@@ -7737,6 +7741,6 @@ export const simply = {
 				simply.setupInlineComps(document);
 			}
 		}
-
+    
 	}
 }
