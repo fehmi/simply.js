@@ -5642,11 +5642,7 @@ export const simply = {
 			RouterElement._anchors = [];
 			RouterElement._encodeSpaceAsPlusInQuery = false;
 			RouterElement.assignedOutlets = {};
-      try {
-
-        window.customElements.define('a-router', RouterElement);
-      }
-      catch(e) {}
+			window.customElements.define('a-router', RouterElement);
 
 			/** */
 			class RouterLinkElement extends HTMLAnchorElement {
