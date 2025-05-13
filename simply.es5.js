@@ -1,3 +1,4 @@
+// simply.js
 export const simply = {
 	components: {},
 	parseTemplate: function (parsingArgs) {
@@ -7739,4 +7740,3 @@ export const simply = {
 
 	}
 }
-simply.init();
