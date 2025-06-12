@@ -1353,7 +1353,11 @@ simply = {
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 
-
+						// automaticaly load awc router for reframer and photopea plugin
+						if (parsedTemplate.indexOf("<a-route") > -1 && !customElements.get('a-route')) {
+							console.log("a-route elementi var ve register edilmemiş", customElements.get('a-route'));
+							simply.initWcRouter();
+						}
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeRender !== "undefined") {
