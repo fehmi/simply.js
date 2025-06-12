@@ -7023,7 +7023,7 @@ Route.prototype.middleware = function(fn) {
 			stringify: stringify
 		};
 	})(),
-	initRouter: function() {
+	initRouter: function(a,b) {
 		window.page = simply.page(); // i'll delete this after seeing all examples (search/replace page with simply.page in examples)
 		simply.page = window.page;
 		
@@ -7034,6 +7034,9 @@ Route.prototype.middleware = function(fn) {
 			var base_href = base.getAttribute("href").replace(/\/$/, "");
 			simply.page.base(base_href);
 		}
+		if (a && b) {
+			simply.page.redirect(a, b);
+		}
 	},
 	initWcRouter() {
 		this.wcRouter();
@@ -7043,8 +7046,8 @@ Route.prototype.middleware = function(fn) {
 		this.observableSlim();
 
 		// simply.page() load edilmemişse
-		simply.page.redirect = function() {
-			simply.initRouter();
+		simply.page.redirect = function(a,b) {
+			simply.initRouter(a,b);
 		}
 		
 		window.get = this.get;
