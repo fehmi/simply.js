@@ -1,0 +1,30 @@
+<html>
+<h1>Products Page</h1>
+<a href="company/products/iphone">Iphone</a>
+<a href="company/products/mac">Mac</a>
+<a href="subpage2/contact/amsterdam">amsterdam</a>
+<a href="subpage2/contact">contact</a>
+
+<route></route>
+
+</html>
+
+<style>
+</style>
+
+<script>
+	class simply {
+		data = {
+			"name": "Products page"
+		}
+		lifecycle = {
+			afterConstruct() {
+				// this is called after the element is created
+				// and the template is inserted into the DOM
+				console.log("products page constructed");
+			},
+			afterFirstRender() {
+			}
+		}
+	}
+</script>

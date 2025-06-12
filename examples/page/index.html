@@ -1,0 +1,151 @@
+<html>
+
+<head>
+	<title>Simply.js Page Example</title>
+	<base href="/simply/examples/page/">
+	<meta charset="UTF-8">
+
+</head>
+
+<body>
+	<h1>Hello nested Routes</h1>
+
+	<a href="">home</a>
+	<a href="subpage/20">subpage</a>
+	<a href="subpage2">subpage2</a>
+	<a href="company">company</a>
+	<a href="unknown">unknown</a>
+
+	<br><br>
+
+	<my-app open></my-app>
+
+	<br><br>
+
+	<route></route>
+
+
+	<script src="../../simply.js"></script>
+	<script>
+		get("my-app.html");
+		get("home-page.html");
+		get("sub-page.html");
+		get("sub-page2.html");
+		get("sub-page3.html");
+		get("contact-page.html");
+		get("contact-istanbul.html");
+		get("contact-amsterdam.html");
+		get("company-page.html");
+		get("products-page.html");
+		get("iphone-page.html");
+		get("mac-page.html");
+		get("not-found.html");
+
+		// define redirection
+		// simply.initRouter();
+		// simply.page.redirect("/", "/subpage/10");
+		simply.router([
+			{
+				path: "/",
+				component: "home-page",
+				shadow_root: false,
+				cache: true,
+				root: document.querySelector("route"),
+				same_page_refresh: false,
+				title: "Home page"
+			},
+			{
+				path: "/subpage/:id",
+				component: "sub-page",
+				shadow_root: false,
+				cache: false,
+				root: document.querySelector("route"),
+				title: "Subpage"
+			},
+			{
+				path: "/subpage2",
+				component: "sub-page2",
+				shadow_root: false,
+				cache: true,
+				title: "Subpage 2",
+				children: [
+					{
+						path: "/about",
+						component: "about-page",
+						title: "Subpage 2 > About",
+					},
+					{
+						path: "/contact",
+						component: "contact-page",
+						shadow_root: false,
+						title: "Subpage 2 > Contact",
+						children: [
+							{
+								path: "/istanbul",
+								component: "contact-istanbul",
+								cache: true,
+								title: "Subpage 2 > Contact > Istanbul",
+							},
+							{
+								path: "/amsterdam",
+								component: "contact-amsterdam",
+								title: "Subpage 2 > Contact > Amsterdam",
+							},
+						]
+					},
+				]
+			},
+			{
+				path: "/company",
+				component: "company-page",
+				shadow_root: false,
+				cache: true,
+				same_page_refresh: false,
+				title: "Company",
+				children: [
+					{
+						path: "/info",
+						component: "info-page",
+						title: "Company > Info",
+					},
+					{
+						path: "/products",
+						component: "products-page",
+						shadow_root: false,
+						title: "Company > Products",
+						children: [
+							{
+								path: "/iphone",
+								component: "iphone-page",
+								cache: true,
+								title: "Company > Products > Iphone",
+							},
+							{
+								path: "/mac",
+								component: "mac-page",
+								title: "Company > Products > Mac",
+							},
+						]
+					},
+				]
+			},
+			{
+				path: "*",
+				component: "not-found",
+				shadow_root: false,
+				root: document.querySelector("route"),
+				title: "404 Not Found"
+			},
+		])
+
+		// go to the current page
+
+
+		simply.page();
+
+
+
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+<html>
+
+home page content {data.name}
+cache: {props.cache}
+
+</html>
+
+<script>
+	class simply {
+		data = {
+			"name": "fehmi"
+		}
+		lifecycle = {
+			afterConstruct() {
+				// this is called after the element is created
+				// and the template is inserted into the DOM
+				console.log("homepage constructed");
+			},
+			afterFirstRender() {
+				setTimeout(() => {
+					data.name = "minyeli";
+					console.log(cache);
+				}, 1000);
+			}
+		}
+	}
+</script>

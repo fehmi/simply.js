@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <title>EnterpriseJS</title>
+  <meta
+    http-equiv="Content-type"
+    content="text/html; charset=utf-8"
+  />
+  <base href="/simply/examples/page/examples/enterprisejs/">
+</head>
+
+<body>
+  <a href="../">« Examples</a>
+  <h1>EnterpriseJS</h1>
+  <p></p>
+  <ul>
+    <li><a href="./">/</a></li>
+    <li><a href="./about">/about</a></li>
+    <li><a href="./contact">/contact</a></li>
+  </ul>
+
+  <script src="/simply/simply.js"></script>
+  <script>
+    // if you're scared by non-"classes":
+
+    function Router(obj) {
+      var self = this;
+
+      // define routes
+      for (var key in obj) {
+        if ('string' == typeof obj[key]) {
+          ; (function (route, fn) {
+            page(key, function () {
+              fn.apply(self, arguments);
+            });
+          })(key, obj[obj[key]]);
+        }
+      }
+
+      this.render = function (text) {
+        document.querySelector('p').textContent = text;
+      };
+
+      this.start = page;
+    }
+
+    var router = new Router({
+      '/': 'index',
+      '/about': 'about',
+      '/contact': 'contact',
+      index: function () { this.render('viewing index') },
+      about: function () { this.render('viewing about') },
+      contact: function () { this.render('viewing contact') }
+    }).start();
+
+  </script>
+</body>
+
+</html>
