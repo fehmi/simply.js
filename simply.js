@@ -6793,6 +6793,14 @@ Route.prototype.middleware = function(fn) {
 		if (!simply.page.Context) {
 			simply.initRouter();
 		}
+
+		simply.page('*', parse)
+
+		function parse(ctx, next) {
+			ctx.query = simply.qs.parse(location.search.slice(1));
+			next();
+		}
+
 		routes.forEach(function(route) {
 			simply.page(
 				route.path,
