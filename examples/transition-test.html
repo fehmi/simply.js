@@ -1,0 +1,76 @@
+<html>
+<div transition="{data.transition}">
+  subpage 2 content<br>
+  sub page 2 name: {data.name}<br>
+  <a href="subpage2/contact">Contact</a>
+  <route></route>
+</div>
+
+</html>
+
+<style>
+  [transition] {
+    opacity: 0;
+    transition: opacity 1500ms;
+  }
+
+  [transition="enter"] {
+    opacity: 1;
+  }
+
+  [transition="exit"] {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      "name": "subpage 2 name"
+    }
+    router = {
+      exit: function (ctx, next, component) {
+        data.transition = "exit";
+        const el = dom.querySelector('[transition]');
+        let onTransitionEnd;
+        let canceled = false;
+        let rejectFn;
+
+        const promise = new Promise((resolve, reject) => {
+          rejectFn = reject;
+          onTransitionEnd = (e) => {
+            e.stopPropagation()
+            console.log(e);
+            el.removeEventListener('transitionend', onTransitionEnd);
+            if (!canceled) {
+              console.warn("Subpage 2 transition ended, resolving exit.");
+              resolve();
+            }
+          };
+          el.addEventListener('transitionend', onTransitionEnd);
+        });
+
+        promise.cancel = () => {
+          rejectFn('canceled');
+          canceled = true;
+          el.removeEventListener('transitionend', onTransitionEnd);
+          console.warn("Subpage 2 transition listener removed via cancel.");
+        };
+
+        return promise;
+      }
+    }
+    lifecycle = {
+      afterConstruct() {
+        // this is called after the element is created
+        // and the template is inserted into the DOM
+        console.log("subpage 2 constructed");
+      },
+      afterFirstRender() {
+        requestAnimationFrame(() => {
+          data.transition = "enter";
+        });
+      }
+    }
+  }
+</script>
