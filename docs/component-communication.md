@@ -1,13 +1,10 @@
 ## Parent to Childs
 
-
-
 ### Direct
 
 You can directly change a variable in a child component or call a function from it like this.
 
 ```js
-
 // Change a variable in child's data
 component.dom.querySelector("child-component").data.name = "New name";
 
@@ -41,38 +38,40 @@ component.parent.methods.functionName();
 <repl-component id="n12menua0kfi0k7" donwload="true"></repl-component>
 
 ## Child to grand parents
+
 ```js
-  // You can use any number of parent.parent.parent ...
-  var grandParent = component.parent.parent;
-  grandParent.data.message = "This changed by a grand child";
-  grandParent.methods.saySomething();
+// You can use any number of parent.parent.parent ...
+var grandParent = component.parent.parent;
+grandParent.data.message = "This changed by a grand child";
+grandParent.methods.saySomething();
 ```
 
 <repl-component id="v5owc8geudzz349" donwload="true"></repl-component>
 
 ## Child to siblings
+
 ```js
-  // Communicate with grand parents directly
-  var sibling = component.parent.dom.querySelector("sibling-component");
-  sibling.data.message = "This changed by a sibling";
-  sibling.methods.saySomething();
+// Communicate with grand parents directly
+var sibling = component.parent.dom.querySelector("sibling-component");
+sibling.data.message = "This changed by a sibling";
+sibling.methods.saySomething();
 ```
 
 <repl-component id="fgtv259ejp0bguh" donwload="true"></repl-component>
 
 ## Props
+
 ```html
-  <child-component message="This is a message from parent"></child-component>
+<child-component message="This is a message from parent"></child-component>
 ```
+
 Then you can access it in template section of the child component like this
 
 ```html
-<template>
-  {props.message}
-</template>
+<template> {props.message} </template>
 ```
 
-You can put any kind of values to the attributes. `Object`, `Array`, `String`, `Boolean`, `Number` and even `Function` are supported. In simply.js attributes synced to props. So, if you define an attribute value the prop will be defined too. 
+You can put any kind of values to the attributes. `Object`, `Array`, `String`, `Boolean`, `Number` and even `Function` are supported. In simply.js attributes synced to props. So, if you define an attribute value the prop will be defined too.
 
 !> Don't change attributes directly with `setAttribute`. It breaks morphing algorithm of DOM.
 
@@ -87,7 +86,7 @@ Or you can access your predefined attributes as props from anywhere in the scrip
       }
     }
   }
-  </script>
+</script>
 ```
 
 ## Short Story Long About Props
@@ -96,10 +95,16 @@ There are 4 ways to define them
 
 1. Inside of a component class `class { props = {"myProp": "myValue"} }`.
 2. As an inline attribute direcly with
-<br> `<my-app myProp='myValue'>`You may to stringify the value if you want to store objects, arrays etc with this way.
+   <br> `<my-app myProp='{a: "b"}'>`You may to stringify the value and wrap it with single quote if you want to store objects, arrays etc with this way. After stringify you may want to replace single quotes like this:
+
+   ```js
+   objToPropString: function (obj) {
+        return JSON.stringify(obj).replace(/'/g, "&apos;");
+   }
+   ```
+
 3. Inside component's logic part (methods/lifecycle etc.)<br>`props.myPprop = "myValue"`
 4. With inline components see: [Inline Components](docs/inline-components)
-
 
 ```js
     <my-app>

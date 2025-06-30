@@ -773,6 +773,7 @@
 		}
 		methods = {
 			renderResult() {
+
 				// index.html'deki get'leri rewrite'a gönderiyor
 				var indexContent = component.editors["index.html"].getValue();
 				var files = component.methods.getFiles("index.html", indexContent);
@@ -894,8 +895,8 @@
 							var blob = new Blob([newContent], { type: "text/html; charset=utf-8" });
 							var blobUrl = URL.createObjectURL(blob);
 
-							if (document.location.host == "root") {// dev env
-								newContent = newContent.replace("https://simply.js.org/simply.min.js", "//root/simply/simply.min.js");
+							if (document.location.host == "localhost") {// dev env
+								newContent = newContent.replace("https://simply.js.org/simply.min.js", "https://localhost/simply/simply.min.js");
 							}
 
 							blobs[file["filename"]] = {
@@ -926,9 +927,10 @@
 						textArea.innerHTML = blobs["index.html"].content;
 						dom.querySelector("iframe#result").contentWindow.dataContent = textArea.value;
 						dom.querySelector("iframe#result").contentWindow.document.write(textArea.value);
+						console.log(textArea.value);
 						//dom.querySelector("iframe#result").contentWindow.document.querySelector("body").setAttribute("data-content", textArea.value);
 						data.resultStatus = "loaded";
-					}, 0);
+					}, 10);
 				});
 			},
 			getFiles(filename, content) {

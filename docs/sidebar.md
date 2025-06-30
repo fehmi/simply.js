@@ -9,7 +9,6 @@
   - [HTML](docs/html.md)
   - [Style](docs/style.md)
   - [Script](docs/script.md)
-  - [Inline Components](docs/inline-components.md)  
 
 - <br>Template Engine
 
@@ -30,10 +29,12 @@
   - [State Management](docs/state.md)
 
 - <br>Style
-	- [Tailwind](docs/uno.md)
+
+  - [Tailwind](docs/uno.md)
   - [Design Tokens](docs/design-tokens.md)
 
 - <br>Router
+
   - [AWC Router](docs/awc-router.md)
   - [Router](docs/router.md)
   - [Electron](docs/electron.md)

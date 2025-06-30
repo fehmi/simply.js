@@ -77,11 +77,11 @@ simply = {
 			else if (bucket.endsWith("<style")) {
 				styleCount += 1;
 			}
-			else if (bucket.endsWith("<template simply>")) {
+			//else if (bucket.endsWith("<template simply>")) {
 				//bucket += "<!--";
 				//processedLetters += "<!--";
-				simplyTemplateCount += 1;
-			}
+				//simplyTemplateCount += 1;
+			//}
 			// else if (bucket.substr(-"<template>".length) === "<template>") {
 			// 	templateCount += 1;
 			// }
@@ -93,14 +93,14 @@ simply = {
 			}
 			// inline template skip
 			// we will look when construct
-			else if (bucket.endsWith("</template>")) {
-				simplyTemplateCount -= 1;
+			//else if (bucket.endsWith("</template>")) {
+				//simplyTemplateCount -= 1;
 				//bucket = bucket.replace(/<\/template>$/, "--></template>");
 				//processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
-			}
+			//}
 			/* / 1ms */
 
-			if (simplyTemplateCount == 0 && styleCount == 0 && scriptCount == 0) {
+			if (styleCount == 0 && scriptCount == 0) {
 				// attribute içindeki fonksyion ise skip
 				if (bucket.endsWith('="function') || bucket.endsWith('="(function')) {
 					ignoreFlag = true;
@@ -657,6 +657,9 @@ simply = {
 			return value;
 		}
 	},
+	objToPropString: function (obj) {
+		return JSON.stringify(obj).replace(/'/g, "&apos;");
+	},
 	customStringify: function (v) {
 		const cache = new Set();
 		return JSON.stringify(v, function (key, value) {
@@ -770,41 +773,6 @@ simply = {
 					this.sfcClass = sfcClass ? sfcClass : {};
 					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
 
-					// inline class varsa sfc class ile merge
-					if (this.querySelector("template[simply]")) {
-						// burada bi encoding sorunu oldu
-						// textare trick'i işi çözemedi
-						// multiple spaceleri { ile replace ettim
-						let t = this.querySelector("template[simply]").innerHTML.replace(/\s{2,}/g, "\n\n");
-						this.inlineComp = simply.splitComponent(t);
-						let inlineClassAsText = simply.runGetsReturnClass(this.inlineComp.script, name);
-						var inlineCompClass = eval(inlineClassAsText);
-
-						// data|state|methods|lifecycle
-						for (var key in inlineCompClass) {
-							if (key.match("data|state|methods|lifecycle|props")) {
-								for (var childKey in inlineCompClass[key]) {
-									if (!this.sfcClass[key]) {
-										this.sfcClass[key] = {};
-									}
-									let value = inlineCompClass[key][childKey];
-									this.sfcClass[key][childKey] = value;
-								}
-							}
-							// inline prop'ları attribute'lara yaz
-							//else if (key == "props") {
-							//	for (var propKey in inlineCompClass[key]) {
-							//		if (!this.sfcClass[key]) {
-							//			this.sfcClass[key] = {};
-							//			let value = inlineCompClass[key][propKey];
-							//			this.sfcClass[key][propKey] = value;										
-							//		}									
-							//let attrValue = simply.prepareAttr(inlineCompClass["props"][propKey]);
-							//this.setAttribute(propKey, attrValue);
-							//}
-							//}
-						}
-					}
 
 					// before construct event
 					if (typeof this.sfcClass.lifecycle !== "undefined") {
@@ -1014,7 +982,7 @@ simply = {
 					};
 
 					this.react = function (property, newValue, previousValue, prop = false) {
-						// console.log("react to ", property, previousValue, newValue, templateName);
+						//console.log("react to ", property, previousValue, newValue);
 
 						if (self.data) {
 							if (typeof self.lifecycle !== "undefined") {
@@ -1048,7 +1016,7 @@ simply = {
 								}
 							}
 							*/
-
+							// console.log("renderellas", self);
 							self.render();
 							if (typeof self.watch !== "undefined") {
 								self.watch(property, newValue);
@@ -1235,7 +1203,6 @@ simply = {
 
 					
 					if (this.parent) {
-						console.log(this.parent);
 						if (this.parent.data) {
 							if (this.parent.cb) {
 								if (this.parent.cb.data) {
@@ -1286,36 +1253,9 @@ simply = {
 							template = template.replaceAll(m[0], newValue);
 						}
 					}
-					// template & style modification from inline comp
-					if (this.inlineComp) {
-						let inlineTemp = this.querySelector("template[simply]");
-						let htmlMethod = inlineTemp.getAttribute("html");
-						let styleMethod = inlineTemp.getAttribute("style");
 
-						if (htmlMethod == "replace" || noFile) {
-							template = this.inlineComp.template;
-						}
-						else if (htmlMethod == "prepend") {
-							var mergedTemp = template.replace("<html>", "<html>" + this.inlineComp.template);
-						}
-						else {
-							template = template.trim();
 
-							var mergedTemp = template.replace(/<\/html>$/s, this.inlineComp.template.trim() + "</html>");
-						}
-
-						if (styleMethod == "replace" || noFile) {
-							styles.local = this.inlineComp.styles.local;
-						}
-						else if (styleMethod == "prepend") {
-							styles.local = this.inlineComp.styles.local + styles.local;
-						}
-						else {
-							styles.local += this.inlineComp.styles.local;
-						}
-					}
-
-					var tmpl = mergedTemp ? mergedTemp : template;
+					var tmpl = template;
 
 					let parsingArgs = {
 						template: tmpl,
@@ -1383,7 +1323,6 @@ simply = {
 
 						this.dom.innerHTML = parsedTemplate;
 
-						simply.setupInlineComps(this.dom, docStr, template);
 						if (window.unoConfig) {
 							//this.component.setAttribute("hoak", true);
 							var classObserver;
@@ -1512,9 +1451,9 @@ simply = {
 									}
 									if (fromEl.isEqualNode(toEl)) {
 										return false
-									}
+									}						
 									if (fromEl.hasAttribute("router-active") == true) {
-										return false;
+										toEl.setAttribute("router-active", true);
 									}											
 									return true
 								},
@@ -1528,9 +1467,15 @@ simply = {
 										return false;
 									}
 									if (fromEl.isSameNode(toEl)) {
+										console.log("same mi node", toEl, fromEl.value, toEl.value)
 										return false;
 									}
 									if (fromEl.isEqualNode(toEl)) {
+										// textarea'dan textarea'ya dönüştürürken
+										// eşit mi diye bakarken value'yu hesaba katmıyor diye eklendi
+										if (toEl.tagName == "TEXTAREA" && fromEl.value !== toEl.value) {
+											return true
+										}
 										return false
 									}
 									if (fromEl.tagName == "CHILD-COMPONENT") {
@@ -1542,10 +1487,7 @@ simply = {
 									else if (toEl.hasAttribute("passive") === true) {
 										return false;
 									}
-									else if (fromEl.hasAttribute("router-active") === true) {
-										console.log("heeeeee", toEl);
-										return false;
-									}									
+							
 									else if (toEl.tagName === 'INPUT') {
 										if (toEl.type == 'RADIO' || toEl.type == 'CHECKBOX') {
 											return false;
@@ -1554,7 +1496,6 @@ simply = {
 											toEl.value = fromEl.value;
 										}
 									}
-
 									else if (toEl.tagName === 'ROUTER') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
@@ -1567,7 +1508,7 @@ simply = {
 										if (fromEl.isEqualNode(toEl)) {
 											return false;
 										}
-									}
+									}								
 									else if (toEl.tagName === 'OPTION') {
 										toEl.selected = fromEl.selected;
 									}
@@ -1575,6 +1516,9 @@ simply = {
 								}
 							});
 						}
+
+
+
 
 						if (this.globalStyle) {
 							var parsedGlobalStyle = simply.parseStyle({
@@ -1611,6 +1555,8 @@ simply = {
 							}
 						}
 					}
+
+
 
 					// cache data and props after every render
 					if ('cache' in this.props) {
@@ -1657,6 +1603,11 @@ simply = {
 						// bu biraz yavaşlatıyor diye commentledim
 						// Reflect.deleteProperty(this.cb.state, this.uid); // true
 					}
+					if (this.cb.data) {
+						this.cb.data[this.uid] = null;
+						// bu biraz yavaşlatıyor diye commentledim
+						// Reflect.deleteProperty(this.cb.state, this.uid); // true
+					}					
 					if (this.parent) {
 						if (this.parent.cb) {
 							if (this.parent.cb.data) {
@@ -4295,91 +4246,6 @@ simply = {
 			simply.morphdom = morphdom;
 		})();
 	},
-	setupInlineComps: function (dom, docStr, tmpl) {
-		simply.gets = simply.gets ? simply.gets : [];
-		let simplyTemplates = dom.querySelectorAll("template[simply]");
-		if (simplyTemplates) {
-			simplyTemplates.forEach(element => {
-				let string;
-				let comp = element.parentElement;
-				let tag = comp.tagName.toLowerCase();
-				let regexstr = "get\(.*" + tag + ".*\)";
-				let regex = new RegExp(regexstr, "i");
-				var allGets = /^\s*get\(.*\)/gm
-				let tempContent;
-
-				// home/root/index.html/result home
-				if (!docStr) {
-					// for REPL
-					if (window.name == "result") {
-						tempContent = window.frameElement.contentWindow.dataContent;
-						string = tempContent;
-						// console.log({ tempContent });
-						//var match = tempContent.match(regex);
-					}
-					// normal
-					else {
-						tempContent = dom.querySelector("body").innerHTML;
-						//var match = tempContent.match(regex);
-					}
-				}
-				// from inside a template
-				else {
-					//var match = docStr.match(regex);
-					tempContent = docStr;
-					string = docStr;
-				}
-
-				// push all gets to a global var to check below if block
-				while ((m = allGets.exec(tempContent)) !== null) {
-					simply.gets.push(m[0]);
-				}
-				let check = simply.gets.filter(e => e.includes(tag)); // true
-				// console.log(simply.gets[1], check.length, tag);
-
-				// is there a get for it in the array
-				// or is it registered already
-				if (check.length == 0 && !customElements.get(tag.toLowerCase())) {
-					// console.log("get yok ya da register edilmemiş", tag);
-					// for root (index.html etc)
-					// get raw content because innerhtml broke some simply tags
-					// for ex each or if in <select> tag
-					if (!string) {
-						var request = new XMLHttpRequest();
-						console.log(window.document.location.href);
-						request.open('GET', window.document.location.href, false);
-						request.onload = function () {
-							if (this.status >= 200 && this.status < 400) {
-								string = this.responseText;
-								//console.log({ string });
-							}
-						};
-						request.send();
-					}
-
-					// parse it and register
-					let inlineComp = simply.getBetweenTag({
-						"string": string,
-						"tag": tag
-					});
-
-					let parsed = simply.splitComponent(inlineComp);
-
-					simply.registerComponent({
-						name: tag, //module.default.name,
-						template: parsed.template,
-						styles: parsed.styles,
-						script: parsed.script,
-						docStr: string,
-						noFile: true
-					});
-				}
-				else {
-					// console.log("get var ya da register edilmiş", comp.tagName);
-				}
-			});
-		}
-	},
 	findShadowRootOrCustomElement: function (element) {
 		let parent = element.parentNode;
 
@@ -5182,6 +5048,19 @@ simply = {
 		}
 		return null; // Return null if no parent with `state` is found
 	},
+	getFirstCustomElementParent(el) {
+		while (el) {
+			const parent = el.parentElement || (el.getRootNode && el.getRootNode().host);
+			if (!parent) break;
+
+			if (parent.tagName && parent.tagName.includes('-')) {
+				return parent;
+			}
+
+			el = parent;
+		}
+		return null;
+	},
 	page: function() {
 		'use strict';
 
@@ -5778,8 +5657,26 @@ simply = {
 			 */
 
 			Page.prototype.show = function(path, state, dispatch, push) {
-				var ctx = new Context(path, state, this), prev = this.prevContext; // maybe i should do the same for this one
 
+				if (simply.preserveParams && simply.preserveParams.length > 0) {
+					const urlParams = new URLSearchParams(window.location.search);
+					const filteredParams = new URLSearchParams();
+
+					for (const [key, value] of urlParams.entries()) {
+						if (simply.preserveParams.includes(key)) {
+							filteredParams.append(key, value);
+						}
+					}
+
+					const filteredQuery = filteredParams.toString();
+
+					if (typeof path === 'string' && !path.includes('?') && filteredQuery) {
+						path += '?' + filteredQuery;
+					}
+				}
+		
+		
+				var ctx = new Context(path, state, this), prev = this.prevContext; // maybe i should do the same for this one
 				// prevContent was always same so i added by swallow copying to ctx.page.simplyPrevContext
 				this.simplyPrevContext = { ...prev }
 
@@ -6359,7 +6256,7 @@ simply = {
 			async function waitForRendered(component) {
 				return new Promise(resolve => {
 					if (component.rendered === true) {
-						console.log("Already rendered:", component);
+						//console.log("Already rendered:", component); 
 						return resolve();
 					}
 
@@ -6372,7 +6269,7 @@ simply = {
 						set(value) {
 							_rendered = value;
 							if (value === true) {
-								console.log("Now rendered:", component);
+								// console.log("Now rendered:", component);
 								resolve();
 							}
 						},
@@ -6406,9 +6303,9 @@ simply = {
 								if (i > 0) {
 									const parentPath = tree[i - 1];
 									parentRootEl = await waitForRenderedAndReturnRoute(parentRootEl.querySelector(lastParentComponent));
-									console.log({parentRootEl, path, parentPath, node});
-									console.log("next target", parentRootEl.querySelector(lastParentComponent));
-									console.log(parentRootEl, path, parentPath);
+									//console.log({parentRootEl, path, parentPath, node});
+									//console.log("next target", parentRootEl.querySelector(lastParentComponent));
+									//console.log(parentRootEl, path, parentPath);
 								}
 								else {
 									parentRootEl = document.querySelector("route");
@@ -6447,12 +6344,13 @@ simply = {
 									await waitForRenderedAndReturnRoute(directChild);
 									directChild.router_settings = settings;
 									directChild.ctx = ctx;					
-
+									
 									if (directChild.router && directChild.router.enter)	{
 										directChild.router.enter(ctx);
 									}
 								}
-
+								//console.log("hedeley", directChild, parentRootEl.parentElement);
+								/*
 								parentRootEl.parentElement.querySelectorAll("a").forEach(function(a) {
 									// console.log(a, path, ctx.path);
 									let href = a.getAttribute("href");
@@ -6466,7 +6364,8 @@ simply = {
 									else {
 										a.removeAttribute("router-active");
 									}
-								})											
+								})				
+								*/			
 							}
 						}
 						// çocuklu route'un son halkası yani target
@@ -6486,7 +6385,7 @@ simply = {
 						if (directChild) {
 							// zaten render edilmiş
 							// innerHTML ile basmadan düz render()
-							console.log("düz render for ", directChild);
+							//console.log("düz render for ", directChild);
 							var component = directChild
 							directChild.render();
 
@@ -6515,30 +6414,82 @@ simply = {
 						if (settings.title) {
 							document.title = settings.title
 						}
-
-						route.parentElement.querySelectorAll("a").forEach(function(a) {
-							let href = a.getAttribute("href");
-							if (href && !href.startsWith('/')) {
-								href = '/' + href;
-							}							
-							let rt = simply.page.getRouteByPath(href)
-							if (ctx.path == rt.key) {
-								a.setAttribute("router-active", true);
-							}
-							else {
-								a.removeAttribute("router-active");
-							}
-						})							
-										
-						await waitForRendered(component)				
-						if (directChild.router && directChild.router.enter)	{
-							directChild.router.enter(ctx);
+						
+						var comp = directChild || component
+						await waitForRendered(comp)				
+						if (comp.router && comp.router.enter)	{
+							comp.router.enter(ctx);
 						}						
 							
 						try {
-							component.querySelector("route").innerHTML = ""
+							comp.querySelector("route").innerHTML = ""
 						}
 						catch(e) {}		
+
+						comp.selectLinks = function() {
+						if (simply.ctx) {
+								let aTags = [];
+								let current = comp;
+
+								// tüm linkleri topla
+								while (current) {
+									if (typeof current.querySelectorAll === "function") {
+										aTags.push(...current.querySelectorAll("a"));
+									}
+									current = current.parent || (current.getRootNode && current.getRootNode().host) || document;
+									if (current === document) {
+										aTags.push(...document.querySelectorAll("a"));
+										break;
+									}
+								}
+
+								//console.log(simply.ctx.path.split("?")[0], aTags, this.parent, simply.ctx);
+
+								let currentPath = simply.ctx.path.split("?")[0];
+								aTags.forEach(function(a) {
+									let href = a.getAttribute("href");
+									if (href && !href.startsWith('/')) {
+										href = '/' + href;
+									}				
+
+									if (href && href == decodeURIComponent(currentPath)) {
+										a.setAttribute("router-active", true);
+									}
+									else {
+										a.removeAttribute("router-active");
+									}
+									// tree içinde current olandan öncesi için
+									// parent linkleri de active edelim
+									var targetRoute = simply.page.getRouteByPath(simply.ctx.path.split("?")[0]);
+									if (href && targetRoute.value.tree) {
+										let tree = targetRoute.value.tree;
+										// console.log(tree);
+										if (tree.includes(simply.ctx.routePath)) {
+											const index = tree.indexOf(simply.ctx.routePath);
+											const parentPaths = index !== -1 ? tree.slice(0, index) : [];
+											let routePathOfLink = simply.page.getRouteByPath(href);
+											// console.log("oooo tree", parentPaths, currentPath, href, routePathOfLink.key, simply.ctx);
+											if (parentPaths.includes(routePathOfLink.key)) {
+												a.setAttribute("router-active", true);
+											}
+											// ! çünkü bazen parent link, child'ın içinde de kullanılıyor
+											// o durumda aktif etmeye demeye çalıştım burada
+											else if (parentPaths.includes(href) && !comp.parent.contains(a)) {
+												// console.log(component, a);
+												a.setAttribute("router-active", true);
+											}
+										}
+									}
+								})		
+							}
+						}
+						setTimeout(() => {
+							comp.selectLinks();
+						}, 0);
+						// app içindeki tüm linkler için
+						// router-active ekle/sil
+
+
 						simply.lastPath = ctx.path;				
 					}
 
@@ -7071,8 +7022,8 @@ Route.prototype.middleware = function(fn) {
 		};
 	})(),
 	initRouter: function(a,b) {
-		window.page = simply.page(); // i'll delete this after seeing all examples (search/replace page with simply.page in examples)
-		simply.page = window.page;
+		// window.page = simply.page(); // i'll delete this after seeing all examples (search/replace page with simply.page in examples)
+		simply.page = simply.page();
 		
 		simply.page.configure({window:window})
 		var base = document.querySelector("base[href]");
@@ -7089,6 +7040,7 @@ Route.prototype.middleware = function(fn) {
 		this.wcRouter();
 	},
 	init: function () {
+		//console.clear();
 		this.morphdom();
 		this.observableSlim();
 
@@ -7098,11 +7050,6 @@ Route.prototype.middleware = function(fn) {
 		}
 		
 		window.get = this.get;
-		document.onreadystatechange = function () {
-			if (document.readyState == "complete") {
-				simply.setupInlineComps(document);
-			}
-		}
 	}
 }
 simply.init();
