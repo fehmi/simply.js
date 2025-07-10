@@ -474,63 +474,55 @@ simply = {
 			return replacement;
 		});
 	},
-	loadComponent: function (path, name, callback) {
-		if (typeof name == "undefined") {
-			var ext = path.split(".").pop();
-			var name = path.split('\\').pop().split('/').pop().split('.').slice(0, -1).join('.');
-		}
-		else {
-			if (name.indexOf(".") > -1) {
-				var ext = name.split(".").pop();
-				var name = name.replace("." + ext, "");
+	loadComponent: function(path, name, callback, triedWithCorsProxy = false) {
+			// Eğer name yoksa çıkar ve parametreye ata
+			var editedName;
+			if (typeof name === "undefined" || !name) {
+				// Eğer proxy URL ise gerçek path'i al
+				const realPath = path.includes("cors.woebegone.workers.dev/?")
+				? path.split("cors.woebegone.workers.dev/?")[1]
+				: path;
+				
+				path = realPath.split('?')[0].split('#')[0];
+				name = path.split('\\').pop().split('/').pop().split('.').slice(0, -1).join('.');
 			}
 			else {
-				var ext = "html";
-			}
-		}
-
-		//request.responseType = 'document';
-
-		if (ext == "js") {
-			// console.log("galiba store/state");
-		}
-		else if (ext == "html") {
-			if (typeof simply.components[name] == "undefined") {
-				simply.components[name] = {};
-				var request = new XMLHttpRequest();
-
-				request.open('GET', path, true);
-
-				request.onload = function () {
-					if (this.status >= 200 && this.status < 400) {
-
-						// var docStr = this.response;
-
-						let docStr = this.response;
-						let parsed = simply.splitComponent(this.response);
-						simply.components[name] = parsed;
-
-						callback({
-							name,
-							template: parsed.template,
-							styles: parsed.styles,
-							script: parsed.script,
-							docStr
-						});
-						//console.log(simply.importCompleted[name]);
-					} else {
-						//console.log("Component import error: We reached our target server, but it returned an error");
-						// console.error(path + " not found!");
-					}
-				};
-				request.onerror = function () {
-				};
-				request.send();
-			}
-			else {
-				// console.log(path + " daha önce yüklendi")
-			}
-		}
+				if (name.indexOf(".") > -1) {
+					var ext = name.split(".").pop();
+					var name = name.replace("." + ext, "");
+				}
+				else {
+					var ext = "html";
+				}
+			}			
+				
+				fetch(path + (path.includes("?") ? "&" : "?") + "_v=" + Date.now())
+				.then(response => {
+					if (!response.ok) throw new Error("Network response was not ok");
+					return response.text();
+				})
+				.then(text => {
+					if (!text) throw new Error("Empty response (possible CORS block)");
+					const parsed = simply.splitComponent(text);
+					console.log({name})
+							simply.components[name] = parsed;
+							callback({
+									name,
+									template: parsed.template,
+									styles: parsed.styles,
+									script: parsed.script,
+									docStr: text
+							});
+					})
+					.catch(error => {
+							console.warn("Fetch error:", error.message, "(possible CORS block) Trying with proxy one time.");
+							if (!triedWithCorsProxy && !path.startsWith("https://cors.woebegone.workers.dev/")) {
+									const proxyUrl = "https://cors.woebegone.workers.dev/?" + path;
+									simply.loadComponent(proxyUrl, name, callback, true);
+							} else {
+									console.error("Could not load component even with proxy:", path);
+							}
+					});
 	},
 	request: function (url, callback, async = false) {
 		var request = new XMLHttpRequest();
@@ -814,6 +806,64 @@ simply = {
 
 					this.component = component;
 					this.dom = dom;
+
+					// --- Observe framer-components added inside this component ---
+					const framerComponentObserver = new MutationObserver(mutations => {
+						for (const mutation of mutations) {
+							for (const node of mutation.addedNodes) {
+								if (node.nodeType === Node.ELEMENT_NODE) {
+									if (node.tagName == "FRAMER-COMPONENT") {
+										var framerComponentUid = "id" + Math.random().toString(16).slice(2);
+										let path = node.getAttribute("path");
+										let rendered = node.hasAttribute("rendered");
+										node.setAttribute("uid", framerComponentUid);
+										node.setAttribute("style", "height: auto; width: auto");
+										
+										
+											// say framer send the candy
+											console.log("ask framer to send the candy here!" , node);
+											window.parent.postMessage({ 
+												method: "component-request",
+												path,
+												name: name,
+												framerComponentUid: framerComponentUid,
+												uid
+											}, "*");
+										
+										console.warn('framer-component added inside <' + name + '>', node);
+									}
+								}
+							}
+						}
+					});				
+
+					// Observe the light DOM or shadow DOM depending on `open`
+					framerComponentObserver.observe(dom, {
+						childList: true,
+						subtree: true
+					});
+
+					dom.addEventListener("click", function (e) {
+						const target = e.target;
+						const link = target.closest("a");
+
+						// Link varsa ve ya "framer-component" içinde ya da "framer-route" attribute'u varsa
+						if (
+							link &&
+							(link.closest("framer-component") || link.hasAttribute("route-framer"))
+						) {
+							console.log("Send this link to framer for route:", link.getAttribute("href"));
+							e.preventDefault();
+							e.stopPropagation();
+							window.parent.postMessage({
+								method: 'link-click',
+								link: link.getAttribute("href"),
+								uid,
+								name
+							}, '*')
+						}
+					});				
+
 					this.lifecycle = lifecycle;
 					this.router = router;
 					
@@ -1069,6 +1119,36 @@ simply = {
 						}
 					}
 
+					self.framerPropsListener = function(event) {
+						event.preventDefault();
+						event.stopPropagation();
+
+						if (event.data.method === "set-props") {
+							console.log("props from parent", event.data.props);
+							Object.entries(event.data.props).forEach(([key, value]) => {
+									self.props[key] = value; 
+							});
+
+							setTimeout(() => {
+									if (methods && methods.propsUpdated) {
+											methods.propsUpdated();  
+									} 
+							}, 0); 
+						}
+					}
+
+					component.runInFramer = function(codeToRun) {
+						window.parent.postMessage({
+							method: 'run-in-framer',
+							name,
+							uid: uid,
+							code: "return " + codeToRun.toString()
+						}, '*')						
+					}
+
+          window.addEventListener("message", self.framerPropsListener);
+					window.parent.postMessage({ method: "simply-ready", uid: uid, name }, "*");		
+
 					if (this.stateToObserve) {
 						if (!this.stateToObserve.__isProxy) {
 
@@ -1134,7 +1214,7 @@ simply = {
 						if (typeof this.lifecycle.afterConstruct !== "undefined") {
 							this.lifecycle.afterConstruct();
 						}
-					}
+					}				
 				}
 				// invoked each time the custom element is appended
 				// into a document-connected element
@@ -1452,6 +1532,10 @@ simply = {
 									if (fromEl.isEqualNode(toEl)) {
 										return false
 									}						
+									else if (toEl.tagName === 'FRAMER-COMPONENT') {
+										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
+										return false;
+									}										
 									if (fromEl.hasAttribute("router-active") == true) {
 										toEl.setAttribute("router-active", true);
 									}											
@@ -1496,6 +1580,10 @@ simply = {
 											toEl.value = fromEl.value;
 										}
 									}
+									else if (toEl.tagName === 'FRAMER-COMPONENT') {
+										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
+										return false;
+									}									
 									else if (toEl.tagName === 'ROUTER') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
@@ -1597,6 +1685,10 @@ simply = {
 
 				}
 				disconnectedCallback() {
+
+                    window.removeEventListener("message", this.framerPropsListener);
+
+					console.log("this thist his")
 					// console.log("disconnector", this.uid);
 					if (this.cb.state) {
 						this.cb.state[this.uid] = null;

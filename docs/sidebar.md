@@ -37,6 +37,10 @@
 
   - [AWC Router](docs/awc-router.md)
   - [Router](docs/router.md)
+
+- <br>Integrations
+
+  - [Framer](docs/framer.md)
   - [Electron](docs/electron.md)
 
 - <br>Components

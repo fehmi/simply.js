@@ -1059,7 +1059,6 @@
 
 			},
 			runInResult() {
-				simply.setupInlineComps(document);
 				window.addEventListener('message', (event) => {
 					if (event.data.action == "consoleEnter") {
 						eval("console.log(" + JSON.stringify(event.data.code) + ");//@ sourceURL=console");
