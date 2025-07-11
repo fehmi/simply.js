@@ -3,16 +3,18 @@
 ## Contents
 
 - [Code Components](#code-components)
-  - [Your First Code Component](#your-first-code-component)
-  - [Supported Property Types](#supported-property-types)
-  - [Writing a Simply.js Component](#writing-a-simplyjs-component)
-  - [Accessing Props](#accessing-props)
+  - [First Code Component](#your-first-code-component)
+  - [Supported Properties](#supported-property-types)
+  - [Writing Simply.js Components](#writing-a-simplyjs-component)
+  - [Using Props](#accessing-props)
   - [Prevent Flicker (FOUC)](#prevent-flicker-fouc)
-  - [Mount Framer Components inside Simply.js](#mount-framer-components-inside-simplyjs)
+  - [Mount Framer Components](#mount-framer-components-inside-simplyjs)
+  - [Component Interactions](#framer-component-interactions)
   - [Collections](#collections)
-    - [Multiple Queries for Collection References](#multiple-queries-for-collection-references)
-  - [Run Custom Code In Framer](#run-custom-code-in-framer)
-  - [Multiple Simply.js Instances in the Same Framer Page](#multiple-simplyjs-instances-in-the-same-framer-page)
+    - [Multiple Queries in Collections](#multiple-queries-for-collection-references)
+  - [Run Custom Code](#run-custom-code-in-framer)
+  - [Scroll Event Listener](#listen-scroll-event)
+  - [Multiple Instances on One Page](#multiple-simplyjs-instances-in-the-same-framer-page)
   - [Links](#links)
   - [Limitations](#limitations)
 - [Plugins](#plugins)
@@ -21,7 +23,7 @@ You can use Simply.js to build Framer plugins and code components. This guide ex
 
 ## Code Components
 
-To make this work, I built a package called **Simply Loader**. It loads Simply.js components inside Framer code components and passes all props—including component instances and collections.
+To make this work, I built a package called **Simply Loader**. It loads Simply.js components inside Framer code components within an encapsulated iframe environment and passes all props—including component instances and collections—from Framer to your Simply.js component.
 
 ### Your First Code Component
 
@@ -155,7 +157,7 @@ To avoid flicker during load, use a conditional based on prop availability or se
 OR
 
 ```html
-<if cond="data.ready">
+<if cond="props.message">
   <p>{props.message}</p>
 </if>
 ```
@@ -224,6 +226,59 @@ You can also access additional data about the component through the `props` obje
   "isOnCanvas": false
 }
 ```
+
+After each mount, Framer runs a function called `framerComponentMounted()` defined in the `methods` of your Simply.js component. You can handle it like this.
+
+```html
+<html>
+  <h1>Mount Component 2</h1>
+  <framer-component path="props.component"></framer-component>
+</html>
+
+<style></style>
+
+<script>
+  class simply {
+    methods = {
+      framerComponentMounted(framerComponent) {
+        console.log("framer component mounted", framerComponent);
+      },
+    };
+  }
+</script>
+```
+
+### Framer Component Interactions
+
+Variants and their interactions, such as `hover` and `click`, will work out of the box. You may also want to detect the current variant state when a component is clicked. You can use `framerComponentClicked(framerComponent)` for that. Here is an example:
+
+```html
+<html>
+  <h1>Interaction</h1>
+  <framer-component path="props.component" id="myComp"></framer-component>
+</html>
+
+<script>
+  class simply {
+    methods = {
+      framerComponentClicked(framerComponent) {
+        var variant =
+          framerComponent.getAttribute("data-framer-name") || "default";
+        console.log(
+          "this one clicked baby",
+          framerComponent,
+          "turned to ",
+          variant
+        );
+      },
+    };
+  }
+</script>
+```
+
+<img src="docs/images/framer-interactions.gif">
+
+!> There is a minor limitation about variant transitions/animations. Its about the opacity property of Framer nodes. It seems they don't work. Try to use alpha value in colors to workaround it.
 
 ### Collections
 
@@ -390,6 +445,50 @@ The line `component.methods.runInFramerResult(data);` inside the `useEffect` hoo
 > - `isOnCanvas`
 > - `component`
 
+### Listen Scroll Event
+
+If you'd like to listen to scroll events from Framer inside your Simply.js component, you can do so by defining a method called `framerOnScroll()` inside your component’s `methods` block.
+
+Here’s how to set it up:
+
+```js
+class simply {
+  methods = {
+    framerOnScroll(data) {
+      console.log(data);
+    },
+  };
+}
+```
+
+The `data` object you receive will contain detailed scroll information. It looks like this:
+
+```json
+{
+  "clientHeight": 477,
+  "clientWidth": 936,
+  "originalEvent": {
+    "isTrusted": true,
+    "type": "scroll",
+    "target": "document",
+    "currentTarget": null,
+    "eventPhase": 0,
+    "bubbles": false,
+    "cancelable": false,
+    "defaultPrevented": false,
+    "composed": false
+  },
+  "scrollBottom": 230,
+  "scrollHeight": 1000,
+  "scrollLeft": 0,
+  "scrollRight": -15,
+  "scrollTop": 293,
+  "scrollWidth": 921
+}
+```
+
+You can use this data to trigger actions based on scroll position, such as detecting when the user is near the bottom of the page.
+
 ### Multiple Simply.js instances in a same Framer page
 
 The great features don’t stop there. You can also create multiple Simply.js components on the same Framer page and enable them to communicate with each other.
@@ -433,7 +532,9 @@ This will trigger routing in Framer and open the corresponding page.
 
 Simply Loader relies on several hacks to function, which makes it fragile. If Framer changes anything these hacks depend on, it may break. I’ll try to update it when that happens, but please use it cautiously.
 
-Interactions on connected component instances (like those bound to click events) do not work inside the Simply.js environment. Hover effects and overlays mostly work, though their transitions (opacity, colors, etc.) can sometimes behave unexpectedly. Transformations like scale, rotate, and position work reliably.
+As a minor issue, opacity changes in transitions between variants don’t seem to work. Try using the color alpha value as a workaround.
+
+---
 
 ## Plugins
 

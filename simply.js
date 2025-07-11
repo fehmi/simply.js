@@ -807,41 +807,93 @@ simply = {
 					this.component = component;
 					this.dom = dom;
 
-					// --- Observe framer-components added inside this component ---
 					const framerComponentObserver = new MutationObserver(mutations => {
 						for (const mutation of mutations) {
 							for (const node of mutation.addedNodes) {
 								if (node.nodeType === Node.ELEMENT_NODE) {
-									if (node.tagName == "FRAMER-COMPONENT") {
-										var framerComponentUid = "id" + Math.random().toString(16).slice(2);
-										let path = node.getAttribute("path");
-										let rendered = node.hasAttribute("rendered");
+									if (node.tagName === "FRAMER-COMPONENT") {
+										const framerComponentUid = "id" + Math.random().toString(16).slice(2);
+										const path = node.getAttribute("path");
+										const rendered = node.hasAttribute("rendered");
 										node.setAttribute("uid", framerComponentUid);
 										node.setAttribute("style", "height: auto; width: auto");
+										node.setAttribute("rendered", true);
+
+										console.warn("framer-component added inside <", name, ">", node);
+
+										// 🔁 Framer'a mesaj gönder
+										window.parent.postMessage({
+											method: "component-request",
+											path,
+											name,
+											framerComponentUid,
+											uid
+										}, "*");
 										
-										
-											// say framer send the candy
-											console.log("ask framer to send the candy here!" , node);
-											window.parent.postMessage({ 
-												method: "component-request",
-												path,
-												name: name,
-												framerComponentUid: framerComponentUid,
-												uid
-											}, "*");
-										
-										console.warn('framer-component added inside <' + name + '>', node);
+										// ✅ Sadece bu `dom` içinde click'leri dinle
+										node.addEventListener("click", e => {
+											console.log("click", e)
+											if (node.contains(e.target)) {
+												triggerOnTapFromDOM(e.target);
+											}
+										}, { passive: true });
 									}
 								}
 							}
 						}
-					});				
+					});
 
-					// Observe the light DOM or shadow DOM depending on `open`
+					// DOM veya shadow DOM'u izle
 					framerComponentObserver.observe(dom, {
 						childList: true,
 						subtree: true
 					});
+
+					// bu yakaladığı ilk component' tıklayıp bırakıyor
+					// framer gibi tap'ın parent'larını da tetiklemek istersen
+					// çalışan kod şurada: https://chatgpt.com/s/t_68710b873f9481919232870b0c7eeb32
+					function triggerOnTapFromDOM(domElement) {
+						console.log("tap")
+						var current = domElement;
+
+						while (current && current.tagName !== "FRAMER-COMPONENT") {
+							// __reactFiber$... anahtarını bul
+							var fiberKey = null;
+							try {
+								var keys = Object.keys(current);
+								for (var i = 0; i < keys.length; i++) {
+									if (keys[i].indexOf("__reactFiber$") === 0) {
+										fiberKey = keys[i];
+										break;
+									}
+								}
+							} catch (e) {}
+
+							var fiber = fiberKey ? current[fiberKey] : null;
+
+							try {
+								var onTap = fiber.return.child.pendingProps.onTap;
+								if (typeof onTap === "function") {
+									console.log("✅ Triggering onTap on:", current);
+									onTap();
+									return;
+								}
+							} catch (e) {}
+
+							try {
+								var onTap = fiber.return.child.child.stateNode.props.onTap;
+								if (typeof onTap === "function") {
+									console.log("✅ Triggering onTap on:", current);
+									onTap();
+									return;
+								}
+							} catch (e) {}
+
+							current = current.parentElement;
+						}
+
+						console.warn("No onTap handler found up to <framer-component>");
+					}
 
 					dom.addEventListener("click", function (e) {
 						const target = e.target;
