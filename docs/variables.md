@@ -1,18 +1,19 @@
 ## Simple form of variables
 
-You can define your variables on the data section in your component like this.
+You can define your variables within the `data` section of your component, as shown below.
 
 ```bash
 <script>
-  class {
+  class simply {
     data = {
       "name": "fehmi",
       "age": 37
-    };
+    }
+  }
 </script>
 ```
 
-Then you will be able to use them in your template like this.
+You can then use them in your template as follows:
 
 ```html
 <html>
@@ -25,11 +26,11 @@ Then you will be able to use them in your template like this.
 
 <repl-component id="05loeqiinqkt8pb" download="true"></repl-component>
 
-?> It is necessary to use dot notation with `data` prefix when reaching variables. The only exception is for `each` loop. When you are in a loop, you can directly reach current subjects.
+?> It is necessary to use dot notation with the `data` prefix when accessing variables. The only exception is within an `each` loop, where you can directly access current subjects.
 
 ## Variable Expressions
 
-Of couse you can do some simple math with your variables using simple expressions. All of them below is valid.
+Of course, you can perform simple mathematical operations with your variables using basic expressions. All of the examples below are valid.
 
 ```js
 { data.variable }
@@ -50,7 +51,7 @@ Of couse you can do some simple math with your variables using simple expression
 <repl-component id="nq485hdi5gxzrx1" download="true"></repl-component>
 
 ## Go Wild
-Possibilities are endless with some imagination.
+Possibilities are endless with a little imagination.
 
 ```html
 <li class="{entry.method}">
@@ -61,7 +62,7 @@ Possibilities are endless with some imagination.
 ```
 
 ## Complex Code Blocks
-The thing is the code blocks must return something bcs it's in the rendering part of the component. For example this will not work.
+The key is that code blocks must return something because they are part of the component's rendering. For example, this will not work:
 
 ```js
 <html>
@@ -73,38 +74,38 @@ The thing is the code blocks must return something bcs it's in the rendering par
 </html>
 ```
 
-But you have a workaorund with inline self executing anonymous functions like below:
+However, you can use a workaround with inline self-executing anonymous functions, as shown below:
 
 <repl-component id="na29cvvjvjnmwd2" download="true"></repl-component>
 
-It's not recommended though. If you need some complex process just write a function in the methods part of your component and call it from your template section like this.
+It is not recommended, however. If you need a complex process, simply write a function in the `methods` section of your component and call it from your template section as follows:
 
 <repl-component id="mheo1xu2xg8lemd" download="true"></repl-component>
 
 
 ## Escaping Delimiter Charactes
-If you need to press any of delimiter characters ("{" and "}") to the dom you must escape them with "\". Bcs they must be confusing for the template engine of simply.js.
+If you need to display any delimiter characters ("{" and "}") in the DOM, you must escape them with a backslash (`\`). This is because they can be confusing for the Simply.js template engine.
 
 <repl-component id="7iznwtlsr26wa81" download="true"></repl-component>
 
 
-Actually you can any complex JavaScript code in the variable delimiters and return anything to put your dom.
+You can actually write any complex JavaScript code within the variable delimiters and return anything to be rendered in your DOM.
 
 ## Variables in `each` loops
 
-If you decide to use `key` and `index` when you define `each` loop. You can reach them directly without using a dot notation.
+If you choose to use `key` and `index` when defining an `each` loop, you can access them directly without using dot notation.
 
 <repl-component id="c0u41ol2ph7rgt8" download="true"></repl-component>
 
 ## Reactivity of Variables
 
-All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
+All variables defined in the `data` section of your component will automatically be reactive. Anytime you change a variable, your template will be re-rendered.
 
 <repl-component id="6rus94eoal01kbk" download="true"></repl-component>
 
 ## Variables in style tag
 
-You can use your reactive data variables as a property value in style tag.
+You can use your reactive data variables as property values within a style tag.
 
 ```html
 <template>
@@ -130,11 +131,11 @@ You can use your reactive data variables as a property value in style tag.
 
 ## Changing variable values in `<html>`
 
-!> It's totally unacceptable to change variables in template like `{data.name = "marilyn monroe"}` or `<!-- {data.name = "marilyn monroe"} -->`. It will cause infinite reaction/render loop. So, simply just don't do it.
+!> It is entirely unacceptable to change variables directly within the template, such as `{data.name = "marilyn monroe"}` or `<!-- {data.name = "marilyn monroe"} -->`. Doing so will cause an infinite reaction/render loop. Therefore, simply avoid this practice.
 
 ## Using variables from functions that returns values
 
-It can be useful when need a post processing for your data before showing them. Here is an example for it. You can write your return functions in data or methods. But please don't forget that the only reactive variables lives in `data` or `state`.
+This can be useful when you need to post-process your data before displaying it. Here is an example: you can write your return functions in `data` or `methods`. However, please remember that reactive variables reside only in `data` or `state`.
 
 <repl-component id="w3wofrexw9ssy1y" download="true"></repl-component>
 
@@ -145,4 +146,3 @@ It can be useful when need a post processing for your data before showing them. 
 ```
 
 <repl-component id="hedq9svhen4ssz3" download="true"></repl-component>
-

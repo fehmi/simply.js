@@ -1,16 +1,16 @@
 # Conditionals
 
-We are defining conditional statemens as special html tags like `<if>`, `<elsif>`, `<else>`. This way helps our IDE to easyly colorize syntax and format the code without and issue.
+Conditional statements are defined using special HTML tags such as `<if>`, `<elsif>`, and `<else>`. This approach allows IDEs to easily colorize syntax and format the code without issues.
 
 ## If
 
 <repl-component id="th73bi8vvx8q32v" download="true"></repl-component>
 
-?> Please remember that every if statement must be closed with an `</if>`
+?> Please remember that every `if` statement must be closed with an `</if>` tag.
 
 ## Elsif
 
-It works just like an `<if>` but just after an `<if>` as you know.
+The `<elsif>` tag functions similarly to an `<if>` tag but must be placed immediately after an `<if>` (or another `<elsif>`) block.
 
 <repl-component id="4te0gtxxiq2u9b1" download="true"></repl-component>
 
@@ -20,11 +20,11 @@ It works just like an `<if>` but just after an `<if>` as you know.
 
 ## Nested Conditionals
 
-All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
+All variables defined in the `data` section of your component will automatically be reactive. Anytime you change a variable, your template will be re-rendered.
 
-<repl-component id="erexq0k102v6bbz" donwload="true"></repl-component>
+<repl-component id="erexq0k102v6bbz" download="true"></repl-component>
 
-?> You can write any if statement that you can write with Vanilla JS like below.
+?> You can write any `if` statement that you would typically write with Vanilla JS, as shown below.
 
 ```html
 

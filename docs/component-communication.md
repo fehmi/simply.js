@@ -1,8 +1,8 @@
-## Parent to Childs
+## Parent to Child Communication
 
-### Direct
+### Direct Manipulation
 
-You can directly change a variable in a child component or call a function from it like this.
+You can directly modify a variable in a child component or invoke a function on it, as shown below:
 
 ```js
 // Change a variable in child's data
@@ -21,11 +21,11 @@ cchild.querySelector("grand-child").methods.functionName();
 ```
 
 Here is a working example:
-<repl-component id="4g6y3ikfl9ihlgb" donwload="true"></repl-component>
+<repl-component id="4g6y3ikfl9ihlgb" download="true"></repl-component>
 
-## Child to Parent
+## Child to Parent Communication
 
-It is possible to communicate with parent sdirectly.
+It is possible to communicate directly with parent components.
 
 ```js
 // To change a variable in parent's data
@@ -35,29 +35,29 @@ component.parent.data.name = "This changed by a child component";
 component.parent.methods.functionName();
 ```
 
-<repl-component id="n12menua0kfi0k7" donwload="true"></repl-component>
+<repl-component id="n12menua0kfi0k7" download="true"></repl-component>
 
-## Child to grand parents
+## Child to Grandparent Communication
 
 ```js
-// You can use any number of parent.parent.parent ...
+// You can chain parent properties to reach any ancestor (e.g., parent.parent.parent).
 var grandParent = component.parent.parent;
-grandParent.data.message = "This changed by a grand child";
+grandParent.data.message = "This was changed by a grandchild.";
 grandParent.methods.saySomething();
 ```
 
-<repl-component id="v5owc8geudzz349" donwload="true"></repl-component>
+<repl-component id="v5owc8geudzz349" download="true"></repl-component>
 
-## Child to siblings
+## Child to Sibling Communication
 
 ```js
-// Communicate with grand parents directly
+// Communicate directly with sibling components.
 var sibling = component.parent.dom.querySelector("sibling-component");
-sibling.data.message = "This changed by a sibling";
+sibling.data.message = "This was changed by a sibling.";
 sibling.methods.saySomething();
 ```
 
-<repl-component id="fgtv259ejp0bguh" donwload="true"></repl-component>
+<repl-component id="fgtv259ejp0bguh" download="true"></repl-component>
 
 ## Props
 
@@ -65,17 +65,17 @@ sibling.methods.saySomething();
 <child-component message="This is a message from parent"></child-component>
 ```
 
-Then you can access it in template section of the child component like this
+You can then access it in the template section of the child component as follows:
 
 ```html
 <template> {props.message} </template>
 ```
 
-You can put any kind of values to the attributes. `Object`, `Array`, `String`, `Boolean`, `Number` and even `Function` are supported. In simply.js attributes synced to props. So, if you define an attribute value the prop will be defined too.
+You can assign any type of value to attributes, including `Object`, `Array`, `String`, `Boolean`, `Number`, and even `Function`. In Simply.js, attributes are synchronized with properties (props). Therefore, if you define an attribute value, the corresponding prop will also be defined.
 
-!> Don't change attributes directly with `setAttribute`. It breaks morphing algorithm of DOM.
+!> Do not change attributes directly using `setAttribute`, as this can disrupt the DOM's morphing algorithm.
 
-Or you can access your predefined attributes as props from anywhere in the script section of the component like this.
+Alternatively, you can access your predefined attributes as props from anywhere within the script section of the component, as shown below:
 
 ```html
 <script>
@@ -89,13 +89,15 @@ Or you can access your predefined attributes as props from anywhere in the scrip
 </script>
 ```
 
-## Short Story Long About Props
+## Detailed Explanation of Props
 
-There are 4 ways to define them
+There are four primary ways to define properties (props):
 
-1. Inside of a component class `class { props = {"myProp": "myValue"} }`.
-2. As an inline attribute direcly with
-   <br> `<my-app myProp='{a: "b"}'>`You may to stringify the value and wrap it with single quote if you want to store objects, arrays etc with this way. After stringify you may want to replace single quotes like this:
+1.  **Within a component class:**
+    `class { props = {"myProp": "myValue"} }`
+2.  **As an inline attribute directly in HTML:**
+    `<my-app myProp='{a: "b"}'>`
+    If you need to store objects, arrays, or similar complex data types using this method, you may need to stringify the value and wrap it with single quotes. After stringifying, you might also need to replace single quotes within the string, like this:
 
    ```js
    objToPropString: function (obj) {
@@ -103,8 +105,10 @@ There are 4 ways to define them
    }
    ```
 
-3. Inside component's logic part (methods/lifecycle etc.)<br>`props.myPprop = "myValue"`
-4. With inline components see: [Inline Components](docs/inline-components)
+3.  **Within the component's logic (e.g., methods, lifecycle hooks):**
+    `props.myProp = "myValue"`
+4.  **Using inline components:**
+    Refer to [Inline Components](docs/inline-components) for details.
 
 ```js
     <my-app>
@@ -124,9 +128,9 @@ There are 4 ways to define them
     </my-app>
 ```
 
-#### component.props > props template > inline props
+#### Property Precedence: `component.props` > Props Template > Inline Props
 
-This is the way about overriding. The last word is belong to the props block (1) of your component class. The props in there will override the inline (2) and other props in the props template (3). Just remember that if you define props with same name in multiple places accidentally.
+This section describes the order of precedence for overriding properties. The properties defined within the `props` block (1) of your component class take ultimate precedence, overriding both inline attributes (2) and properties defined in the props template (3). Keep this in mind if you accidentally define properties with the same name in multiple locations.
 
 Props from Template
-<repl-component id="mz6b2i2zj96fm8q"></repl-component>
+<repl-component id="mz6b2i2zj96fm8q" download="true"></repl-component>

@@ -10,13 +10,13 @@ Repo in https://github.com/docsifyjs/docsify-ssr-demo
 
 ## Quick start
 
-Install `now` and `docsify-cli` in your project.
+Install `now` and `docsify-cli` in your project's development dependencies.
 
 ```bash
 npm i now docsify-cli -D
 ```
 
-Edit `package.json`. If the documentation in `./docs` subdirectory.
+Edit `package.json`. If your documentation is located in the `./docs` subdirectory:
 
 ```json
 {
@@ -42,7 +42,7 @@ Edit `package.json`. If the documentation in `./docs` subdirectory.
 
 !> The `basePath` just like webpack `publicPath`. We can use local or remote files.
 
-We can preview in the local to see if it works.
+You can preview it locally to verify functionality.
 
 ```bash
 npm start
@@ -56,11 +56,11 @@ Publish it!
 now -p
 ```
 
-Now, You have a support for SSR the docs site.
+Now, your Docsify site supports Server-Side Rendering (SSR).
 
 ## Custom template
 
-You can provide a template for entire page's HTML. such as
+You can provide a custom template for the entire page's HTML, as shown below:
 
 ```html
 <!DOCTYPE html>
@@ -83,13 +83,13 @@ You can provide a template for entire page's HTML. such as
 </html>
 ```
 
-The template should contain these comments for rendered app content.
+The template should contain these comments for the rendered application content:
  - `<!--inject-app-->`
  - `<!--inject-config-->`
 
 ## Configuration
 
-You can configure it in a special config file, or `package.json`.
+You can configure it in a dedicated configuration file or within `package.json`.
 
 ```js
 module.exports = {
@@ -103,7 +103,7 @@ module.exports = {
 
 ## Deploy for your VPS
 
-You can run `docsify start` directly on your Node server, or write your own server app with `docsify-server-renderer`.
+You can run `docsify start` directly on your Node.js server, or create your own server application using `docsify-server-renderer`.
 
 ```js
 var Renderer = require('docsify-server-renderer')

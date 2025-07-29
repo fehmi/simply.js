@@ -1,6 +1,6 @@
 # Themes
 
-There is a handful of themes available, both official and community-made. Copy [Vue](//vuejs.org) and [buble](//buble.surge.sh) website custom theme and [@liril-net](https://github.com/liril-net) contribution to the theme of the black style.
+A variety of themes are available, including both official and community-contributed options. These include custom themes inspired by the [Vue](//vuejs.org) and [Buble](//buble.surge.sh) websites, as well as a dark-style theme contributed by [@liril-net](https://github.com/liril-net).
 
 ```html
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/vue.css">
@@ -20,7 +20,7 @@ There is a handful of themes available, both official and community-made. Copy [
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/lib/themes/pure.css">
 ```
 
-If you have any ideas or would like to develop a new theme, you are welcome to submit a [pull request](https://github.com/docsifyjs/docsify/pulls).
+If you have ideas or wish to develop a new theme, you are welcome to submit a [pull request](https://github.com/docsifyjs/docsify/pulls).
 
 #### Click to preview
 

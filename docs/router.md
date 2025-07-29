@@ -1,14 +1,14 @@
 ## Router
 
-!> The router module is deprecated and will be deleted on upcoming releases. Use [AWC router](docs/awc-router) instead.
+!> The router module is deprecated and will be removed in upcoming releases. Use [AWC router](docs/awc-router) instead.
 
-Add your site path as base href.
+Add your site path as the base `href`.
 
 ```html
 <base href="https://root/simply/examples/routeri/index.html">
 ```
 
-Pass your router container to the Router.
+Pass your router container to the Router instance.
 
 ```html
 <body>
@@ -22,7 +22,7 @@ const router = new Router(outlet, {
 });
 ```
 
-Optionaly you can pass `enableHash: true` to Router as an option.
+Optionally, you can pass `enableHash: true` to the Router as an option.
 
 ```js
 const router = new Router(outlet, {
@@ -31,7 +31,7 @@ const router = new Router(outlet, {
 ```
 
 
-Get your components. You'll pass their names to the router later.
+Retrieve your components. You will pass their names to the router later.
 
 ```js
 get('hello-world.html', "hello-world");
@@ -41,7 +41,7 @@ get('user-profile.html', "user-profile");
 ```
 
 
-?> Set your routes.
+?> Define your routes.
 
 ```js
 router.setRoutes([
@@ -58,7 +58,7 @@ router.setRoutes([
 ```
 
 
-And your links will be like:
+Your links will then be structured as follows:
 
 ```html
 <a href="#">Home</a>
@@ -80,27 +80,26 @@ router.hooks = {
 }
 ```
 
-?> Sometimes when you have a deep base path, you may need to play with the path options if you want navigate with JS.
+?> If you have a deeply nested base path, you might need to adjust the path options for JavaScript-based navigation.
 
 ```js
 simply.Router.go(router.baseUrl.replace(document.location.origin, "") + "/users");
 ```
 
-<repl-component id="tmsnjymg4frkdu3" donwload="true"></repl-component>
+<repl-component id="tmsnjymg4frkdu3" download="true"></repl-component>
 
 ## Use uno with router
 
-<repl-component id="m5i3gdr0onxdzb2" donwload="true"></repl-component>
+<repl-component id="m5i3gdr0onxdzb2" download="true"></repl-component>
 
 ## Using global styles in router
 
-<repl-component id="e634gz1758urupc" donwload="true"></repl-component>
+<repl-component id="e634gz1758urupc" download="true"></repl-component>
 
 ## Visual transition between routes
 
-<repl-component id="eqh33t4dur68bc9" donwload="true"></repl-component>
+<repl-component id="eqh33t4dur68bc9" download="true"></repl-component>
 
 
 Vaadin docs[Vaadin docs](https://vaadin.github.io/router/vaadin-router/#/classes/Router)<br>
 Demos [Demos](https://vaadin.github.io/router/vaadin-router/#/classes/Router/demos/demo/index.html)
-

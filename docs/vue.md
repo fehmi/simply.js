@@ -1,8 +1,8 @@
 # Vue compatibility
 
-Docsify allows Vue content to be added directly to you markdown pages. This can greatly simplify working with data and adding reactivity to your site.
+Docsify allows Vue content to be directly added to your Markdown pages. This can significantly simplify data management and enhance reactivity on your site.
 
-To get started, add Vue [2.x](https://vuejs.org) or [3.x](https://v3.vuejs.org) to your `index.html` file. Choose the production version for your live site or the development version for helpful console warnings and [Vue.js devtools](https://github.com/vuejs/vue-devtools) support.
+To get started, add Vue [2.x](https://vuejs.org) or [3.x](https://v3.vuejs.org) to your `index.html` file. Choose the production version for your live site, or the development version for helpful console warnings and [Vue.js devtools](https://github.com/vuejs/vue-devtools) support.
 
 #### Vue 2.x
 
@@ -26,7 +26,7 @@ To get started, add Vue [2.x](https://vuejs.org) or [3.x](https://v3.vuejs.org) 
 
 ## Template syntax
 
-Vue [template syntax](https://vuejs.org/v2/guide/syntax.html) is used to create dynamic content. With no additional configuration, this syntax offers several useful features like support for [JavaScript expressions](https://vuejs.org/v2/guide/syntax.html#Using-JavaScript-Expressions) and Vue [directives](https://vuejs.org/v2/guide/syntax.html#Directives) for loops and conditional rendering.
+Vue's [template syntax](https://vuejs.org/v2/guide/syntax.html) is used to create dynamic content. With no additional configuration, this syntax offers several useful features, such as support for [JavaScript expressions](https://vuejs.org/v2/guide/syntax.html#Using-JavaScript-Expressions) and Vue [directives](https://vuejs.org/v2/guide/syntax.html#Directives) for loops and conditional rendering.
 
 ```markdown
 <!-- Hide in docsify, show elsewhere (e.g. GitHub) -->
@@ -53,7 +53,7 @@ Vue [template syntax](https://vuejs.org/v2/guide/syntax.html) is used to create 
 
 [View output on GitHub](https://github.com/docsifyjs/docsify/blob/develop/docs/vue.md#template-syntax)
 
-Vue content becomes more interesting when [data](#data), [computed properties](#computed-properties), [methods](#methods), and [lifecycle hooks](#lifecycle-hooks) are used. These options can be specified as [global options](#global-options) or within DOM [mounts](#mounts) and [components](#components).
+Vue content becomes more dynamic and powerful when [data](#data), [computed properties](#computed-properties), [methods](#methods), and [lifecycle hooks](#lifecycle-hooks) are utilized. These options can be specified as [global options](#global-options) or within DOM [mounts](#mounts) and [components](#components).
 
 ### Data
 
@@ -193,7 +193,7 @@ Good {{ timeOfDay }}!
 
 ## Global options
 
-Use `vueGlobalOptions` to specify [Vue options](https://vuejs.org/v2/api/#Options-Data) for use with Vue content not explicitly mounted with [vueMounts](#mounts), [vueComponents](#components), or a [markdown script](#markdown-script). Changes to global `data` will persist and be reflected anywhere global references are used.
+Use `vueGlobalOptions` to specify [Vue options](https://vuejs.org/v2/api/#Options-Data) for Vue content not explicitly mounted with [vueMounts](#mounts), [vueComponents](#components), or a [Markdown script](#markdown-script). Changes to global `data` will persist and be reflected wherever global references are used.
 
 ```js
 window.$docsify = {
@@ -223,7 +223,7 @@ window.$docsify = {
   </p>
 </output>
 
-Notice the behavior when multiple global counters are rendered:
+Observe the behavior when multiple global counters are rendered:
 
 <output data-lang="output">
   <p>
@@ -233,11 +233,11 @@ Notice the behavior when multiple global counters are rendered:
   </p>
 </output>
 
-Changes made to one counter affect the both counters. This is because both instances reference the same global `count` value. Now, navigate to a new page and return to this section to see how changes made to global data persist between page loads.
+Changes made to one counter affect both counters because both instances reference the same global `count` value. Now, navigate to a new page and return to this section to see how changes made to global data persist between page loads.
 
 ## Mounts
 
-Use `vueMounts` to specify DOM elements to mount as [Vue instances](https://vuejs.org/v2/guide/instance.html) and their associated options. Mount elements are specified using a [CSS selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors) as the key with an object containing Vue options as their value. Docsify will mount the first matching element in the main content area each time a new page is loaded. Mount element `data` is unique for each instance and will not persist as users navigate the site.
+Use `vueMounts` to specify DOM elements to mount as [Vue instances](https://vuejs.org/v2/guide/instance.html) along with their associated options. Mount elements are specified using a [CSS selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors) as the key, with an object containing Vue options as their value. Docsify will mount the first matching element in the main content area each time a new page is loaded. Mount element `data` is unique for each instance and will not persist as users navigate the site.
 
 ```js
 window.$docsify = {
@@ -269,7 +269,7 @@ window.$docsify = {
 
 ## Components
 
-Use `vueComponents` to create and register global [Vue components](https://vuejs.org/v2/guide/components.html). Components are specified using the component name as the key with an object containing Vue options as the value. Component `data` is unique for each instance and will not persist as users navigate the site.
+Use `vueComponents` to create and register global [Vue components](https://vuejs.org/v2/guide/components.html). Components are specified using the component name as the key, with an object containing Vue options as the value. Component `data` is unique for each instance and will not persist as users navigate the site.
 
 ```js
 window.$docsify = {
@@ -302,9 +302,9 @@ window.$docsify = {
 
 ## Markdown script
 
-Vue content can mounted using a `<script>` tag in your markdown pages.
+Vue content can be mounted using a `<script>` tag in your Markdown pages.
 
-!> Only the first `<script>` tag in a markdown file is executed. If you wish to mount multiple Vue instances using a script tag, all instances must be mounted within the first script tag in your markdown.
+!> Only the first `<script>` tag in a Markdown file is executed. If you wish to mount multiple Vue instances using a script tag, all instances must be mounted within the first script tag in your Markdown.
 
 ```html
 <!-- Vue 2.x  -->
@@ -327,13 +327,13 @@ Vue content can mounted using a `<script>` tag in your markdown pages.
 
 ## Technical Notes
 
-- Docsify processes Vue content in the following order on each page load:
+- Docsify processes Vue content in the following order upon each page load:
   1. Execute markdown `<script>`
   1. Register global `vueComponents`
   1. Mount `vueMounts`
   1. Auto-mount unmounted `vueComponents`
   1. Auto-mount unmounted Vue template syntax using `vueGlobalOptions`
-- When auto-mounting Vue content, docsify will mount each top-level element in your markdown that contains template syntax or a component. For example, in the following HTML the top-level `<p>`, `<my-component />`, and `<div>` elements will be mounted.
+- When auto-mounting Vue content, Docsify will mount each top-level element in your Markdown that contains template syntax or a component. For example, in the following HTML, the top-level `<p>`, `<my-component />`, and `<div>` elements will be mounted.
   ```html
   <p>{{ foo }}</p>
   <my-component />
@@ -342,5 +342,5 @@ Vue content can mounted using a `<script>` tag in your markdown pages.
     <some-other-component />
   </div>
   ```
-- Docsify will not mount an existing Vue instance or an element that contains an existing Vue instance.
+- Docsify will not mount an existing Vue instance or an element that already contains a Vue instance.
 - Docsify will automatically destroy/unmount all Vue instances it creates before each page load.

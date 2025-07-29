@@ -2,25 +2,25 @@
 
 ## Reactivity of Variables
 
-All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered if necessarry.
+All variables defined in the `data` section of your component will automatically be reactive. Anytime you change a variable, your template will be re-rendered if necessary.
 
-!> When a data or prop changed in a parent component, all children react to that. But children not react to the changes in granparents. If you need to do that use [state management](docs/state) instead.
+!> When data or a property changes in a parent component, all children react to that change. However, children do not react to changes in their grandparents. If you need this functionality, use [state management](docs/state) instead.
 
 ## Element exception
 
-You can disable reactivity for specific elements in your template like below. The div that has "passive" parameter remain passive after first render. It and its children will not affected from data changes.
+You can disable reactivity for specific elements in your template, as shown below. The `div` element with the "passive" parameter will remain passive after the first render. It and its children will not be affected by data changes.
 
-<repl-component id="k3lkxbulmflvlm9" donwload="true"></repl-component>
+<repl-component id="k3lkxbulmflvlm9" download="true"></repl-component>
 
 ## Make changes without triggering react/render
 
-?> This aproach can be unnecessary because new template and reactivity engine is fast enough to handle cases like that. Need more test though. This section can be deleted after some battle tests.
+?> This approach might be unnecessary as the new template and reactivity engine are fast enough to handle such cases. Further testing is required. This section may be removed after more comprehensive battle tests.
 
-It can be helpful for performance reasons. In that scenario, do your changes withot triggering reaction and then render manually when you finish.
+It can be helpful for performance reasons. In such scenarios, make your changes without triggering a reaction, and then render manually when finished.
 
 <repl-component id="t509ixnfmmbk0n5" donwload="true"></repl-component>
 
-You can also use built-in method to set data without triggering render. Then you can render manually for increasing performance.
+You can also use a built-in method to set data without triggering a render. You can then manually render for increased performance.
 
 ```js
 simply.setWithoutRender(data, {
@@ -32,7 +32,7 @@ simply.setWithoutRender(data, {
 component.render(); // or component.react()
 ```
 
-You can also pasue/resume reactivity for that. data, state and props supported.
+You can also pause/resume reactivity for this. Data, state, and properties are supported.
 
 ```js
 ObservableSlim.pause(data);
@@ -58,11 +58,11 @@ ObservableSlim.resume(data);
 
 ## Assigning a reactive variable to another reactive variable
 
-Each node in `data`, `state`, or `props` is a reactive proxy object. Assigning one to another can be problematic and may break the reactivity engine by causing infinite loops. For example, assigning `data.person = state.person` or vice versa can lead to a "maximum call stack size exceeded" error.
+Each node in `data`, `state`, or `props` is a reactive proxy object. Assigning one to another can be problematic and may break the reactivity engine by causing infinite loops. For example, assigning `data.person = state.person` or vice versa can lead to a "Maximum call stack size exceeded" error.
 
-It might work the first time you assign it, but subsequent assignments can trigger these issues.
+While it might work the first time you assign it, subsequent assignments can trigger these issues.
 
-To prevent this, you should first **remove the existing reference** before reassigning. You can do this by either:
+To prevent this, you should first **remove the existing reference** before reassigning it. You can do this by either:
 
 ```js
 delete data.person;
@@ -74,7 +74,7 @@ or
 data.person = {};
 ```
 
-After that, it's safe to assign it again as you did the first time:
+After that, it is safe to assign it again as you did the first time:
 
 ```js
 data.person = state.person;

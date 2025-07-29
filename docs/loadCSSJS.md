@@ -1,7 +1,7 @@
 # CSS
 
-Template içine `<link rel="stylesheet" type="text/css" href="style.css">` ekle
-ya da style tag i içinde `@import` kullan `<style>` tagi içinde en üstte
+Add `<link rel="stylesheet" type="text/css" href="style.css">` inside the template,
+or use `@import` within the `<style>` tag at the top:
 ```html
 <template>
   Test
@@ -27,11 +27,11 @@ ya da style tag i içinde `@import` kullan `<style>` tagi içinde en üstte
 <script>
   class {
     // ...
-    lifecycle() {
-      afterFirstRender = {
+    lifecycle = {
+      afterFirstRender() {
         loadJS("jszip.min.js", function () {
           console.log("script is loaded");
-        }
+        });
       }
     }
   }

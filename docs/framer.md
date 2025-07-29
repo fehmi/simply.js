@@ -16,18 +16,19 @@
   - [Scroll Event Listener](#listen-scroll-event)
   - [Multiple Instances on One Page](#multiple-simplyjs-instances-in-the-same-framer-page)
   - [Links](#links)
+  - [Disable SSR](#disable-SSR)
   - [Limitations](#limitations)
 - [Plugins](#plugins)
 
-You can use Simply.js to build Framer plugins and code components. This guide explains how to run Simply.js components inside Framer and develop plugins with it.
+You can use Simply.js to build Framer plugins and code components. This guide explains how to integrate Simply.js components within Framer and develop plugins using Simply.js.
 
 ## Code Components
 
-To make this work, I built a package called **Simply Loader**. It loads Simply.js components inside Framer code components within an encapsulated iframe environment and passes all props—including component instances and collections—from Framer to your Simply.js component.
+To enable this integration, I developed a package called **Simply Loader**. This package loads Simply.js components within Framer code components inside an encapsulated iframe environment. It also passes all properties, including component instances and collections, from Framer to your Simply.js component.
 
 ### Your First Code Component
 
-To get started, import `SimplyLoader` and return it in your code component. Here's an example:
+To get started, import `SimplyLoader` and return it within your code component. Here is an example:
 
 ```js
 import { addPropertyControls, ControlType } from "framer";
@@ -101,15 +102,15 @@ Save this on a public server and set its URL in the `simply` property in Framer.
 
 ?> If a CORS error occurs, Simply.js will attempt to fetch the file using a proxy. A random parameter is also added to the URL to prevent caching and always fetch the latest version.
 
-We pass the value of the message property to our Simply.js component.
+The value of the message property is passed to our Simply.js component.
 
 <img src="docs/images/framer-hello-world.jpg">
 
 ### Accessing Props
 
-You can access all the properties defined in your Framer code component from within your Simply.js component. When any of these props change in Framer, the values in your Simply.js component are automatically updated.
+All properties defined in your Framer code component are accessible from within your Simply.js component. When any of these properties change in Framer, the corresponding values in your Simply.js component are automatically updated.
 
-Additionally, you can watch for prop changes by defining a special method called `propsUpdated()` inside your component. Here’s how:
+Additionally, you can monitor property changes by defining a special method named `propsUpdated()` within your component. Here's how:
 
 ```html
 <html>
@@ -130,7 +131,7 @@ Additionally, you can watch for prop changes by defining a special method called
 
 ### Prevent Flicker (FOUC)
 
-To avoid flicker during load, use a conditional based on prop availability or set a `data.ready` flag.
+To prevent flickering (Flash of Unstyled Content) during loading, use a conditional based on property availability or set a `data.ready` flag.
 
 ```html
 <html>
@@ -162,15 +163,15 @@ OR
 </if>
 ```
 
-This prevents the user from seeing flickering of pre-compiled content including curly braces during the loading of the page.
+This prevents the user from experiencing flickering of pre-compiled content, including curly braces, during page loading.
 
 ### Mount Framer Components inside Simply.js
 
-When you bind a component instance (such as a component, collection, or frame) to a prop in your Framer code component, you can mount that instance inside your Simply.js component.
+When you bind a component instance (such as a component, collection, or frame) to a property in your Framer code component, you can mount that instance inside your Simply.js component.
 
-To do this, use a special tag in your HTML: <framer-component path="props.component">. The path attribute should point to the prop where the component is assigned in Framer.
+To achieve this, use a special tag in your HTML: `<framer-component path="props.component">`. The `path` attribute should point to the property where the component is assigned in Framer.
 
-For example, let’s say you’ve connected a component to your code component like this:
+For example, if you have connected a component to your code component as follows:
 
 ```js
 import { addPropertyControls, ControlType } from "framer";
@@ -194,7 +195,7 @@ addPropertyControls(MountComponent, {
 
 <img src="docs/images/mount-component.jpg">
 
-Then you can mount it in your Simply.js component with this code.
+You can then mount it in your Simply.js component using this code:
 
 ```html
 <html>
@@ -203,7 +204,7 @@ Then you can mount it in your Simply.js component with this code.
 </html>
 ```
 
-When you do this, Simply Loader will locate the React component and mount it inside the <framer-component path="props.component"> tag. All styles, fonts, and even hover or overlay effects will be preserved. In preview mode, you’ll see your Framer component fully rendered within the Simply.js environment.
+When this is done, Simply Loader will locate the React component and mount it inside the `<framer-component path="props.component">` tag. All styles, fonts, and even hover or overlay effects will be preserved. In preview mode, your Framer component will be fully rendered within the Simply.js environment.
 
 <img src="docs/images/mount-component-preview.gif">
 
@@ -227,7 +228,7 @@ You can also access additional data about the component through the `props` obje
 }
 ```
 
-After each mount, Framer runs a function called `framerComponentMounted()` defined in the `methods` of your Simply.js component. You can handle it like this.
+After each mount, Framer executes a function named `framerComponentMounted()` defined within the `methods` of your Simply.js component. You can handle it as follows:
 
 ```html
 <html>
@@ -250,7 +251,7 @@ After each mount, Framer runs a function called `framerComponentMounted()` defin
 
 ### Framer Component Interactions
 
-Variants and their interactions, such as `hover` and `click`, will work out of the box. You may also want to detect the current variant state when a component is clicked. You can use `framerComponentClicked(framerComponent)` for that. Here is an example:
+Variants and their interactions, such as `hover` and `click`, will function automatically. You may also want to detect the current variant state when a component is clicked. You can use `framerComponentClicked(framerComponent)` for this purpose. Here is an example:
 
 ```html
 <html>
@@ -278,17 +279,17 @@ Variants and their interactions, such as `hover` and `click`, will work out of t
 
 <img src="docs/images/framer-interactions.gif">
 
-!> There is a minor limitation about variant transitions/animations. Its about the opacity property of Framer nodes. It seems they don't work. Try to use alpha value in colors to workaround it.
+!> There is a minor limitation regarding variant transitions/animations: the opacity property of Framer nodes appears not to work. Try using the alpha value in colors as a workaround.
 
 ### Collections
 
-You can also connect collections as component instances in Framer. These are special instances that include additional information, which you can access through `props` in your Simply.js component.
+You can also connect collections as component instances in Framer. These are special instances that include additional information, accessible through `props` in your Simply.js component.
 
-Mounting works exactly the same as described above. All entries in the collection will be returned and mounted automatically. It’s up to you to filter or display them as needed within your Simply.js component. You can use the `propsUpdated()` hook to handle that.
+Mounting functions exactly as described above. All entries in the collection will be returned and mounted automatically. It is up to you to filter or display them as needed within your Simply.js component. You can use the `propsUpdated()` hook to manage this.
 
 <img src="docs/images/mount-collection.jpg">
 
-You’ll also receive some additional useful data when mounting a collection, which will be available in the `props` object as shown below:
+You will also receive additional useful data when mounting a collection, which will be available in the `props` object as shown below:
 
 ```js
 {
@@ -345,11 +346,15 @@ You’ll also receive some additional useful data when mounting a collection, wh
 }
 ```
 
+Simply.js will also insert all this data into the corresponding DOM elements as attributes, as illustrated below.
+
+<img src="docs/images/dom-attributes.png">
+
 #### Multiple Queries for Collection References
 
-You may notice that the `category` and `categories` fields in the decoded items are empty or contain encoded data. This is because those values come from reference collections.
+You may notice that the `category` and `categories` fields in the decoded items are empty or contain encoded data. This is because these values originate from reference collections.
 
-To include them properly, instead of defining a single component instance, you should define an array of component instances. Then, add the reference collections immediately after the main collection instance in that array.
+To include them properly, instead of defining a single component instance, define an array of component instances. Then, add the reference collections immediately after the main collection instance in that array.
 
 ```js
 collection: {
@@ -363,19 +368,19 @@ collection: {
 
 <img src="docs/images/multiple-queries2.jpg">
 
-After doing this, the encoded or empty values in `props` will be replaced with decoded real data pulled from the reference collections.
+After this, the encoded or empty values in `props` will be replaced with decoded real data retrieved from the reference collections.
 
-Since multiple collections are queried, the main data will now be available under an array called `multipleQueries` in `props`.
+Since multiple collections are queried, the main data will now be available under an array named `multipleQueries` within `props`.
 
 <img src="docs/images/multiple-queries.jpg">
 
-Accessing your entire collection with fully decoded data is fantastic, isn’t it? With this data, you can build custom Simply.js components, apply any filters you want, and create custom layouts for rendering.
+Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom Simply.js components, apply any desired filters, and create custom layouts for rendering.
 
-?> Accessing your entire collection with fully decoded data is fantastic, isn’t it? With this data, you can build custom Simply.js components, apply any filters you want, and create custom layouts for rendering. ⚡ This setup also supports localization — all data is automatically filtered and provided in the user’s or site’s current language preference within `props`.
+?> Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom Simply.js components, apply any desired filters, and create custom layouts for rendering. ⚡ This setup also supports localization — all data is automatically filtered and provided based on the user's or site's current language preference within `props`.
 
 ### Run Custom Code In Framer
 
-Another great feature is that you can send custom JavaScript code from Simply.js to run inside the parent Framer component via Simply Loader. This is easy to do using Simply.js’s built-in `component.runInFramer(codeToRun)` function. Here’s an example:
+Another powerful feature allows you to send custom JavaScript code from Simply.js to execute within the parent Framer component via Simply Loader. This is easily achieved using Simply.js's built-in `component.runInFramer(codeToRun)` function. Here's an example:
 
 ```html
 <html>
@@ -420,7 +425,7 @@ Another great feature is that you can send custom JavaScript code from Simply.js
 </script>
 ```
 
-The line `component.methods.runInFramerResult(data);` inside the `useEffect` hook passes the collected data back into your current Simply.js `component`. Here, component refers to your Simply.js component instance, and calling its method allows you to send the data to any function you define inside its `methods`.
+The line `component.methods.runInFramerResult(data);` within the `useEffect` hook passes the collected data back into your current Simply.js `component`. Here, `component` refers to your Simply.js component instance, and calling its method allows you to send data to any function defined within its `methods`.
 
 > The following variables and hooks are available inside the Framer component’s runtime scope:
 >
@@ -447,7 +452,7 @@ The line `component.methods.runInFramerResult(data);` inside the `useEffect` hoo
 
 ### Listen Scroll Event
 
-If you'd like to listen to scroll events from Framer inside your Simply.js component, you can do so by defining a method called `framerOnScroll()` inside your component’s `methods` block.
+To listen for scroll events from Framer within your Simply.js component, define a method named `framerOnScroll()` inside your component's `methods` block.
 
 Here’s how to set it up:
 
@@ -461,7 +466,7 @@ class simply {
 }
 ```
 
-The `data` object you receive will contain detailed scroll information. It looks like this:
+The `data` object you receive will contain detailed scroll information, structured as follows:
 
 ```json
 {
@@ -487,15 +492,15 @@ The `data` object you receive will contain detailed scroll information. It looks
 }
 ```
 
-You can use this data to trigger actions based on scroll position, such as detecting when the user is near the bottom of the page.
+This data can be used to trigger actions based on scroll position, such as detecting when the user is near the bottom of the page.
 
 ### Multiple Simply.js instances in a same Framer page
 
-The great features don’t stop there. You can also create multiple Simply.js components on the same Framer page and enable them to communicate with each other.
+The powerful features extend further. You can also create multiple Simply.js components on the same Framer page and enable them to communicate with each other.
 
 <img src="docs/images/multiple-simply-instances.gif">
 
-To send a message to other Simply.js instances, you can use the code below. It will broadcast the message to all Simply.js instances on the current page except itself.
+To send a message to other Simply.js instances, use the code below. This will broadcast the message to all Simply.js instances on the current page, excluding the sender.
 
 ```js
       sendMessage() {
@@ -507,7 +512,7 @@ To send a message to other Simply.js instances, you can use the code below. It w
         }, '*')
 ```
 
-Then, in other instances, you can listen for messages like this:
+Then, in other instances, you can listen for messages as follows:
 
 ```js
 window.addEventListener("message", function (e) {
@@ -520,25 +525,48 @@ window.addEventListener("message", function (e) {
 
 ### Links
 
-All links in mounted components or collections will work seamlessly. Simply.js intercepts click events and forwards them to Framer’s internal router. You can also make any link in your Simply.js component trigger Framer navigation by adding the `route-framer` attribute, like this:
+All links within mounted components or collections will function seamlessly. Simply.js intercepts click events and forwards them to Framer's internal router. You can also make any link in your Simply.js component trigger Framer navigation by adding the `route-framer` attribute, as shown:
 
 ```html
 <a href="./somepage" route-framer>Go!</a>
 ```
 
-This will trigger routing in Framer and open the corresponding page.
+This will trigger routing within Framer and open the corresponding page.
+
+### Disable SSR
+
+When the breakpoint changes due to a window resize or a property update, you may experience the component unmounting and remounting with a momentary flash effect. This behavior is caused by Server-Side Rendering (SSR). You can disable SSR and prevent this by implementing the following:
+
+```js
+export default function Voltron(props) {
+  if (!window) return null;
+  return <SimplyLoader {...props} />;
+}
+```
+
+OR
+
+```js
+export default function Voltron(props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
+
+  return <SimplyLoader {...props} />;
+}
+```
 
 ### Limitations
 
-Simply Loader relies on several hacks to function, which makes it fragile. If Framer changes anything these hacks depend on, it may break. I’ll try to update it when that happens, but please use it cautiously.
-
-As a minor issue, opacity changes in transitions between variants don’t seem to work. Try using the color alpha value as a workaround.
+A minor issue exists where opacity changes in transitions between variants do not appear to function. Consider using the color alpha value as a workaround.
 
 ---
 
 ## Plugins
 
-You can easily develop Framer plugins using Simply.js. As a proof of concept, you can check out my latest plugin: [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager/preview/).
+You can easily develop Framer plugins using Simply.js. As a proof of concept, you can refer to my latest plugin: [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager/preview/).
 
 <img src="docs/images/framer-plugin.webp" alt="Image Alt Manager Preview" />
 

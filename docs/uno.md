@@ -1,13 +1,13 @@
 # Tailwind Integration
 
-You can enable [Tailwind](https://tailwindcss.com/docs/utility-first) support (thanks to [UNO](https://unocss.dev/)) for your components and start to use all Tailwind utility classes and even more. 
+You can enable [Tailwind](https://tailwindcss.com/docs/utility-first) support (thanks to [UNO](https://unocss.dev/)) for your components, allowing you to utilize all Tailwind utility classes and more.
 
-Add below custom build of UNO for simply.js to your root (index.html) page.
+Add the custom build of UNO for Simply.js to your root (`index.html`) page, as shown below.
 ```html
 <script src="https://simply.js.org/style/uno.min.js"></script>
 ```
 
-And just pass an [UNO config object](https://unocss.dev/config/) from any of your components like below.
+Then, simply pass an [UNO config object](https://unocss.dev/config/) from any of your components, as shown below.
 
 ```html
 <script>
@@ -25,17 +25,17 @@ And just pass an [UNO config object](https://unocss.dev/config/) from any of you
 </script>
 ```
 
-When simply.js see this UNO config object in any of your components, it will automaticaly load the UNO script from CDN and will apply the config if you provide some. Here are working examples:
+When Simply.js detects this UNO config object in any of your components, it will automatically load the UNO script from the CDN and apply the provided configuration. Here are working examples:
 
 <repl-component id="fqu7rho9tb1s4bk" download="true"></repl-component>
 
-After that UNO will be global. You will be able to access all UNO features in all your components. No need to pass that config again from your other components.
+After this, UNO will be globally available. You will be able to access all UNO features in all your components, eliminating the need to pass the configuration again from other components.
 
 <repl-component id="ej2yfqzecjv5a0t" download="true"></repl-component>
 
 ## Available Config Entries
 
-There are plenty of config to change the behaviour of UNO for your custom needs. You can find available ones from [UNO config object](https://unocss.dev/config/)
+There are many configuration options available to customize UNO's behavior for your specific needs. You can find available options in the [UNO config object](https://unocss.dev/config/).
 
 
 ## Official UNO Presets
@@ -43,16 +43,16 @@ Presets need to be installed and added to the presets option of the UNO config.
 https://unocss.dev/presets/
 
 ## Simply.js Styles
-You may be wondering what if you want to override some style of an element which you utilized with Tailwind classes earlier in the template section of your components. So, it's easy. Just write your normal CSS to the standard style section of your component. Utility classes are good but you have the right to say last word. For example, let's just simply override the `purple` with `blue` using our `<style>` tag:
+You might wonder how to override a style for an element that already uses Tailwind classes in your component's template section. It's straightforward: simply write your normal CSS in the standard style section of your component. While utility classes are effective, you retain control over the final styling. For example, you can easily override `purple` with `blue` using your `<style>` tag:
 
 <repl-component id="m07agz5m3gjlivw" download="true"></repl-component>
 
-And last but not least; you can go wild with the combination of simply.js variables and Tailwind utility classes easyly.
+And finally, you can easily combine Simply.js variables with Tailwind utility classes for powerful styling.
 
 <repl-component id="ocg113eix6uf6en" download="true"></repl-component>
 
 ## Sources
-Here are some links to help you to strengthen your Tailwind muscles:
+Here are some links to help you strengthen your Tailwind expertise:
 
 [UNO Config Page](https://unocss.dev/config/)<br>
 [UNO Presets](https://unocss.dev/presets/)

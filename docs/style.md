@@ -1,29 +1,33 @@
 # Style
 
-Encapsulated style definitions only affect the elements inside the template tag of the component. But there is one exception. The inherited styles of the document can affect all child components. For example, when you define `color` property of `body` as `red` in the root document (index.html), then texts of all components inside the document will be `red` if you don't define otherwise inside the style tag of a component. Here is an example about it:
+Encapsulated style definitions only affect elements within the component's template tag. However, there is one exception: inherited styles from the document can affect all child components. For example, if you define the `color` property of the `body` as `red` in the root document (index.html), then the text of all components within that document will be `red` unless otherwise defined within a component's style tag. Here is an example:
 
 <repl-component id="56ezen3ypsn2w7v" download="true"></repl-component>
 
 ### Styling Component Container
 
-When you want to style the component itself inside the component you can use `:host` selector. Also you can define your CSS variables in it.
+To style the component's container from within the component itself, you can use the `:host` selector. You can also define your CSS variables within it.
 
 <repl-component id="bzr1zokh1i7udmw" download="true"></repl-component>
 
 ### Link a CSS file
 
-You can link a CSS file inside the template tag of the component like this. Because there are CSS variables in :host{} part of the external CSS file you imported, they will be all available in the current component and all its childs. It's a good approach to maintain your design tokens. 
+You can link a CSS file inside the component's template tag as follows. Since the external CSS file you import contains CSS variables within its `:host{}` section, these variables will be available to the current component and all its children. This is a good approach for maintaining your design tokens.
 
 <repl-component id="xugiyk48m90e56s" download="true"></repl-component>
 
 ### JavaScript Variables
 
-The best thing about styling is you can use reactive JS variables in style tag. Syntax is like `color: "{data.color}";`.
+One of the key advantages of styling is the ability to use reactive JavaScript variables within style tags. The syntax is as follows: `color: "{data.color}";` and `width: "{data.width ? data.width : '100%'}";`.
 
-?> Just don't forget to write variable name between apostrophes like `"{data.color}"`
-
-<repl-component id="udiuc37epe5li8u" download="true"></repl-component>
+?> Remember to enclose the variable name within apostrophes, like `"{data.color}"`.
 
 ### Tailwind
-You also have the ability to use Tailwind magic in your components. See more at [Style section](tailwind.md)
 
+You also have the ability to leverage Tailwind CSS within your components. See more in the [Style section](tailwind.md).
+
+### Conditions
+
+You can also use Simply.js conditions, as shown in the example below.
+
+<repl-component id="g8ey7ye01fp3g5z" download="true"></repl-component>

@@ -5,7 +5,7 @@ simply = {
 		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
 
 		/*
-    let cacheKey =  JSON.stringify({template, data, state, props});
+		let cacheKey =  JSON.stringify({template, data, state, props});
 
 		// Check if the cache has this key
 		if (simply.cache.has(cacheKey)) {
@@ -78,9 +78,9 @@ simply = {
 				styleCount += 1;
 			}
 			//else if (bucket.endsWith("<template simply>")) {
-				//bucket += "<!--";
-				//processedLetters += "<!--";
-				//simplyTemplateCount += 1;
+			//bucket += "<!--";
+			//processedLetters += "<!--";
+			//simplyTemplateCount += 1;
 			//}
 			// else if (bucket.substr(-"<template>".length) === "<template>") {
 			// 	templateCount += 1;
@@ -94,9 +94,9 @@ simply = {
 			// inline template skip
 			// we will look when construct
 			//else if (bucket.endsWith("</template>")) {
-				//simplyTemplateCount -= 1;
-				//bucket = bucket.replace(/<\/template>$/, "--></template>");
-				//processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
+			//simplyTemplateCount -= 1;
+			//bucket = bucket.replace(/<\/template>$/, "--></template>");
+			//processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
 			//}
 			/* / 1ms */
 
@@ -309,13 +309,14 @@ simply = {
 		// console.log(bucket); 
 		// console.log(capturedLogics); 
 		bucket = bucket.replace(/minyeli/g, '$');
-		
+
 		eval(bucket);
 		// simply.cache.set(cacheKey, ht);
 
 		//console.timeEnd();
 		return ht;
 	},
+	/*
 	parseStyle: function (parsingArgs) {
 		var { template, style, data, state, parent, methods, props, component, dom, methods, lifecycle, watch } = parsingArgs;
 		let variable = /(\"|\')(\{)([^{}\n]*)\}(\"|\')/;
@@ -334,6 +335,105 @@ simply = {
 			style = style.split(m[0]).join("var(" + variableName + ")");
 		}
 		return { style, vars };
+	},
+	*/
+	extractVarName(expr) {
+		// Örneğin expr = "data.width ? data.width + 'px' : '100%'"
+		// İlk bulunan variable path'ini alıyoruz (data.width gibi)
+		let match = expr.match(/([a-zA-Z_$][\w.$]*)/);
+		if (match) {
+			return match[1].replace(/\./g, "-"); // data.width → data-width
+		}
+		// fallback
+		return expr.replace(/\W+/g, "-");
+	},
+	parseStyle: function (parsingArgs) {
+		let { style, data, state, parent, methods, props, component, dom, lifecycle, watch } = parsingArgs;
+
+		style = typeof style === "string" ? style : "";
+		let insideSupports = false;
+		let supportsBlocks = [];
+		let currentType = null;
+		let currentCondition = null;
+		let currentBlock = "";
+		let blockLevel = 0;
+		let cleanStyle = "";
+		let i = 0;
+
+		// 1. @supports bloklarını ayıkla
+		while (i < style.length) {
+			if (!insideSupports && style.slice(i, i + 10).startsWith("@supports")) {
+				let match = style.slice(i).match(/^@supports\s*\((if|elsif|else)\s*:\s*("?)(.*?)\2?\)\s*\{/);
+				if (match) {
+					currentType = match[1];
+					currentCondition = match[3];
+					insideSupports = true;
+					blockLevel = 1;
+					currentBlock = "";
+					i += match[0].length;
+					continue;
+				}
+			}
+
+			if (insideSupports) {
+				let char = style[i];
+				if (char === "{") blockLevel++;
+				if (char === "}") blockLevel--;
+				if (blockLevel === 0) {
+					supportsBlocks.push({
+						type: currentType,
+						condition: currentCondition,
+						block: currentBlock.trim()
+					});
+					insideSupports = false;
+					currentBlock = "";
+					currentType = null;
+					currentCondition = null;
+					i++;
+					continue;
+				} else {
+					currentBlock += char;
+				}
+			} else {
+				cleanStyle += style[i];
+			}
+			i++;
+		}
+
+		// 2. Birden fazla doğru bloğu uygula
+		let appliedBlocks = [];
+
+		for (const block of supportsBlocks) {
+			if (block.type === "if" || block.type === "elsif") {
+				try {
+					if (eval(block.condition)) {
+						appliedBlocks.push(block.block);
+					}
+				} catch (e) {
+					//console.warn("Condition error:", block.condition);
+				}
+			} else if (block.type === "else" && appliedBlocks.length === 0) {
+				appliedBlocks.push(block.block);
+			}
+		}
+
+		if (appliedBlocks.length > 0) {
+			cleanStyle += "\n" + appliedBlocks.join("\n");
+		}
+
+		// 3. { ... } değişkenlerini global olarak değiştir
+		const variable = /(["'])\{([^{}\n]*)\}\1/g;
+
+		cleanStyle = cleanStyle.replace(variable, (_, quote, expr) => {
+			try {
+				let value = eval(expr);
+				return typeof value === "number" ? value.toString() : value;
+			} catch {
+				return "";
+			}
+		});
+
+		return { style: cleanStyle.trim() };
 	},
 	getBetweenTag: function (obj) {
 		let { string, tag, prop } = obj;
@@ -474,55 +574,58 @@ simply = {
 			return replacement;
 		});
 	},
-	loadComponent: function(path, name, callback, triedWithCorsProxy = false) {
-			// Eğer name yoksa çıkar ve parametreye ata
-			var editedName;
-			if (typeof name === "undefined" || !name) {
-				// Eğer proxy URL ise gerçek path'i al
-				const realPath = path.includes("cors.woebegone.workers.dev/?")
+	loadComponent: function (path, name, callback, triedWithCorsProxy = false) {
+		// Eğer name yoksa çıkar ve parametreye ata
+		var editedName;
+		if (typeof name === "undefined" || !name) {
+			// Eğer proxy URL ise gerçek path'i al
+			const realPath = path.includes("cors.woebegone.workers.dev/?")
 				? path.split("cors.woebegone.workers.dev/?")[1]
 				: path;
-				
-				path = realPath.split('?')[0].split('#')[0];
-				name = path.split('\\').pop().split('/').pop().split('.').slice(0, -1).join('.');
+
+			path = realPath.split('?')[0].split('#')[0];
+			name = path.split('\\').pop().split('/').pop().split('.').slice(0, -1).join('.');
+		}
+		else {
+			if (name.indexOf(".") > -1) {
+				var ext = name.split(".").pop();
+				var name = name.replace("." + ext, "");
 			}
 			else {
-				if (name.indexOf(".") > -1) {
-					var ext = name.split(".").pop();
-					var name = name.replace("." + ext, "");
+				var ext = "html";
+			}
+		}
+
+		const isBlob = path.startsWith("blob:");
+		const fetchUrl = isBlob ? path : path + (path.includes("?") ? "&" : "?") + "_v=" + Date.now();
+
+		fetch(fetchUrl)
+			.then(response => {
+				if (!response.ok) throw new Error("Network response was not ok");
+				return response.text();
+			})
+			.then(text => {
+				if (!text) throw new Error("Empty response (possible CORS block)");
+				const parsed = simply.splitComponent(text);
+				console.log({ name })
+				simply.components[name] = parsed;
+				callback({
+					name,
+					template: parsed.template,
+					styles: parsed.styles,
+					script: parsed.script,
+					docStr: text
+				});
+			})
+			.catch(error => {
+				console.warn("Fetch error:", error.message, "(possible CORS block) Trying with proxy one time.");
+				if (!triedWithCorsProxy && !path.startsWith("https://cors.woebegone.workers.dev/")) {
+					const proxyUrl = "https://cors.woebegone.workers.dev/?" + path;
+					simply.loadComponent(proxyUrl, name, callback, true);
+				} else {
+					console.error("Could not load component even with proxy:", path);
 				}
-				else {
-					var ext = "html";
-				}
-			}			
-				
-				fetch(path + (path.includes("?") ? "&" : "?") + "_v=" + Date.now())
-				.then(response => {
-					if (!response.ok) throw new Error("Network response was not ok");
-					return response.text();
-				})
-				.then(text => {
-					if (!text) throw new Error("Empty response (possible CORS block)");
-					const parsed = simply.splitComponent(text);
-					console.log({name})
-							simply.components[name] = parsed;
-							callback({
-									name,
-									template: parsed.template,
-									styles: parsed.styles,
-									script: parsed.script,
-									docStr: text
-							});
-					})
-					.catch(error => {
-							console.warn("Fetch error:", error.message, "(possible CORS block) Trying with proxy one time.");
-							if (!triedWithCorsProxy && !path.startsWith("https://cors.woebegone.workers.dev/")) {
-									const proxyUrl = "https://cors.woebegone.workers.dev/?" + path;
-									simply.loadComponent(proxyUrl, name, callback, true);
-							} else {
-									console.error("Could not load component even with proxy:", path);
-							}
-					});
+			});
 	},
 	request: function (url, callback, async = false) {
 		var request = new XMLHttpRequest();
@@ -779,7 +882,7 @@ simply = {
 
 					var uid = "id" + Math.random().toString(16).slice(2)
 					var component = this;
-					
+
 					if (!open) {
 						var dom = this.attachShadow({ mode: 'open' });
 						var parent = this.getRootNode().host;
@@ -795,14 +898,14 @@ simply = {
 
 					var data = this.sfcClass.data ? this.sfcClass.data : {};
 					var props = this.sfcClass.props ? this.sfcClass.props : {};
-					
+
 					var router = this.sfcClass.router ? this.sfcClass.router : {};
 
 					var methods = this.sfcClass.methods;
 					var watch = this.sfcClass.watch;
 					var lifecycle = this.sfcClass.lifecycle;
 					var state;
-					var cb = {}		
+					var cb = {}
 
 					this.component = component;
 					this.dom = dom;
@@ -829,7 +932,7 @@ simply = {
 											framerComponentUid,
 											uid
 										}, "*");
-										
+
 										// ✅ Sadece bu `dom` içinde click'leri dinle
 										node.addEventListener("click", e => {
 											console.log("click", e)
@@ -867,7 +970,7 @@ simply = {
 										break;
 									}
 								}
-							} catch (e) {}
+							} catch (e) { }
 
 							var fiber = fiberKey ? current[fiberKey] : null;
 
@@ -878,7 +981,7 @@ simply = {
 									onTap();
 									return;
 								}
-							} catch (e) {}
+							} catch (e) { }
 
 							try {
 								var onTap = fiber.return.child.child.stateNode.props.onTap;
@@ -887,7 +990,7 @@ simply = {
 									onTap();
 									return;
 								}
-							} catch (e) {}
+							} catch (e) { }
 
 							current = current.parentElement;
 						}
@@ -914,11 +1017,11 @@ simply = {
 								name
 							}, '*')
 						}
-					});				
+					});
 
 					this.lifecycle = lifecycle;
 					this.router = router;
-					
+
 
 					this.propsToObserve = props;
 
@@ -932,11 +1035,11 @@ simply = {
 						try {
 							var cachedData = simply.cache[simply.lastPath][component.elementId].data;
 						}
-						catch(e) {}
+						catch (e) { }
 
 						if (cachedData) {
 							this.cache.data = simply.cache[simply.lastPath][component.elementId].data;
-							
+
 							console.log("cache hit for data!");
 							for (const key in cachedData) {
 								if (Object.hasOwnProperty.call(cachedData, key)) {
@@ -945,7 +1048,7 @@ simply = {
 							}
 						}
 					}
-									
+
 
 					this.methods = methods;
 					this.watch = watch;
@@ -988,7 +1091,7 @@ simply = {
 						try {
 							var cachedProps = simply.cache[simply.lastPath][component.elementId].props;
 						}
-						catch(e) {}
+						catch (e) { }
 
 						if (cachedProps) {
 							this.cache.props = simply.cache[simply.lastPath][component.elementId].props;
@@ -999,7 +1102,7 @@ simply = {
 								}
 							}
 						}
-					}					
+					}
 
 					// tailwind instance setup
 					if (this.sfcClass.uno) {
@@ -1145,7 +1248,7 @@ simply = {
 						if (template.indexOf("data.") > -1 || script.indexOf("data.") > -1) {
 							this.cb.data = {}
 							this.cb.data[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-							data = this.data;					
+							data = this.data;
 							this.setCbData(this.cb.data);
 						}
 					}
@@ -1171,35 +1274,36 @@ simply = {
 						}
 					}
 
-					self.framerPropsListener = function(event) {
+					// buna artık gerek yok çünkü mesah ile değil 
+					// direk .props ile yolluyorum
+					self.framerPropsListener = function (event) {
 						event.preventDefault();
 						event.stopPropagation();
 
 						if (event.data.method === "set-props") {
 							console.log("props from parent", event.data.props);
-							Object.entries(event.data.props).forEach(([key, value]) => {
-									self.props[key] = value; 
-							});
+							Object.assign(props, event.data.props)
 
-							setTimeout(() => {
-									if (methods && methods.propsUpdated) {
-											methods.propsUpdated();  
-									} 
-							}, 0); 
+
+							if (methods && methods.propsUpdated) {
+								methods.propsUpdated();
+							}
+							component.render();
+
 						}
 					}
 
-					component.runInFramer = function(codeToRun) {
+					component.runInFramer = function (codeToRun) {
 						window.parent.postMessage({
 							method: 'run-in-framer',
 							name,
 							uid: uid,
 							code: "return " + codeToRun.toString()
-						}, '*')						
+						}, '*')
 					}
 
-          window.addEventListener("message", self.framerPropsListener);
-					window.parent.postMessage({ method: "simply-ready", uid: uid, name }, "*");		
+					window.addEventListener("message", self.framerPropsListener);
+					window.parent.postMessage({ method: "simply-ready", uid: uid, name }, "*");
 
 					if (this.stateToObserve) {
 						if (!this.stateToObserve.__isProxy) {
@@ -1266,7 +1370,7 @@ simply = {
 						if (typeof this.lifecycle.afterConstruct !== "undefined") {
 							this.lifecycle.afterConstruct();
 						}
-					}				
+					}
 				}
 				// invoked each time the custom element is appended
 				// into a document-connected element
@@ -1333,7 +1437,7 @@ simply = {
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
 
-					
+
 					if (this.parent) {
 						if (this.parent.data) {
 							if (this.parent.cb) {
@@ -1345,16 +1449,16 @@ simply = {
 							}
 
 						}
-						
+
 						if (this.parent.props) {
 							if (this.parent.cb && this.parent.cb.props) {
 								this.parent.cb.props[this.uid] = function (prop, value) { self.react(prop, value) };
 								this.parent.setProps = this.parent.props;
 							}
-						}	
-						
+						}
+
 					}
-					
+
 
 
 
@@ -1424,6 +1528,7 @@ simply = {
 
 
 					if (!this.rendered) {
+
 						this.rendered = true;
 						var self = this;
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
@@ -1489,7 +1594,6 @@ simply = {
 							// https://gourav.io/blog/tailwind-in-shadow-dom
 							// window.observe(this.tw, this.dom);
 						}
-
 						try {
 							if (!this.open) {
 								//console.log("not open", this);
@@ -1501,8 +1605,13 @@ simply = {
 							}
 
 							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
+							if (this.open) {
 
-							var vars = ":host {";
+								var vars = ":root {";
+							}
+							else {
+								var vars = ":host {";
+							}
 							if (parsedGlobalStyle) {
 								for (var key in parsedGlobalStyle.vars) {
 									if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue;
@@ -1583,14 +1692,14 @@ simply = {
 									}
 									if (fromEl.isEqualNode(toEl)) {
 										return false
-									}						
+									}
 									else if (toEl.tagName === 'FRAMER-COMPONENT') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
-									}										
+									}
 									if (fromEl.hasAttribute("router-active") == true) {
 										toEl.setAttribute("router-active", true);
-									}											
+									}
 									return true
 								},
 								onBeforeNodeDiscarded: function (node) {
@@ -1617,13 +1726,13 @@ simply = {
 									if (fromEl.tagName == "CHILD-COMPONENT") {
 										// console.log("dont again");
 									}
-									else if (fromEl.tagName == "STYLE") {
+									else if (fromEl.tagName == "STYLE" && fromEl.hasAttribute("global")) {
 										return false;
 									}
 									else if (toEl.hasAttribute("passive") === true) {
 										return false;
 									}
-							
+
 									else if (toEl.tagName === 'INPUT') {
 										if (toEl.type == 'RADIO' || toEl.type == 'CHECKBOX') {
 											return false;
@@ -1635,7 +1744,7 @@ simply = {
 									else if (toEl.tagName === 'FRAMER-COMPONENT') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
-									}									
+									}
 									else if (toEl.tagName === 'ROUTER') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
@@ -1643,12 +1752,12 @@ simply = {
 									else if (toEl.tagName === 'ROUTE') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
-									}									
+									}
 									else if (toEl.tagName == 'LABEL') {
 										if (fromEl.isEqualNode(toEl)) {
 											return false;
 										}
-									}								
+									}
 									else if (toEl.tagName === 'OPTION') {
 										toEl.selected = fromEl.selected;
 									}
@@ -1684,10 +1793,6 @@ simply = {
 							}
 						}
 						// test
-						for (var key in parsedStyle.vars) {
-							if (!parsedStyle.vars.hasOwnProperty(key)) continue;
-							this.sheet.cssRules[0].style.setProperty(key, parsedStyle.vars[key]);
-						}
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterRerender !== "undefined") {
@@ -1695,8 +1800,6 @@ simply = {
 							}
 						}
 					}
-
-
 
 					// cache data and props after every render
 					if ('cache' in this.props) {
@@ -1707,24 +1810,24 @@ simply = {
 
 							let tagName = this.component.tagName.toLowerCase();
 							let tagNameOfRoute = simply.page.getRouteByPath(simply.lastPath).value.settings.component;
-	
+
 							if (tagName == tagNameOfRoute) {
-							simply.cache = simply.cache ? simply.cache : {}
-							simply.cache[simply.lastPath] = simply.cache[simply.lastPath] ? simply.cache[simply.lastPath] : {}
-							simply.cache[simply.lastPath][this.elementId] = {
-								data: this.data,
-								props: this.props
-							}
-	
-							this.cache = {
-								data: this.data,
-								props: this.props
-							}
-	
-							// console.log("cached!", this.elementId, this.tagName, simply.cache);
+								simply.cache = simply.cache ? simply.cache : {}
+								simply.cache[simply.lastPath] = simply.cache[simply.lastPath] ? simply.cache[simply.lastPath] : {}
+								simply.cache[simply.lastPath][this.elementId] = {
+									data: this.data,
+									props: this.props
+								}
+
+								this.cache = {
+									data: this.data,
+									props: this.props
+								}
+
+								// console.log("cached!", this.elementId, this.tagName, simply.cache);
 							}
 						}
-						catch(e) {}
+						catch (e) { }
 
 
 					}
@@ -1738,7 +1841,7 @@ simply = {
 				}
 				disconnectedCallback() {
 
-                    window.removeEventListener("message", this.framerPropsListener);
+					window.removeEventListener("message", this.framerPropsListener);
 
 					console.log("this thist his")
 					// console.log("disconnector", this.uid);
@@ -1751,7 +1854,7 @@ simply = {
 						this.cb.data[this.uid] = null;
 						// bu biraz yavaşlatıyor diye commentledim
 						// Reflect.deleteProperty(this.cb.state, this.uid); // true
-					}					
+					}
 					if (this.parent) {
 						if (this.parent.cb) {
 							if (this.parent.cb.data) {
@@ -2909,7 +3012,7 @@ simply = {
 							if (routeElement.hasAttribute("open")) {
 								content = content.replace("><", " open><")
 								console.log("hee");
-							}							
+							}
 							outletElement.renderOutletContent(content);
 							console.log("hey hey", content, match, routeElement);
 
@@ -5205,7 +5308,7 @@ simply = {
 		}
 		return null;
 	},
-	page: function() {
+	page: function () {
 		'use strict';
 
 		var isarray = Array.isArray || function (arr) {
@@ -5245,7 +5348,7 @@ simply = {
 		 * @param  {String} str
 		 * @return {Array}
 		 */
-		function parse (str) {
+		function parse(str) {
 			var tokens = [];
 			var key = 0;
 			var index = 0;
@@ -5312,14 +5415,14 @@ simply = {
 		 * @param  {String}   str
 		 * @return {Function}
 		 */
-		function compile (str) {
+		function compile(str) {
 			return tokensToFunction(parse(str))
 		}
 
 		/**
 		 * Expose a method for transforming tokens into the path function.
 		 */
-		function tokensToFunction (tokens) {
+		function tokensToFunction(tokens) {
 			// Compile all the tokens into regexps.
 			var matches = new Array(tokens.length);
 
@@ -5399,7 +5502,7 @@ simply = {
 		 * @param  {String} str
 		 * @return {String}
 		 */
-		function escapeString (str) {
+		function escapeString(str) {
 			return str.replace(/([.+*?=^!:${}()[\]|\/])/g, '\\$1')
 		}
 
@@ -5409,7 +5512,7 @@ simply = {
 		 * @param  {String} group
 		 * @return {String}
 		 */
-		function escapeGroup (group) {
+		function escapeGroup(group) {
 			return group.replace(/([=!:$\/()])/g, '\\$1')
 		}
 
@@ -5420,7 +5523,7 @@ simply = {
 		 * @param  {Array}  keys
 		 * @return {RegExp}
 		 */
-		function attachKeys (re, keys) {
+		function attachKeys(re, keys) {
 			re.keys = keys;
 			return re
 		}
@@ -5431,7 +5534,7 @@ simply = {
 		 * @param  {Object} options
 		 * @return {String}
 		 */
-		function flags (options) {
+		function flags(options) {
 			return options.sensitive ? '' : 'i'
 		}
 
@@ -5442,7 +5545,7 @@ simply = {
 		 * @param  {Array}  keys
 		 * @return {RegExp}
 		 */
-		function regexpToRegexp (path, keys) {
+		function regexpToRegexp(path, keys) {
 			// Use a negative lookahead to match only capturing groups.
 			var groups = path.source.match(/\((?!\?)/g);
 
@@ -5470,7 +5573,7 @@ simply = {
 		 * @param  {Object} options
 		 * @return {RegExp}
 		 */
-		function arrayToRegexp (path, keys, options) {
+		function arrayToRegexp(path, keys, options) {
 			var parts = [];
 
 			for (var i = 0; i < path.length; i++) {
@@ -5490,7 +5593,7 @@ simply = {
 		 * @param  {Object} options
 		 * @return {RegExp}
 		 */
-		function stringToRegexp (path, keys, options) {
+		function stringToRegexp(path, keys, options) {
 			var tokens = parse(path);
 			var re = tokensToRegExp(tokens, options);
 
@@ -5512,7 +5615,7 @@ simply = {
 		 * @param  {Object} options
 		 * @return {RegExp}
 		 */
-		function tokensToRegExp (tokens, options) {
+		function tokensToRegExp(tokens, options) {
 			options = options || {};
 
 			var strict = options.strict;
@@ -5580,7 +5683,7 @@ simply = {
 		 * @param  {Object}                [options]
 		 * @return {RegExp}
 		 */
-		function pathToRegexp (path, keys, options) {
+		function pathToRegexp(path, keys, options) {
 			keys = keys || [];
 
 			if (!isarray(keys)) {
@@ -5610,739 +5713,739 @@ simply = {
 			 * Module dependencies.
 			 */
 
-			
 
-			/**
-			 * Short-cuts for global-object checks
-			 */
 
-			var hasDocument = ('undefined' !== typeof document);
-			var hasWindow = ('undefined' !== typeof window);
-			var hasHistory = ('undefined' !== typeof history);
-			var hasProcess = typeof process !== 'undefined';
+		/**
+		 * Short-cuts for global-object checks
+		 */
 
-			/**
-			 * Detect click event
-			 */
-			var clickEvent = hasDocument && document.ontouchstart ? 'touchstart' : 'click';
+		var hasDocument = ('undefined' !== typeof document);
+		var hasWindow = ('undefined' !== typeof window);
+		var hasHistory = ('undefined' !== typeof history);
+		var hasProcess = typeof process !== 'undefined';
 
-			/**
-			 * To work properly with the URL
-			 * history.location generated polyfill in https://github.com/devote/HTML5-History-API
-			 */
+		/**
+		 * Detect click event
+		 */
+		var clickEvent = hasDocument && document.ontouchstart ? 'touchstart' : 'click';
 
-			var isLocation = hasWindow && !!(window.history.location || window.location);
+		/**
+		 * To work properly with the URL
+		 * history.location generated polyfill in https://github.com/devote/HTML5-History-API
+		 */
 
-			/**
-			 * The page instance
-			 * @api private
-			 */
-			function Page() {
-				// public things
-				this.callbacks = [];
-				this.exits = [];
-				this.current = '';
-				this.len = 0;
+		var isLocation = hasWindow && !!(window.history.location || window.location);
 
-				// private things
-				this._decodeURLComponents = true;
-				this._base = '';
-				this._strict = false;
-				this._running = false;
-				this._hashbang = false;
+		/**
+		 * The page instance
+		 * @api private
+		 */
+		function Page() {
+			// public things
+			this.callbacks = [];
+			this.exits = [];
+			this.current = '';
+			this.len = 0;
 
-				// bound functions
-				this.clickHandler = this.clickHandler.bind(this);
-				this._onpopstate = this._onpopstate.bind(this);
+			// private things
+			this._decodeURLComponents = true;
+			this._base = '';
+			this._strict = false;
+			this._running = false;
+			this._hashbang = false;
+
+			// bound functions
+			this.clickHandler = this.clickHandler.bind(this);
+			this._onpopstate = this._onpopstate.bind(this);
+		}
+
+		/**
+		 * Configure the instance of page. This can be called multiple times.
+		 *
+		 * @param {Object} options
+		 * @api public
+		 */
+
+		Page.prototype.configure = function (options) {
+			var opts = options || {};
+
+			this._window = opts.window || (hasWindow && window);
+			this._decodeURLComponents = opts.decodeURLComponents !== false;
+			this._popstate = opts.popstate !== false && hasWindow;
+			this._click = opts.click !== false && hasDocument;
+			this._hashbang = !!opts.hashbang;
+
+			var _window = this._window;
+			if (this._popstate) {
+				_window.addEventListener('popstate', this._onpopstate, false);
+			} else if (hasWindow) {
+				_window.removeEventListener('popstate', this._onpopstate, false);
 			}
 
-			/**
-			 * Configure the instance of page. This can be called multiple times.
-			 *
-			 * @param {Object} options
-			 * @api public
-			 */
+			if (this._click) {
+				_window.document.addEventListener(clickEvent, this.clickHandler, false);
+			} else if (hasDocument) {
+				_window.document.removeEventListener(clickEvent, this.clickHandler, false);
+			}
 
-			Page.prototype.configure = function(options) {
-				var opts = options || {};
+			if (this._hashbang && hasWindow && !hasHistory) {
+				_window.addEventListener('hashchange', this._onpopstate, false);
+			} else if (hasWindow) {
+				_window.removeEventListener('hashchange', this._onpopstate, false);
+			}
+		};
 
-				this._window = opts.window || (hasWindow && window);
-				this._decodeURLComponents = opts.decodeURLComponents !== false;
-				this._popstate = opts.popstate !== false && hasWindow;
-				this._click = opts.click !== false && hasDocument;
-				this._hashbang = !!opts.hashbang;
+		/**
+		 * Get or set basepath to `path`.
+		 *
+		 * @param {string} path
+		 * @api public
+		 */
 
-				var _window = this._window;
-				if(this._popstate) {
-					_window.addEventListener('popstate', this._onpopstate, false);
-				} else if(hasWindow) {
-					_window.removeEventListener('popstate', this._onpopstate, false);
-				}
+		Page.prototype.base = function (path) {
+			if (0 === arguments.length) return this._base;
+			this._base = path;
+		};
 
-				if (this._click) {
-					_window.document.addEventListener(clickEvent, this.clickHandler, false);
-				} else if(hasDocument) {
-					_window.document.removeEventListener(clickEvent, this.clickHandler, false);
-				}
+		/**
+		 * Gets the `base`, which depends on whether we are using History or
+		 * hashbang routing.
 
-				if(this._hashbang && hasWindow && !hasHistory) {
-					_window.addEventListener('hashchange', this._onpopstate, false);
-				} else if(hasWindow) {
-					_window.removeEventListener('hashchange', this._onpopstate, false);
-				}
-			};
+		* @api private
+		*/
+		Page.prototype._getBase = function () {
+			var base = this._base;
+			if (!!base) return base;
+			var loc = hasWindow && this._window && this._window.location;
 
-			/**
-			 * Get or set basepath to `path`.
-			 *
-			 * @param {string} path
-			 * @api public
-			 */
+			if (hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
+				base = loc.pathname;
+			}
 
-			Page.prototype.base = function(path) {
-				if (0 === arguments.length) return this._base;
-				this._base = path;
-			};
+			return base;
+		};
 
-			/**
-			 * Gets the `base`, which depends on whether we are using History or
-			 * hashbang routing.
+		/**
+		 * Get or set strict path matching to `enable`
+		 *
+		 * @param {boolean} enable
+		 * @api public
+		 */
 
-			* @api private
-			*/
-			Page.prototype._getBase = function() {
-				var base = this._base;
-				if(!!base) return base;
-				var loc = hasWindow && this._window && this._window.location;
-
-				if(hasWindow && this._hashbang && loc && loc.protocol === 'file:') {
-					base = loc.pathname;
-				}
-
-				return base;
-			};
-
-			/**
-			 * Get or set strict path matching to `enable`
-			 *
-			 * @param {boolean} enable
-			 * @api public
-			 */
-
-			Page.prototype.strict = function(enable) {
-				if (0 === arguments.length) return this._strict;
-				this._strict = enable;
-			};
+		Page.prototype.strict = function (enable) {
+			if (0 === arguments.length) return this._strict;
+			this._strict = enable;
+		};
 
 
-			/**
-			 * Bind with the given `options`.
-			 *
-			 * Options:
-			 *
-			 *    - `click` bind to click events [true]
-			 *    - `popstate` bind to popstate [true]
-			 *    - `dispatch` perform initial dispatch [true]
-			 *
-			 * @param {Object} options
-			 * @api public
-			 */
+		/**
+		 * Bind with the given `options`.
+		 *
+		 * Options:
+		 *
+		 *    - `click` bind to click events [true]
+		 *    - `popstate` bind to popstate [true]
+		 *    - `dispatch` perform initial dispatch [true]
+		 *
+		 * @param {Object} options
+		 * @api public
+		 */
 
-			Page.prototype.start = function(options) {
-				var opts = options || {};
-				this.configure(opts);
+		Page.prototype.start = function (options) {
+			var opts = options || {};
+			this.configure(opts);
 
-				if (false === opts.dispatch) return;
-				this._running = true;
-				var url;
-				if(isLocation) {
-					var window = this._window;
-					var loc = window.location;
-
-					if(this._hashbang && ~loc.hash.indexOf('#!')) {
-						url = loc.hash.substr(2) + loc.search;
-					} else if (this._hashbang) {
-						url = loc.search + loc.hash;
-					} else {
-						url = loc.pathname + loc.search + loc.hash;
-					}
-				}
-
-				this.replace(url, null, true, opts.dispatch);
-			};
-
-			/**
-			 * Unbind click and popstate event handlers.
-			 *
-			 * @api public
-			 */
-
-			Page.prototype.stop = function() {
-				if (!this._running) return;
-				this.current = '';
-				this.len = 0;
-				this._running = false;
-
+			if (false === opts.dispatch) return;
+			this._running = true;
+			var url;
+			if (isLocation) {
 				var window = this._window;
-				this._click && window.document.removeEventListener(clickEvent, this.clickHandler, false);
-				hasWindow && window.removeEventListener('popstate', this._onpopstate, false);
-				hasWindow && window.removeEventListener('hashchange', this._onpopstate, false);
-			};
+				var loc = window.location;
 
-			/**
-			 * Show `path` with optional `state` object.
-			 *
-			 * @param {string} path
-			 * @param {Object=} state
-			 * @param {boolean=} dispatch
-			 * @param {boolean=} push
-			 * @return {!Context}
-			 * @api public
-			 */
-
-			Page.prototype.show = function(path, state, dispatch, push) {
-
-				if (simply.preserveParams && simply.preserveParams.length > 0) {
-					const urlParams = new URLSearchParams(window.location.search);
-					const filteredParams = new URLSearchParams();
-
-					for (const [key, value] of urlParams.entries()) {
-						if (simply.preserveParams.includes(key)) {
-							filteredParams.append(key, value);
-						}
-					}
-
-					const filteredQuery = filteredParams.toString();
-
-					if (typeof path === 'string' && !path.includes('?') && filteredQuery) {
-						path += '?' + filteredQuery;
-					}
-				}
-		
-		
-				var ctx = new Context(path, state, this), prev = this.prevContext; // maybe i should do the same for this one
-				// prevContent was always same so i added by swallow copying to ctx.page.simplyPrevContext
-				this.simplyPrevContext = { ...prev }
-
-				this.prevContext = ctx;
-				this.current = ctx.path;
-				if (false !== dispatch) this.dispatch(ctx, prev);
-				if (false !== ctx.handled && false !== push) ctx.pushState();
-				return ctx;
-			};
-
-			/**
-			 * Goes back in the history
-			 * Back should always let the current route push state and then go back.
-			 *
-			 * @param {string} path - fallback path to go back if no more history exists, if undefined defaults to page.base
-			 * @param {Object=} state
-			 * @api public
-			 */
-
-			Page.prototype.back = function(path, state) {
-				var page = this;
-				if (this.len > 0) {
-					var window = this._window;
-					// this may need more testing to see if all browsers
-					// wait for the next tick to go back in history
-					hasHistory && window.history.back();
-					this.len--;
-				} else if (path) {
-					setTimeout(function() {
-						page.show(path, state);
-					});
+				if (this._hashbang && ~loc.hash.indexOf('#!')) {
+					url = loc.hash.substr(2) + loc.search;
+				} else if (this._hashbang) {
+					url = loc.search + loc.hash;
 				} else {
-					setTimeout(function() {
-						page.show(page._getBase(), state);
-					});
+					url = loc.pathname + loc.search + loc.hash;
 				}
-			};
+			}
 
-			/**
-			 * Register route to redirect from one path to other
-			 * or just redirect to another route
-			 *
-			 * @param {string} from - if param 'to' is undefined redirects to 'from'
-			 * @param {string=} to
-			 * @api public
-			 */
-			Page.prototype.redirect = function(from, to) {
-				var inst = this;
+			this.replace(url, null, true, opts.dispatch);
+		};
 
-				// Define route from a path to another
-				if ('string' === typeof from && 'string' === typeof to) {
-					page.call(this, from, function(e) {
-						setTimeout(function() {
-							inst.replace(/** @type {!string} */ (to));
-						}, 0);
-					});
+		/**
+		 * Unbind click and popstate event handlers.
+		 *
+		 * @api public
+		 */
+
+		Page.prototype.stop = function () {
+			if (!this._running) return;
+			this.current = '';
+			this.len = 0;
+			this._running = false;
+
+			var window = this._window;
+			this._click && window.document.removeEventListener(clickEvent, this.clickHandler, false);
+			hasWindow && window.removeEventListener('popstate', this._onpopstate, false);
+			hasWindow && window.removeEventListener('hashchange', this._onpopstate, false);
+		};
+
+		/**
+		 * Show `path` with optional `state` object.
+		 *
+		 * @param {string} path
+		 * @param {Object=} state
+		 * @param {boolean=} dispatch
+		 * @param {boolean=} push
+		 * @return {!Context}
+		 * @api public
+		 */
+
+		Page.prototype.show = function (path, state, dispatch, push) {
+
+			if (simply.preserveParams && simply.preserveParams.length > 0) {
+				const urlParams = new URLSearchParams(window.location.search);
+				const filteredParams = new URLSearchParams();
+
+				for (const [key, value] of urlParams.entries()) {
+					if (simply.preserveParams.includes(key)) {
+						filteredParams.append(key, value);
+					}
 				}
 
-				// Wait for the push state and replace it with another
-				if ('string' === typeof from && 'undefined' === typeof to) {
-					setTimeout(function() {
-						inst.replace(from);
+				const filteredQuery = filteredParams.toString();
+
+				if (typeof path === 'string' && !path.includes('?') && filteredQuery) {
+					path += '?' + filteredQuery;
+				}
+			}
+
+
+			var ctx = new Context(path, state, this), prev = this.prevContext; // maybe i should do the same for this one
+			// prevContent was always same so i added by swallow copying to ctx.page.simplyPrevContext
+			this.simplyPrevContext = { ...prev }
+
+			this.prevContext = ctx;
+			this.current = ctx.path;
+			if (false !== dispatch) this.dispatch(ctx, prev);
+			if (false !== ctx.handled && false !== push) ctx.pushState();
+			return ctx;
+		};
+
+		/**
+		 * Goes back in the history
+		 * Back should always let the current route push state and then go back.
+		 *
+		 * @param {string} path - fallback path to go back if no more history exists, if undefined defaults to page.base
+		 * @param {Object=} state
+		 * @api public
+		 */
+
+		Page.prototype.back = function (path, state) {
+			var page = this;
+			if (this.len > 0) {
+				var window = this._window;
+				// this may need more testing to see if all browsers
+				// wait for the next tick to go back in history
+				hasHistory && window.history.back();
+				this.len--;
+			} else if (path) {
+				setTimeout(function () {
+					page.show(path, state);
+				});
+			} else {
+				setTimeout(function () {
+					page.show(page._getBase(), state);
+				});
+			}
+		};
+
+		/**
+		 * Register route to redirect from one path to other
+		 * or just redirect to another route
+		 *
+		 * @param {string} from - if param 'to' is undefined redirects to 'from'
+		 * @param {string=} to
+		 * @api public
+		 */
+		Page.prototype.redirect = function (from, to) {
+			var inst = this;
+
+			// Define route from a path to another
+			if ('string' === typeof from && 'string' === typeof to) {
+				page.call(this, from, function (e) {
+					setTimeout(function () {
+						inst.replace(/** @type {!string} */(to));
 					}, 0);
+				});
+			}
+
+			// Wait for the push state and replace it with another
+			if ('string' === typeof from && 'undefined' === typeof to) {
+				setTimeout(function () {
+					inst.replace(from);
+				}, 0);
+			}
+		};
+
+		/**
+		 * Replace `path` with optional `state` object.
+		 *
+		 * @param {string} path
+		 * @param {Object=} state
+		 * @param {boolean=} init
+		 * @param {boolean=} dispatch
+		 * @return {!Context}
+		 * @api public
+		 */
+
+
+		Page.prototype.replace = function (path, state, init, dispatch) {
+			var ctx = new Context(path, state, this),
+				prev = this.prevContext;
+			this.prevContext = ctx;
+			this.current = ctx.path;
+			ctx.init = init;
+			ctx.save(); // save before dispatching, which may redirect
+			if (false !== dispatch) this.dispatch(ctx, prev);
+			return ctx;
+		};
+
+
+		Page.prototype.dispatch = async function (ctx, prev) {
+			var i = 0, j = 0, page = this;
+
+
+			function nextExit() {
+				var fn = page.exits[j++];
+				if (!fn) return nextEnter();
+				let theRoute = simply.page.getRouteByPath(page.current);
+				fn(prev, nextExit);
+			}
+
+
+			function nextEnter() {
+				var fn = page.callbacks[i++];
+
+				if (ctx.path !== page.current) {
+					ctx.handled = false;
+					return;
+				}
+				if (!fn) return unhandled.call(page, ctx);
+				fn(ctx, nextEnter);
+			}
+			nextEnter();
+		};
+
+		/**
+		 * Register an exit route on `path` with
+		 * callback `fn()`, which will be called
+		 * on the previous context when a new
+		 * page is visited.
+		 */
+		Page.prototype.exit = function (path, fn) {
+			if (typeof path === 'function') {
+				return this.exit('*', path);
+			}
+
+			var route = new Route(path, null, this);
+			let theRoutePath = simply.page.getRouteByPath(path).value.path;
+
+			simply.routes[theRoutePath].exits = simply.routes[theRoutePath].exits ? simply.routes[theRoutePath].exits : [];
+			simply.page.deleteExitCallbacksByPath(theRoutePath);
+
+			for (var i = 1; i < arguments.length; ++i) {
+				const wrappedFn = route.middleware(arguments[i]);
+				this.exits.push(wrappedFn);
+				wrappedFn.pureFunc = arguments[i];
+				simply.routes[theRoutePath].exits.push(wrappedFn);
+			}
+			console.log(theRoutePath, "'in exitleri silindi yenisi eklendi");
+		};
+
+		/**
+		 * Handle "click" events.
+		 */
+
+		/* jshint +W054 */
+		Page.prototype.clickHandler = function (e) {
+			if (1 !== this._which(e)) return;
+
+			if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+			if (e.defaultPrevented) return;
+
+			// ensure link
+			// use shadow dom when available if not, fall back to composedPath()
+			// for browsers that only have shady
+			var el = e.target;
+			var eventPath = e.path || (e.composedPath ? e.composedPath() : null);
+
+			if (eventPath) {
+				for (var i = 0; i < eventPath.length; i++) {
+					if (!eventPath[i].nodeName) continue;
+					if (eventPath[i].nodeName.toUpperCase() !== 'A') continue;
+					if (!eventPath[i].href) continue;
+
+					el = eventPath[i];
+					break;
+				}
+			}
+
+			// continue ensure link
+			// el.nodeName for svg links are 'a' instead of 'A'
+			while (el && 'A' !== el.nodeName.toUpperCase()) el = el.parentNode;
+			if (!el || 'A' !== el.nodeName.toUpperCase()) return;
+
+			// check if link is inside an svg
+			// in this case, both href and target are always inside an object
+			var svg = (typeof el.href === 'object') && el.href.constructor.name === 'SVGAnimatedString';
+
+			// Ignore if tag has
+			// 1. "download" attribute
+			// 2. rel="external" attribute
+			if (el.hasAttribute('download') || el.getAttribute('rel') === 'external') return;
+
+			// ensure non-hash for the same path
+			var link = el.getAttribute('href');
+			if (!this._hashbang && this._samePath(el) && (el.hash || '#' === link)) return;
+
+			// Check for mailto: in the href
+			if (link && link.indexOf('mailto:') > -1) return;
+
+			// check target
+			// svg target is an object and its desired value is in .baseVal property
+			if (svg ? el.target.baseVal : el.target) return;
+
+			// x-origin
+			// note: svg links that are not relative don't call click events (and skip page.js)
+			// consequently, all svg links tested inside page.js are relative and in the same origin
+			if (!svg && !this.sameOrigin(el.href)) return;
+
+			// rebuild path
+			// There aren't .pathname and .search properties in svg links, so we use href
+			// Also, svg href is an object and its desired value is in .baseVal property
+			var path = svg ? el.href.baseVal : (el.pathname + el.search + (el.hash || ''));
+
+			path = path[0] !== '/' ? '/' + path : path;
+
+			// strip leading "/[drive letter]:" on NW.js on Windows
+			if (hasProcess && path.match(/^\/[a-zA-Z]:\//)) {
+				path = path.replace(/^\/[a-zA-Z]:\//, '/');
+			}
+
+			// same page
+			var orig = path;
+			var pageBase = this._getBase();
+
+			if (path.indexOf(pageBase) === 0) {
+				path = path.substr(pageBase.length);
+			}
+
+			// console.log({orig, pageBase, path});
+			// console.log("last path: ", simply.lastPath, "href: ", el.href, "link:", link)
+
+			if (this.current == path) {
+				let route = simply.page.getRouteByPath(path).value;
+				if (!route.settings.same_page_refresh) {
+					console.log("same page baba, no refresh sana", this, e);
+					e.preventDefault();
+					return;
+				}
+
+			}
+
+			if (this._hashbang) path = path.replace('#!', '');
+
+			if (pageBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
+				return;
+			}
+
+			e.preventDefault();
+			this.show(orig);
+		};
+
+		/**
+		 * Handle "populate" events.
+		 * @api private
+		 */
+
+		Page.prototype._onpopstate = (function () {
+			var loaded = false;
+			if (!hasWindow) {
+				return function () { };
+			}
+			if (hasDocument && document.readyState === 'complete') {
+				loaded = true;
+			} else {
+				window.addEventListener('load', function () {
+					setTimeout(function () {
+						loaded = true;
+					}, 0);
+				});
+			}
+			return function onpopstate(e) {
+				if (!loaded) return;
+				var page = this;
+				if (e.state) {
+					var path = e.state.path;
+					e.state.popstate = true;
+					page.replace(path, e.state);
+				} else if (isLocation) {
+					var loc = page._window.location;
+					page.show(loc.pathname + loc.search + loc.hash, undefined, undefined, false);
 				}
 			};
+		})();
 
-			/**
-			 * Replace `path` with optional `state` object.
-			 *
-			 * @param {string} path
-			 * @param {Object=} state
-			 * @param {boolean=} init
-			 * @param {boolean=} dispatch
-			 * @return {!Context}
-			 * @api public
-			 */
+		/**
+		 * Event button.
+		 */
+		Page.prototype._which = function (e) {
+			e = e || (hasWindow && this._window.event);
+			return null == e.which ? e.button : e.which;
+		};
 
+		/**
+		 * Convert to a URL object
+		 * @api private
+		 */
+		Page.prototype._toURL = function (href) {
+			var window = this._window;
+			if (typeof URL === 'function' && isLocation) {
+				return new URL(href, window.location.toString());
+			} else if (hasDocument) {
+				var anc = window.document.createElement('a');
+				anc.href = href;
+				return anc;
+			}
+		};
 
-			Page.prototype.replace = function(path, state, init, dispatch) {
-				var ctx = new Context(path, state, this),
-					prev = this.prevContext;
-				this.prevContext = ctx;
-				this.current = ctx.path;
-				ctx.init = init;
-				ctx.save(); // save before dispatching, which may redirect
-				if (false !== dispatch) this.dispatch(ctx, prev);
-				return ctx;
-			};
+		/**
+		 * Check if `href` is the same origin.
+		 * @param {string} href
+		 * @api public
+		 */
+		Page.prototype.sameOrigin = function (href) {
+			if (!href || !isLocation) return false;
 
-			
-  Page.prototype.dispatch = async function(ctx, prev) {
-    var i = 0, j = 0, page = this;
+			var url = this._toURL(href);
+			var window = this._window;
 
-		
-    function nextExit() {
-      var fn = page.exits[j++];
-      if (!fn) return nextEnter();
-			let theRoute = simply.page.getRouteByPath(page.current);
-      fn(prev, nextExit);
-    }
-		
+			var loc = window.location;
 
-    function nextEnter() {
-      var fn = page.callbacks[i++];
+			/*
+				When the port is the default http port 80 for http, or 443 for
+				https, internet explorer 11 returns an empty string for loc.port,
+				so we need to compare loc.port with an empty string if url.port
+				is the default port 80 or 443.
+				Also the comparition with `port` is changed from `===` to `==` because
+				`port` can be a string sometimes. This only applies to ie11.
+			*/
+			return loc.protocol === url.protocol &&
+				loc.hostname === url.hostname &&
+				(loc.port === url.port || loc.port === '' && (url.port == 80 || url.port == 443)); // jshint ignore:line
+		};
 
-      if (ctx.path !== page.current) {
-        ctx.handled = false;
-        return;
-      }
-      if (!fn) return unhandled.call(page, ctx);
-      fn(ctx, nextEnter);
-    }
-		nextEnter();
-  };			
+		/**
+		 * @api private
+		 */
+		Page.prototype._samePath = function (url) {
+			if (!isLocation) return false;
+			var window = this._window;
+			var loc = window.location;
+			return url.pathname === loc.pathname &&
+				url.search === loc.search;
+		};
 
-			/**
-			 * Register an exit route on `path` with
-			 * callback `fn()`, which will be called
-			 * on the previous context when a new
-			 * page is visited.
-			 */
-			Page.prototype.exit = function(path, fn) {
-				if (typeof path === 'function') {
-					return this.exit('*', path);
+		/**
+		 * Remove URL encoding from the given `str`.
+		 * Accommodates whitespace in both x-www-form-urlencoded
+		 * and regular percent-encoded form.
+		 *
+		 * @param {string} val - URL component to decode
+		 * @api private
+		 */
+		Page.prototype._decodeURLEncodedURIComponent = function (val) {
+			if (typeof val !== 'string') { return val; }
+			return this._decodeURLComponents ? decodeURIComponent(val.replace(/\+/g, ' ')) : val;
+		};
+
+		/**
+		 * Create a new `page` instance and function
+		 */
+		function createPage() {
+			var pageInstance = new Page();
+
+			function pageFn(/* args */) {
+				return page.apply(pageInstance, arguments);
+			}
+
+			// Copy all of the things over. In 2.0 maybe we use setPrototypeOf
+			pageFn.callbacks = pageInstance.callbacks;
+			pageFn.exits = pageInstance.exits;
+			pageFn.base = pageInstance.base.bind(pageInstance);
+			pageFn.strict = pageInstance.strict.bind(pageInstance);
+			pageFn.start = pageInstance.start.bind(pageInstance);
+			pageFn.stop = pageInstance.stop.bind(pageInstance);
+			pageFn.show = pageInstance.show.bind(pageInstance);
+			pageFn.back = pageInstance.back.bind(pageInstance);
+			pageFn.redirect = pageInstance.redirect.bind(pageInstance);
+			pageFn.replace = pageInstance.replace.bind(pageInstance);
+			pageFn.dispatch = pageInstance.dispatch.bind(pageInstance);
+			pageFn.exit = pageInstance.exit.bind(pageInstance);
+			pageFn.configure = pageInstance.configure.bind(pageInstance);
+			pageFn.sameOrigin = pageInstance.sameOrigin.bind(pageInstance);
+			pageFn.clickHandler = pageInstance.clickHandler.bind(pageInstance);
+			pageFn.create = createPage;
+
+			// simply additions
+			pageFn.getRoutes = function () {
+				return simply.routes;
+			}
+
+			pageFn.getCurrentRoute = function () {
+				var current = this.current;
+
+				for (const [key, value] of Object.entries(simply.routes)) {
+					if (current.match(value.regexp) && key !== "(.*)") {
+						return value;
+						break;
+					}
+				}
+				return false;
+			}
+
+			pageFn.getRouteByPath = function (path) {
+				var found = false
+				for (const [key, value] of Object.entries(simply.routes)) {
+					if (path.match(value.regexp) && key !== "(.*)") {
+						found = { key, value };
+					}
+				}
+				// to return "/" child
+				if (found) {
+					return found
 				}
 
-				var route = new Route(path, null, this);
-				let theRoutePath = simply.page.getRouteByPath(path).value.path;
-				
-				simply.routes[theRoutePath].exits = simply.routes[theRoutePath].exits ? simply.routes[theRoutePath].exits : [];
-				simply.page.deleteExitCallbacksByPath(theRoutePath);
-				
-				for (var i = 1; i < arguments.length; ++i) {
-					const wrappedFn = route.middleware(arguments[i]);
-					this.exits.push(wrappedFn);
-					wrappedFn.pureFunc = arguments[i];
-					simply.routes[theRoutePath].exits.push(wrappedFn);
+				// bulunamadı ise .*'ı döndür (varsa)
+				if (simply.routes["(.*)"]) {
+					return {
+						key: "(.*)",
+						value: simply.routes["(.*)"]
+					}
 				}
-				console.log(theRoutePath, "'in exitleri silindi yenisi eklendi");
-			};
 
-			/**
-			 * Handle "click" events.
-			 */
+				// o da yoksa false
+				return false;
+			}
 
-			/* jshint +W054 */
-			Page.prototype.clickHandler = function(e) {
-				if (1 !== this._which(e)) return;
-
-				if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-				if (e.defaultPrevented) return;
-
-				// ensure link
-				// use shadow dom when available if not, fall back to composedPath()
-				// for browsers that only have shady
-				var el = e.target;
-				var eventPath = e.path || (e.composedPath ? e.composedPath() : null);
-
-				if(eventPath) {
-					for (var i = 0; i < eventPath.length; i++) {
-						if (!eventPath[i].nodeName) continue;
-						if (eventPath[i].nodeName.toUpperCase() !== 'A') continue;
-						if (!eventPath[i].href) continue;
-
-						el = eventPath[i];
+			pageFn.getParentRouteByPath = function (path) {
+				var found = false
+				for (const [key, value] of Object.entries(simply.routes)) {
+					if (path.match(value.regexp) && key !== "(.*)") {
+						return { key, value };
 						break;
 					}
 				}
 
-				// continue ensure link
-				// el.nodeName for svg links are 'a' instead of 'A'
-				while (el && 'A' !== el.nodeName.toUpperCase()) el = el.parentNode;
-				if (!el || 'A' !== el.nodeName.toUpperCase()) return;
-
-				// check if link is inside an svg
-				// in this case, both href and target are always inside an object
-				var svg = (typeof el.href === 'object') && el.href.constructor.name === 'SVGAnimatedString';
-
-				// Ignore if tag has
-				// 1. "download" attribute
-				// 2. rel="external" attribute
-				if (el.hasAttribute('download') || el.getAttribute('rel') === 'external') return;
-
-				// ensure non-hash for the same path
-				var link = el.getAttribute('href');
-				if(!this._hashbang && this._samePath(el) && (el.hash || '#' === link)) return;
-
-				// Check for mailto: in the href
-				if (link && link.indexOf('mailto:') > -1) return;
-
-				// check target
-				// svg target is an object and its desired value is in .baseVal property
-				if (svg ? el.target.baseVal : el.target) return;
-
-				// x-origin
-				// note: svg links that are not relative don't call click events (and skip page.js)
-				// consequently, all svg links tested inside page.js are relative and in the same origin
-				if (!svg && !this.sameOrigin(el.href)) return;
-
-				// rebuild path
-				// There aren't .pathname and .search properties in svg links, so we use href
-				// Also, svg href is an object and its desired value is in .baseVal property
-				var path = svg ? el.href.baseVal : (el.pathname + el.search + (el.hash || ''));
-
-				path = path[0] !== '/' ? '/' + path : path;
-
-				// strip leading "/[drive letter]:" on NW.js on Windows
-				if (hasProcess && path.match(/^\/[a-zA-Z]:\//)) {
-					path = path.replace(/^\/[a-zA-Z]:\//, '/');
+				// bulunamadı ise .*'ı döndür (varsa)
+				if (simply.routes["(.*)"]) {
+					return {
+						key: "(.*)",
+						value: simply.routes["(.*)"]
+					}
 				}
 
-				// same page
-				var orig = path;
-				var pageBase = this._getBase();
-
-				if (path.indexOf(pageBase) === 0) {
-					path = path.substr(pageBase.length);
-				}
-
-				// console.log({orig, pageBase, path});
-				// console.log("last path: ", simply.lastPath, "href: ", el.href, "link:", link)
-
-				if (this.current == path) {
-					let route = simply.page.getRouteByPath(path).value;
-					if (!route.settings.same_page_refresh) {
-						console.log("same page baba, no refresh sana", this, e);
-						e.preventDefault();
-						return;
-					}
-
-				}
-
-				if (this._hashbang) path = path.replace('#!', '');
-
-				if (pageBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
-					return;
-				}
-
-				e.preventDefault();
-				this.show(orig);
-			};
-
-			/**
-			 * Handle "populate" events.
-			 * @api private
-			 */
-
-			Page.prototype._onpopstate = (function () {
-				var loaded = false;
-				if ( ! hasWindow ) {
-					return function () {};
-				}
-				if (hasDocument && document.readyState === 'complete') {
-					loaded = true;
-				} else {
-					window.addEventListener('load', function() {
-						setTimeout(function() {
-							loaded = true;
-						}, 0);
-					});
-				}
-				return function onpopstate(e) {
-					if (!loaded) return;
-					var page = this;
-					if (e.state) {
-						var path = e.state.path;
-						e.state.popstate = true;
-						page.replace(path, e.state);
-					} else if (isLocation) {
-						var loc = page._window.location;
-						page.show(loc.pathname + loc.search + loc.hash, undefined, undefined, false);
-					}
-				};
-			})();
-
-			/**
-			 * Event button.
-			 */
-			Page.prototype._which = function(e) {
-				e = e || (hasWindow && this._window.event);
-				return null == e.which ? e.button : e.which;
-			};
-
-			/**
-			 * Convert to a URL object
-			 * @api private
-			 */
-			Page.prototype._toURL = function(href) {
-				var window = this._window;
-				if(typeof URL === 'function' && isLocation) {
-					return new URL(href, window.location.toString());
-				} else if (hasDocument) {
-					var anc = window.document.createElement('a');
-					anc.href = href;
-					return anc;
-				}
-			};
-
-			/**
-			 * Check if `href` is the same origin.
-			 * @param {string} href
-			 * @api public
-			 */
-			Page.prototype.sameOrigin = function(href) {
-				if(!href || !isLocation) return false;
-
-				var url = this._toURL(href);
-				var window = this._window;
-
-				var loc = window.location;
-
-				/*
-					When the port is the default http port 80 for http, or 443 for
-					https, internet explorer 11 returns an empty string for loc.port,
-					so we need to compare loc.port with an empty string if url.port
-					is the default port 80 or 443.
-					Also the comparition with `port` is changed from `===` to `==` because
-					`port` can be a string sometimes. This only applies to ie11.
-				*/
-				return loc.protocol === url.protocol &&
-					loc.hostname === url.hostname &&
-					(loc.port === url.port || loc.port === '' && (url.port == 80 || url.port == 443)); // jshint ignore:line
-			};
-
-			/**
-			 * @api private
-			 */
-			Page.prototype._samePath = function(url) {
-				if(!isLocation) return false;
-				var window = this._window;
-				var loc = window.location;
-				return url.pathname === loc.pathname &&
-					url.search === loc.search;
-			};
-
-			/**
-			 * Remove URL encoding from the given `str`.
-			 * Accommodates whitespace in both x-www-form-urlencoded
-			 * and regular percent-encoded form.
-			 *
-			 * @param {string} val - URL component to decode
-			 * @api private
-			 */
-			Page.prototype._decodeURLEncodedURIComponent = function(val) {
-				if (typeof val !== 'string') { return val; }
-				return this._decodeURLComponents ? decodeURIComponent(val.replace(/\+/g, ' ')) : val;
-			};
-
-			/**
-			 * Create a new `page` instance and function
-			 */
-			function createPage() {
-				var pageInstance = new Page();
-
-				function pageFn(/* args */) {
-					return page.apply(pageInstance, arguments);
-				}
-
-				// Copy all of the things over. In 2.0 maybe we use setPrototypeOf
-				pageFn.callbacks = pageInstance.callbacks;
-				pageFn.exits = pageInstance.exits;
-				pageFn.base = pageInstance.base.bind(pageInstance);
-				pageFn.strict = pageInstance.strict.bind(pageInstance);
-				pageFn.start = pageInstance.start.bind(pageInstance);
-				pageFn.stop = pageInstance.stop.bind(pageInstance);
-				pageFn.show = pageInstance.show.bind(pageInstance);
-				pageFn.back = pageInstance.back.bind(pageInstance);
-				pageFn.redirect = pageInstance.redirect.bind(pageInstance);
-				pageFn.replace = pageInstance.replace.bind(pageInstance);
-				pageFn.dispatch = pageInstance.dispatch.bind(pageInstance);
-				pageFn.exit = pageInstance.exit.bind(pageInstance);
-				pageFn.configure = pageInstance.configure.bind(pageInstance);
-				pageFn.sameOrigin = pageInstance.sameOrigin.bind(pageInstance);
-				pageFn.clickHandler = pageInstance.clickHandler.bind(pageInstance);
-				pageFn.create = createPage;
-
-				// simply additions
-				pageFn.getRoutes = function() {
-					return simply.routes;
-				}
-
-				pageFn.getCurrentRoute = function() {
-					var current = this.current;
-
-					for (const [key, value] of Object.entries(simply.routes)) {
-						if (current.match(value.regexp) && key !== "(.*)") {
-							return value;
-							break;
-						}
-					}
-					return false;
-				}				
-
-				pageFn.getRouteByPath = function(path) {
-					var found = false
-					for (const [key, value] of Object.entries(simply.routes)) {
-						if (path.match(value.regexp) && key !== "(.*)") {
-							found = {key, value};
-						}
-					}
-					// to return "/" child
-					if (found) {
-						return found
-					}
-
-					// bulunamadı ise .*'ı döndür (varsa)
-					if (simply.routes["(.*)"]) {
-						return {
-							key: "(.*)",
-							value: simply.routes["(.*)"]
-						}
-					}
-
-					// o da yoksa false
-					return false;
-				}
-
-				pageFn.getParentRouteByPath = function(path) {
-					var found = false
-					for (const [key, value] of Object.entries(simply.routes)) {
-						if (path.match(value.regexp) && key !== "(.*)") {
-							return {key, value};
-							break;
-						}
-					}
-
-					// bulunamadı ise .*'ı döndür (varsa)
-					if (simply.routes["(.*)"]) {
-						return {
-							key: "(.*)",
-							value: simply.routes["(.*)"]
-						}
-					}
-
-					// o da yoksa false
-					return false;
-				}				
-
-				pageFn.deleteRouteByPath = function(path) {
-					console.log("hee", this, page.callbacks);
-					let route = pageFn.getRouteByPath(path);
-					var rebelCallbacks = route.value.page.callbacks
-
-					for (const [key, v] of Object.entries(route.value.callbacks)) {
-						console.log(v);
-  					const fn = v.originalFn;
-
-						// Remove from global callbacks
-						simply.page.callbacks = simply.page.callbacks.filter(cb => cb.originalFn !== fn);
-
-						// Remove from the route page's callbacks (the rebelCallbacks array)
-						route.value.page.callbacks = route.value.page.callbacks.filter(cb => cb.originalFn !== fn);
-					}
-					// Delete the whole route if needed
-					simply.routes[route.key].callbacks = [];
-				}		
-				
-				pageFn.deleteExitCallbacksByPath = function(path) {
-					let route = pageFn.getRouteByPath(path);
-					// console.log(path, route, route.value.page.exits);
-
-					for (const [key, v] of Object.entries(route.value.page.exits)) {
-  					const fn = v.originalFn;
-
-						// Remove from global callbacks
-						simply.page.exits = simply.page.exits.filter(cb => cb.originalFn !== fn);
-
-						// Remove from the route page's callbacks (the rebelCallbacks array)
-						route.value.page.exits = route.value.page.exits.filter(cb => cb.originalFn !== fn);
-					}
-					// Delete the whole route if needed
-					simply.routes[route.key].exits = [];
-				}						
-
-				Object.defineProperty(pageFn, 'len', {
-					get: function(){
-						return pageInstance.len;
-					},
-					set: function(val) {
-						pageInstance.len = val;
-					}
-				});
-
-				Object.defineProperty(pageFn, 'current', {
-					get: function(){
-						return pageInstance.current;
-					},
-					set: function(val) {
-						pageInstance.current = val;
-					}
-				});
-
-				// In 2.0 these can be named exports
-				pageFn.Context = Context;
-				pageFn.Route = Route;
-
-				return pageFn;
+				// o da yoksa false
+				return false;
 			}
 
-			/**
-			 * Register `path` with callback `fn()`,
-			 * or route `path`, or redirection,
-			 * or `page.start()`.
-			 *
-			 *   page(fn);
-			 *   page('*', fn);
-			 *   page('/user/:id', load, user);
-			 *   page('/user/' + user.id, { some: 'thing' });
-			 *   page('/user/' + user.id);
-			 *   page('/from', '/to')
-			 *   page();
-			 *
-			 * @param {string|!Function|!Object} path
-			 * @param {Function=} fn
-			 * @api public
-			 */
+			pageFn.deleteRouteByPath = function (path) {
+				console.log("hee", this, page.callbacks);
+				let route = pageFn.getRouteByPath(path);
+				var rebelCallbacks = route.value.page.callbacks
 
-			function page(path, fn) {
-				// <callback>
-				if ('function' === typeof path) {
-					return page.call(this, '*', path);
+				for (const [key, v] of Object.entries(route.value.callbacks)) {
+					console.log(v);
+					const fn = v.originalFn;
+
+					// Remove from global callbacks
+					simply.page.callbacks = simply.page.callbacks.filter(cb => cb.originalFn !== fn);
+
+					// Remove from the route page's callbacks (the rebelCallbacks array)
+					route.value.page.callbacks = route.value.page.callbacks.filter(cb => cb.originalFn !== fn);
 				}
+				// Delete the whole route if needed
+				simply.routes[route.key].callbacks = [];
+			}
+
+			pageFn.deleteExitCallbacksByPath = function (path) {
+				let route = pageFn.getRouteByPath(path);
+				// console.log(path, route, route.value.page.exits);
+
+				for (const [key, v] of Object.entries(route.value.page.exits)) {
+					const fn = v.originalFn;
+
+					// Remove from global callbacks
+					simply.page.exits = simply.page.exits.filter(cb => cb.originalFn !== fn);
+
+					// Remove from the route page's callbacks (the rebelCallbacks array)
+					route.value.page.exits = route.value.page.exits.filter(cb => cb.originalFn !== fn);
+				}
+				// Delete the whole route if needed
+				simply.routes[route.key].exits = [];
+			}
+
+			Object.defineProperty(pageFn, 'len', {
+				get: function () {
+					return pageInstance.len;
+				},
+				set: function (val) {
+					pageInstance.len = val;
+				}
+			});
+
+			Object.defineProperty(pageFn, 'current', {
+				get: function () {
+					return pageInstance.current;
+				},
+				set: function (val) {
+					pageInstance.current = val;
+				}
+			});
+
+			// In 2.0 these can be named exports
+			pageFn.Context = Context;
+			pageFn.Route = Route;
+
+			return pageFn;
+		}
+
+		/**
+		 * Register `path` with callback `fn()`,
+		 * or route `path`, or redirection,
+		 * or `page.start()`.
+		 *
+		 *   page(fn);
+		 *   page('*', fn);
+		 *   page('/user/:id', load, user);
+		 *   page('/user/' + user.id, { some: 'thing' });
+		 *   page('/user/' + user.id);
+		 *   page('/from', '/to')
+		 *   page();
+		 *
+		 * @param {string|!Function|!Object} path
+		 * @param {Function=} fn
+		 * @api public
+		 */
+
+		function page(path, fn) {
+			// <callback>
+			if ('function' === typeof path) {
+				return page.call(this, '*', path);
+			}
 
 			async function waitForRenderedAndReturnRoute(el) {
 				if (!el) throw new Error("Element not found");
@@ -6422,507 +6525,507 @@ simply = {
 				});
 			}
 
-				if (typeof fn === 'object' && fn !== null && !Array.isArray(fn)) {
-					var settings = {...fn}
-					var children = fn.children ? fn.children : undefined;
+			if (typeof fn === 'object' && fn !== null && !Array.isArray(fn)) {
+				var settings = { ...fn }
+				var children = fn.children ? fn.children : undefined;
 
-					// her path'in ilk fonksiyonu
-					fn = async function(ctx, next) {
-						simply.ctx = ctx;
-						// bunu global'e attım çünkü komponent içinden okumak zorundayım
-						var route;
-						var parent;
-						if (settings.child_of) {
-							var targetRoute = simply.page.getRouteByPath(settings.path);
-							console.log(targetRoute);
-							var tree = targetRoute.value.tree;
-							var parentRootEl;
-							var lastParentComponent;
-							var targetParentRoute;
-							
-							for (let i = 0; i < tree.length; i++) {
-								const path = tree[i];
-								const node = simply.routes[path];								
-								
-								if (i > 0) {
-									const parentPath = tree[i - 1];
-									parentRootEl = await waitForRenderedAndReturnRoute(parentRootEl.querySelector(lastParentComponent));
-									//console.log({parentRootEl, path, parentPath, node});
-									//console.log("next target", parentRootEl.querySelector(lastParentComponent));
-									//console.log(parentRootEl, path, parentPath);
+				// her path'in ilk fonksiyonu
+				fn = async function (ctx, next) {
+					simply.ctx = ctx;
+					// bunu global'e attım çünkü komponent içinden okumak zorundayım
+					var route;
+					var parent;
+					if (settings.child_of) {
+						var targetRoute = simply.page.getRouteByPath(settings.path);
+						console.log(targetRoute);
+						var tree = targetRoute.value.tree;
+						var parentRootEl;
+						var lastParentComponent;
+						var targetParentRoute;
+
+						for (let i = 0; i < tree.length; i++) {
+							const path = tree[i];
+							const node = simply.routes[path];
+
+							if (i > 0) {
+								const parentPath = tree[i - 1];
+								parentRootEl = await waitForRenderedAndReturnRoute(parentRootEl.querySelector(lastParentComponent));
+								//console.log({parentRootEl, path, parentPath, node});
+								//console.log("next target", parentRootEl.querySelector(lastParentComponent));
+								//console.log(parentRootEl, path, parentPath);
+							}
+							else {
+								parentRootEl = document.querySelector("route");
+							}
+
+							lastParentComponent = node.settings.component;
+							targetParentRoute = simply.page.getParentRouteByPath(path).value;
+							// console.log({parentRootEl}, targetParentRoute.settings.component);
+
+							let directChild = Array.from(parentRootEl.children).find(
+								el => el.matches(targetParentRoute.settings.component)
+							);
+
+							// son çocuk/target-route değilse/parent'sa ve router > component şeklinde render edilmemişse
+							if (i !== tree.length - 1 && !directChild) {
+								let attrs = [];
+								if (targetParentRoute.settings.shadow_root == false) attrs.push('open');
+								if (targetParentRoute.settings.cache) attrs.push('cache');
+
+
+								window.scrollPositions = window.scrollPositions ? window.scrollPositions : {}
+								simply.saveScrollPositions(parentRootEl, tree[i]);
+
+
+								parentRootEl.innerHTML = `<${targetParentRoute.settings.component} ${attrs.join(' ')}></${targetParentRoute.settings.component}>`;
+								if (directChild) {
+									// zaten render edilmiş
+									// innerHTML ile basmadan düz render()
+									console.log("düz render for ", directChild);
+									var component = directChild
+									directChild.render();
 								}
 								else {
-									parentRootEl = document.querySelector("route");
+									directChild = parentRootEl.querySelector(targetParentRoute.settings.component);
 								}
-								
-								lastParentComponent = node.settings.component;
-								targetParentRoute = simply.page.getParentRouteByPath(path).value;
-								// console.log({parentRootEl}, targetParentRoute.settings.component);
-								
-								let directChild = Array.from(parentRootEl.children).find(
-									el => el.matches(targetParentRoute.settings.component)
-								);
-								
-								// son çocuk/target-route değilse/parent'sa ve router > component şeklinde render edilmemişse
-								if (i !== tree.length - 1 && !directChild) {
-									let attrs = [];
-									if (targetParentRoute.settings.shadow_root == false) attrs.push('open');
-									if (targetParentRoute.settings.cache) attrs.push('cache');
+								await waitForRenderedAndReturnRoute(directChild);
+								directChild.router_settings = settings;
+								directChild.ctx = ctx;
 
-								
-									window.scrollPositions = window.scrollPositions ? window.scrollPositions : {}
-									simply.saveScrollPositions(parentRootEl, tree[i]);
-								
-
-									parentRootEl.innerHTML = `<${targetParentRoute.settings.component} ${attrs.join(' ')}></${targetParentRoute.settings.component}>`;		
-									if (directChild) {
-										// zaten render edilmiş
-										// innerHTML ile basmadan düz render()
-										console.log("düz render for ", directChild);
-										var component = directChild
-										directChild.render();
-									}
-									else {
-										directChild = parentRootEl.querySelector(targetParentRoute.settings.component);
-									}
-									await waitForRenderedAndReturnRoute(directChild);
-									directChild.router_settings = settings;
-									directChild.ctx = ctx;					
-									
-									if (directChild.router && directChild.router.enter)	{
-										directChild.router.enter(ctx);
-									}
+								if (directChild.router && directChild.router.enter) {
+									directChild.router.enter(ctx);
 								}
-								//console.log("hedeley", directChild, parentRootEl.parentElement);
-								/*
-								parentRootEl.parentElement.querySelectorAll("a").forEach(function(a) {
-									// console.log(a, path, ctx.path);
-									let href = a.getAttribute("href");
-									if (href && !href.startsWith('/')) {
-										href = '/' + href;
-									}							
-									let rt = simply.page.getRouteByPath(href)
-									if (path == rt.key || href == ctx.path) {
-										a.setAttribute("router-active", true);
-									}
-									else {
-										a.removeAttribute("router-active");
-									}
-								})				
-								*/			
 							}
+							//console.log("hedeley", directChild, parentRootEl.parentElement);
+							/*
+							parentRootEl.parentElement.querySelectorAll("a").forEach(function(a) {
+								// console.log(a, path, ctx.path);
+								let href = a.getAttribute("href");
+								if (href && !href.startsWith('/')) {
+									href = '/' + href;
+								}							
+								let rt = simply.page.getRouteByPath(href)
+								if (path == rt.key || href == ctx.path) {
+									a.setAttribute("router-active", true);
+								}
+								else {
+									a.removeAttribute("router-active");
+								}
+							})				
+							*/
 						}
-						// çocuklu route'un son halkası yani target
-						if (parentRootEl)  {
-							route = parentRootEl;
-							settings = simply.page.getRouteByPath(path).value.settings
+					}
+					// çocuklu route'un son halkası yani target
+					if (parentRootEl) {
+						route = parentRootEl;
+						settings = simply.page.getRouteByPath(path).value.settings
+					}
+					// or single route
+					else {
+						route = settings.root ? settings.root : document.querySelector("route");
+					}
+
+					let directChild = Array.from(route.children).find(
+						el => el.matches(settings.component)
+					);
+
+					if (directChild) {
+						// zaten render edilmiş
+						// innerHTML ile basmadan düz render()
+						//console.log("düz render for ", directChild);
+						var component = directChild
+						directChild.render();
+
+					}
+					else {
+						console.warn("INNERHTML")
+						let attrs = [];
+						if (settings.shadow_root == false) attrs.push('open');
+						if (settings.cache) attrs.push('cache');
+
+
+						// burada scroll kaydedilebilir
+						if (simply.lastPath) {
+							window.scrollPositions = window.scrollPositions ? window.scrollPositions : {}
+							simply.saveScrollPositions(route, simply.lastPath);
 						}
-						// or single route
-						else {
-							route = settings.root ? settings.root : document.querySelector("route");
-						}						
+						console.log("heee", settings);
+						route.innerHTML = `<${settings.component} ${attrs.join(' ')}></${settings.component}>`;
 
-						let directChild = Array.from(route.children).find(
-							el => el.matches(settings.component)
-						);						
-						
-						if (directChild) {
-							// zaten render edilmiş
-							// innerHTML ile basmadan düz render()
-							//console.log("düz render for ", directChild);
-							var component = directChild
-							directChild.render();
+						var component = route.querySelector(settings.component);
+						ctx.component = component;
+						component.router_settings = settings;
+						component.ctx = ctx;
+					}
 
-						}
-						else {
-							console.warn("INNERHTML")
-							let attrs = [];
-							if (settings.shadow_root == false) attrs.push('open');
-							if (settings.cache) attrs.push('cache');
+					if (settings.title) {
+						document.title = settings.title
+					}
 
-							
-							// burada scroll kaydedilebilir
-							if (simply.lastPath) {
-								window.scrollPositions = window.scrollPositions ? window.scrollPositions : {}
-								simply.saveScrollPositions(route, simply.lastPath);
-							}
-							console.log("heee", settings);
-							route.innerHTML = `<${settings.component} ${attrs.join(' ')}></${settings.component}>`;	
+					var comp = directChild || component
+					await waitForRendered(comp)
+					if (comp.router && comp.router.enter) {
+						comp.router.enter(ctx);
+					}
 
-							var component = route.querySelector(settings.component);
-							ctx.component = component;
-							component.router_settings = settings;
-							component.ctx = ctx;						
-						}
+					try {
+						comp.querySelector("route").innerHTML = ""
+					}
+					catch (e) { }
 
-						if (settings.title) {
-							document.title = settings.title
-						}
-						
-						var comp = directChild || component
-						await waitForRendered(comp)				
-						if (comp.router && comp.router.enter)	{
-							comp.router.enter(ctx);
-						}						
-							
-						try {
-							comp.querySelector("route").innerHTML = ""
-						}
-						catch(e) {}		
-
-						comp.selectLinks = function() {
+					comp.selectLinks = function () {
 						if (simply.ctx) {
-								let aTags = [];
-								let current = comp;
+							let aTags = [];
+							let current = comp;
 
-								// tüm linkleri topla
-								while (current) {
-									if (typeof current.querySelectorAll === "function") {
-										aTags.push(...current.querySelectorAll("a"));
-									}
-									current = current.parent || (current.getRootNode && current.getRootNode().host) || document;
-									if (current === document) {
-										aTags.push(...document.querySelectorAll("a"));
-										break;
-									}
+							// tüm linkleri topla
+							while (current) {
+								if (typeof current.querySelectorAll === "function") {
+									aTags.push(...current.querySelectorAll("a"));
+								}
+								current = current.parent || (current.getRootNode && current.getRootNode().host) || document;
+								if (current === document) {
+									aTags.push(...document.querySelectorAll("a"));
+									break;
+								}
+							}
+
+							//console.log(simply.ctx.path.split("?")[0], aTags, this.parent, simply.ctx);
+
+							let currentPath = simply.ctx.path.split("?")[0];
+							aTags.forEach(function (a) {
+								let href = a.getAttribute("href");
+								if (href && !href.startsWith('/')) {
+									href = '/' + href;
 								}
 
-								//console.log(simply.ctx.path.split("?")[0], aTags, this.parent, simply.ctx);
-
-								let currentPath = simply.ctx.path.split("?")[0];
-								aTags.forEach(function(a) {
-									let href = a.getAttribute("href");
-									if (href && !href.startsWith('/')) {
-										href = '/' + href;
-									}				
-
-									if (href && href == decodeURIComponent(currentPath)) {
-										a.setAttribute("router-active", true);
-									}
-									else {
-										a.removeAttribute("router-active");
-									}
-									// tree içinde current olandan öncesi için
-									// parent linkleri de active edelim
-									var targetRoute = simply.page.getRouteByPath(simply.ctx.path.split("?")[0]);
-									if (href && targetRoute.value.tree) {
-										let tree = targetRoute.value.tree;
-										// console.log(tree);
-										if (tree.includes(simply.ctx.routePath)) {
-											const index = tree.indexOf(simply.ctx.routePath);
-											const parentPaths = index !== -1 ? tree.slice(0, index) : [];
-											let routePathOfLink = simply.page.getRouteByPath(href);
-											// console.log("oooo tree", parentPaths, currentPath, href, routePathOfLink.key, simply.ctx);
-											if (parentPaths.includes(routePathOfLink.key)) {
-												a.setAttribute("router-active", true);
-											}
-											// ! çünkü bazen parent link, child'ın içinde de kullanılıyor
-											// o durumda aktif etmeye demeye çalıştım burada
-											else if (parentPaths.includes(href) && !comp.parent.contains(a)) {
-												// console.log(component, a);
-												a.setAttribute("router-active", true);
-											}
+								if (href && href == decodeURIComponent(currentPath)) {
+									a.setAttribute("router-active", true);
+								}
+								else {
+									a.removeAttribute("router-active");
+								}
+								// tree içinde current olandan öncesi için
+								// parent linkleri de active edelim
+								var targetRoute = simply.page.getRouteByPath(simply.ctx.path.split("?")[0]);
+								if (href && targetRoute.value.tree) {
+									let tree = targetRoute.value.tree;
+									// console.log(tree);
+									if (tree.includes(simply.ctx.routePath)) {
+										const index = tree.indexOf(simply.ctx.routePath);
+										const parentPaths = index !== -1 ? tree.slice(0, index) : [];
+										let routePathOfLink = simply.page.getRouteByPath(href);
+										// console.log("oooo tree", parentPaths, currentPath, href, routePathOfLink.key, simply.ctx);
+										if (parentPaths.includes(routePathOfLink.key)) {
+											a.setAttribute("router-active", true);
+										}
+										// ! çünkü bazen parent link, child'ın içinde de kullanılıyor
+										// o durumda aktif etmeye demeye çalıştım burada
+										else if (parentPaths.includes(href) && !comp.parent.contains(a)) {
+											// console.log(component, a);
+											a.setAttribute("router-active", true);
 										}
 									}
-								})		
-							}
-						}
-						setTimeout(() => {
-							comp.selectLinks();
-						}, 0);
-						// app içindeki tüm linkler için
-						// router-active ekle/sil
-
-
-						simply.lastPath = ctx.path;				
-					}
-
-					arguments[1] = fn;
-				}
-
-				
-				// route <path> to <callback ...>
-				if ('function' === typeof fn) {
-					var route = new Route(/** @type {string} */ (path), null, this);
-					simply.routes = simply.routes ? simply.routes : {}
-					simply.routes[route.path] = route;
-					simply.routes[route.path].callbacks = simply.routes[route.path].callback ? simply.routes[route.path].callback : [];
-					simply.routes[route.path].settings = settings;				
-					simply.routes[route.path].page = this;
-
-					function registerChildRoutes(children, parentPath = '') {
-						if (!children) return;
-
-						for (const child of children) {
-							const fullPath = parentPath + child.path;
-
-							// Register current child with full path
-							simply.router([{
-								...child,
-								path: fullPath
-							}], parentPath);
-
-							// Recursively handle its children
-							if (child.children) {
-								registerChildRoutes(child.children, fullPath);
-							}
+								}
+							})
 						}
 					}
+					setTimeout(() => {
+						comp.selectLinks();
+					}, 0);
+					// app içindeki tüm linkler için
+					// router-active ekle/sil
 
-					registerChildRoutes(children, path)
-					
-					for (var i = 1; i < arguments.length; ++i) {
-						const wrappedFn = route.middleware(arguments[i]);
-						this.callbacks.push(wrappedFn);
-						simply.routes[route.path].callbacks.push(wrappedFn);
 
-						// Build the tree using `settings.child_of`
-						const tree = [];
-						let currentPath = route.path;
+					simply.lastPath = ctx.path;
+				}
 
-						while (currentPath && simply.routes[currentPath]) {
-							tree.unshift(currentPath); // prepend to maintain order from root to current
-							var parent = simply.routes[currentPath] &&
-													 simply.routes[currentPath].settings &&
-													 simply.routes[currentPath].settings.child_of;
-							currentPath = parent || null;
-						}
-						if (tree.length > 1) {
-							simply.routes[route.path].tree = tree;
+				arguments[1] = fn;
+			}
+
+
+			// route <path> to <callback ...>
+			if ('function' === typeof fn) {
+				var route = new Route(/** @type {string} */(path), null, this);
+				simply.routes = simply.routes ? simply.routes : {}
+				simply.routes[route.path] = route;
+				simply.routes[route.path].callbacks = simply.routes[route.path].callback ? simply.routes[route.path].callback : [];
+				simply.routes[route.path].settings = settings;
+				simply.routes[route.path].page = this;
+
+				function registerChildRoutes(children, parentPath = '') {
+					if (!children) return;
+
+					for (const child of children) {
+						const fullPath = parentPath + child.path;
+
+						// Register current child with full path
+						simply.router([{
+							...child,
+							path: fullPath
+						}], parentPath);
+
+						// Recursively handle its children
+						if (child.children) {
+							registerChildRoutes(child.children, fullPath);
 						}
 					}
-
-					// show <path> with [state]
-				} else if ('string' === typeof path) {
-					console.log("show or redirect");
-					this['string' === typeof fn ? 'redirect' : 'show'](path, fn);
-					// start [options]
-				} else {
-					this.start(path);
-				}
-				return this;
-			}
-
-			/**
-			 * Unhandled `ctx`. When it's not the initial
-			 * popstate then redirect. If you wish to handle
-			 * 404s on your own use `page('*', callback)`.
-			 *
-			 * @param {Context} ctx
-			 * @api private
-			 */
-			function unhandled(ctx) {
-				if (ctx.handled) return;
-				var current;
-				var page = this;
-				var window = page._window;
-
-				if (page._hashbang) {
-					current = isLocation && this._getBase() + window.location.hash.replace('#!', '');
-				} else {
-					current = isLocation && window.location.pathname + window.location.search;
 				}
 
-				if (current === ctx.canonicalPath) return;
-				page.stop();
-				ctx.handled = false;
-				isLocation && (window.location.href = ctx.canonicalPath);
-			}
+				registerChildRoutes(children, path)
 
-			/**
-			 * Escapes RegExp characters in the given string.
-			 *
-			 * @param {string} s
-			 * @api private
-			 */
-			function escapeRegExp(s) {
-				return s.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1');
-			}
+				for (var i = 1; i < arguments.length; ++i) {
+					const wrappedFn = route.middleware(arguments[i]);
+					this.callbacks.push(wrappedFn);
+					simply.routes[route.path].callbacks.push(wrappedFn);
 
-			/**
-			 * Initialize a new "request" `Context`
-			 * with the given `path` and optional initial `state`.
-			 *
-			 * @constructor
-			 * @param {string} path
-			 * @param {Object=} state
-			 * @api public
-			 */
+					// Build the tree using `settings.child_of`
+					const tree = [];
+					let currentPath = route.path;
 
-			function Context(path, state, pageInstance) {
-				var _page = this.page = pageInstance || page;
-				var window = _page._window;
-				var hashbang = _page._hashbang;
-
-				var pageBase = _page._getBase();
-				if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;
-				var i = path.indexOf('?');
-
-				this.canonicalPath = path;
-				var re = new RegExp('^' + escapeRegExp(pageBase));
-				this.path = path.replace(re, '') || '/';
-				if (hashbang) this.path = this.path.replace('#!', '') || '/';
-
-				this.title = (hasDocument && window.document.title);
-				this.state = state || {};
-				this.state.path = path;
-				this.querystring = ~i ? _page._decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
-				this.pathname = _page._decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
-				this.params = {};
-
-				// fragment
-				this.hash = '';
-				if (!hashbang) {
-					if (!~this.path.indexOf('#')) return;
-					var parts = this.path.split('#');
-					this.path = this.pathname = parts[0];
-					this.hash = _page._decodeURLEncodedURIComponent(parts[1]) || '';
-					this.querystring = this.querystring.split('#')[0];
+					while (currentPath && simply.routes[currentPath]) {
+						tree.unshift(currentPath); // prepend to maintain order from root to current
+						var parent = simply.routes[currentPath] &&
+							simply.routes[currentPath].settings &&
+							simply.routes[currentPath].settings.child_of;
+						currentPath = parent || null;
+					}
+					if (tree.length > 1) {
+						simply.routes[route.path].tree = tree;
+					}
 				}
+
+				// show <path> with [state]
+			} else if ('string' === typeof path) {
+				console.log("show or redirect");
+				this['string' === typeof fn ? 'redirect' : 'show'](path, fn);
+				// start [options]
+			} else {
+				this.start(path);
+			}
+			return this;
+		}
+
+		/**
+		 * Unhandled `ctx`. When it's not the initial
+		 * popstate then redirect. If you wish to handle
+		 * 404s on your own use `page('*', callback)`.
+		 *
+		 * @param {Context} ctx
+		 * @api private
+		 */
+		function unhandled(ctx) {
+			if (ctx.handled) return;
+			var current;
+			var page = this;
+			var window = page._window;
+
+			if (page._hashbang) {
+				current = isLocation && this._getBase() + window.location.hash.replace('#!', '');
+			} else {
+				current = isLocation && window.location.pathname + window.location.search;
 			}
 
-			/**
-			 * Push state.
-			 *
-			 * @api private
-			 */
+			if (current === ctx.canonicalPath) return;
+			page.stop();
+			ctx.handled = false;
+			isLocation && (window.location.href = ctx.canonicalPath);
+		}
 
-			Context.prototype.pushState = function() {
-				var page = this.page;
-				var window = page._window;
-				var hashbang = page._hashbang;
+		/**
+		 * Escapes RegExp characters in the given string.
+		 *
+		 * @param {string} s
+		 * @api private
+		 */
+		function escapeRegExp(s) {
+			return s.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1');
+		}
 
-				page.len++;
-				if (hasHistory) {
-						window.history.pushState(this.state, this.title,
-							hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+		/**
+		 * Initialize a new "request" `Context`
+		 * with the given `path` and optional initial `state`.
+		 *
+		 * @constructor
+		 * @param {string} path
+		 * @param {Object=} state
+		 * @api public
+		 */
+
+		function Context(path, state, pageInstance) {
+			var _page = this.page = pageInstance || page;
+			var window = _page._window;
+			var hashbang = _page._hashbang;
+
+			var pageBase = _page._getBase();
+			if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;
+			var i = path.indexOf('?');
+
+			this.canonicalPath = path;
+			var re = new RegExp('^' + escapeRegExp(pageBase));
+			this.path = path.replace(re, '') || '/';
+			if (hashbang) this.path = this.path.replace('#!', '') || '/';
+
+			this.title = (hasDocument && window.document.title);
+			this.state = state || {};
+			this.state.path = path;
+			this.querystring = ~i ? _page._decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+			this.pathname = _page._decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
+			this.params = {};
+
+			// fragment
+			this.hash = '';
+			if (!hashbang) {
+				if (!~this.path.indexOf('#')) return;
+				var parts = this.path.split('#');
+				this.path = this.pathname = parts[0];
+				this.hash = _page._decodeURLEncodedURIComponent(parts[1]) || '';
+				this.querystring = this.querystring.split('#')[0];
+			}
+		}
+
+		/**
+		 * Push state.
+		 *
+		 * @api private
+		 */
+
+		Context.prototype.pushState = function () {
+			var page = this.page;
+			var window = page._window;
+			var hashbang = page._hashbang;
+
+			page.len++;
+			if (hasHistory) {
+				window.history.pushState(this.state, this.title,
+					hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+			}
+		};
+
+		/**
+		 * Save the context state.
+		 *
+		 * @api public
+		 */
+
+		Context.prototype.save = function () {
+			var page = this.page;
+			if (hasHistory) {
+				page._window.history.replaceState(this.state, this.title,
+					page._hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+			}
+		};
+
+		/**
+		 * Initialize `Route` with the given HTTP `path`,
+		 * and an array of `callbacks` and `options`.
+		 *
+		 * Options:
+		 *
+		 *   - `sensitive`    enable case-sensitive routes
+		 *   - `strict`       enable strict matching for trailing slashes
+		 *
+		 * @constructor
+		 * @param {string} path
+		 * @param {Object=} options
+		 * @api private
+		 */
+
+		function Route(path, options, page) {
+			var _page = this.page = page || globalPage;
+			var opts = options || {};
+			opts.strict = opts.strict || _page._strict;
+			this.path = (path === '*') ? '(.*)' : path;
+			this.method = 'GET';
+			this.regexp = pathToRegexp_1(this.path, this.keys = [], opts);
+		}
+
+		/**
+		 * Return route middleware with
+		 * the given callback `fn()`.
+		 *
+		 * @param {Function} fn
+		 * @return {Function}
+		 * @api public
+		 */
+		/*
+		Route.prototype.middleware = function(fn) {
+			var self = this;
+			return function(ctx, next) {
+				if (self.match(ctx.path, ctx.params, ctx.routePath)) {
+					ctx.routePath = self.path;
+					return fn(ctx, next);
 				}
+				next();
 			};
-
-			/**
-			 * Save the context state.
-			 *
-			 * @api public
-			 */
-
-			Context.prototype.save = function() {
-				var page = this.page;
-				if (hasHistory) {
-						page._window.history.replaceState(this.state, this.title,
-							page._hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+		};
+		*/
+		Route.prototype.middleware = function (fn) {
+			var self = this;
+			function wrapper(ctx, next) {
+				if (self.match(ctx.path, ctx.params, ctx.routePath)) {
+					ctx.routePath = self.path;
+					return fn(ctx, next);
 				}
-			};
-
-			/**
-			 * Initialize `Route` with the given HTTP `path`,
-			 * and an array of `callbacks` and `options`.
-			 *
-			 * Options:
-			 *
-			 *   - `sensitive`    enable case-sensitive routes
-			 *   - `strict`       enable strict matching for trailing slashes
-			 *
-			 * @constructor
-			 * @param {string} path
-			 * @param {Object=} options
-			 * @api private
-			 */
-
-			function Route(path, options, page) {
-				var _page = this.page = page || globalPage;
-				var opts = options || {};
-				opts.strict = opts.strict || _page._strict;
-				this.path = (path === '*') ? '(.*)' : path;
-				this.method = 'GET';
-				this.regexp = pathToRegexp_1(this.path, this.keys = [], opts);
+				next();
 			}
+			wrapper.originalFn = fn;  // keep reference to original fn
+			return wrapper;
+		};
 
-			/**
-			 * Return route middleware with
-			 * the given callback `fn()`.
-			 *
-			 * @param {Function} fn
-			 * @return {Function}
-			 * @api public
-			 */
-			/*
-			Route.prototype.middleware = function(fn) {
-				var self = this;
-				return function(ctx, next) {
-					if (self.match(ctx.path, ctx.params, ctx.routePath)) {
-						ctx.routePath = self.path;
-						return fn(ctx, next);
-					}
-					next();
-				};
-			};
-			*/
-Route.prototype.middleware = function(fn) {
-  var self = this;
-  function wrapper(ctx, next) {
-    if (self.match(ctx.path, ctx.params, ctx.routePath)) {
-      ctx.routePath = self.path;
-      return fn(ctx, next);
-    }
-    next();
-  }
-  wrapper.originalFn = fn;  // keep reference to original fn
-  return wrapper;
-};			
+		/**
+		 * Check if this route matches `path`, if so
+		 * populate `params`.
+		 *
+		 * @param {string} path
+		 * @param {Object} params
+		 * @return {boolean}
+		 * @api private
+		 */
 
-			/**
-			 * Check if this route matches `path`, if so
-			 * populate `params`.
-			 *
-			 * @param {string} path
-			 * @param {Object} params
-			 * @return {boolean}
-			 * @api private
-			 */
+		Route.prototype.findRouteWithPath = function (path) {
+			qsIndex = path.indexOf('?'),
+				pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
+				m = this.regexp.exec(decodeURIComponent(pathname));
+			if (!m) return false;
+			return m;
+		}
 
-			Route.prototype.findRouteWithPath = function(path) {
+		Route.prototype.match = function (path, params) {
+			var keys = this.keys,
 				qsIndex = path.indexOf('?'),
 				pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
 				m = this.regexp.exec(decodeURIComponent(pathname));
-				if (!m) return false;
-				return m;
-			}			
+			if (!m) return false;
 
-			Route.prototype.match = function(path, params) {
-				var keys = this.keys,
-				qsIndex = path.indexOf('?'),
-				pathname = ~qsIndex ? path.slice(0, qsIndex) : path,
-				m = this.regexp.exec(decodeURIComponent(pathname));
-				if (!m) return false;
-				
-				delete params[0];
-				
-				for (var i = 1, len = m.length; i < len; ++i) {
-					var key = keys[i - 1];
-					var val = this.page._decodeURLEncodedURIComponent(m[i]);
+			delete params[0];
 
-					if (val !== undefined || !(hasOwnProperty.call(params, key.name))) {
-						params[key.name] = val;
-					}
+			for (var i = 1, len = m.length; i < len; ++i) {
+				var key = keys[i - 1];
+				var val = this.page._decodeURLEncodedURIComponent(m[i]);
+
+				if (val !== undefined || !(hasOwnProperty.call(params, key.name))) {
+					params[key.name] = val;
 				}
+			}
 
-				return true;
-			};
+			return true;
+		};
 
 
-			/**
-			 * Module exports.
-			 */
+		/**
+		 * Module exports.
+		 */
 
-			var globalPage = createPage();
-			var page_js = globalPage;
-			var default_1 = globalPage;
+		var globalPage = createPage();
+		var page_js = globalPage;
+		var default_1 = globalPage;
 
 		page_js.default = default_1;
 
 		return page_js;
 	},
-	router: function(routes, child_of) {
+	router: function (routes, child_of) {
 		// simply.page() load edilmemişse
 		if (!simply.page.Context) {
 			simply.initRouter();
@@ -6935,7 +7038,7 @@ Route.prototype.middleware = function(fn) {
 			next();
 		}
 
-		routes.forEach(function(route) {
+		routes.forEach(function (route) {
 			simply.page(
 				route.path,
 				{
@@ -6946,7 +7049,7 @@ Route.prototype.middleware = function(fn) {
 			);
 		});
 	},
-	getElementUniqueId:function(el) {
+	getElementUniqueId: function (el) {
 		const parts = [];
 
 		while (el) {
@@ -6970,7 +7073,7 @@ Route.prototype.middleware = function(fn) {
 
 		return parts.reverse().join(' > ');
 	},
-	saveScrollPositions: function(root, path) {
+	saveScrollPositions: function (root, path) {
 		const scrollPositions = {};
 		const route = root.querySelector('route');
 
@@ -7009,7 +7112,7 @@ Route.prototype.middleware = function(fn) {
 		traverse(root);
 		window.scrollPositions[path] = scrollPositions;
 	},
-	qs: (function() {
+	qs: (function () {
 		var toString = Object.prototype.toString;
 		var isint = /^[0-9]+$/;
 
@@ -7071,7 +7174,7 @@ Route.prototype.middleware = function(fn) {
 
 		function parseObject(obj) {
 			var ret = { base: {} };
-			Object.keys(obj).forEach(function(name) {
+			Object.keys(obj).forEach(function (name) {
 				merge(ret, name, obj[name]);
 			});
 			return ret.base;
@@ -7080,7 +7183,7 @@ Route.prototype.middleware = function(fn) {
 		function parseString(str) {
 			return String(str)
 				.split('&')
-				.reduce(function(ret, pair) {
+				.reduce(function (ret, pair) {
 					try {
 						pair = decodeURIComponent(pair.replace(/\+/g, ' '));
 					} catch (e) { /* ignore */ }
@@ -7156,7 +7259,7 @@ Route.prototype.middleware = function(fn) {
 
 		// Public API
 		return {
-			parse: function(str) {
+			parse: function (str) {
 				if (str == null || str === '') return {};
 				return typeof str === 'object'
 					? parseObject(str)
@@ -7165,11 +7268,11 @@ Route.prototype.middleware = function(fn) {
 			stringify: stringify
 		};
 	})(),
-	initRouter: function(a,b) {
+	initRouter: function (a, b) {
 		// window.page = simply.page(); // i'll delete this after seeing all examples (search/replace page with simply.page in examples)
 		simply.page = simply.page();
-		
-		simply.page.configure({window:window})
+
+		simply.page.configure({ window: window })
 		var base = document.querySelector("base[href]");
 		if (base) {
 			// delete last slach
@@ -7189,10 +7292,10 @@ Route.prototype.middleware = function(fn) {
 		this.observableSlim();
 
 		// simply.page() load edilmemişse
-		simply.page.redirect = function(a,b) {
-			simply.initRouter(a,b);
+		simply.page.redirect = function (a, b) {
+			simply.initRouter(a, b);
 		}
-		
+
 		window.get = this.get;
 	}
 }

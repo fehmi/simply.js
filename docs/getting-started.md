@@ -3,7 +3,7 @@
 
 ## Add it to your app
 
-You can add simply.js to your app via `<script>` tag to start using it. Just be sure to add it right before the closing `</body>` tag.
+You can integrate Simply.js into your application by adding a `<script>` tag. Ensure it is placed just before the closing `</body>` tag.
 
 ```html
 <script src="https://simply.js.org/simply.min.js"></script>
@@ -11,7 +11,7 @@ You can add simply.js to your app via `<script>` tag to start using it. Just be 
 
 ## Create a Component
 
-Now our page is ready to interact with simply.js components. The components in simply.js have three sections; `template`, `style` and `script`. You can learn more about them from the [component structure](docs/component-structure) section later but we want to quickly jump in right now. So create a `hello-world.html` file with the content below and save it to the same folder with the app you added simply.js in it at the first step.
+Your page is now ready to interact with Simply.js components. Simply.js components are structured into three main sections: `template`, `style`, and `script`. While more details are available in the [component structure](docs/component-structure) section, let's quickly get started. Create a `hello-world.html` file with the content below and save it to the same folder as the application where you initially added Simply.js.
 
 ```html
 <html>
@@ -37,13 +37,13 @@ Now our page is ready to interact with simply.js components. The components in s
 
 ## Use the Component
 
-You can use `get()` function of simply.js to load your component anywhere in your app/page like this.
+You can use Simply.js's `get()` function to load your component anywhere in your application or page, as shown below.
 
 ```js
 get("hello-world.html");
 ```
 
-After getting your component, the filename without extension will be your custom tag name and then you will be able to put the component anywhere you want by just writing the tag like this.
+Once your component is loaded, its filename (without the extension) will serve as its custom tag name, allowing you to place the component anywhere by simply using the tag, like this:
 
 ```html
 <hello-world></hello-world>
@@ -51,7 +51,7 @@ After getting your component, the filename without extension will be your custom
 
 ## Everything Together
 
-Now you have two files and they are look like below. You can just click to download to have them in your local for fastest start if you don't want to create these files manually.
+You now have two files, structured as shown below. For a quicker start, you can download them directly instead of creating them manually.
 
 <repl-component download="true" id="10fcijpwru4j34e"></repl-component>
 
@@ -59,7 +59,7 @@ Now you have two files and they are look like below. You can just click to downl
 You can also define and use your component while writing them inline without a need of an external file. 
 <repl-component download="true" id="nvrh9n07asl89ed"></repl-component>
 
-This method also can be used to manipulate after loading single file components. See [inline components](#/docs/inline-components)
+This method can also be used to manipulate single-file components after they are loaded. Refer to [inline components](#/docs/inline-components) for more information.
 
 
 ## Preview Your App
@@ -67,7 +67,7 @@ This method also can be used to manipulate after loading single file components.
 When you have these files you can start a server to preview your app. You can use any web server but here are some suggestions for you.
 <br>
 - #### Python
-If you have Python installed you can easyly run:
+If Python is installed, you can easily run:
 ```bash
 #python 2
 cd hello-world && python -m SimpleHTTPServer 8000
@@ -90,4 +90,3 @@ http-server [path] [options]
 - #### Other Options
 
   Other options to start a server can be [XAMPP](https://www.apachefriends.org/), [MAMP](https://www.mamp.info/), [Prepros](https://prepros.io/) or [Codekit](https://codekitapp.com/).
-

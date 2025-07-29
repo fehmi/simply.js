@@ -1,12 +1,12 @@
 # Offline Mode
 
-[Progressive Web Apps](https://developers.google.com/web/progressive-web-apps/) (PWA) are experiences that combine the best of the web with the best of apps. We can enhance our website with service workers to work **offline** or on low-quality networks.
+[Progressive Web Apps](https://developers.google.com/web/progressive-web-apps/) (PWA) are experiences that combine the best of the web with the best of apps. We can enhance our website with service workers to enable **offline** functionality or improve performance on low-quality networks.
 
-It is also very easy to use it.
+It is also very easy to implement.
 
 ## Create serviceWorker
 
-Create a `sw.js` file in your documents root directory and copy the following code:
+Create an `sw.js` file in your document's root directory and copy the following code:
 
 *sw.js*
 
@@ -51,7 +51,7 @@ const getFixedUrl = (req) => {
 
 /**
  *  @Lifecycle Activate
- *  New one activated when old isnt being used.
+ *  A new service worker is activated when the old one is no longer in use.
  *
  *  waitUntil(): activating ====> activated
  */
@@ -61,12 +61,12 @@ self.addEventListener('activate', event => {
 
 /**
  *  @Functional Fetch
- *  All network requests are being intercepted here.
+ *  All network requests are intercepted here.
  *
  *  void respondWith(Promise<Response> r)
  */
 self.addEventListener('fetch', event => {
-  // Skip some of cross-origin requests, like those for Google Analytics.
+  // Skip some cross-origin requests, such as those for Google Analytics.
   if (HOSTNAME_WHITELIST.indexOf(new URL(event.request.url).hostname) > -1) {
     // Stale-while-revalidate
     // similar to HTTP's stale-while-revalidate: https://www.mnot.net/blog/2007/12/12/stale
@@ -77,8 +77,8 @@ self.addEventListener('fetch', event => {
     const fetchedCopy = fetched.then(resp => resp.clone())
 
     // Call respondWith() with whatever we get first.
-    // If the fetch fails (e.g disconnected), wait for the cache.
-    // If there’s nothing in cache, wait for the fetch.
+    // If the fetch fails (e.g., disconnected), wait for the cache.
+    // If there is nothing in the cache, wait for the fetch.
     // If neither yields a response, return offline pages.
     event.respondWith(
       Promise.race([fetched.catch(_ => cached), cached])
@@ -86,7 +86,7 @@ self.addEventListener('fetch', event => {
         .catch(_ => { /* eat any errors */ })
     )
 
-    // Update the cache with the version we fetched (only for ok status)
+    // Update the cache with the fetched version (only for successful status codes).
     event.waitUntil(
       Promise.all([fetchedCopy, caches.open(RUNTIME)])
         .then(([response, cache]) => response.ok && cache.put(event.request, response))
@@ -98,7 +98,7 @@ self.addEventListener('fetch', event => {
 
 ## Register
 
-Now, register it in your `index.html`. It only works on some modern browsers, so we need to judge:
+Now, register it in your `index.html`. This functionality is supported only on modern browsers, so a conditional check is necessary:
 
 *index.html*
 
@@ -112,4 +112,4 @@ Now, register it in your `index.html`. It only works on some modern browsers, so
 
 ## Enjoy it
 
-Release your website and start experiencing magical offline feature. :ghost: You can turn off Wi-Fi and refresh the current site to experience it.
+Deploy your website and experience the powerful offline capabilities. :ghost: You can turn off Wi-Fi and refresh the current site to test it.

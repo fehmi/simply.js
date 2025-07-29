@@ -1,6 +1,6 @@
 ## Simple form of variables
 
-You can define your variables on the data section in your component like this.
+You can define your variables within the `data` section of your component, as shown below.
 
 ```bash
 <script>
@@ -12,7 +12,7 @@ You can define your variables on the data section in your component like this.
 </script>
 ```
 
-Then you will be able to use them in your template like this.
+You can then use them in your template as follows:
 
 ```html
 <template>
@@ -23,11 +23,11 @@ Then you will be able to use them in your template like this.
 </template>
 ```
 
-?> It is necessary to use dot notation with `data` prefix when reaching variables. The only exception is for `each` loop. When you are in a loop, you can directly reach current subjects.
+?> It is necessary to use dot notation with the `data` prefix when accessing variables. The only exception is within an `each` loop, where you can directly access current subjects.
 
 ## Variable Expressions
 
-Of couse you can do some simple math with your variables using simple expressions. All of them below is valid.
+Of course, you can perform simple mathematical operations with your variables using basic expressions. All of the examples below are valid.
 
 ```js
 { data.variable }
@@ -38,7 +38,7 @@ Of couse you can do some simple math with your variables using simple expression
 
 ## Variables in `each` loops
 
-If you decide to use `key` and `index` when you define `each` loop. You can reach them directly without using a dot notation.
+If you choose to use `key` and `index` when defining an `each` loop, you can access them directly without using dot notation.
 
 ```html
   <each data.hobbies as hobbie, key (index)>
@@ -48,7 +48,7 @@ If you decide to use `key` and `index` when you define `each` loop. You can reac
 
 ## Reactivity of Variables
 
-All variables you define on the data section of your component automaticaly will be reactive. Anytime you change the variable, your template will be rerendered.
+All variables defined in the `data` section of your component will automatically be reactive. Anytime you change a variable, your template will be re-rendered.
 
 ```html
   <each data.hobbies as hobbie, key (index)> 
@@ -58,7 +58,7 @@ All variables you define on the data section of your component automaticaly will
 
 ## Variables in style tag
 
-You can use your reactive data variables as a property value in style tag.
+You can use your reactive data variables as property values within a style tag.
 
 ```html
 <template>

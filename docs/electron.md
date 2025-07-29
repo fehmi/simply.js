@@ -1,8 +1,8 @@
 ## Electron Integration
 
-!> The router module is deprecated and will be deleted on upcoming releases. Use [AWC router](docs/awc-router) instead.
+!> The router module is deprecated and will be removed in upcoming releases. Use [AWC router](docs/awc-router) instead.
 
-Add the index.html path as base href.
+Add the `index.html` path as the base `href`.
 
 ```html
 <base href="https://root/simply/examples/routeri/index.html">
@@ -19,7 +19,7 @@ const router = new Router(outlet, {
 ```
 
 
-Get your components. You'll pass their names to the router later.
+Retrieve your components. You will pass their names to the router later.
 
 ```js
 get('hello-world.html', "hello-world");
@@ -29,7 +29,7 @@ get('user-profile.html', "user-profile");
 ```
 
 
-?> Set all routes inside `index.html` path as children.
+?> Set all routes within the `index.html` path as children.
 
 ```js
 router.setRoutes([
@@ -50,7 +50,7 @@ router.setRoutes([
 ```
 
 
-And your links will be like:
+Your links will then be structured as follows:
 
 ```html
 <a href="#">Home</a>
@@ -58,5 +58,4 @@ And your links will be like:
 <a href="#/users/kim">Kim</a>
 ```
 
-That's it!
-
+That completes the setup!

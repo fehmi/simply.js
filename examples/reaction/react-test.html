@@ -1,0 +1,23 @@
+<html>
+{data.name}
+
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "fehmi",
+      things: [1, 2, 3],
+      he: "me",
+      de: "ge"
+    }
+    watch(a, b, c) {
+      console.log("data change", a, b, c)
+    }
+    lifecycle = {
+      afterRerender() {
+        console.log("rerender")
+      }
+    }
+  }
+</script>

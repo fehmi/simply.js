@@ -2,7 +2,7 @@
 
 ## Full text search
 
-By default, the hyperlink on the current page is recognized and the content is saved in `localStorage`. You can also specify the path to the files.
+By default, hyperlinks on the current page are recognized, and their content is saved in `localStorage`. You can also specify the paths to the files.
 
 ```html
 <script>
@@ -85,7 +85,7 @@ Configure by `data-ga`.
 
 ## emoji
 
-The default is to support parsing emoji. For example `:100:` will be parsed to :100:. But it is not precise because there is no matching non-emoji string. If you need to correctly parse the emoji string, you need install this plugin.
+By default, emoji parsing is supported (e.g., `:100:` will be parsed to :100:). However, this is not precise as there might be no matching non-emoji string. If you need to correctly parse emoji strings, you must install this plugin.
 
 ```html
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
@@ -95,7 +95,7 @@ The default is to support parsing emoji. For example `:100:` will be parsed to :
 
 ## External Script
 
-If the script on the page is an external one (imports a js file via `src` attribute), you'll need this plugin to make it work.
+If a script on the page is external (i.e., imports a JavaScript file via the `src` attribute), you will need this plugin for it to function correctly.
 
 ```html
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/external-script.min.js"></script>
@@ -103,13 +103,13 @@ If the script on the page is an external one (imports a js file via `src` attrib
 
 ## Zoom image
 
-Medium's image zoom. Based on [medium-zoom](https://github.com/francoischalifour/medium-zoom).
+Enables image zoom functionality similar to Medium, based on [medium-zoom](https://github.com/francoischalifour/medium-zoom).
 
 ```html
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
 ```
 
-Exclude the special image
+Exclude specific images from zooming
 
 ```markdown
 ![](image.png ":no-zoom")
@@ -117,19 +117,19 @@ Exclude the special image
 
 ## Edit on github
 
-Add `Edit on github` button on every pages. Provided by [@njleonzhang](https://github.com/njleonzhang), check [document](https://github.com/njleonzhang/docsify-edit-on-github)
+Adds an 'Edit on GitHub' button to every page. Provided by [@njleonzhang](https://github.com/njleonzhang); refer to the [documentation](https://github.com/njleonzhang/docsify-edit-on-github) for more details.
 
 ## Demo code with instant preview and jsfiddle integration
 
-With this plugin, sample code can be rendered on the page instantly, so that the readers can see the preview immediately.
-When readers expand the demo box, the source code and description are shown there. if they click the button `Try in Jsfiddle`,
-`jsfiddle.net` will be open with the code of this sample, which allow readers to revise the code and try on their own.
+This plugin allows sample code to be rendered instantly on the page, enabling readers to see a preview immediately.
+When readers expand the demo box, the source code and description are displayed. If they click the `Try in JSFiddle` button,
+`jsfiddle.net` will open with the sample code, allowing readers to revise and experiment with the code independently.
 
 [Vue](https://njleonzhang.github.io/docsify-demo-box-vue/) and [React](https://njleonzhang.github.io/docsify-demo-box-react/) are both supported.
 
 ## Copy to Clipboard
 
-Add a simple `Click to copy` button to all preformatted code blocks to effortlessly allow users to copy example code from your docs. Provided by [@jperasmus](https://github.com/jperasmus)
+Adds a simple 'Click to copy' button to all preformatted code blocks, enabling users to effortlessly copy example code from your documentation. Provided by [@jperasmus](https://github.com/jperasmus).
 
 ```html
 <script src="//cdn.jsdelivr.net/npm/docsify-copy-code"></script>
@@ -174,7 +174,7 @@ Disqus comments. https://disqus.com/
 
 ## Pagination
 
-Pagination for docsify. By [@imyelo](https://github.com/imyelo)
+Provides pagination functionality for Docsify. By [@imyelo](https://github.com/imyelo).
 
 ```html
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
@@ -183,7 +183,7 @@ Pagination for docsify. By [@imyelo](https://github.com/imyelo)
 
 ## Tabs
 
-A docsify.js plugin for displaying tabbed content from markdown.
+A Docsify.js plugin for displaying tabbed content from Markdown.
 
 - [Documentation & Demos](https://jhildenbiddle.github.io/docsify-tabs)
 
