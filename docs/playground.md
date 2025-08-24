@@ -12,4 +12,4 @@
   }
   </style>
 
-<repl-component id="10fcijpwru4j34e" download="true" save="true" console="true" crud="true" focus="true"></replcomponent>
+<repl-component id="10fcijpwru4j34e" download="true" save="true" console="true" crud="true" focus="true"></repl-component>

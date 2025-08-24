@@ -110,7 +110,7 @@ The value of the message property is passed to our Simply.js component.
 
 All properties defined in your Framer code component are accessible from within your Simply.js component. When any of these properties change in Framer, the corresponding values in your Simply.js component are automatically updated.
 
-Additionally, you can monitor property changes by defining a special method named `propsUpdated()` within your component. Here's how:
+Additionally, you can monitor property changes by defining a special method named `framerPropsUpdated()` within your component. Here's how:
 
 ```html
 <html>
@@ -120,8 +120,8 @@ Additionally, you can monitor property changes by defining a special method name
 
 <script>
   class simply {
-    methods = {
-      propsUpdated() {
+    lifecycle = {
+      framerPropsUpdated() {
         console.log("Props updated!", props);
       },
     };
@@ -146,8 +146,8 @@ To prevent flickering (Flash of Unstyled Content) during loading, use a conditio
     data = {
       ready: false,
     };
-    methods = {
-      propsUpdated() {
+    lifecycle = {
+      framerPropsUpdated() {
         console.log("Props updated!", props);
       },
     };
@@ -228,7 +228,7 @@ You can also access additional data about the component through the `props` obje
 }
 ```
 
-After each mount, Framer executes a function named `framerComponentMounted()` defined within the `methods` of your Simply.js component. You can handle it as follows:
+After each mount, Framer executes a function named `framerComponentMounted()` defined within the `lifecycle` of your Simply.js component. You can handle it as follows:
 
 ```html
 <html>
@@ -240,7 +240,7 @@ After each mount, Framer executes a function named `framerComponentMounted()` de
 
 <script>
   class simply {
-    methods = {
+    lifecycle = {
       framerComponentMounted(framerComponent) {
         console.log("framer component mounted", framerComponent);
       },
@@ -261,7 +261,7 @@ Variants and their interactions, such as `hover` and `click`, will function auto
 
 <script>
   class simply {
-    methods = {
+    lifecycle = {
       framerComponentClicked(framerComponent) {
         var variant =
           framerComponent.getAttribute("data-framer-name") || "default";
@@ -285,7 +285,7 @@ Variants and their interactions, such as `hover` and `click`, will function auto
 
 You can also connect collections as component instances in Framer. These are special instances that include additional information, accessible through `props` in your Simply.js component.
 
-Mounting functions exactly as described above. All entries in the collection will be returned and mounted automatically. It is up to you to filter or display them as needed within your Simply.js component. You can use the `propsUpdated()` hook to manage this.
+Mounting functions exactly as described above. All entries in the collection will be returned and mounted automatically. It is up to you to filter or display them as needed within your Simply.js component. You can use the `framerPropsUpdated()` hook to manage this.
 
 <img src="docs/images/mount-collection.jpg">
 
@@ -390,13 +390,11 @@ Another powerful feature allows you to send custom JavaScript code from Simply.j
 
 <script>
   class simply {
-    methods = {
+    lifecycle = {
       runInFramerResult(result) {
         data.result = JSON.stringify(result);
         console.log("the result", result);
       },
-    };
-    lifecycle = {
       afterConstruct() {
         var codeToRun = function () {
           var data;
@@ -412,7 +410,7 @@ Another powerful feature allows you to send custom JavaScript code from Simply.j
 
           // this is optionally where we return data
           useEffect(() => {
-            component.methods.runInFramerResult(data);
+            component.lifecycle.runInFramerResult(data);
           }, [data]);
         };
 
@@ -425,7 +423,7 @@ Another powerful feature allows you to send custom JavaScript code from Simply.j
 </script>
 ```
 
-The line `component.methods.runInFramerResult(data);` within the `useEffect` hook passes the collected data back into your current Simply.js `component`. Here, `component` refers to your Simply.js component instance, and calling its method allows you to send data to any function defined within its `methods`.
+The line `component.lifecycle.runInFramerResult(data);` within the `useEffect` hook passes the collected data back into your current Simply.js `component`. Here, `component` refers to your Simply.js component instance, and calling its method allows you to send data to any function defined within its `methods`.
 
 > The following variables and hooks are available inside the Framer component’s runtime scope:
 >
@@ -452,13 +450,13 @@ The line `component.methods.runInFramerResult(data);` within the `useEffect` hoo
 
 ### Listen Scroll Event
 
-To listen for scroll events from Framer within your Simply.js component, define a method named `framerOnScroll()` inside your component's `methods` block.
+To listen for scroll events from Framer within your Simply.js component, define a method named `framerOnScroll()` inside your component's `lifecycle` block.
 
 Here’s how to set it up:
 
 ```js
 class simply {
-  methods = {
+  lifecycle = {
     framerOnScroll(data) {
       console.log(data);
     },

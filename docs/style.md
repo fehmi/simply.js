@@ -22,10 +22,6 @@ One of the key advantages of styling is the ability to use reactive JavaScript v
 
 ?> Remember to enclose the variable name within apostrophes, like `"{data.color}"`.
 
-### Tailwind
-
-You also have the ability to leverage Tailwind CSS within your components. See more in the [Style section](tailwind.md).
-
 ### Conditions
 
 You can also use Simply.js conditions, as shown in the example below.

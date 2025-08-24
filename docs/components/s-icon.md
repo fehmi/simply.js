@@ -5,7 +5,7 @@ The icon component is a wrapper around beautiful [Iconify](https://docs.iconify.
 You can use all official attributes of Iconify component in the icon component like this:
 
 <s-component-api section="demo" component="components/s-icon.html"></s-component-api>
-<s-component-api section="demo" component="components/s-icon.html"></s-component-api>
+
 
 
 <repl-component id="aeja6q3rhqda822" download="true"></repl-component>

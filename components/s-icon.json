@@ -109,8 +109,8 @@
                         "name": "HTMLElement"
                     },
                     "tagName": "s-icon",
-                    "summary": "This is MyElement",
-                    "customElement": true
+                    "customElement": true,
+                    "summary": "This is MyElement"
                 }
             ],
             "exports": [

@@ -1,10 +1,16 @@
 <html>
-	{p = ''}
-	<each of="props" as="prop" key="key">
-	  <!-- {p += key + '="' + prop + '" ';} -->
-	</each>	
-	<iconify-icon {p}>
-	</iconify-icon>
+{p = ''}
+<each
+	of="props"
+	as="prop"
+	key="key"
+>
+	<!-- {p += key + '="' + prop + '" ';} -->
+</each>
+
+<iconify-icon {p}>
+</iconify-icon>
+
 </html>
 
 <style>
@@ -13,14 +19,13 @@
 		bcs we pass style attribute
 		to iconify
 	*/
-	:host {
+	s-icon {
 		background-color: yellow;
 		all: unset !important;
-		height: calc("{props.height}" * 1px)!important;
-		width: calc("{props.height}" * 1px)!important;
-		display: inline-block!important;
+		height: calc("{props.height}" * 1px) !important;
+		width: calc("{props.height}" * 1px) !important;
+		display: inline-block !important;
 	}
-
 </style>
 
 <script>
@@ -35,11 +40,11 @@
 	 * @cssprop --text-color - Controls the color of f
 	 * @cssproperty [--background-color=red] - Controls the color of bar
 	 *
- 	 * @property {string} icon - Icon code
- 	 * @property {string} flip - Horizontal / Vertical
-	 * @property {number} height - Height of the icon
- 	 * @property {string} rotate - Degree 
- 	 * @property {boolean} inline - Vertical alignment
+		 * @property {string} icon - Icon code
+		 * @property {string} flip - Horizontal / Vertical
+			* @property {number} height - Height of the icon
+		 * @property {string} rotate - Degree 
+		 * @property {boolean} inline - Vertical alignment
 	 *
 	 * @fires custom-event - some description for custom-event
 	 * @fires {Event} typed-event - some description for typed-event

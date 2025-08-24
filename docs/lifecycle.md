@@ -16,8 +16,21 @@
 |                    |                                                    |
 | **whenDataChange** | After a variable in the component's data object is changed|
 | **whenPropChange** | After a prop is changed                            |
+| **whenStateChange** | After a state is changed                            |
 |                    |                                                    |
 | **disconnected**   | Triggered when the component is removed from the DOM|
+|                    |                                                    |
+| **routerEnter**   | Triggered when the router enter with the component  |
+|                    |                                                    |
+| **framerPropsUpdated**   | When a prop is changed in Framer             |
+| **framerComponentMounted**   | When a Framer component is mounted       |
+| **framerComponentClicked**   | When a Framer component is clicked       |
+| **runInFramerResult**   | When a custom code run result is recieved     |
+| **framerOnScroll**   | When the page in Framer is scrolled              |
+
+
+
+
 
 !> DOM and state variables are not available during the "construct" phase. You can only access them in "render" events, especially if you are using routers.
 

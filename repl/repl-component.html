@@ -170,7 +170,8 @@
 </html>
 
 <style>
-	:host {
+	:host,
+	repl-component {
 		display: flex;
 		width: 1000px;
 		height: 500px;
@@ -186,7 +187,8 @@
 		/* overflow: hidden; */
 	}
 
-	:host(.fullscreen) {
+	:host(.fullscreen),
+	repl-component(.fullscreen) {
 		position: fixed;
 		width: 100%;
 
@@ -616,6 +618,7 @@
 		list-style: none;
 		padding: 0px;
 		margin: 0px;
+		max-width: unset;
 	}
 
 	#files {
@@ -745,7 +748,7 @@
 </style>
 
 <script>
-	class {
+	class simply {
 		data = {
 			files: [],
 			url: "/",
@@ -762,8 +765,8 @@
 			topAreaHeight: "120px",
 			resultStatus: "init",
 			URLShortening: {
-				short: "https://fehmi.ozuseven.com/short/shorten/",
-				redirect: "https://fehmi.ozuseven.com/short/redirect/?url="
+				short: "https://fehmi.ozuseven.com/simply/repl-url-shortener/shorten/",
+				redirect: "https://fehmi.ozuseven.com/simply/repl-url-shortener/redirect/?url="
 			},
 			hamdi: {
 				osman: {
@@ -927,7 +930,7 @@
 						textArea.innerHTML = blobs["index.html"].content;
 						dom.querySelector("iframe#result").contentWindow.dataContent = textArea.value;
 						dom.querySelector("iframe#result").contentWindow.document.write(textArea.value);
-						console.log(textArea.value);
+						// console.log(textArea.value);
 						//dom.querySelector("iframe#result").contentWindow.document.querySelector("body").setAttribute("data-content", textArea.value);
 						data.resultStatus = "loaded";
 					}, 10);
@@ -1171,8 +1174,6 @@
 												console.char = file[2].slice(0, -1);
 											}
 
-
-
 											F.apply.call(allHandlers[i], console, argsForAll);
 										}
 										// Calls old
@@ -1354,17 +1355,18 @@
 						return;
 					}
 					me.preventDefault();
-					var containerWidth = dom.getRootNode().host.offsetWidth;
-					var containerHeight = dom.getRootNode().host.offsetHeight;
+					console.log(dom);
+					var containerWidth = simply.getCompRoot(dom).offsetWidth;
+					var containerHeight = simply.getCompRoot(dom).offsetHeight;
 
 					if (data.resize.x) {
-						var offsetRight = containerWidth - (me.clientX - dom.getRootNode().host.getBoundingClientRect().left);
+						var offsetRight = containerWidth - (me.clientX - simply.getCompRoot(dom).getBoundingClientRect().left);
 						var birim = containerWidth / 100;
 						offsetRight = 100 - (offsetRight / birim);
 						data.editorWidth = offsetRight + "%";
 					}
 					else {
-						var offsetTop = containerHeight - (me.clientY - dom.getRootNode().host.getBoundingClientRect().top);
+						var offsetTop = containerHeight - (me.clientY - simply.getCompRoot(dom).getBoundingClientRect().top);
 						data.topAreaHeight = Math.abs(offsetTop) + "px";
 					}
 				});
@@ -1608,11 +1610,11 @@
 				}
 			},
 			fullscreenToggle() {
-				if (dom.getRootNode().host.className.indexOf("fullscreen") > -1) {
-					dom.getRootNode().host.classList.remove("fullscreen");
+				if (simply.getCompRoot(dom).className.indexOf("fullscreen") > -1) {
+					simply.getCompRoot(dom).classList.remove("fullscreen");
 				}
 				else {
-					dom.getRootNode().host.classList.add("fullscreen");
+					simply.getCompRoot(dom).classList.add("fullscreen");
 				}
 
 			},

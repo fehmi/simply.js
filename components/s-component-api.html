@@ -1,16 +1,18 @@
 <html>
-  {p = ""}
-  <each of="props" as="prop" key="key">
-    <!-- {p += key + '="' + prop + '" ';} -->
-  </each>
+{p = ""}
+<each
+  of="props"
+  as="prop"
+  key="key"
+>
+  <!-- {p += key + '="' + prop + '" ';} -->
+</each>
 
-  <api-viewer :="p">
-    <template data-element="intl-currency" data-target="prefix">
-      <em>
-        Shipping:
-      </em>
-    </template>
-  </api-viewer>
+<api-viewer
+  :="p"
+  attribute-knobs="dir(ltr|rtl),theme[small|filled|reverse],indeterminate?"
+></api-viewer>
+
 </html>
 
 <script>
@@ -26,7 +28,7 @@
         // custom element defined, let get jsdoc now
         customElements.whenDefined(compName).then(function (a) {
           // pass inside of <s-component-api> to <api-viewer>
-          let insideOfComp = dom.getRootNode().host;
+          let insideOfComp = simply.getCompRoot(dom);
           // let template = insideOfComp.querySelector("template[data-target=host]");
           // let passedCompName = template.getAttribute("data-element");
           // var comp = template.content.querySelector(passedCompName);
@@ -40,6 +42,7 @@
           // burada component tag'i içindeki prop template'i inline'a dönüştürüp
           // replace edeceğuk 
           dom.querySelector("api-viewer").innerHTML = insideOfComp.innerHTML;
+          console.log("toto bu ne", insideOfComp.innerHTML);
           let script = simply.components[compName].script;
           const regex = /^(?<jsdoc>(\s+)?\/\*\*.*\*\/)(\s+)class/gms;
           let m;
@@ -50,14 +53,14 @@
               // bu mecbur (apiviewerelement)
 
               //import('https://cdn.skypack.dev/api-viewer-element');
-              import('https://cdn.jsdelivr.net/npm/api-viewer-element@1.0.0-pre.7/+esm');
+              //import('https://jspm.dev/api-viewer-element@1.0.0-pre.8');
               var jsdoc = m.groups.jsdoc;
               var manifest;
 
               async function loadManifest(save) {
                 if (typeof window.ts == "undefined") {
                   console.log("analyzer is loading");
-                  var { create, ts, litPlugin } = await import('https://cdn.jsdelivr.net/npm/@custom-elements-manifest/analyzer@0.6.6/browser/index.js');
+                  var { create, ts, litPlugin } = await import('https://cdn.jsdelivr.net/npm/@custom-elements-manifest/analyzer@0.10.4/browser/index.min.js');
                   window.ts = ts;
                   window.create = create;
                   window.createSourceFile = ts.createSourceFile;
@@ -81,7 +84,7 @@
 
                 if (save === true) {
                   var request = new XMLHttpRequest();
-                  request.open('GET', "components/save-manifest.php?name=" + compName + "&manifest=" + encodeURIComponent(JSON.stringify(manifest)), true);
+                  request.open('GET', "save-manifest.php?name=" + compName + "&manifest=" + encodeURIComponent(JSON.stringify(manifest)), true);
                   request.onreadystatechange = function () {
                     if (this.readyState === 4) {
                       if (this.status >= 200 && this.status < 400) {
@@ -127,6 +130,7 @@
       },
       afterFirstRender: function () {
         let _onPropChanged = function (e) {
+
           if (e.composedPath) {
             var target = e.composedPath()[0];
           }
@@ -137,6 +141,7 @@
           const { name, type } = target.dataset;
           var apiViewer = this.getRootNode().host;
           let comp = apiViewer.shadowRoot.querySelector("[part='demo-output'] > *");
+          console.log({ apiViewer, comp });
 
           let value;
           switch (type) {

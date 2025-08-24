@@ -571,9 +571,14 @@
 		})();
 	</script>
 
+	<script
+		type="module"
+		src="https://jspm.dev/api-viewer-element@1.0.0-pre.8"
+	></script>
+
 	<script>
 		loadJS("simply.js", function () {
-			get("repl/repl-component.html");
+			get("https://fehmi.ozuseven.com/simply/components/repl-component.html?dev");
 			get("components/s-component-api.html");
 		});
 

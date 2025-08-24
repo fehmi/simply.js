@@ -24,18 +24,15 @@
   - [Load Components](docs/loadcomponent.md)
   - [Component Communication](docs/component-communication.md)
   - [Lifecycle](docs/lifecycle.md)
-  - [Watch Event](docs/watch.md)
   - [Reactivity](docs/reactivity.md)
   - [State Management](docs/state.md)
 
 - <br>Style
 
-  - [Tailwind](docs/uno.md)
   - [Design Tokens](docs/design-tokens.md)
 
 - <br>Router
 
-  - [AWC Router](docs/awc-router.md)
   - [Router](docs/router.md)
 
 - <br>Integrations

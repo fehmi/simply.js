@@ -1,20 +1,38 @@
 <html>
 
 <head>
-	<script src="https://root/simply/simply.min.js"></script>
-	<script type="module" src="https://unpkg.com/api-viewer-element?module"></script>
+	<script src="https://localhost/simply/simply.min.js"></script>
+	<script
+		type="module"
+		src="https://unpkg.com/api-viewer-element?module"
+	></script>
 
-	<link rel="shortcut icon" href="#">
+	<link
+		rel="shortcut icon"
+		href="#"
+	>
 </head>
 
 <body>
 
 	<api-viewer section="demo">
-		<template data-element="s-icon" data-target="knob" data-attr="height" data-type="string"  attribute-knobs="?test">
-			<input/>
+		<template
+			data-element="s-icon"
+			data-target="knob"
+			data-attr="height"
+			data-type="string"
+			attribute-knobs="?test"
+		>
+			<input />
 		</template>
-		<template data-target="host" data-element="s-icon">
-			<s-icon icon="cil:locomotive" height="100"></s-icon>
+		<template
+			data-target="host"
+			data-element="s-icon"
+		>
+			<s-icon
+				icon="cil:locomotive"
+				height="100"
+			></s-icon>
 		</template>
 	</api-viewer>
 
@@ -23,7 +41,7 @@
 		get("../s-icon.html", "s-icon");
 	</script>
 	<script type="module">
-				import { create, ts, litPlugin } from 'https://cdn.jsdelivr.net/npm/@custom-elements-manifest/analyzer@0.6.6/browser/index.js';
+		import { create, ts, litPlugin } from 'https://cdn.jsdelivr.net/npm/@custom-elements-manifest/analyzer@0.6.6/browser/index.js';
 
 		var test = function () {
 			/**
@@ -72,24 +90,25 @@
 
 		let _onPropChanged = function (e) {
 			console.log("naber iyi");
-    const target = e.composedPath()[0];
-    const { name, type } = target.dataset;
-    let value;
-    switch (type) {
-      case 'boolean':
-        value = target.checked;
-        break;
-      case 'number':
-        value = target.value === '' ? null : Number(target.value);
-        break;
-      default:
-        value = target.value;}
+			const target = e.composedPath()[0];
+			const { name, type } = target.dataset;
+			let value;
+			switch (type) {
+				case 'boolean':
+					value = target.checked;
+					break;
+				case 'number':
+					value = target.value === '' ? null : Number(target.value);
+					break;
+				default:
+					value = target.value;
+			}
 
-    const { knob, custom } = this.getKnob(name);
-    if (knob) {
-      this.setKnobs(name, type, value, knob.attribute, custom);
-    }
-  }
+			const { knob, custom } = this.getKnob(name);
+			if (knob) {
+				this.setKnobs(name, type, value, knob.attribute, custom);
+			}
+		}
 		var opc = customElements.get("api-demo-layout").prototype._onPropChanged = _onPropChanged;
 		console.log(manifest);
 	</script>

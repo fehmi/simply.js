@@ -16,9 +16,3 @@ Simply.js provides several methods for design token management. Choose the one t
 
 ## CSS variable in ':host'
 <repl-component id="vi3k3uspqvsrvfl"></repl-component>
-
-## Manage all with UNO!
-<repl-component id="uwcjovt87x13743"></repl-component>
-
-## Global style with states
-<repl-component id="kzqow3a2hwfkq21"></repl-component>

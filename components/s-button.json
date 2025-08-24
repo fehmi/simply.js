@@ -1,0 +1,134 @@
+{
+    "schemaVersion": "1.0.0",
+    "readme": "",
+    "modules": [
+        {
+            "kind": "javascript-module",
+            "path": "s-button.html",
+            "declarations": [
+                {
+                    "kind": "class",
+                    "description": "",
+                    "name": "UnityComponent",
+                    "cssProperties": [
+                        {
+                            "description": "Controls the color of f",
+                            "name": "--text-color"
+                        },
+                        {
+                            "description": "Controls the color of bar",
+                            "name": "--background-color",
+                            "default": "red"
+                        }
+                    ],
+                    "cssParts": [
+                        {
+                            "description": "Styles the color of b",
+                            "name": "bar"
+                        }
+                    ],
+                    "slots": [
+                        {
+                            "description": "This is a default\/unnamed slot",
+                            "name": "test"
+                        }
+                    ],
+                    "members": [
+                        {
+                            "type": {
+                                "text": "string"
+                            },
+                            "description": "hey",
+                            "name": "slot",
+                            "kind": "field"
+                        },
+                        {
+                            "type": {
+                                "text": "string"
+                            },
+                            "description": "Horizontal \/ Vertical",
+                            "name": "flip",
+                            "kind": "field"
+                        },
+                        {
+                            "type": {
+                                "text": "number"
+                            },
+                            "description": "Height of the icon",
+                            "name": "height",
+                            "kind": "field"
+                        },
+                        {
+                            "type": {
+                                "text": "string"
+                            },
+                            "description": "Degree",
+                            "name": "rotate",
+                            "kind": "field"
+                        },
+                        {
+                            "type": {
+                                "text": "boolean"
+                            },
+                            "description": "Vertical alignment",
+                            "name": "inline",
+                            "kind": "field"
+                        }
+                    ],
+                    "events": [
+                        {
+                            "description": "some description for custom-event",
+                            "name": "custom-event"
+                        },
+                        {
+                            "type": {
+                                "text": "Event"
+                            },
+                            "description": "some description for typed-event",
+                            "name": "typed-event"
+                        },
+                        {
+                            "type": {
+                                "text": "CustomEvent"
+                            },
+                            "description": "some description for typed-custom-event",
+                            "name": "typed-custom-event"
+                        }
+                    ],
+                    "attributes": [
+                        {
+                            "type": {
+                                "text": "boolean"
+                            },
+                            "description": "disables the element",
+                            "name": "disabled"
+                        },
+                        {
+                            "type": {
+                                "text": "string"
+                            },
+                            "description": "description for foo [link]{@link https:\/\/www.google.com}.",
+                            "name": "foo"
+                        }
+                    ],
+                    "superclass": {
+                        "name": "HTMLElement"
+                    },
+                    "tagName": "s-button",
+                    "customElement": true,
+                    "summary": "This is MyElement"
+                }
+            ],
+            "exports": [
+                {
+                    "kind": "custom-element-definition",
+                    "name": "s-button",
+                    "declaration": {
+                        "name": "UnityComponent",
+                        "module": "s-button.html"
+                    }
+                }
+            ]
+        }
+    ]
+}
