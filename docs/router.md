@@ -22,7 +22,7 @@ simply.router([
 	{
 		path: "/", // The path of the route
 		component: "home-page", // The component's tag name
-		shadow_root: false, // Default: true
+		shadow_root: true, // Default: false
 		cache: true, // Default: false
 		same_page_refresh: true, // Default: false
 		title: "Home Page" // Sets the document title after routing
@@ -77,7 +77,6 @@ simply.router([
 			{
 				path: "/about",
 				component: "about-page"
-
 			},
 			{
 				path: "/contact",

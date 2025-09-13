@@ -841,7 +841,7 @@ simply = {
 						for (const mutation of mutations) {
 							for (const node of mutation.addedNodes) {
 								if (node.nodeType === Node.ELEMENT_NODE) {
-									if (node.tagName === "FRAMER-COMPONENT") {
+									if (node.tagName === "FRAMER-COMPONENT" && !node.hasAttribute("uid")) {
 										const framerComponentUid = "id" + Math.random().toString(16).slice(2);
 										const path = node.getAttribute("path");
 										const rendered = node.hasAttribute("rendered");
@@ -1621,6 +1621,14 @@ simply = {
 									else if (toEl.tagName === 'FRAMER-COMPONENT') {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
+									}
+									if (fromEl.tagName == "DIALOG") {
+										console.log(fromEl.getAttribute("open"), toEl.getAttribute("open"));
+										if (fromEl.hasAttribute("open")) {
+											toEl.setAttribute("open", true);
+										}
+										return true;
+										// console.log("dont again");
 									}
 									if (fromEl.hasAttribute("router-active") == true) {
 										toEl.setAttribute("router-active", true);
@@ -5140,7 +5148,9 @@ simply = {
 		simply.page('*', parse)
 
 		function parse(ctx, next) {
-			ctx.query = simply.qs.parse(location.search.slice(1));
+			setTimeout(() => {
+				ctx.query = simply.qs.parse(location.search.slice(1));
+			}, 0);
 			next();
 		}
 
