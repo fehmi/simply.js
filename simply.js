@@ -544,7 +544,7 @@ simply = {
 			.then(text => {
 				if (!text) throw new Error("Empty response (possible CORS block)");
 				const parsed = simply.splitComponent(text);
-				console.log({ name });
+
 				simply.components[name] = parsed;
 				callback({
 					name,
@@ -849,7 +849,7 @@ simply = {
 										node.setAttribute("style", "height: auto; width: auto");
 										node.setAttribute("rendered", true);
 
-										console.warn("framer-component added inside <", name, ">", node);
+										console.warn("framer-component added inside <" + name + ">", node);
 
 										// 🔁 Framer'a mesaj gönder
 										window.parent.postMessage({
