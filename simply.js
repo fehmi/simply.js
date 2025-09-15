@@ -555,12 +555,12 @@ simply = {
 				});
 			})
 			.catch(error => {
-				console.warn("Fetch error:", error.message, "(possible CORS block) Trying with proxy one time.");
+				// console.warn("Fetch error:", error.message, "(possible CORS block) Trying with proxy one time.");
 				if (!triedWithCorsProxy && !path.startsWith("https://cors.woebegone.workers.dev/")) {
 					const proxyUrl = "https://cors.woebegone.workers.dev/?" + path;
 					simply.loadComponent(proxyUrl, name, callback, true);
 				} else {
-					console.error("Could not load component even with proxy:", path);
+					// console.error("Could not load component even with proxy:", path);
 				}
 			});
 	},
@@ -849,7 +849,7 @@ simply = {
 										node.setAttribute("style", "height: auto; width: auto");
 										node.setAttribute("rendered", true);
 
-										console.warn("framer-component added inside <" + name + ">", node);
+										// console.warn("framer-component added inside <" + name + ">", node);
 
 										// 🔁 Framer'a mesaj gönder
 										window.parent.postMessage({
@@ -862,7 +862,7 @@ simply = {
 
 										// ✅ Sadece bu `dom` içinde click'leri dinle
 										node.addEventListener("click", e => {
-											console.log("click", e)
+											// console.log("click", e)
 											if (node.contains(e.target)) {
 												triggerOnTapFromDOM(e.target);
 											}
@@ -883,7 +883,7 @@ simply = {
 					// framer gibi tap'ın parent'larını da tetiklemek istersen
 					// çalışan kod şurada: https://chatgpt.com/s/t_68710b873f9481919232870b0c7eeb32
 					function triggerOnTapFromDOM(domElement) {
-						console.log("tap")
+						// console.log("tap")
 						var current = domElement;
 
 						while (current && current.tagName !== "FRAMER-COMPONENT") {
@@ -904,7 +904,7 @@ simply = {
 							try {
 								var onTap = fiber.return.child.pendingProps.onTap;
 								if (typeof onTap === "function") {
-									console.log("✅ Triggering onTap on:", current);
+									// console.log("✅ Triggering onTap on:", current);
 									onTap();
 									setTimeout(() => {
 										try {
@@ -918,7 +918,7 @@ simply = {
 							try {
 								var onTap = fiber.return.child.child.stateNode.props.onTap;
 								if (typeof onTap === "function") {
-									console.log("✅ Triggering onTap on:", current);
+									// console.log("✅ Triggering onTap on:", current);
 									onTap();
 									setTimeout(() => {
 										try {
@@ -932,7 +932,7 @@ simply = {
 							current = current.parentElement;
 						}
 
-						console.warn("No onTap handler found up to <framer-component>");
+						// console.warn("No onTap handler found up to <framer-component>");
 					}
 
 					dom.addEventListener("click", function (e) {
@@ -944,7 +944,7 @@ simply = {
 							link &&
 							(link.closest("framer-component") || link.hasAttribute("route-framer"))
 						) {
-							console.log("Send this link to framer for route:", link.getAttribute("href"));
+							// console.log("Send this link to framer for route:", link.getAttribute("href"));
 							e.preventDefault();
 							e.stopPropagation();
 							window.parent.postMessage({
@@ -976,7 +976,7 @@ simply = {
 						if (cachedData) {
 							this.cache.data = simply.cache[simply.lastPath][component.elementId].data;
 
-							console.log("cache hit for data!");
+							// console.log("cache hit for data!");
 							for (const key in cachedData) {
 								if (Object.hasOwnProperty.call(cachedData, key)) {
 									component.dataToObserve[key] = cachedData[key];
@@ -1030,7 +1030,7 @@ simply = {
 
 						if (cachedProps) {
 							this.cache.props = simply.cache[simply.lastPath][component.elementId].props;
-							console.log("cache hit for props!");
+							// console.log("cache hit for props!");
 							for (const key in cachedProps) {
 								if (Object.hasOwnProperty.call(cachedProps, key)) {
 									component.propsToObserve[key] = cachedProps[key];
@@ -1216,7 +1216,7 @@ simply = {
 						event.stopPropagation();
 
 						if (event.data.method === "set-props") {
-							console.log("props from parent", event.data.props);
+							// console.log("props from parent", event.data.props);
 							Object.assign(props, event.data.props)
 
 
@@ -1487,7 +1487,7 @@ simply = {
 
 
 						if (this.innerHTML && this.innerHTML.trim() !== "") {
-							console.log(this.innerHTML);
+							// console.log(this.innerHTML);
 							this.slotContent = this.innerHTML;
 
 							// parent var context odur
@@ -1623,7 +1623,7 @@ simply = {
 										return false;
 									}
 									if (fromEl.tagName == "DIALOG") {
-										console.log(fromEl.getAttribute("open"), toEl.getAttribute("open"));
+										// console.log(fromEl.getAttribute("open"), toEl.getAttribute("open"));
 										if (fromEl.hasAttribute("open")) {
 											toEl.setAttribute("open", true);
 										}
@@ -1645,7 +1645,7 @@ simply = {
 										return false;
 									}
 									if (fromEl.isSameNode(toEl)) {
-										console.log("same mi node", toEl, fromEl.value, toEl.value)
+										// console.log("same mi node", toEl, fromEl.value, toEl.value)
 										return false;
 									}
 									if (fromEl.isEqualNode(toEl)) {
@@ -1779,7 +1779,7 @@ simply = {
 
 					window.removeEventListener("message", this.framerPropsListener);
 
-					console.log("this thist his")
+					// console.log("this thist his")
 					// console.log("disconnector", this.uid);
 					if (this.cb.state) {
 						this.cb.state[this.uid] = null;
@@ -4176,7 +4176,7 @@ simply = {
 				wrappedFn.pureFunc = arguments[i];
 				simply.routes[theRoutePath].exits.push(wrappedFn);
 			}
-			console.log(theRoutePath, "'in exitleri silindi yenisi eklendi");
+			// console.log(theRoutePath, "'in exitleri silindi yenisi eklendi");
 		};
 
 		/**
@@ -4263,7 +4263,7 @@ simply = {
 			if (this.current == path) {
 				let route = simply.page.getRouteByPath(path).value;
 				if (!route.settings.same_page_refresh) {
-					console.log("same page baba, no refresh sana", this, e);
+					// console.log("same page baba, no refresh sana", this, e);
 					e.preventDefault();
 					return;
 				}
@@ -4477,12 +4477,12 @@ simply = {
 			}
 
 			pageFn.deleteRouteByPath = function (path) {
-				console.log("hee", this, page.callbacks);
+				//console.log("hee", this, page.callbacks);
 				let route = pageFn.getRouteByPath(path);
 				var rebelCallbacks = route.value.page.callbacks
 
 				for (const [key, v] of Object.entries(route.value.callbacks)) {
-					console.log(v);
+					// console.log(v);
 					const fn = v.originalFn;
 
 					// Remove from global callbacks
@@ -4576,7 +4576,7 @@ simply = {
 						},
 						set(value) {
 							_rendered = value;
-							console.log('rendered changed to:', value);
+							// console.log('rendered changed to:', value);
 							if (value) resolve(value);
 						},
 					});
@@ -4651,7 +4651,7 @@ simply = {
 					var parent;
 					if (settings.child_of) {
 						var targetRoute = simply.page.getRouteByPath(settings.path);
-						console.log(targetRoute);
+						// console.log(targetRoute);
 						var tree = targetRoute.value.tree;
 						var parentRootEl;
 						var lastParentComponent;
@@ -4695,7 +4695,7 @@ simply = {
 								if (directChild) {
 									// zaten render edilmiş
 									// innerHTML ile basmadan düz render()
-									console.log("düz render for ", directChild);
+									// console.log("düz render for ", directChild);
 									var component = directChild
 									directChild.render();
 								}
@@ -4752,7 +4752,7 @@ simply = {
 
 					}
 					else {
-						console.warn("INNERHTML")
+						// console.warn("INNERHTML")
 						let attrs = [];
 						if (settings.shadow_root == true) attrs.push('shadow');
 						if (settings.cache) attrs.push('cache');
@@ -4763,7 +4763,7 @@ simply = {
 							window.scrollPositions = window.scrollPositions ? window.scrollPositions : {}
 							simply.saveScrollPositions(route, simply.lastPath);
 						}
-						console.log("heee", settings);
+						// console.log("heee", settings);
 						route.innerHTML = `<${settings.component} ${attrs.join(' ')}></${settings.component}>`;
 
 						var component = route.querySelector(settings.component);
@@ -4911,7 +4911,7 @@ simply = {
 
 				// show <path> with [state]
 			} else if ('string' === typeof path) {
-				console.log("show or redirect");
+				// console.log("show or redirect");
 				this['string' === typeof fn ? 'redirect' : 'show'](path, fn);
 				// start [options]
 			} else {
