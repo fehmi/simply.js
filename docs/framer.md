@@ -24,7 +24,7 @@ You can use Simply.js to build Framer plugins and code components. This guide ex
 
 ## Code Components
 
-To enable this integration, I developed a package called **Simply Loader**. This package loads Simply.js components within Framer code components inside an encapsulated iframe environment. It also passes all properties, including component instances and collections, from Framer to your Simply.js component.
+To enable this integration, I developed a package called **Simply Loader**. This package loads Simply.js components within Framer code components inside an encapsulated environment. It also passes all properties, including component instances and collections, from Framer to your Simply.js component.
 
 ### Your First Code Component
 
