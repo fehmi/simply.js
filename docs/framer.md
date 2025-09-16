@@ -279,8 +279,6 @@ Variants and their interactions, such as `hover` and `click`, will function auto
 
 <img src="docs/images/framer-interactions.gif">
 
-!> There is a minor limitation regarding variant transitions/animations: the opacity property of Framer nodes appears not to work. Try using the alpha value in colors as a workaround.
-
 ### Collections
 
 You can also connect collections as component instances in Framer. These are special instances that include additional information, accessible through `props` in your Simply.js component.
@@ -555,10 +553,6 @@ export default function Voltron(props) {
   return <SimplyLoader {...props} />;
 }
 ```
-
-### Limitations
-
-A minor issue exists where opacity changes in transitions between variants do not appear to function. Consider using the color alpha value as a workaround.
 
 ---
 
