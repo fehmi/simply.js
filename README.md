@@ -11,7 +11,7 @@
 
 Simply.js is a web-component library for developing user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions of design systems. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
 
-It has a built-in super-fast declarative template engine that coded from scratch. Some parts of simply.js are respectfully forked from other beautiful projects. For example;[morphdom](https://github.com/patrick-steele-idem/morphdom) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [AWC](https://github.com/colscott/a-wc-router) for router.
+It has a built-in super-fast declarative template engine that coded from scratch. Some parts of simply.js are respectfully forked from other beautiful projects. For example; [morphdom](https://github.com/patrick-steele-idem/morphdom) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js]https://github.com/visionmedia/page.js) for router.
 
 Long story short, simply.js is the name of the brand new template engine and the bridge between the adopted tools.
 
@@ -26,9 +26,7 @@ While you are working with simply.js, everything will run in the browser of the 
 - Lighting fast template engine<br>
 - Reactive DOM<br>
 - Single file components<br>
-- Inline components<br>
 - State management<br>
-- Tailwind support<br>
 - Electron support<br>
 - Router<br>
 - Zero dependency<br>

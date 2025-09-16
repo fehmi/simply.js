@@ -1,6 +1,6 @@
 ## Electron Integration
 
-!> The router module is deprecated and will be removed in upcoming releases. Use [AWC router](docs/awc-router) instead.
+!> This method is deprecated and will be removed in upcoming releases.
 
 Add the `index.html` path as the base `href`.
 
