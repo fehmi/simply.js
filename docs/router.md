@@ -42,6 +42,10 @@ You can define a redirection using `simply.page("/subpage", "/subpage2");` or th
 
 Redirect definitions must be placed before your route definitions.
 
+## Replacing Current Route
+
+It's as easy as `simply.page.replace("new-path")`.
+
 ## Cache
 
 Besides the router, you can cache any other component in your Simply app by adding the `cache` attribute to the component tag, like this:

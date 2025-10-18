@@ -1,0 +1,150 @@
+<html>
+
+<header>
+  <h5>&lt;{data.doc?.name}&gt;</h5>
+  <if cond="data.doc?.description">
+    <p>{data.doc.description}</p>
+  </if>
+</header>
+<stack>
+  <preview>
+    <{props.component}></{props.component}>
+  </preview>
+
+  <configurator>
+    <if cond="data.doc">
+      <each
+        of="data.doc.props"
+        as="prop"
+        key="key"
+      >
+        <if cond="prop.options">
+          <label>{key}</label>
+          <select
+            prop-key="{key}"
+            oninput="methods.changeProp(event, this);"
+          >
+            <each
+              of="prop.options"
+              as="option"
+            >
+              <option value="{option}">{methods.propKeyToTitle(option)}</option>
+            </each>
+          </select>
+        </if>
+        <elsif cond="typeof prop.default === 'boolean'">
+          <label>
+            <input
+              type="checkbox"
+              prop-key="{key}"
+              :="prop.default ? 'checked' : ''"
+              onchange="methods.changeProp(event, this);"
+            />
+            {methods.propKeyToTitle(key)}
+          </label>
+        </elsif>
+        <elsif cond="key == 'slot'">
+          <label>{key}</label>
+          <textarea
+            prop-key="{key}"
+            oninput="methods.changeProp(event, this);"
+          >{prop.default}</textarea>
+        </elsif>
+        <else>
+          <label>{key}</label>
+          <input
+            value="{prop.default}"
+            prop-key="{key}"
+            oninput="methods.changeProp(event, this);"
+          />
+        </else>
+      </each>
+    </if>
+  </configurator>
+</stack>
+
+
+</html>
+
+<style>
+  component-viewer {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    max-width: 500px;
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 2px);
+  }
+
+  component-viewer preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem;
+  }
+
+  component-viewer configurator {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-left: 1px solid hsl(var(--border));
+  }
+
+  component-viewer header {
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  component-viewer stack {
+    display: flex;
+  }
+
+  configurator label {
+    text-transform: capitalize;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+
+    }
+    state = {
+
+    }
+    methods = {
+      changeProp: function (event, el) {
+        var key = el.getAttribute('prop-key');
+        var comp = dom.querySelector(props.component);
+
+        if (key == "slot") {
+          var slot = comp.querySelector("simply-slot")
+          slot.innerHTML = el.value;
+        }
+        else if (el.type === "checkbox") {
+          comp.props[key] = el.checked;
+        }
+        else {
+          comp.props[key] = el.value;
+        }
+
+        console.log(event, el.value);
+      },
+      propKeyToTitle(key) {
+        return key
+          // camelCase'i boşluklara ayır
+          .replace(/([A-Z])/g, " $1")
+          // ilk harfi büyük yap, diğerleri küçük
+          .replace(/^./, str => str.toUpperCase());
+      }
+    }
+    lifecycle = {
+      afterConstruct: async function () {
+        await customElements.whenDefined(props.component)
+        data.doc = document.createElement(props.component).data.doc
+      }
+    }
+  }
+</script>

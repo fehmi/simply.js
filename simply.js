@@ -1045,6 +1045,7 @@ simply = {
 
 					// anadan babadan gelen state varsa
 					if (parent) {
+						
 						if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
 							let current = parent;
 							while (current) {
@@ -1062,9 +1063,10 @@ simply = {
 						}
 					}
 
+					
 					// komponent içinde state tanımlı ise
 					if (typeof this.sfcClass.state !== "undefined") {
-						if (!this.state) {
+						if (!this.stateToObserve) {
 							this.stateToObserve = {};
 						}
 						var newStates = this.sfcClass.state;
@@ -1072,8 +1074,9 @@ simply = {
 							this.stateToObserve[key] = newStates[key];
 						}
 					}
-
+					
 					state = component.state;
+					console.log("hey", this.stateToObserve);
 					parent = component.parent;
 					cb = component.cb;
 					// we couldn't get state and parent
@@ -1622,6 +1625,10 @@ simply = {
 										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
 									}
+
+									if (toEl.hasAttribute("passive") === true) {
+										return false;
+									}									
 									if (fromEl.tagName == "DIALOG") {
 										// console.log(fromEl.getAttribute("open"), toEl.getAttribute("open"));
 										if (fromEl.hasAttribute("open")) {

@@ -2,15 +2,24 @@
 <button
   class="button transition-all"
   variant="{props.variant || 'default'}"
+  size="{props.size || 'default'}"
+  width="{props.width || 'default'}"
 >
-  <simply-slot>Eheh</simply-slot>
+  <simply-slot>{props.slot || data.doc.props.slot.default}</simply-slot>
 </button>
 
 </html>
 
 <style>
+  s-button {
+    display: contents;
+  }
+
   .button {
     display: inline-flex;
+    width: fit-content;
+    gap: .36rem;
+    height: 2.25rem;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
@@ -20,12 +29,51 @@
     background-color: hsl(var(--primary));
     color: white;
     border: none;
+    line-height: 1;
+    padding-left: .76rem;
+    padding-right: .76rem;
+  }
+
+
+  .button[size='sm'] {
+    height: 2rem;
+    border-radius: 0.375rem;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+
+  .button[size='lg'] {
+    height: 2.5rem;
+    border-radius: 0.375rem;
+    padding-left: 0.925rem;
+    padding-right: 0.925rem;
+  }
+
+  .button[width='wide'] {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .button[size="sm"][width="wide"] {
     padding-left: 1rem;
     padding-right: 1rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    max-width: 20rem;
   }
+
+  .button[size="lg"][width="wide"] {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .button[width="full"] {
+    width: 100%;
+  }
+
+  button svg {
+    width: 0.92rem;
+    height: 0.92rem;
+  }
+
+  button[size='sm'] i {}
 
   .button:hover {
     cursor: pointer;
@@ -61,10 +109,12 @@
   }
 
   .button[variant='outline'] {
-    border: 1px solid hsl(var(--border));
+    outline: 1px solid hsl(var(--border));
+    outline-offset: -1px;
+    /* içeriye çeker */
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    box-shadow: 0 1px 2px 0 var(#0000000d);
+    box-shadow: 0 1px 2px 0 #0000000d;
   }
 
   .button[variant='outline']:hover {
@@ -79,19 +129,17 @@
   }
 
   .button[variant='secondary']:hover {
-    background-color: hsl(var(--secondary) / 0.9);
+    background-color: hsl(var(--secondary) / 0.8);
   }
 
   .button[variant='ghost'] {
     background-color: transparent;
-    border: 1px solid transparent;
     color: hsl(var(--foreground));
-    display: flex;
     align-items: center;
   }
 
   .button[variant='ghost']:hover {
-    background-color: hsl(var(--foreground) / 0.1);
+    background-color: hsl(var(--foreground) / 0.05);
   }
 
   .button[variant='link'] {
@@ -111,41 +159,8 @@
     text-decoration-color: hsl(var(--foreground));
   }
 
-  .button[variant='icon'] {
-    background-color: hsl(var(--foreground));
-    border: none;
-    color: hsl(var(--background));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 2rem;
-    width: 2rem;
-    padding: 0;
-    border-radius: 9999px;
-  }
-
-  .button[variant='icon']:hover {
-    background-color: hsl(var(--accent) / 0.8);
-  }
-
-  /* sizing */
-  .button[size='sm'] {
-    height: 2.25rem;
-    border-radius: 0.375rem;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-
-  .button[size='lg'] {
-    height: 2.75rem;
-    border-radius: 0.375rem;
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-
-  .button[size='icon'] {
-    height: 2.5rem;
-    width: 2.5rem;
+  .button[variant='link']:hover i {
+    text-decoration: none;
   }
 </style>
 
@@ -178,6 +193,32 @@
    * @tagname s-button
   */
   class simply {
-
+    data = {
+      doc: {
+        name: "s-button",
+        description: "The button component",
+        props: {
+          variant: {
+            options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+            default: 'default'
+          },
+          size: {
+            options: ['default', 'sm', 'lg'],
+            default: 'default'
+          },
+          width: {
+            options: ["default", "wide", "full"],
+            default: "default"
+          },
+          state: {
+            options: ['hover', 'active', 'focus:visible', 'disabled'],
+            multiselect: true
+          },
+          slot: {
+            default: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-git-branch-icon lucide-git-branch"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>Selam'
+          }
+        }
+      }
+    }
   }
 </script>

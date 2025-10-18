@@ -59,6 +59,10 @@
 	--chart-5: 340 75% 55%;
 }
 
+body {
+	color: var(--foreground);
+}
+
 /* çünkü body'deki font-family
 tanımından etkilenmiyorlar */
 button,
@@ -79,6 +83,67 @@ textarea {
 	transition-duration: var(--default-transition-duration);
 }
 
+*,
+::backdrop,
+:after,
+:before {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+/* Typography */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	scroll-margin: 5rem;
+	letter-spacing: -0.025em;
+	font-weight: 600;
+}
+
+h1 {
+	text-wrap: balance;
+	font-size: 2.25rem;
+	line-height: 2.5rem;
+	font-weight: 800;
+}
+
+h2 {
+	font-size: 1.875rem;
+	line-height: 2.25rem;
+}
+
+h3 {
+	font-size: 1.5rem;
+	line-height: 2rem;
+}
+
+h4 {
+	font-size: 1.25rem;
+	line-height: 1.75rem;
+}
+
+h5 {
+	font-size: 1.125rem;
+	line-height: 1.5rem;
+}
+
+h6 {
+	font-size: 1rem;
+	line-height: 1.25rem;
+}
+
+p {
+	font-size: .925rem;
+	line-height: 1.75rem;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Simply styles */
 simply-slot {
 	display: contents;
 }

@@ -17,22 +17,13 @@
 </head>
 
 <body>
-	<s-button>Hamdi abi</s-button>
-	<s-component-api
-		section="demo"
-		component="s-button.html"
-		shadow
-	></s-component-api>
 
-	<script
-		type="module"
-		src="https://jspm.dev/api-viewer-element@1.0.0-pre.8"
-	></script>
+	<component-viewer component="s-button"></component-viewer>
 
 	<script src="../simply.js"></script>
 	<script>
 		get("s-button.html");
-		get("s-component-api.html");
+		get("component-viewer.html");
 	</script>
 </body>
 
