@@ -56,6 +56,12 @@ result.results.forEach(function (entry, i) {
 ObservableSlim.resume(data);
 ```
 
+Or just do
+
+```
+data.__getTarget.currentZoomPercent = 100; 
+```
+
 ## Assigning a reactive variable to another reactive variable
 
 Each node in `data`, `state`, or `props` is a reactive proxy object. Assigning one to another can be problematic and may break the reactivity engine by causing infinite loops. For example, assigning `data.person = state.person` or vice versa can lead to a "Maximum call stack size exceeded" error.
