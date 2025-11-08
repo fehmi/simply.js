@@ -270,7 +270,7 @@ simply = {
 			return result;
 		}
 		var end = performance.now();
-		console.log(end - window.sss);
+		//console.log(end - window.sss);
 		// for the last non-logical text
 		/*
 		if (processedLetters.trimEnd() !== "") {
@@ -1530,6 +1530,18 @@ simply = {
 							}
 						}
 						this.renderingDone = true;
+
+						setTimeout(() => {
+							if (this.component.router_settings.transition) {
+								this.component.transitionEnterStart = Date.now();
+
+								setTimeout(() => {
+									delete this.component.transitionEnterStart;
+								}, this.component.router_settings.transition.enter);
+								this.component.setAttribute("enter", "");
+							}
+						}, 5);
+
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -1562,7 +1574,7 @@ simply = {
 						*/
 						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
 						var parsedStyle = simply.parseStyle(parsingArgs);
-						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
+						var newDom = "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>" + parsedTemplate;
 						//console.log("morfingen");
 						if (this.shadow) {
 							var newDomAsString = "<" + name + " shadow>" + newDom + "</" + name + ">";
@@ -1620,6 +1632,9 @@ simply = {
 									}
 									if (fromEl.hasAttribute("router-active") == true) {
 										toEl.setAttribute("router-active", true);
+									}
+									if (fromEl.hasAttribute("transition") == true) {
+										//toEl.setAttribute("transition", fromEl.getAttribute("transition"));
 									}
 									return true
 								},
@@ -1755,6 +1770,7 @@ simply = {
 
 
 					}
+
 
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.afterRender !== "undefined") {
@@ -4138,7 +4154,147 @@ simply = {
 				if (!fn) return unhandled.call(page, ctx);
 				fn(ctx, nextEnter);
 			}
-			nextEnter();
+
+			function exitThis(comp, type, updateContext) {
+				if (type == "enter") {
+					comp.setAttribute("enter", "");
+					comp.removeAttribute("exit");
+				}
+				else {
+					comp.setAttribute("exit", "");
+					comp.removeAttribute("enter");
+				}
+
+				var now = Date.now();
+				if (comp.transitionEnterStart) {
+					var timeoutDuration = now - comp.transitionEnterStart;
+				}
+				else if (comp.transitionExitStart) {
+					var timeoutDuration = now - comp.transitionExitStart;
+				}
+				else {
+					timeoutDuration = comp.router_settings.transition.exit;
+				}
+
+				clearTimeout(comp.transitionTimer);
+				comp.transitionExitStart = now;
+				comp.transitionTimer = setTimeout(() => {
+					delete comp.transitionTimer, comp.transitionExitStart;
+					delete comp.transitionExitStart;
+					delete comp.transitionEnterStart;
+					comp.removeAttribute("exit");
+					if (updateContext) {
+						console.log("Router context updated!");
+						nextEnter();
+					}
+				}, timeoutDuration);
+			}
+
+			if (prev) {
+				var from = simply.page.getRouteByPath(prev.path);
+				var to = simply.page.getRouteByPath(page.current);
+				var fromTree = from.value && from.value.tree ? from.value.tree : [];
+				var toTree = to.value && to.value.tree && to.value.path ? to.value.tree : [];
+				var fromSettings = from.value.settings;
+				var toSettings = to.value.settings;
+
+				if (toTree.length == 0) toTree.push(to.value.path);
+				toTree.reverse();
+
+				const currentRoutes = Array.from(document.querySelectorAll('route'))
+					.map(r => r.firstElementChild)
+					.filter(Boolean).reverse();
+
+				var enterThose = currentRoutes.filter(r =>
+					toTree.includes(r.router_settings.path)
+				);
+
+				const exitThose = currentRoutes.filter(r =>
+					!toTree.includes(r.router_settings.path)
+				);
+
+
+
+				console.log({ enterThose, exitThose, toTree, currentRoutes });
+
+
+				if (toTree.length == 0) {
+
+				}
+
+				return;
+
+
+				// parent'tan parent'a
+				if ((fromTree.length == 0 && toTree.length == 0)) {
+					var route = document.querySelector("route");
+					// exit'i bitmeden yine kendisine dönülüyor
+					if (simply.ctx.path == to.value.path) {
+						var comp = route.querySelector(toSettings.component);
+						exitThis(comp, "enter", true);
+					}
+					// düz exit ediliyor
+					else {
+						var comp = route.querySelector(fromSettings.component);
+						exitThis(comp, "exit", true);
+					}
+				}
+				// exit same tree
+				else if (fromTree[0] == toTree[0] || to.value.path == fromTree[0] || from.value.path == toTree[0]) {
+					console.log("exit same tree");
+					var exitThoseRoutes = [];
+					var exitThoseComponents = [];
+					var lastComp = null;
+					var enterFlag = false;
+					for (let i = fromTree.length - 1; i >= 0; i--) {
+						const path = fromTree[i];
+						const route = simply.page.getRouteByPath(path);
+
+						if (toTree[i] !== path && to.value.path !== path) {
+							if (i === fromTree.length - 1) {
+								lastComp = simply.ctx.component;
+							}
+							else {
+								let componentName = route.value.settings.component;
+								lastComp = lastComp.closest("route").closest(componentName);
+							}
+							console.log("hehelow");
+							exitThis(lastComp, "exit", i == 1);
+						}
+						else {
+							console.log("totobune");
+							console.log(from, fromTree.length, toTree);
+						}
+					}
+					return;
+				}
+
+				console.log({ exitThoseRoutes, exitThoseComponents });
+				//console.log({ from, to, toTree, fromTree });
+
+				return;
+
+				if (fromComp) {
+					fromComp.setAttribute("exit", "");
+					fromComp.removeAttribute("enter");
+					fromComp.transitionExitStart = Date.now();
+				}
+				// transition bitmeden kendine geri dönüyor
+				else {
+					simply.ctx.component.setAttribute("enter", "");
+					simply.ctx.component.removeAttribute("exit");
+				}
+
+
+
+			}
+			else {
+				nextEnter();
+			}
+
+			// prev var ise bir yerden bir yere gidiliyordur
+			// o yüzden bir öncekinin exit'ini çalıştırmalı
+			// else bir üstteki nextEnter()
 		};
 
 		/**
@@ -4164,7 +4320,7 @@ simply = {
 				wrappedFn.pureFunc = arguments[i];
 				simply.routes[theRoutePath].exits.push(wrappedFn);
 			}
-			// console.log(theRoutePath, "'in exitleri silindi yenisi eklendi");
+			console.log(theRoutePath, "'in exitleri silindi yenisi eklendi");
 		};
 
 		/**
@@ -4680,6 +4836,7 @@ simply = {
 
 
 								parentRootEl.innerHTML = `<${targetParentRoute.settings.component} ${attrs.join(' ')}></${targetParentRoute.settings.component}>`;
+
 								if (directChild) {
 									// zaten render edilmiş
 									// innerHTML ile basmadan düz render()
@@ -4691,7 +4848,7 @@ simply = {
 									directChild = parentRootEl.querySelector(targetParentRoute.settings.component);
 								}
 								await waitForRenderedAndReturnRoute(directChild);
-								directChild.router_settings = settings;
+								directChild.router_settings = node.settings;
 								directChild.ctx = ctx;
 
 								if (directChild.lifecycle && directChild.lifecycle.routerEnter) {
@@ -4882,6 +5039,7 @@ simply = {
 					simply.routes[route.path].callbacks.push(wrappedFn);
 
 					// Build the tree using `settings.child_of`
+
 					const tree = [];
 					let currentPath = route.path;
 

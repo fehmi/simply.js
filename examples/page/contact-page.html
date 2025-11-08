@@ -10,6 +10,22 @@
 
 </html>
 
+<style>
+	contact-page {
+		opacity: 0;
+	}
+	
+	contact-page[enter] {
+		transition: all 2000ms; 
+		opacity: 1;
+	}
+
+	contact-page[exit] {
+		transition: all 2000ms;
+		opacity: 0;
+	}	
+</style>
+
 <script>
 	class simply {
 		data = {

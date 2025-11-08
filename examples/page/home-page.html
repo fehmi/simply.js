@@ -5,6 +5,22 @@ cache: {props.cache}
 
 </html>
 
+<style>
+	home-page {
+		opacity: 0;
+	}
+	
+	home-page[enter] {
+		transition: all 2000ms;
+		opacity: 1;
+	}
+
+	home-page[exit] {
+		transition: all 2000ms;
+		opacity: 0;
+	}
+</style>
+
 <script>
 	class simply {
 		data = {
@@ -19,7 +35,6 @@ cache: {props.cache}
 			afterFirstRender() {
 				setTimeout(() => {
 					data.name = "minyeli";
-					console.log(cache);
 				}, 1000);
 			}
 		}
