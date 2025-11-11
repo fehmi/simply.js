@@ -1,6 +1,6 @@
 <html>
 
-
+<line></line>
 <h1>Company Page</h1>
 <a href="company/products">Products</a>
 <a href="company/products/iphone">Iphone page</a>
@@ -12,18 +12,27 @@
 
 <style>
 	company-page {
-		opacity: 0;
+		display: block;
 	}
 	
-	company-page[enter] {
-		transition: all 2000ms; 
-		opacity: 1;
+	company-page > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+
+		display: block;
+    height: 3px;
+    background-color: black;		
 	}
 
-	company-page[exit] {
-		transition: all 2000ms;
-		opacity: 0;
-	}	
+	company-page[enter] {
+		opacity: 1;
+	} 
+  
+	/* Giriş: genişlet */
+	company-page[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }
 </style>
 
 <script>

@@ -1,5 +1,5 @@
 <html>
-
+<line></line>
 <h2>contact page</h2>
 <br>
 <a href="subpage2/contact/istanbul">İstanbul</a>
@@ -11,19 +11,21 @@
 </html>
 
 <style>
-	contact-page {
-		opacity: 0;
-	}
-	
-	contact-page[enter] {
-		transition: all 2000ms; 
-		opacity: 1;
-	}
+	contact-page > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+		
+		display: block;
+    height: 3px;
+    background-color: black;
 
-	contact-page[exit] {
-		transition: all 2000ms;
-		opacity: 0;
-	}	
+	}
+  
+	/* Giriş: genişlet */
+	contact-page[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
 </style>
 
 <script>

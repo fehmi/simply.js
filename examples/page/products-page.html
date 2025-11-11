@@ -1,4 +1,5 @@
 <html>
+	<line></line>
 <h1>Products Page</h1>
 <a href="company/products/iphone">Iphone</a>
 <a href="company/products/mac">Mac</a>
@@ -10,15 +11,20 @@
 </html>
 
 <style>
-		products-page[enter] {
-		transition: all 2000ms; 
-		opacity: 1;
-	}
+	products-page > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
 
-	products-page[exit] {
-		transition: all 2000ms;
-		opacity: 0;
-	}	
+		display: block;
+    height: 3px;
+    background-color: black;		
+	}
+  
+	/* Giriş: genişlet */
+	products-page[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
 </style>
 
 <script>

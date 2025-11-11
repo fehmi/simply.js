@@ -1,19 +1,25 @@
 <html>
-
+<line></line>
 amsterdam
 
 </html>
 
 <style>
-	contact-amsterdam[enter] {
-		transition: all 2000ms; 
-		opacity: 1;
-	}
+	contact-amsterdam > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+		
+		display: block;
+    height: 3px;
+    background-color: black;
 
-	contact-amsterdam[exit] {
-		transition: all 2000ms;
-		opacity: 0;
-	}		
+	}
+  
+	/* Giriş: genişlet */
+	contact-amsterdam[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
 </style>
 
 <script>

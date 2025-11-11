@@ -1,4 +1,5 @@
 <html>
+	<line></line>
 <h1>Mac Page</h1>
 <a href="company/products/iphone">Go to iphone page</a>
 
@@ -7,15 +8,21 @@
 </html>
 
 <style>
-	mac-page[enter] {
-		transition: all 2000ms; 
-		opacity: 1;
-	}
+	mac-page > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+		
+		display: block;
+    height: 3px;
+    background-color: black;
 
-	mac-page[exit] {
-		transition: all 2000ms;
-		opacity: 0;
-	}	
+	}
+  
+	/* Giriş: genişlet */
+	mac-page[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
 </style>
 
 <script>

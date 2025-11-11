@@ -39,155 +39,106 @@
 
 		// define redirection
 		// simply.initRouter();
-		// simply.page.redirect("/", "/subpage/10");
-		simply.router([
+		simply.go.redirect("/", "/subpage/10");
+
+		simply.go.setup(
 			{
-				path: "/",
-				component: "home-page",
-				shadow_root: false,
-				cache: true,
-				root: document.querySelector("route"),
-				same_page_refresh: false,
-				title: "Home page",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				}
-			}, 
-			{
-				path: "/subpage/:id",
-				component: "sub-page",
-				shadow_root: false,
-				cache: false,
-				root: document.querySelector("route"),
-				title: "Subpage",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				}				
+				transition: true,
+				stagger: 75
 			},
-			{
-				path: "/subpage2",
-				component: "sub-page2",
-				shadow_root: false,
-				cache: true,
-				title: "Subpage 2",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				},				
-				children: [
-					{
-						path: "/about",
-						component: "about-page",
-						title: "Subpage 2 > About",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				}						
-					},
-					{
-						path: "/contact",
-						component: "contact-page",
-						shadow_root: false,
-						title: "Subpage 2 > Contact",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				},						
-						children: [
-							{
-								path: "/istanbul",
-								component: "contact-istanbul",
-								cache: true,
-								title: "Subpage 2 > Contact > Istanbul",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				}								
-							},
-							{
-								path: "/amsterdam",
-								component: "contact-amsterdam",
-								title: "Subpage 2 > Contact > Amsterdam",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				}								
-							},
-						]
-					},
-				]
-			},
-			{
-				path: "/company",
-				component: "company-page",
-				shadow_root: false,
-				cache: true,
-				same_page_refresh: false,
-				title: "Company",
-				transition: {
-					enter: 2000,
-					exit: 2000
+			[
+				{
+					path: "/",
+					component: "home-page",
+					shadow_root: false,
+					cache: true,
+					root: document.querySelector("route"),
+					same_page_refresh: false,
+					title: "Home page",
 				},
-				children: [
-					{
-						path: "/info",
-						component: "info-page",
-						title: "Company > Info",
-					},
-					{
-						path: "/products",
-						component: "products-page", 
-						shadow_root: false,
-						title: "Company > Products",
-						transition: {
-							enter: 2000,
-							exit: 2000
-						},						
-						children: [
-							{
-								path: "/iphone",
-								component: "iphone-page",
-								cache: true,
-								title: "Company > Products > Iphone",
-								transition: {
-									enter: 2000,
-									exit: 2000
-								},								
-							},
-							{
-								path: "/mac",
-								component: "mac-page",
-								title: "Company > Products > Mac",
-								transition: {
-									enter: 2000,
-									exit: 2000
-								},								
-							},
-						]
-					},
-				]
-			},
-			{
-				path: "*",
-				component: "not-found",
-				shadow_root: false,
-				root: document.querySelector("route"),
-				title: "404 Not Found",
-				transition: {
-					enter: 2000,
-					exit: 2000
-				}				
-			},
-		])
-
-		// go to the current page
-
-
-		simply.page();
-
-
+				{
+					path: "/subpage/:id",
+					component: "sub-page",
+					shadow_root: false,
+					cache: false,
+					root: document.querySelector("route"),
+					title: "Subpage",
+				},
+				{
+					path: "/subpage2",
+					component: "sub-page2",
+					shadow_root: false,
+					cache: true,
+					title: "Subpage 2",
+					children: [
+						{
+							path: "/about",
+							component: "about-page",
+							title: "Subpage 2 > About",
+						},
+						{
+							path: "/contact",
+							component: "contact-page",
+							shadow_root: false,
+							title: "Subpage 2 > Contact",
+							children: [
+								{
+									path: "/istanbul",
+									component: "contact-istanbul",
+									cache: true,
+									title: "Subpage 2 > Contact > Istanbul",
+								},
+								{
+									path: "/amsterdam",
+									component: "contact-amsterdam",
+									title: "Subpage 2 > Contact > Amsterdam",
+								},
+							]
+						},
+					]
+				},
+				{
+					path: "/company",
+					component: "company-page",
+					shadow_root: false,
+					cache: true,
+					same_page_refresh: false,
+					title: "Company",
+					children: [
+						{
+							path: "/info",
+							component: "info-page",
+							title: "Company > Info",
+						},
+						{
+							path: "/products",
+							component: "products-page",
+							shadow_root: false,
+							title: "Company > Products",
+							children: [
+								{
+									path: "/iphone",
+									component: "iphone-page",
+									cache: true,
+									title: "Company > Products > Iphone",
+								},
+								{
+									path: "/mac",
+									component: "mac-page",
+									title: "Company > Products > Mac",
+								},
+							]
+						},
+					]
+				},
+				{
+					path: "*",
+					component: "not-found",
+					shadow_root: false,
+					root: document.querySelector("route"),
+					title: "404 Not Found",
+				},
+			])
 
 	</script>
 </body>

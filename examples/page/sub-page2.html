@@ -1,4 +1,5 @@
 <html>
+	<line></line>
 subpage 2 content<br>
 sub page 2 name: {data.name}<br>
 <a href="subpage2/contact">Contact</a>
@@ -8,16 +9,22 @@ sub page 2 name: {data.name}<br>
 </html>
 
 <style>
-	sub-page2[enter] {
-		transition: all 2000ms; 
-		opacity: 1;
-	}
+	sub-page2 > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+		
+		display: block;
+    height: 3px;
+    background-color: black;
 
-	sub-page2[exit] {
-		transition: all 2000ms; 
-		opacity: 0;
-	}		
-</style>
+	}
+  
+	/* Giriş: genişlet */
+	sub-page2[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
+</style> 
 
 <script>
 	class simply {

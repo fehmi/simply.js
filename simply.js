@@ -8,12 +8,13 @@ simply = {
 		let ifStart = /\<if(\s)cond=\"(.*)\"(\>$)/;
 		let elsifStart = /\<elsif(\s)cond=\"(.*)\"(\>$)/;
 		let customElStart = /<([a-z]{1,10}-[a-z]{1,10})>$/
-		const MAX_LENGTH = 150;
 		let inTagVar = /:="([^"]+)"$/; // https://regex101.com/r/vzY75x/1
 		let ifCount = 0;
 		let eachCount = 0;
-		let m;
+		let m; // match
 		let bucket = "";
+		const MAX_LENGTH = 150;
+		var recentBucket = "";
 		var processedLetters = "";
 		var capturedLogics = [];
 		var flag = false;
@@ -23,7 +24,6 @@ simply = {
 		var styleCount = 0;
 		var customEl = 0;
 		var ignoreFlag = false;
-		var recentBucket = "";
 
 		template = template.replace(/[\r\n]+/g, '');
 
@@ -31,19 +31,23 @@ simply = {
 			template = template.replace(/\$\{/g, 'minyeli{');
 		}
 
+		/*
+			Template'i harf harf kontrol edip yakalanan logic' string'leri
+			js'ye çevirip bucket içinde bunları replace ediyor.
+			en sonra ht değişkenini eval edip son halini üretiyor.
+		*/
+
 		for (var i = 0; i < template.length; i++) {
-			// alttaki 4 satır 95ms
 			let ch = template[i];
 			processedLetters += ch;
 			bucket += ch;
 			recentBucket += ch;
+			// bu tam bir performance boost. her seferinde substring olmuyor
 			if (recentBucket.length > MAX_LENGTH * 2) { // 300, MAX_LENGTH'in 2 katı olarak
 				recentBucket = recentBucket.substring(MAX_LENGTH);
 			}
-			//let recentBucket = bucket.slice(-MAX_LENGTH);
 
-			/* bu if else bloğu 5 ms */
-			/* 1ms */
+			// tag exceptions
 			if (ch == ">") {
 				if (recentBucket.endsWith("<script>")) {
 					scriptCount += 1;
@@ -57,14 +61,6 @@ simply = {
 						customEl = m[1];
 					}
 				}
-				// else if (bucket.endsWith("<template simply>")) {
-				// bucket += "<!--";
-				// processedLetters += "<!--";
-				// simplyTemplateCount += 1;
-				// }
-				// else if (bucket.substr(-"<template>".length) === "<template>") {
-				// 	templateCount += 1;
-				// }
 				else if (recentBucket.endsWith("</script>")) {
 					scriptCount -= 1;
 				}
@@ -77,16 +73,8 @@ simply = {
 					customEl = 0;
 				}
 			}
-			// inline template skip
-			// we will look when construct
-			// else if (bucket.endsWith("</template>")) {
-			// simplyTemplateCount -= 1;
-			// bucket = bucket.replace(/<\/template>$/, "--></template>");
-			// processedLetters = processedLetters.replace(/<\/template>$/, "--></template>");
-			// }
-			/* / 1ms */
 
-			// 3-4 ms
+			// exception değilse
 			if (styleCount == 0 && scriptCount == 0 && !customEl) {
 				// attribute içindeki fonksyion ise skip
 				if (recentBucket.endsWith('="function') || recentBucket.endsWith('="(function')) {
@@ -133,6 +121,7 @@ simply = {
 					m = null;
 				}
 
+				// if else elsif each gibi custom tag'lar
 				if (ch == ">") {
 					if (recentBucket.endsWith("</each>")) {
 						m = ["</each>"];
@@ -213,6 +202,7 @@ simply = {
 				}
 			}
 
+			// yakalanan logic var ise
 			if (flag === true) {
 				try {
 					capturedLogics.push(m[0]);
@@ -221,13 +211,8 @@ simply = {
 					varBucket = "";
 				}
 				let logicLine = capturedLogics[capturedLogics.length - 1];
-				// staticText = processedLetters.replace(logicLine, "");
-				// logicline'ın last occurance'ını siliyore
-				// bir üstteki hata fırlatıyordu mesela iki tane {data.name} varsa
 				let lio = processedLetters.lastIndexOf(logicLine)
-
 				staticText = processedLetters.substring(0, lio) + "";
-
 				let replaceThis = staticText + logicLine;
 
 				// if else arasına ht=""; girince hata fırlatıyordu
@@ -270,16 +255,6 @@ simply = {
 			return result;
 		}
 		var end = performance.now();
-		//console.log(end - window.sss);
-		// for the last non-logical text
-		/*
-		if (processedLetters.trimEnd() !== "") {
-			processedLettersRegex = processedLetters.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-			console.log(processedLettersRegex);
-			//bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.replace(/(?:\r\n|\r|\n)/g, '').trim() + "`;")
-			bucket = bucket.replace(new RegExp(processedLettersRegex + '$'), "ht+=`" + processedLetters.trimEnd() + "`;")
-		}
-			*/
 
 		if (processedLetters.trimEnd() !== "") {
 			if (bucket.endsWith(processedLetters)) {
@@ -295,9 +270,6 @@ simply = {
 		bucket = bucket.replace(/minyeli/g, '$');
 
 		eval(bucket);
-
-		// simply.cache.set(cacheKey, ht);
-		//console.timeEnd();
 		return ht;
 	},
 	/*
@@ -1301,7 +1273,6 @@ simply = {
 								var newVal = mutation.target.getAttribute(mutation.attributeName);
 								// console.log(mutation.attributeName, "attribute changed to", newVal, callback);
 								callback(mutation.attributeName, newVal);
-
 							}
 						});
 					});
@@ -1503,7 +1474,6 @@ simply = {
 
 							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
 							if (this.shadow) {
-
 								var vars = ":root {";
 							}
 							else {
@@ -1531,17 +1501,66 @@ simply = {
 						}
 						this.renderingDone = true;
 
-						setTimeout(() => {
-							if (this.component.router_settings.transition) {
-								this.component.transitionEnterStart = Date.now();
+						var comp = this.component;
+						var p = this.props;
+
+						console.log(comp);
+						requestAnimationFrame(() => {
+							// comp'ta tanımlıysa (true/false/undefined olsa bile)
+							// comp'taki değeri kullan, yoksa global'e bak
+							const transition = comp.routerSettings && 'transition' in comp.routerSettings
+								? comp.routerSettings.transition
+								: (simply.routerSettings && simply.routerSettings.transition);
+							if (transition) {
+								ObservableSlim.pause(p);
+
+								// hack: stop transition to initial values on first render
+								this.dom.style.transition = "none";
 
 								setTimeout(() => {
-									delete this.component.transitionEnterStart;
-								}, this.component.router_settings.transition.enter);
-								this.component.setAttribute("enter", "");
-							}
-						}, 5);
+									comp.style.transition = ""; // extension of the hack
 
+									// comp'ta tanımlıysa (true/false/undefined olsa bile)
+									// comp'taki değeri kullan, yoksa global'e bak
+									var stagger = comp.routerSettings && 'stagger' in comp.routerSettings
+										? comp.routerSettings.stagger
+										: (simply.routerSettings && simply.routerSettings.stagger);
+
+									if (stagger) {
+										if (!self.parent) {
+											// ilk seviye, no delay
+											comp.setAttribute("enter", "");
+										}
+										else {
+											comp.stagger = stagger + (self.parent.stagger || 0);
+
+											// parent tamamlanmamışsa bekle
+											if (typeof self.parent.completed === "undefined") {
+												console.log("stag this", comp);
+												comp.staggerFn = setTimeout(() => {
+													comp.setAttribute("enter", "");
+													clearTimeout(comp.staggerFn);
+												}, comp.stagger);
+											}
+											else {
+												console.log("no stag for this", comp);
+												comp.setAttribute("enter", "");
+											}
+										}
+									} else {
+										// ✅ stagger = 0 ise direkt çalıştır
+										comp.setAttribute("enter", "");
+									}
+
+									ObservableSlim.resume(p);
+								}, 0);
+							}
+							else {
+								// parent'ta transition false ise
+								// çocuk transition'a stagger'sız başlasın diye
+								comp.completed = true;
+							}
+						});
 					}
 					else {
 						if (typeof this.lifecycle !== "undefined") {
@@ -1549,7 +1568,6 @@ simply = {
 								this.lifecycle.beforeRerender();
 							}
 						}
-
 
 						// var ddd = this.data;
 						// parsingArgs.data = JSON.parse(JSON.stringify(ddd));
@@ -1574,7 +1592,7 @@ simply = {
 						*/
 						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
 						var parsedStyle = simply.parseStyle(parsingArgs);
-						var newDom = "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>" + parsedTemplate;
+						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
 						//console.log("morfingen");
 						if (this.shadow) {
 							var newDomAsString = "<" + name + " shadow>" + newDom + "</" + name + ">";
@@ -1748,7 +1766,7 @@ simply = {
 						try {
 
 							let tagName = this.component.tagName.toLowerCase();
-							let tagNameOfRoute = simply.page.getRouteByPath(simply.lastPath).value.settings.component;
+							let tagNameOfRoute = simply.go.getRouteByPath(simply.lastPath).value.settings.component;
 
 							if (tagName == tagNameOfRoute) {
 								simply.cache = simply.cache ? simply.cache : {}
@@ -3390,15 +3408,6 @@ simply = {
 		// Export in a try catch to prevent this from erroring out on older browsers
 		try { module.exports = ObservableSlim; } catch (err) { };
 	},
-	go: function (path) {
-		window.dispatchEvent(
-			new CustomEvent(
-				'navigate', {
-				detail: {
-					href: path
-				}
-			}));
-	},
 	findParentWithState: function (element) {
 		let parent = element.parentElement;
 		while (parent) {
@@ -3426,7 +3435,7 @@ simply = {
 		}
 		return null;
 	},
-	page: function () {
+	go: function () {
 		'use strict';
 
 		var isarray = Array.isArray || function (arr) {
@@ -3855,7 +3864,7 @@ simply = {
 		var isLocation = hasWindow && !!(window.history.location || window.location);
 
 		/**
-		 * The page instance
+		 * The go instance
 		 * @api private
 		 */
 		function Page() {
@@ -3878,7 +3887,7 @@ simply = {
 		}
 
 		/**
-		 * Configure the instance of page. This can be called multiple times.
+		 * Configure the instance of go. This can be called multiple times.
 		 *
 		 * @param {Object} options
 		 * @api public
@@ -4042,7 +4051,7 @@ simply = {
 
 
 			var ctx = new Context(path, state, this), prev = this.prevContext; // maybe i should do the same for this one
-			// prevContent was always same so i added by swallow copying to ctx.page.simplyPrevContext
+			// prevContent was always same so i added by swallow copying to ctx.go.simplyPrevContext
 			this.simplyPrevContext = { ...prev }
 
 			this.prevContext = ctx;
@@ -4056,13 +4065,13 @@ simply = {
 		 * Goes back in the history
 		 * Back should always let the current route push state and then go back.
 		 *
-		 * @param {string} path - fallback path to go back if no more history exists, if undefined defaults to page.base
+		 * @param {string} path - fallback path to go back if no more history exists, if undefined defaults to go.base
 		 * @param {Object=} state
 		 * @api public
 		 */
 
 		Page.prototype.back = function (path, state) {
-			var page = this;
+			var go = this;
 			if (this.len > 0) {
 				var window = this._window;
 				// this may need more testing to see if all browsers
@@ -4071,11 +4080,11 @@ simply = {
 				this.len--;
 			} else if (path) {
 				setTimeout(function () {
-					page.show(path, state);
+					go.show(path, state);
 				});
 			} else {
 				setTimeout(function () {
-					page.show(page._getBase(), state);
+					go.show(go._getBase(), state);
 				});
 			}
 		};
@@ -4090,10 +4099,30 @@ simply = {
 		 */
 		Page.prototype.redirect = function (from, to) {
 			var inst = this;
+			console.log({ to });
+
+			if (simply.preserveParams && simply.preserveParams.length > 0) {
+				const urlParams = new URLSearchParams(window.location.search);
+				const filteredParams = new URLSearchParams();
+
+				for (const [key, value] of urlParams.entries()) {
+					if (simply.preserveParams.includes(key)) {
+						filteredParams.append(key, value);
+					}
+				}
+
+				const filteredQuery = filteredParams.toString();
+
+				if (typeof to === 'string' && !to.includes('?') && filteredQuery) {
+					to += '?' + filteredQuery;
+				}
+			}
+
+			console.log(to);
 
 			// Define route from a path to another
 			if ('string' === typeof from && 'string' === typeof to) {
-				page.call(this, from, function (e) {
+				go.call(this, from, function (e) {
 					setTimeout(function () {
 						inst.replace(/** @type {!string} */(to));
 					}, 0);
@@ -4133,70 +4162,162 @@ simply = {
 
 
 		Page.prototype.dispatch = async function (ctx, prev) {
-			var i = 0, j = 0, page = this;
+			var i = 0, j = 0, go = this;
 
 
 			function nextExit() {
-				var fn = page.exits[j++];
+				var fn = go.exits[j++];
 				if (!fn) return nextEnter();
-				let theRoute = simply.page.getRouteByPath(page.current);
+				let theRoute = simply.go.getRouteByPath(go.current);
 				fn(prev, nextExit);
 			}
 
 
 			function nextEnter() {
-				var fn = page.callbacks[i++];
+				var fn = go.callbacks[i++];
 
-				if (ctx.path !== page.current) {
+				if (ctx.path !== go.current) {
 					ctx.handled = false;
 					return;
 				}
-				if (!fn) return unhandled.call(page, ctx);
+				if (!fn) return unhandled.call(go, ctx);
 				fn(ctx, nextEnter);
 			}
 
-			function exitThis(comp, type, updateContext) {
-				if (type == "enter") {
-					comp.setAttribute("enter", "");
-					comp.removeAttribute("exit");
-				}
-				else {
-					comp.setAttribute("exit", "");
-					comp.removeAttribute("enter");
-				}
+			function getAllElementsOf(comp) {
+				const result = [];
 
-				var now = Date.now();
-				if (comp.transitionEnterStart) {
-					var timeoutDuration = now - comp.transitionEnterStart;
-				}
-				else if (comp.transitionExitStart) {
-					var timeoutDuration = now - comp.transitionExitStart;
-				}
-				else {
-					timeoutDuration = comp.router_settings.transition.exit;
-				}
+				function walk(el) {
+					const tag = el.tagName.toLowerCase();
 
-				clearTimeout(comp.transitionTimer);
-				comp.transitionExitStart = now;
-				comp.transitionTimer = setTimeout(() => {
-					delete comp.transitionTimer, comp.transitionExitStart;
-					delete comp.transitionExitStart;
-					delete comp.transitionEnterStart;
-					comp.removeAttribute("exit");
-					if (updateContext) {
-						console.log("Router context updated!");
-						nextEnter();
+					if (tag === 'route' || tag === 'style') return;
+					result.push(el);
+
+					// light DOM çocukları
+					el.childNodes.forEach(child => {
+						if (child.nodeType === 1) walk(child);
+					});
+
+					// shadow DOM varsa
+					if (el.shadowRoot) {
+						el.shadowRoot.childNodes.forEach(child => {
+							if (child.nodeType === 1) walk(child);
+						});
 					}
-				}, timeoutDuration);
+				}
+
+				// comp her zaman dahil
+				result.push(comp);
+
+				// comp içindekileri kontrol et
+				comp.childNodes.forEach(child => {
+					if (child.nodeType === 1) walk(child);
+				});
+				if (comp.shadowRoot) {
+					comp.shadowRoot.childNodes.forEach(child => {
+						if (child.nodeType === 1) walk(child);
+					});
+				}
+
+				return result;
+			}
+
+			function handleTransition(comp, type, updateContext, delay) {
+				// render() tarafından oluştuluyor
+				clearTimeout(comp.fallbackTimeout);
+				// 🔥 önceki fallback'i iptal et
+				clearTimeout(comp.staggerFn);
+
+				const run = () => {
+					// --- Interruption Handling ---
+					if (comp.activeTransitionController) {
+						comp.activeTransitionController.abort();
+					}
+
+					const controller = new AbortController();
+					comp.activeTransitionController = controller;
+					comp.completed = false;
+
+					const onComplete = () => {
+						if (controller.signal.aborted) {
+							comp.completed = false;
+							return;
+						}
+						comp.completed = true;
+						delete comp.activeTransitionController;
+						clearTimeout(comp.fallbackTimeout); // ✅ fallback'i temizle
+
+						if (type === "exit") comp.remove();
+
+						if (updateContext) {
+							console.log("Router context updated!");
+							nextEnter();
+						}
+					};
+
+					if (type === "enter") comp.setAttribute("enter", "");
+					else comp.removeAttribute("enter");
+
+					if (controller.signal.aborted) {
+						comp.completed = false;
+						return;
+					}
+
+					const transitioningElements = [comp, ...getAllElementsOf(comp)].filter(el => {
+						const style = getComputedStyle(el);
+						const durations = style.transitionDuration.split(',').map(s => parseFloat(s));
+						return durations.some(d => d > 0);
+					});
+
+					if (transitioningElements.length === 0) {
+						onComplete();
+						return;
+					}
+
+					let maxDuration = 0;
+					for (const el of transitioningElements) {
+						const style = getComputedStyle(el);
+						const durations = style.transitionDuration.split(',').map(s => parseFloat(s) * 1000);
+						const delays = style.transitionDelay.split(',').map(s => parseFloat(s) * 1000);
+						const maxElDuration = Math.max(...durations.map((d, i) => d + (delays[i] || 0)));
+						maxDuration = Math.max(maxDuration, maxElDuration);
+					}
+
+					let remaining = transitioningElements.length;
+					const checkDone = () => {
+						if (--remaining === 0) onComplete();
+					};
+
+					for (const el of transitioningElements) {
+						const handler = (event) => {
+							if (event.target === el) {
+								el.removeEventListener("transitionend", handler);
+								checkDone();
+							}
+						};
+						el.addEventListener("transitionend", handler, { signal: controller.signal });
+					}
+
+					// ✅ fallback timeout (geçmiş fallback'leri iptal edecek)
+					if (type == "exit") {
+						comp.fallbackTimeout = setTimeout(() => {
+							console.log("⚠️ Transition fallback triggered:", comp);
+							onComplete();
+						}, maxDuration + delay);
+					}
+				};
+
+				if (delay > 0) {
+					setTimeout(run, delay);
+				} else {
+					run();
+				}
 			}
 
 			if (prev) {
-				var from = simply.page.getRouteByPath(prev.path);
-				var to = simply.page.getRouteByPath(page.current);
-				var fromTree = from.value && from.value.tree ? from.value.tree : [];
-				var toTree = to.value && to.value.tree && to.value.path ? to.value.tree : [];
-				var fromSettings = from.value.settings;
-				var toSettings = to.value.settings;
+				var to = simply.go.getRouteByPath(go.current);
+				var toTree = to.value && to.value.tree && to.value.path ? [...to.value.tree] : [];
+				var contextUpdateFlag = false;
 
 				if (toTree.length == 0) toTree.push(to.value.path);
 				toTree.reverse();
@@ -4206,102 +4327,87 @@ simply = {
 					.filter(Boolean).reverse();
 
 				var enterThose = currentRoutes.filter(r =>
-					toTree.includes(r.router_settings.path)
+					toTree.includes(r.routerSettings.path)
 				);
 
 				const exitThose = currentRoutes.filter(r =>
-					!toTree.includes(r.router_settings.path)
+					!toTree.includes(r.routerSettings.path)
 				);
 
+				/* bu her konuşda stagger ekliyordu
+				belki bi optiyon olabilir stager: crazy diye :P
+					enterThose.forEach((comp, index) => {
+						const stagger = comp.routerSettings && 'stagger' in comp.routerSettings
+							? comp.routerSettings.stagger
+							: (simply.routerSettings && simply.routerSettings.stagger) || 0;
+						handleTransition(comp, "enter", false, index * stagger);
+					});
+				*/
+				// artık comp current route içinde ise (görünürde)
+				// stargger olmadan başlat çünkü görünürse zaten bi kere stag etmiştir
+				enterThose.forEach((comp, index) => {
+					const inCurrent = currentRoutes.includes(comp);
 
+					const stagger = inCurrent
+						? 0 // zaten currentRoutes'ta varsa gecikme olmasın
+						: (
+							(comp.routerSettings && 'stagger' in comp.routerSettings
+								? comp.routerSettings.stagger
+								: (simply.routerSettings && simply.routerSettings.stagger)
+							) || 0
+						);
 
-				console.log({ enterThose, exitThose, toTree, currentRoutes });
+					handleTransition(comp, "enter", false, index * stagger);
+				});
 
+				/* bu her konuşda stagger ekliyordu
+				exitThose.forEach((comp, index) => {
+					const stagger = comp.routerSettings && 'stagger' in comp.routerSettings
+						? comp.routerSettings.stagger
+						: (simply.routerSettings && simply.routerSettings.stagger) || 0;
 
-				if (toTree.length == 0) {
+					// if last one, update context
+					contextUpdateFlag = index == exitThose.length - 1;
+					handleTransition(comp, "exit", contextUpdateFlag, index * stagger);
+				});
+				*/
 
+				// artık comp current route içinde ise (görünürde)
+				// stargger olmadan başlat çünkü görünürse zaten bi kere stag etmiştir
+				exitThose.forEach((comp, index) => {
+					console.log();
+					let stagger = comp.routerSettings && 'stagger' in comp.routerSettings ? comp.routerSettings.stagger : (simply.routerSettings && simply.routerSettings.stagger) || 0;
+					if (!comp.completed) stagger = 0;
+					// if last one, update context 
+					contextUpdateFlag = index == exitThose.length - 1;
+					handleTransition(comp, "exit", contextUpdateFlag, index * stagger);
+				});
+
+				// gidilen route'a ait component piyasada yoksa
+				// düz render'ı ve context update'i çalıştırmak için
+				const targetComponent = to.value.settings.component;
+
+				const hasComponent = enterThose.some(r =>
+					r.routerSettings.component === targetComponent
+				);
+
+				if (!hasComponent && !contextUpdateFlag) {
+					// enterThose içinde component yoksa yapılacak şey
+					console.log("Component not found in enterThose");
+					nextEnter();
 				}
-
-				return;
-
-
-				// parent'tan parent'a
-				if ((fromTree.length == 0 && toTree.length == 0)) {
-					var route = document.querySelector("route");
-					// exit'i bitmeden yine kendisine dönülüyor
-					if (simply.ctx.path == to.value.path) {
-						var comp = route.querySelector(toSettings.component);
-						exitThis(comp, "enter", true);
-					}
-					// düz exit ediliyor
-					else {
-						var comp = route.querySelector(fromSettings.component);
-						exitThis(comp, "exit", true);
-					}
-				}
-				// exit same tree
-				else if (fromTree[0] == toTree[0] || to.value.path == fromTree[0] || from.value.path == toTree[0]) {
-					console.log("exit same tree");
-					var exitThoseRoutes = [];
-					var exitThoseComponents = [];
-					var lastComp = null;
-					var enterFlag = false;
-					for (let i = fromTree.length - 1; i >= 0; i--) {
-						const path = fromTree[i];
-						const route = simply.page.getRouteByPath(path);
-
-						if (toTree[i] !== path && to.value.path !== path) {
-							if (i === fromTree.length - 1) {
-								lastComp = simply.ctx.component;
-							}
-							else {
-								let componentName = route.value.settings.component;
-								lastComp = lastComp.closest("route").closest(componentName);
-							}
-							console.log("hehelow");
-							exitThis(lastComp, "exit", i == 1);
-						}
-						else {
-							console.log("totobune");
-							console.log(from, fromTree.length, toTree);
-						}
-					}
-					return;
-				}
-
-				console.log({ exitThoseRoutes, exitThoseComponents });
-				//console.log({ from, to, toTree, fromTree });
-
-				return;
-
-				if (fromComp) {
-					fromComp.setAttribute("exit", "");
-					fromComp.removeAttribute("enter");
-					fromComp.transitionExitStart = Date.now();
-				}
-				// transition bitmeden kendine geri dönüyor
-				else {
-					simply.ctx.component.setAttribute("enter", "");
-					simply.ctx.component.removeAttribute("exit");
-				}
-
-
-
+				console.log({ enterThose, exitThose, toTree, currentRoutes, to });
 			}
 			else {
 				nextEnter();
 			}
-
-			// prev var ise bir yerden bir yere gidiliyordur
-			// o yüzden bir öncekinin exit'ini çalıştırmalı
-			// else bir üstteki nextEnter()
 		};
 
 		/**
 		 * Register an exit route on `path` with
 		 * callback `fn()`, which will be called
 		 * on the previous context when a new
-		 * page is visited.
+		 * go is visited.
 		 */
 		Page.prototype.exit = function (path, fn) {
 			if (typeof path === 'function') {
@@ -4309,10 +4415,10 @@ simply = {
 			}
 
 			var route = new Route(path, null, this);
-			let theRoutePath = simply.page.getRouteByPath(path).value.path;
+			let theRoutePath = simply.go.getRouteByPath(path).value.path;
 
 			simply.routes[theRoutePath].exits = simply.routes[theRoutePath].exits ? simply.routes[theRoutePath].exits : [];
-			simply.page.deleteExitCallbacksByPath(theRoutePath);
+			simply.go.deleteExitCallbacksByPath(theRoutePath);
 
 			for (var i = 1; i < arguments.length; ++i) {
 				const wrappedFn = route.middleware(arguments[i]);
@@ -4377,8 +4483,8 @@ simply = {
 			if (svg ? el.target.baseVal : el.target) return;
 
 			// x-origin
-			// note: svg links that are not relative don't call click events (and skip page.js)
-			// consequently, all svg links tested inside page.js are relative and in the same origin
+			// note: svg links that are not relative don't call click events (and skip go.js)
+			// consequently, all svg links tested inside go.js are relative and in the same origin
 			if (!svg && !this.sameOrigin(el.href)) return;
 
 			// rebuild path
@@ -4393,21 +4499,21 @@ simply = {
 				path = path.replace(/^\/[a-zA-Z]:\//, '/');
 			}
 
-			// same page
+			// same go
 			var orig = path;
-			var pageBase = this._getBase();
+			var goBase = this._getBase();
 
-			if (path.indexOf(pageBase) === 0) {
-				path = path.substr(pageBase.length);
+			if (path.indexOf(goBase) === 0) {
+				path = path.substr(goBase.length);
 			}
 
-			// console.log({orig, pageBase, path});
+			// console.log({orig, goBase, path});
 			// console.log("last path: ", simply.lastPath, "href: ", el.href, "link:", link)
 
 			if (this.current == path) {
-				let route = simply.page.getRouteByPath(path).value;
-				if (!route.settings.same_page_refresh) {
-					// console.log("same page baba, no refresh sana", this, e);
+				let route = simply.go.getRouteByPath(path).value;
+				if (!route.settings.same_go_refresh) {
+					// console.log("same go baba, no refresh sana", this, e);
 					e.preventDefault();
 					return;
 				}
@@ -4416,7 +4522,7 @@ simply = {
 
 			if (this._hashbang) path = path.replace('#!', '');
 
-			if (pageBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
+			if (goBase && orig === path && (!isLocation || this._window.location.protocol !== 'file:')) {
 				return;
 			}
 
@@ -4445,14 +4551,14 @@ simply = {
 			}
 			return function onpopstate(e) {
 				if (!loaded) return;
-				var page = this;
+				var go = this;
 				if (e.state) {
 					var path = e.state.path;
 					e.state.popstate = true;
-					page.replace(path, e.state);
+					go.replace(path, e.state);
 				} else if (isLocation) {
-					var loc = page._window.location;
-					page.show(loc.pathname + loc.search + loc.hash, undefined, undefined, false);
+					var loc = go._window.location;
+					go.show(loc.pathname + loc.search + loc.hash, undefined, undefined, false);
 				}
 			};
 		})();
@@ -4531,39 +4637,94 @@ simply = {
 		};
 
 		/**
-		 * Create a new `page` instance and function
+		 * Create a new `go` instance and function
 		 */
 		function createPage() {
-			var pageInstance = new Page();
+			var goInstance = new Page();
 
-			function pageFn(/* args */) {
-				return page.apply(pageInstance, arguments);
+			function goFn(/* args */) {
+				return go.apply(goInstance, arguments);
 			}
 
 			// Copy all of the things over. In 2.0 maybe we use setPrototypeOf
-			pageFn.callbacks = pageInstance.callbacks;
-			pageFn.exits = pageInstance.exits;
-			pageFn.base = pageInstance.base.bind(pageInstance);
-			pageFn.strict = pageInstance.strict.bind(pageInstance);
-			pageFn.start = pageInstance.start.bind(pageInstance);
-			pageFn.stop = pageInstance.stop.bind(pageInstance);
-			pageFn.show = pageInstance.show.bind(pageInstance);
-			pageFn.back = pageInstance.back.bind(pageInstance);
-			pageFn.redirect = pageInstance.redirect.bind(pageInstance);
-			pageFn.replace = pageInstance.replace.bind(pageInstance);
-			pageFn.dispatch = pageInstance.dispatch.bind(pageInstance);
-			pageFn.exit = pageInstance.exit.bind(pageInstance);
-			pageFn.configure = pageInstance.configure.bind(pageInstance);
-			pageFn.sameOrigin = pageInstance.sameOrigin.bind(pageInstance);
-			pageFn.clickHandler = pageInstance.clickHandler.bind(pageInstance);
-			pageFn.create = createPage;
+			goFn.callbacks = goInstance.callbacks;
+			goFn.exits = goInstance.exits;
+			goFn.base = goInstance.base.bind(goInstance);
+			goFn.strict = goInstance.strict.bind(goInstance);
+			goFn.start = goInstance.start.bind(goInstance);
+			goFn.stop = goInstance.stop.bind(goInstance);
+			goFn.show = goInstance.show.bind(goInstance);
+			goFn.back = goInstance.back.bind(goInstance);
+			goFn.redirect = goInstance.redirect.bind(goInstance);
+			goFn.replace = goInstance.replace.bind(goInstance);
+			goFn.dispatch = goInstance.dispatch.bind(goInstance);
+			goFn.exit = goInstance.exit.bind(goInstance);
+			goFn.configure = goInstance.configure.bind(goInstance);
+			goFn.sameOrigin = goInstance.sameOrigin.bind(goInstance);
+			goFn.clickHandler = goInstance.clickHandler.bind(goInstance);
+			goFn.create = createPage;
+			goFn.setup = function (a, b) {
+				var initialSeup = false;
+				if (Array.isArray(a) && b) {
+					// dynamic setup called to create nested routes
+					var routes = a;
+					var child_of = b
+				}
+				else if (a && typeof a === "object" && !Array.isArray(a)) {
+					// initial setup with settings
+					var settings = a;
+					simply.routerSettings = settings;
+					var routes = b
+					var initialSeup = true;
+				}
+				else {
+					// initial setup without settings 
+					var routes = a;
+					var initialSeup = true;
+				}
+
+				// simply.go() load edilmemişse
+				if (!simply.go.Context) {
+					simply.initGo();
+				}
+
+				simply.go('*', parse)
+
+				function parse(ctx, next) {
+					setTimeout(() => {
+						ctx.query = simply.qs.parse(location.search.slice(1));
+					}, 0);
+					next();
+				}
+				console.log(routes);
+				routes.forEach(function (route) {
+					simply.go(
+						route.path,
+						{
+							...route,
+							child_of
+						},
+						...(route.callbacks || [])
+					);
+				});
+
+				if (initialSeup) {
+					simply.go();
+				}
+			};
+			goFn.preserveParams = function (params) {
+				if (!simply.preserveParams) {
+					simply.preserveParams = [];
+				}
+				simply.preserveParams.push(...params);
+			}
 
 			// simply additions
-			pageFn.getRoutes = function () {
+			goFn.getRoutes = function () {
 				return simply.routes;
 			}
 
-			pageFn.getCurrentRoute = function () {
+			goFn.getCurrentRoute = function () {
 				var current = this.current;
 
 				for (const [key, value] of Object.entries(simply.routes)) {
@@ -4575,7 +4736,7 @@ simply = {
 				return false;
 			}
 
-			pageFn.getRouteByPath = function (path) {
+			goFn.getRouteByPath = function (path) {
 				var found = false
 				for (const [key, value] of Object.entries(simply.routes)) {
 					if (path.match(value.regexp) && key !== "(.*)") {
@@ -4599,7 +4760,7 @@ simply = {
 				return false;
 			}
 
-			pageFn.getParentRouteByPath = function (path) {
+			goFn.getParentRouteByPath = function (path) {
 				var found = false
 				for (const [key, value] of Object.entries(simply.routes)) {
 					if (path.match(value.regexp) && key !== "(.*)") {
@@ -4620,89 +4781,89 @@ simply = {
 				return false;
 			}
 
-			pageFn.deleteRouteByPath = function (path) {
-				//console.log("hee", this, page.callbacks);
-				let route = pageFn.getRouteByPath(path);
-				var rebelCallbacks = route.value.page.callbacks
+			goFn.deleteRouteByPath = function (path) {
+				//console.log("hee", this, go.callbacks);
+				let route = goFn.getRouteByPath(path);
+				var rebelCallbacks = route.value.go.callbacks
 
 				for (const [key, v] of Object.entries(route.value.callbacks)) {
 					// console.log(v);
 					const fn = v.originalFn;
 
 					// Remove from global callbacks
-					simply.page.callbacks = simply.page.callbacks.filter(cb => cb.originalFn !== fn);
+					simply.go.callbacks = simply.go.callbacks.filter(cb => cb.originalFn !== fn);
 
-					// Remove from the route page's callbacks (the rebelCallbacks array)
-					route.value.page.callbacks = route.value.page.callbacks.filter(cb => cb.originalFn !== fn);
+					// Remove from the route go's callbacks (the rebelCallbacks array)
+					route.value.go.callbacks = route.value.go.callbacks.filter(cb => cb.originalFn !== fn);
 				}
 				// Delete the whole route if needed
 				simply.routes[route.key].callbacks = [];
 			}
 
-			pageFn.deleteExitCallbacksByPath = function (path) {
-				let route = pageFn.getRouteByPath(path);
-				// console.log(path, route, route.value.page.exits);
+			goFn.deleteExitCallbacksByPath = function (path) {
+				let route = goFn.getRouteByPath(path);
+				// console.log(path, route, route.value.go.exits);
 
-				for (const [key, v] of Object.entries(route.value.page.exits)) {
+				for (const [key, v] of Object.entries(route.value.go.exits)) {
 					const fn = v.originalFn;
 
 					// Remove from global callbacks
-					simply.page.exits = simply.page.exits.filter(cb => cb.originalFn !== fn);
+					simply.go.exits = simply.go.exits.filter(cb => cb.originalFn !== fn);
 
-					// Remove from the route page's callbacks (the rebelCallbacks array)
-					route.value.page.exits = route.value.page.exits.filter(cb => cb.originalFn !== fn);
+					// Remove from the route go's callbacks (the rebelCallbacks array)
+					route.value.go.exits = route.value.go.exits.filter(cb => cb.originalFn !== fn);
 				}
 				// Delete the whole route if needed
 				simply.routes[route.key].exits = [];
 			}
 
-			Object.defineProperty(pageFn, 'len', {
+			Object.defineProperty(goFn, 'len', {
 				get: function () {
-					return pageInstance.len;
+					return goInstance.len;
 				},
 				set: function (val) {
-					pageInstance.len = val;
+					goInstance.len = val;
 				}
 			});
 
-			Object.defineProperty(pageFn, 'current', {
+			Object.defineProperty(goFn, 'current', {
 				get: function () {
-					return pageInstance.current;
+					return goInstance.current;
 				},
 				set: function (val) {
-					pageInstance.current = val;
+					goInstance.current = val;
 				}
 			});
 
 			// In 2.0 these can be named exports
-			pageFn.Context = Context;
-			pageFn.Route = Route;
+			goFn.Context = Context;
+			goFn.Route = Route;
 
-			return pageFn;
+			return goFn;
 		}
 
 		/**
 		 * Register `path` with callback `fn()`,
 		 * or route `path`, or redirection,
-		 * or `page.start()`.
+		 * or `go.start()`.
 		 *
-		 *   page(fn);
-		 *   page('*', fn);
-		 *   page('/user/:id', load, user);
-		 *   page('/user/' + user.id, { some: 'thing' });
-		 *   page('/user/' + user.id);
-		 *   page('/from', '/to')
-		 *   page();
+		 *   go(fn);
+		 *   go('*', fn);
+		 *   go('/user/:id', load, user);
+		 *   go('/user/' + user.id, { some: 'thing' });
+		 *   go('/user/' + user.id);
+		 *   go('/from', '/to')
+		 *   go();
 		 *
 		 * @param {string|!Function|!Object} path
 		 * @param {Function=} fn
 		 * @api public
 		 */
 
-		function page(path, fn) {
+		function go(path, fn) {
 			// <callback>
 			if ('function' === typeof path) {
-				return page.call(this, '*', path);
+				return go.call(this, '*', path);
 			}
 
 			async function waitForRenderedAndReturnRoute(el) {
@@ -4794,7 +4955,7 @@ simply = {
 					var route;
 					var parent;
 					if (settings.child_of) {
-						var targetRoute = simply.page.getRouteByPath(settings.path);
+						var targetRoute = simply.go.getRouteByPath(settings.path);
 						// console.log(targetRoute);
 						var tree = targetRoute.value.tree;
 						var parentRootEl;
@@ -4817,7 +4978,7 @@ simply = {
 							}
 
 							lastParentComponent = node.settings.component;
-							targetParentRoute = simply.page.getParentRouteByPath(path).value;
+							targetParentRoute = simply.go.getParentRouteByPath(path).value;
 							// console.log({parentRootEl}, targetParentRoute.settings.component);
 
 							let directChild = Array.from(parentRootEl.children).find(
@@ -4841,14 +5002,15 @@ simply = {
 									// zaten render edilmiş
 									// innerHTML ile basmadan düz render()
 									// console.log("düz render for ", directChild);
-									var component = directChild
+									var component = directChild;
+
 									directChild.render();
 								}
 								else {
 									directChild = parentRootEl.querySelector(targetParentRoute.settings.component);
 								}
 								await waitForRenderedAndReturnRoute(directChild);
-								directChild.router_settings = node.settings;
+								directChild.routerSettings = node.settings;
 								directChild.ctx = ctx;
 
 								if (directChild.lifecycle && directChild.lifecycle.routerEnter) {
@@ -4863,7 +5025,7 @@ simply = {
 								if (href && !href.startsWith('/')) {
 									href = '/' + href;
 								}							
-								let rt = simply.page.getRouteByPath(href)
+								let rt = simply.go.getRouteByPath(href)
 								if (path == rt.key || href == ctx.path) {
 									a.setAttribute("router-active", true);
 								}
@@ -4877,7 +5039,7 @@ simply = {
 					// çocuklu route'un son halkası yani target
 					if (parentRootEl) {
 						route = parentRootEl;
-						settings = simply.page.getRouteByPath(path).value.settings
+						settings = simply.go.getRouteByPath(path).value.settings
 					}
 					// or single route
 					else {
@@ -4892,7 +5054,7 @@ simply = {
 						// zaten render edilmiş
 						// innerHTML ile basmadan düz render()
 						//console.log("düz render for ", directChild);
-						var component = directChild
+						var component = directChild;
 						directChild.render();
 
 					}
@@ -4913,7 +5075,7 @@ simply = {
 
 						var component = route.querySelector(settings.component);
 						ctx.component = component;
-						component.router_settings = settings;
+						component.routerSettings = settings;
 						component.ctx = ctx;
 					}
 
@@ -4966,14 +5128,14 @@ simply = {
 								}
 								// tree içinde current olandan öncesi için
 								// parent linkleri de active edelim
-								var targetRoute = simply.page.getRouteByPath(simply.ctx.path.split("?")[0]);
+								var targetRoute = simply.go.getRouteByPath(simply.ctx.path.split("?")[0]);
 								if (href && targetRoute.value.tree) {
 									let tree = targetRoute.value.tree;
 									// console.log(tree);
 									if (tree.includes(simply.ctx.routePath)) {
 										const index = tree.indexOf(simply.ctx.routePath);
 										const parentPaths = index !== -1 ? tree.slice(0, index) : [];
-										let routePathOfLink = simply.page.getRouteByPath(href);
+										let routePathOfLink = simply.go.getRouteByPath(href);
 										// console.log("oooo tree", parentPaths, currentPath, href, routePathOfLink.key, simply.ctx);
 										if (parentPaths.includes(routePathOfLink.key)) {
 											a.setAttribute("router-active", true);
@@ -5010,7 +5172,7 @@ simply = {
 				simply.routes[route.path] = route;
 				simply.routes[route.path].callbacks = simply.routes[route.path].callback ? simply.routes[route.path].callback : [];
 				simply.routes[route.path].settings = settings;
-				simply.routes[route.path].page = this;
+				simply.routes[route.path].go = this;
 
 				function registerChildRoutes(children, parentPath = '') {
 					if (!children) return;
@@ -5019,7 +5181,7 @@ simply = {
 						const fullPath = parentPath + child.path;
 
 						// Register current child with full path
-						simply.router([{
+						simply.go.setup([{
 							...child,
 							path: fullPath
 						}], parentPath);
@@ -5039,7 +5201,6 @@ simply = {
 					simply.routes[route.path].callbacks.push(wrappedFn);
 
 					// Build the tree using `settings.child_of`
-
 					const tree = [];
 					let currentPath = route.path;
 
@@ -5069,7 +5230,7 @@ simply = {
 		/**
 		 * Unhandled `ctx`. When it's not the initial
 		 * popstate then redirect. If you wish to handle
-		 * 404s on your own use `page('*', callback)`.
+		 * 404s on your own use `go('*', callback)`.
 		 *
 		 * @param {Context} ctx
 		 * @api private
@@ -5077,17 +5238,17 @@ simply = {
 		function unhandled(ctx) {
 			if (ctx.handled) return;
 			var current;
-			var page = this;
-			var window = page._window;
+			var go = this;
+			var window = go._window;
 
-			if (page._hashbang) {
+			if (go._hashbang) {
 				current = isLocation && this._getBase() + window.location.hash.replace('#!', '');
 			} else {
 				current = isLocation && window.location.pathname + window.location.search;
 			}
 
 			if (current === ctx.canonicalPath) return;
-			page.stop();
+			go.stop();
 			ctx.handled = false;
 			isLocation && (window.location.href = ctx.canonicalPath);
 		}
@@ -5112,25 +5273,25 @@ simply = {
 		 * @api public
 		 */
 
-		function Context(path, state, pageInstance) {
-			var _page = this.page = pageInstance || page;
-			var window = _page._window;
-			var hashbang = _page._hashbang;
+		function Context(path, state, goInstance) {
+			var _go = this.go = goInstance || go;
+			var window = _go._window;
+			var hashbang = _go._hashbang;
 
-			var pageBase = _page._getBase();
-			if ('/' === path[0] && 0 !== path.indexOf(pageBase)) path = pageBase + (hashbang ? '#!' : '') + path;
+			var goBase = _go._getBase();
+			if ('/' === path[0] && 0 !== path.indexOf(goBase)) path = goBase + (hashbang ? '#!' : '') + path;
 			var i = path.indexOf('?');
 
 			this.canonicalPath = path;
-			var re = new RegExp('^' + escapeRegExp(pageBase));
+			var re = new RegExp('^' + escapeRegExp(goBase));
 			this.path = path.replace(re, '') || '/';
 			if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
 			this.title = (hasDocument && window.document.title);
 			this.state = state || {};
 			this.state.path = path;
-			this.querystring = ~i ? _page._decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
-			this.pathname = _page._decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
+			this.querystring = ~i ? _go._decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+			this.pathname = _go._decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
 			this.params = {};
 
 			// fragment
@@ -5139,7 +5300,7 @@ simply = {
 				if (!~this.path.indexOf('#')) return;
 				var parts = this.path.split('#');
 				this.path = this.pathname = parts[0];
-				this.hash = _page._decodeURLEncodedURIComponent(parts[1]) || '';
+				this.hash = _go._decodeURLEncodedURIComponent(parts[1]) || '';
 				this.querystring = this.querystring.split('#')[0];
 			}
 		}
@@ -5151,11 +5312,11 @@ simply = {
 		 */
 
 		Context.prototype.pushState = function () {
-			var page = this.page;
-			var window = page._window;
-			var hashbang = page._hashbang;
+			var go = this.go;
+			var window = go._window;
+			var hashbang = go._hashbang;
 
-			page.len++;
+			go.len++;
 			if (hasHistory) {
 				window.history.pushState(this.state, this.title,
 					hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
@@ -5169,10 +5330,10 @@ simply = {
 		 */
 
 		Context.prototype.save = function () {
-			var page = this.page;
+			var go = this.go;
 			if (hasHistory) {
-				page._window.history.replaceState(this.state, this.title,
-					page._hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+				go._window.history.replaceState(this.state, this.title,
+					go._hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
 			}
 		};
 
@@ -5191,10 +5352,10 @@ simply = {
 		 * @api private
 		 */
 
-		function Route(path, options, page) {
-			var _page = this.page = page || globalPage;
+		function Route(path, options, go) {
+			var _go = this.go = go || globalPage;
 			var opts = options || {};
-			opts.strict = opts.strict || _page._strict;
+			opts.strict = opts.strict || _go._strict;
 			this.path = (path === '*') ? '(.*)' : path;
 			this.method = 'GET';
 			this.regexp = pathToRegexp_1(this.path, this.keys = [], opts);
@@ -5262,7 +5423,7 @@ simply = {
 
 			for (var i = 1, len = m.length; i < len; ++i) {
 				var key = keys[i - 1];
-				var val = this.page._decodeURLEncodedURIComponent(m[i]);
+				var val = this.go._decodeURLEncodedURIComponent(m[i]);
 
 				if (val !== undefined || !(hasOwnProperty.call(params, key.name))) {
 					params[key.name] = val;
@@ -5278,38 +5439,12 @@ simply = {
 		 */
 
 		var globalPage = createPage();
-		var page_js = globalPage;
+		var go_js = globalPage;
 		var default_1 = globalPage;
 
-		page_js.default = default_1;
+		go_js.default = default_1;
 
-		return page_js;
-	},
-	router: function (routes, child_of) {
-		// simply.page() load edilmemişse
-		if (!simply.page.Context) {
-			simply.initRouter();
-		}
-
-		simply.page('*', parse)
-
-		function parse(ctx, next) {
-			setTimeout(() => {
-				ctx.query = simply.qs.parse(location.search.slice(1));
-			}, 0);
-			next();
-		}
-
-		routes.forEach(function (route) {
-			simply.page(
-				route.path,
-				{
-					...route,
-					child_of
-				},
-				...(route.callbacks || [])
-			);
-		});
+		return go_js;
 	},
 	getElementUniqueId: function (el) {
 		const parts = [];
@@ -5530,19 +5665,17 @@ simply = {
 			stringify: stringify
 		};
 	})(),
-	initRouter: function (a, b) {
-		// window.page = simply.page(); // i'll delete this after seeing all examples (search/replace page with simply.page in examples)
-		simply.page = simply.page();
+	initGo: function (a, b) {
+		// window.go = simply.go(); // i'll delete this after seeing all examples (search/replace go with simply.go in examples)
+		simply.go = simply.go();
+		simply.go.configure({ window: window })
 
-		simply.page.configure({ window: window })
 		var base = document.querySelector("base[href]");
+
 		if (base) {
-			// delete last slach
+			// delete last slash
 			var base_href = base.getAttribute("href").replace(/\/$/, "");
-			simply.page.base(base_href);
-		}
-		if (a && b) {
-			simply.page.redirect(a, b);
+			simply.go.base(base_href);
 		}
 	},
 	init: function () {
@@ -5550,10 +5683,8 @@ simply = {
 		this.morphdom();
 		this.observableSlim();
 
-		// simply.page() load edilmemişse
-		simply.page.redirect = function (a, b) {
-			simply.initRouter(a, b);
-		}
+		// simply.go() load edilmemişse 
+		simply.initGo();
 
 		window.get = this.get;
 	}
