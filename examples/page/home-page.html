@@ -1,13 +1,32 @@
 <html>
+	heee
 <line></line>
-home page content {data.name}
-cache: {props.cache} 
+<span>{data.name}</span>
+<p no-morph-animation>home page content {data.name}<div>{data.name}</div></p>
+<div>hee</div> 
+
 
 </html>
 
 <style>
+	::view-transition-group(root),
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation-duration: 1250ms;
+	}
 
-	home-page {
+	/* example to disable morph animation */
+	::view-transition-group(nmp),
+	::view-transition-old(nmp),
+	::view-transition-new(nmp) {
+		animation: none;
+	}
+	::view-transition-old(nmp) {
+		display: none;
+	}
+
+	[no-morph-animation] { 
+		view-transition-name: nmp;
   }
 
 	home-page line {
@@ -32,6 +51,9 @@ cache: {props.cache}
 
 <script>
 	class simply {
+		settings = {
+			morphAnimation: true 
+		}
 		data = {
 			"name": "fehmi"
 		}

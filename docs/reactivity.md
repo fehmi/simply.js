@@ -116,3 +116,50 @@ To prevent this, assign a unique `id` to the element. This allows morphdom to tr
 ```
 
 This works because `morphdom` uses the element’s `id` as a stable key by default (via `getNodeKey`) to preserve it during DOM updates.
+
+## Morph Animation
+
+When a reactive variable changes, the DOM updates instantly. You can add animations to these updates by enabling the `morphAnimation` setting in your component class, like this:
+
+```js
+class simply {
+	settings = {
+		morphAnimation: true 
+	}
+
+	data = {}
+	methods = {}
+}
+```
+
+Simply uses the **View Transition API** under the hood. The default effect is a fade in/out, but you can customize it using transition API pseudo-selectors.
+Learn more at [Chrome Developers – View Transitions](https://developer.chrome.com/docs/web-platform/view-transitions/same-document).
+
+For example, the following CSS changes the animation duration. You can also create your own custom animations:
+
+```css
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) { 
+	animation-duration: 1250ms;
+}
+```
+
+You can disable morph animation for specific elements as well:
+
+```css
+/* Disable morph animation */
+::view-transition-group(nmp),
+::view-transition-old(nmp),
+::view-transition-new(nmp) {
+	animation: none;
+}
+
+::view-transition-old(nmp) {
+	display: none;
+}
+
+[no-morph-animation] {
+	view-transition-name: nmp;
+}
+```

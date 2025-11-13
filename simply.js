@@ -779,6 +779,7 @@ simply = {
 
 					var data = this.sfcClass.data ? this.sfcClass.data : {};
 					var props = this.sfcClass.props ? this.sfcClass.props : {};
+					var settings = this.sfcClass.settings ? this.sfcClass.settings : {};
 
 
 					var methods = this.sfcClass.methods;
@@ -788,6 +789,7 @@ simply = {
 
 					this.component = component;
 					this.dom = dom;
+					this.settings = settings;
 
 					const framerComponentObserver = new MutationObserver(mutations => {
 						for (const mutation of mutations) {
@@ -1412,13 +1414,11 @@ simply = {
 							lifecycle: this.lifecycle
 						});
 					}
-
+					var self = this;
 
 
 					if (!this.rendered) {
-
 						this.rendered = true;
-						var self = this;
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
@@ -1504,7 +1504,6 @@ simply = {
 						var comp = this.component;
 						var p = this.props;
 
-						console.log(comp);
 						requestAnimationFrame(() => {
 							// comp'ta tanımlıysa (true/false/undefined olsa bile)
 							// comp'taki değeri kullan, yoksa global'e bak
@@ -1597,11 +1596,39 @@ simply = {
 						if (this.shadow) {
 							var newDomAsString = "<" + name + " shadow>" + newDom + "</" + name + ">";
 
-							morphIt(this.dom, newDomAsString);
+							if (document.startViewTransition && this.settings.morphAnimation) {
+								document.startViewTransition(function () {
+									morphIt(self.dom, newDomAsString);
+								});
+							}
+							else {
+								morphIt(this.dom, newDomAsString);
+							}
+
 						}
 						else {
 							var newDomAsString = "<" + name + ">" + newDom + "</" + name + ">";
-							morphIt(this.dom, newDomAsString);
+							if (document.startViewTransition && this.settings.morphAnimation) {
+								console.log("1", this.settings.morphAnimation);
+								const start = performance.now();
+
+								const transition = document.startViewTransition(function () {
+									// console.log("First Snapshot alındı:", performance.now() - start, "ms");
+									morphIt(self.dom, newDomAsString);
+								});
+
+								transition.ready.then(() => {
+									// console.log("All Snapshots alındı:", performance.now() - start, "ms");
+								});
+
+								transition.finished.then(() => {
+									// console.log("Tüm transition bitti:", performance.now() - start, "ms");
+								});
+							}
+							else {
+								morphIt(this.dom, newDomAsString);
+								console.log("2");
+							}
 						}
 
 						if (this.slotContent) {
@@ -1612,15 +1639,22 @@ simply = {
 								template: this.slotContent,
 								...p
 							});
-
-							morphIt(this.dom.querySelector("simply-slot"), "<simply-slot>" + parsedSlot + "</simply-slot>");
+							if (document.startViewTransition && this.settings.morphAnimation) {
+								document.startViewTransition(function () {
+									morphIt(self.dom.querySelector("simply-slot"), "<simply-slot>" + parsedSlot + "</simply-slot>");
+								});
+							}
+							else {
+								morphIt(this.dom.querySelector("simply-slot"), "<simply-slot>" + parsedSlot + "</simply-slot>");
+							}
 						}
 
 						// console.log(newDomAsString);
 
 
 						function morphIt(dom, newDomAsString) {
-							//console.log("morphing");
+							console.log("morphing");
+
 							simply.morphdom(dom, newDomAsString, {
 
 								childrenOnly: true,
@@ -1648,8 +1682,8 @@ simply = {
 										return true;
 										// console.log("dont again");
 									}
-									if (fromEl.hasAttribute("router-active") == true) {
-										toEl.setAttribute("router-active", true);
+									if (fromEl.hasAttribute("go-active") == true) {
+										toEl.setAttribute("go-active", true);
 									}
 									if (fromEl.hasAttribute("transition") == true) {
 										//toEl.setAttribute("transition", fromEl.getAttribute("transition"));
@@ -1723,9 +1757,6 @@ simply = {
 								}
 							});
 						}
-
-
-
 
 						if (this.globalStyle) {
 							var parsedGlobalStyle = simply.parseStyle({
@@ -4314,6 +4345,8 @@ simply = {
 				}
 			}
 
+
+
 			if (prev) {
 				var to = simply.go.getRouteByPath(go.current);
 				var toTree = to.value && to.value.tree && to.value.path ? [...to.value.tree] : [];
@@ -4348,6 +4381,10 @@ simply = {
 				enterThose.forEach((comp, index) => {
 					const inCurrent = currentRoutes.includes(comp);
 
+					const transition = comp.routerSettings && 'transition' in comp.routerSettings
+						? comp.routerSettings.transition
+						: (simply.routerSettings && simply.routerSettings.transition);
+
 					const stagger = inCurrent
 						? 0 // zaten currentRoutes'ta varsa gecikme olmasın
 						: (
@@ -4357,7 +4394,10 @@ simply = {
 							) || 0
 						);
 
-					handleTransition(comp, "enter", false, index * stagger);
+					if (transition) {
+						handleTransition(comp, "enter", false, index * stagger);
+					}
+
 				});
 
 				/* bu her konuşda stagger ekliyordu
@@ -4375,21 +4415,36 @@ simply = {
 				// artık comp current route içinde ise (görünürde)
 				// stargger olmadan başlat çünkü görünürse zaten bi kere stag etmiştir
 				exitThose.forEach((comp, index) => {
-					console.log();
+
+					const transition = comp.routerSettings && 'transition' in comp.routerSettings
+						? comp.routerSettings.transition
+						: (simply.routerSettings && simply.routerSettings.transition);
+
 					let stagger = comp.routerSettings && 'stagger' in comp.routerSettings ? comp.routerSettings.stagger : (simply.routerSettings && simply.routerSettings.stagger) || 0;
 					if (!comp.completed) stagger = 0;
 					// if last one, update context 
-					contextUpdateFlag = index == exitThose.length - 1;
-					handleTransition(comp, "exit", contextUpdateFlag, index * stagger);
+					if (transition) {
+						contextUpdateFlag = index == exitThose.length - 1;
+						handleTransition(comp, "exit", contextUpdateFlag, index * stagger);
+					}
+					else {
+						contextUpdateFlag = false;
+					}
 				});
 
 				// gidilen route'a ait component piyasada yoksa
 				// düz render'ı ve context update'i çalıştırmak için
-				const targetComponent = to.value.settings.component;
+				// redirect edilmişse settings.component yok
+				try {
+					const targetComponent = to.value.settings.component;
 
-				const hasComponent = enterThose.some(r =>
-					r.routerSettings.component === targetComponent
-				);
+					const hasComponent = enterThose.some(r =>
+						r.routerSettings.component === targetComponent
+					);
+				}
+				catch (e) {
+					var hasComponent = false;
+				}
 
 				if (!hasComponent && !contextUpdateFlag) {
 					// enterThose içinde component yoksa yapılacak şey
@@ -4683,20 +4738,24 @@ simply = {
 					var initialSeup = true;
 				}
 
-				// simply.go() load edilmemişse
-				if (!simply.go.Context) {
-					simply.initGo();
+				if (simply.routerSettings && simply.routerSettings.redirects) {
+					simply.routerSettings.redirects.forEach(function (redirect) {
+						console.log(redirect);
+						simply.go.redirect(redirect.from, redirect.to);
+					});
 				}
 
-				simply.go('*', parse)
+				if (initialSeup) {
+					simply.go('*', parse)
 
-				function parse(ctx, next) {
-					setTimeout(() => {
-						ctx.query = simply.qs.parse(location.search.slice(1));
-					}, 0);
-					next();
+					function parse(ctx, next) {
+						setTimeout(() => {
+							ctx.query = simply.qs.parse(location.search.slice(1));
+						}, 0);
+						next();
+					}
 				}
-				console.log(routes);
+
 				routes.forEach(function (route) {
 					simply.go(
 						route.path,
@@ -5027,10 +5086,10 @@ simply = {
 								}							
 								let rt = simply.go.getRouteByPath(href)
 								if (path == rt.key || href == ctx.path) {
-									a.setAttribute("router-active", true);
+									a.setAttribute("go-active", true);
 								}
 								else {
-									a.removeAttribute("router-active");
+									a.removeAttribute("go-active");
 								}
 							})				
 							*/
@@ -5115,16 +5174,17 @@ simply = {
 
 							let currentPath = simply.ctx.path.split("?")[0];
 							aTags.forEach(function (a) {
-								let href = a.getAttribute("href");
-								if (href && !href.startsWith('/')) {
+								let href = "/" + a.href.replace(document.querySelector("base").href, "");
+								// let href = a.getAttribute("href");
+								if ((href && !href.startsWith('/')) || href == "") {
 									href = '/' + href;
 								}
 
 								if (href && href == decodeURIComponent(currentPath)) {
-									a.setAttribute("router-active", true);
+									a.setAttribute("go-active", true);
 								}
 								else {
-									a.removeAttribute("router-active");
+									a.removeAttribute("go-active");
 								}
 								// tree içinde current olandan öncesi için
 								// parent linkleri de active edelim
@@ -5138,13 +5198,13 @@ simply = {
 										let routePathOfLink = simply.go.getRouteByPath(href);
 										// console.log("oooo tree", parentPaths, currentPath, href, routePathOfLink.key, simply.ctx);
 										if (parentPaths.includes(routePathOfLink.key)) {
-											a.setAttribute("router-active", true);
+											a.setAttribute("go-active", true);
 										}
 										// ! çünkü bazen parent link, child'ın içinde de kullanılıyor
 										// o durumda aktif etmeye demeye çalıştım burada
 										else if (parentPaths.includes(href) && !comp.parent.contains(a)) {
 											// console.log(component, a);
-											a.setAttribute("router-active", true);
+											a.setAttribute("go-active", true);
 										}
 									}
 								}
@@ -5155,7 +5215,7 @@ simply = {
 						comp.selectLinks();
 					}, 0);
 					// app içindeki tüm linkler için
-					// router-active ekle/sil
+					// go-active ekle/sil
 
 
 					simply.lastPath = ctx.path;

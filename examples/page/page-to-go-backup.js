@@ -1648,8 +1648,8 @@ simply = {
                     return true;
                     // console.log("dont again");
                   }
-                  if (fromEl.hasAttribute("router-active") == true) {
-                    toEl.setAttribute("router-active", true);
+                  if (fromEl.hasAttribute("go-active") == true) {
+                    toEl.setAttribute("go-active", true);
                   }
                   if (fromEl.hasAttribute("transition") == true) {
                     //toEl.setAttribute("transition", fromEl.getAttribute("transition"));
@@ -4907,10 +4907,10 @@ simply = {
                 }							
                 let rt = simply.page.getRouteByPath(href)
                 if (path == rt.key || href == ctx.path) {
-                  a.setAttribute("router-active", true);
+                  a.setAttribute("go-active", true);
                 }
                 else {
-                  a.removeAttribute("router-active");
+                  a.removeAttribute("go-active");
                 }
               })				
               */
@@ -5001,10 +5001,10 @@ simply = {
                 }
 
                 if (href && href == decodeURIComponent(currentPath)) {
-                  a.setAttribute("router-active", true);
+                  a.setAttribute("go-active", true);
                 }
                 else {
-                  a.removeAttribute("router-active");
+                  a.removeAttribute("go-active");
                 }
                 // tree içinde current olandan öncesi için
                 // parent linkleri de active edelim
@@ -5018,13 +5018,13 @@ simply = {
                     let routePathOfLink = simply.page.getRouteByPath(href);
                     // console.log("oooo tree", parentPaths, currentPath, href, routePathOfLink.key, simply.ctx);
                     if (parentPaths.includes(routePathOfLink.key)) {
-                      a.setAttribute("router-active", true);
+                      a.setAttribute("go-active", true);
                     }
                     // ! çünkü bazen parent link, child'ın içinde de kullanılıyor
                     // o durumda aktif etmeye demeye çalıştım burada
                     else if (parentPaths.includes(href) && !comp.parent.contains(a)) {
                       // console.log(component, a);
-                      a.setAttribute("router-active", true);
+                      a.setAttribute("go-active", true);
                     }
                   }
                 }
@@ -5035,7 +5035,7 @@ simply = {
             comp.selectLinks();
           }, 0);
           // app içindeki tüm linkler için
-          // router-active ekle/sil
+          // go-active ekle/sil
 
 
           simply.lastPath = ctx.path;

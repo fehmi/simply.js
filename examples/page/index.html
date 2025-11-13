@@ -10,7 +10,7 @@
 <body>
 	<h1>Hello nested Routes</h1>
 
-	<a href="">home</a>
+	<a href="./">home</a>
 	<a href="subpage/20">subpage</a>
 	<a href="subpage2">subpage2</a>
 	<a href="company">company</a>
@@ -37,14 +37,18 @@
 		get("mac-page.html");
 		get("not-found.html");
 
-		// define redirection
-		// simply.initRouter();
-		simply.go.redirect("/", "/subpage/10");
-
-		simply.go.setup(
+		simply.go.setup( 
 			{
-				transition: true,
-				stagger: 75
+				transition: false,
+				stagger: 75,
+				redirects: [
+					/*
+					{
+						from: "/",
+						to: "/subpage/10"
+					}
+					*/
+				]
 			},
 			[
 				{

@@ -33,7 +33,7 @@
 
 - <br>Router
 
-  - [Router](docs/router.md)
+  - [Go (Router)](docs/router.md)
 
 - <br>Integrations
 
