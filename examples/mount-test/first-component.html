@@ -1,0 +1,37 @@
+<html>
+  <if cond="data.name == 'ahmeh'">
+    <h1>Hello, Ahmeh!</h1>
+  </if>
+  
+  <div id="thediv">
+    <second-component id="second"></second-component>
+  </div>
+</html>
+
+<style>
+  
+</style>
+
+<script>
+  class simply {
+    data = {
+      name: "Fehmi"
+    }
+    state = {
+      
+    }
+    methods = {
+      
+    }
+    lifecycle = {
+      afterConstruct() {
+        console.log("First component constructed");
+      },
+      afterFirstRender() {
+        setTimeout(() => {
+          data.name = "ahmeh";
+        }, 3000);
+      }
+    }
+  }
+</script>

@@ -1,0 +1,32 @@
+<html>
+
+not found
+
+</html>
+
+<style>
+		not-found[enter] {
+		transition: all 2000ms; 
+		opacity: 1;
+	}
+
+	not-found[exit] {
+		transition: all 2000ms;
+		opacity: 0;
+	}	
+</style>
+
+<script>
+	class simply {
+		data = {
+			"name": "subpage name"
+		}
+		lifecycle = {
+			afterConstruct() {
+				// this is called after the element is created
+				// and the template is inserted into the DOM
+				console.log("not found constructed");
+			}
+		}
+	}
+</script>

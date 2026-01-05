@@ -1,0 +1,41 @@
+<html>
+<line></line>
+istanbul
+
+</html>
+
+<style>
+	contact-istanbul > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+		
+		display: block;
+    height: 3px;
+    background-color: black;
+
+	}
+  
+	/* Giriş: genişlet */
+	contact-istanbul[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
+</style>
+
+<script>
+	class simply {
+		data = {
+			"name": "fehmi"
+		}
+		lifecycle = {
+			afterConstruct() {
+				// this is called after the element is created
+				// and the template is inserted into the DOM
+				console.log("contact istanbul constructed");
+			},
+			afterFirstRender() {
+
+			}
+		}
+	}
+</script>

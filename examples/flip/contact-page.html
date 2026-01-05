@@ -1,0 +1,47 @@
+<html>
+<line></line>
+<h2>contact page</h2>
+<br>
+<a href="subpage2/contact/istanbul">İstanbul</a>
+<br>
+<a href="subpage2/contact/amsterdam">Amsterdam</a>
+<br>
+<route></route>
+
+</html>
+
+<style>
+	contact-page > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+		
+		display: block;
+    height: 3px;
+    background-color: black;
+
+	}
+  
+	/* Giriş: genişlet */
+	contact-page[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
+</style>
+
+<script>
+	class simply {
+		data = {
+			"name": "fehmi"
+		}
+		lifecycle = {
+			afterConstruct() {
+				// this is called after the element is created
+				// and the template is inserted into the DOM
+				console.log("contact page constructed");
+			},
+			afterFirstRender() {
+
+			}
+		}
+	}
+</script>

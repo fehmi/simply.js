@@ -1,0 +1,44 @@
+<html>
+	<line></line>
+<h1>Mac Page</h1>
+<a href="company/products/iphone">Go to iphone page</a>
+
+<route></route>
+
+</html>
+
+<style>
+	mac-page > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+		
+		display: block;
+    height: 3px;
+    background-color: black;
+
+	}
+  
+	/* Giriş: genişlet */
+	mac-page[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
+</style>
+
+<script>
+	class simply {
+		data = {
+			"name": "Mac page"
+		}
+		lifecycle = {
+			afterConstruct() {
+				// this is called after the element is created
+				// and the template is inserted into the DOM
+				console.log("mac page constructed");
+			},
+			afterFirstRender() {
+
+			}
+		}
+	}
+</script>

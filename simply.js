@@ -1328,8 +1328,6 @@ simply = {
 
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
-
-
 					if (this.parent) {
 						if (this.parent.data) {
 							if (this.parent.cb) {
@@ -1348,18 +1346,25 @@ simply = {
 								this.parent.setProps = this.parent.props;
 							}
 						}
-
 					}
-
-
-
 
 					this.render();
 				}
 				render() {
 					let m;
 					// tüm on.* atribute değerleri için
-					let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
+					// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
+
+					// new line serbest bırakıldı
+					// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"']*)(\"|\')/gm;
+
+					// onclick="" içinde ilk tek tırnakta kesilme sorunu düzeltildi
+					// https://chatgpt.com/c/69523d00-8a50-8327-95a2-e14875750a0c
+					let regex = /\s+on[a-z]+(\s*)=(\s*)("(?<match>(?:\\.|[^"])*)"|'(?<match>(?:\\.|[^'])*)')/gm;
+
+
+
+
 					while ((m = regex.exec(template)) !== null) {
 						if (m.index === regex.lastIndex) {
 							regex.lastIndex++;
@@ -1370,6 +1375,7 @@ simply = {
 						else {
 							var match = "simply.findShadowRootOrCustomElement(this)";
 						}
+
 						if (m.groups["match"].indexOf(match) == -1) {
 							var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
 
@@ -1602,6 +1608,7 @@ simply = {
 								});
 							}
 							else {
+								const state = Flip.getState(this.dom.children);
 								morphIt(this.dom, newDomAsString);
 							}
 
@@ -1627,7 +1634,6 @@ simply = {
 							}
 							else {
 								morphIt(this.dom, newDomAsString);
-								console.log("2");
 							}
 						}
 
@@ -1653,13 +1659,13 @@ simply = {
 
 
 						function morphIt(dom, newDomAsString) {
-							console.log("morphing");
 
 							simply.morphdom(dom, newDomAsString, {
 
 								childrenOnly: true,
 								onBeforeElUpdated: function (fromEl, toEl) {
-									// spec - https://dom.spec.whatwg.org/#concept-node-equals							
+									// spec - https://dom.spec.whatwg.org/#concept-node-equals	
+
 									if (fromEl.isSameNode(toEl)) {
 										return false;
 									}
@@ -1699,6 +1705,9 @@ simply = {
 									if (customElements.get(fromEl.tagName.toLowerCase())) {
 										return false;
 									}
+									if (toEl.hasAttribute("passive") === true) {
+										return false;
+									}
 									if (fromEl.isSameNode(toEl)) {
 										// console.log("same mi node", toEl, fromEl.value, toEl.value)
 										return false;
@@ -1721,9 +1730,7 @@ simply = {
 									else if (fromEl.tagName == "STYLE" && fromEl.hasAttribute("global")) {
 										return false;
 									}
-									else if (toEl.hasAttribute("passive") === true) {
-										return false;
-									}
+
 
 									else if (toEl.tagName === 'INPUT') {
 										if (toEl.type == 'RADIO' || toEl.type == 'CHECKBOX') {
@@ -2657,6 +2664,7 @@ simply = {
 		})();
 	},
 	findShadowRootOrCustomElement: function (element) {
+		// console.log(element);
 		let parent = element.parentNode;
 
 		while (parent !== null) {
@@ -4130,7 +4138,6 @@ simply = {
 		 */
 		Page.prototype.redirect = function (from, to) {
 			var inst = this;
-			console.log({ to });
 
 			if (simply.preserveParams && simply.preserveParams.length > 0) {
 				const urlParams = new URLSearchParams(window.location.search);
@@ -4148,8 +4155,6 @@ simply = {
 					to += '?' + filteredQuery;
 				}
 			}
-
-			console.log(to);
 
 			// Define route from a path to another
 			if ('string' === typeof from && 'string' === typeof to) {
@@ -4448,10 +4453,10 @@ simply = {
 
 				if (!hasComponent && !contextUpdateFlag) {
 					// enterThose içinde component yoksa yapılacak şey
-					console.log("Component not found in enterThose");
+					// console.log("Component not found in enterThose");
 					nextEnter();
 				}
-				console.log({ enterThose, exitThose, toTree, currentRoutes, to });
+				// console.log({ enterThose, exitThose, toTree, currentRoutes, to });
 			}
 			else {
 				nextEnter();
@@ -4740,7 +4745,6 @@ simply = {
 
 				if (simply.routerSettings && simply.routerSettings.redirects) {
 					simply.routerSettings.redirects.forEach(function (redirect) {
-						console.log(redirect);
 						simply.go.redirect(redirect.from, redirect.to);
 					});
 				}

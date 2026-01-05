@@ -1,0 +1,45 @@
+<html>
+	<line></line>
+<h1>Products Page</h1>
+<a href="company/products/iphone">Iphone</a>
+<a href="company/products/mac">Mac</a>
+<a href="subpage2/contact/amsterdam">amsterdam</a>
+<a href="subpage2/contact">contact</a>
+
+<route></route>
+
+</html>
+
+<style>
+	products-page > line {
+		width: 0;
+		transition: width 2000ms ease-in-out; 
+
+		display: block;
+    height: 3px;
+    background-color: black;		
+	}
+  
+	/* Giriş: genişlet */
+	products-page[enter] > line {
+		transition: width 4000ms ease-in-out; 
+		width: 100%; 
+  }	
+</style>
+
+<script>
+	class simply {
+		data = {
+			"name": "Products page"
+		}
+		lifecycle = {
+			afterConstruct() {
+				// this is called after the element is created
+				// and the template is inserted into the DOM
+				console.log("products page constructed");
+			},
+			afterFirstRender() {
+			}
+		}
+	}
+</script>
