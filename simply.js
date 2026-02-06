@@ -62,7 +62,7 @@ simply = {
 				let logic = "";
 
 				if (fullTag === '</each>') {
-					logic = "};";
+					logic = "}};";
 				} else if (fullTag === '<else>') {
 					logic = "else {";
 				} else if (fullTag === '</if>' || fullTag === '</elsif>' || fullTag === '</else>') {
@@ -72,16 +72,35 @@ simply = {
 				} else if (tagMatch[3]) { // <elsif cond="...">
 					logic = "else if (" + unescape(tagMatch[3]) + ") {";
 				} else if (fullTag.startsWith('<each')) {
+
 					const groups = parseEachTag(fullTag);
 					const iter = "s" + Math.random().toString(36).slice(2, 7);
 
 					logic = `
-					for (let ${iter} in ${groups.of}) {
-						if (!Object.prototype.hasOwnProperty.call(${groups.of}, ${iter})) continue;
-						const ${groups.as} = ${groups.of}[${iter}];
-						let uniqueItemKey = "${iter}" + ${iter};
-						${groups.key ? `let ${groups.key} = ${iter};` : ""}
-						${groups.index ? `let ${groups.index} = parseInt(${iter});` : ""}`;
+    for (let ${iter} in ${groups.of}) {
+        if (!Object.prototype.hasOwnProperty.call(${groups.of}, ${iter})) continue;
+        const ${groups.as} = ${groups.of}[${iter}];
+
+        // 1. Üst döngüden gelen zinciri al.
+        // En dıştaki döngüdeysek 'undefined' olacağı için boş string kabul et.
+        const parentChain = (typeof keyChain !== 'undefined') ? keyChain : "";
+
+        // 2. YENİ SCOPE AÇIYORUZ
+        {
+            // 3. Mevcut zinciri oluştur: (Parent varsa sonuna tire koy) + (Mevcut Index)
+            // Örnek: Parent "2-5", iter "3" ise sonuç: "2-5-3"
+            // Örnek: Parent "", iter "2" ise sonuç: "2"
+            let keyChain = (parentChain === "" ? "" : parentChain + "-") + ${iter};
+
+            // Render fonksiyonun kullandığı değişkene ata
+            let uniqueItemKey = keyChain;
+
+            ${groups.key ? `let ${groups.key} = ${iter};` : ""}
+            ${groups.index ? `let ${groups.index} = parseInt(${iter});` : ""}
+            
+            // DİKKAT: Burada süslü parantezi kapatmıyoruz! 
+            // Kapanış </each> tag'inde yapılmalı.
+    `;
 				}
 
 				if (logic) {
