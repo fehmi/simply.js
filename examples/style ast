@@ -1,0 +1,84 @@
+style ast
+no need bcs there is replacesync
+
+/*
+var t0 = performance.now();
+function simpleScope(scope) {
+  return function (el) {
+    if (el.type !== 'rule') return;
+
+    el.props = el.props.map(p => {
+
+      // :global(...) escape
+      if (p.includes(':global(')) {
+        return p.replace(/:global\((.*?)\)/g, '$1');
+      }
+
+      // @keyframes içi selector'a dokunma
+      if (el.root && el.root.type === '@keyframes') {
+        return p;
+      }
+
+      // Zaten scoped
+      if (p.includes(scope)) return p;
+
+      // Root selector (:host, :where, [attr])
+      if (p[0] === ':' || p[0] === '[') {
+        return `${p}${scope}`;
+      }
+
+      return `${scope} ${p}`;
+    });
+  };
+}
+
+
+var lastStyleAST = stylis.compile(parsedStyle);
+simply.components[name].lastStyleAST = lastStyleAST;
+
+var serializedCSS = stylis.serialize(
+  lastStyleAST,
+  stylis.middleware([
+    stylis.stringify
+  ])
+);
+var t1 = performance.now();
+console.log(`Style AST for ${name} took ${t1 - t0} ms`);
+var test = stylis.compile(parsedStyle);
+console.log(lastStyleAST, test, serializedCSS);
+*/
+
+
+/*
+var previousStyleAST = simply.components[name].lastStyleAST;
+var newStyleAST = stylis.compile(parsedStyle);
+var currentCSSOM = this.dom.querySelector(":scope > style[simply]").sheet.cssRules;
+var end = performance.now();
+console.log(`Style AST re compile for ${name} took ${end - start} ms`);
+console.log(previousStyleAST, newStyleAST, currentCSSOM);
+
+function safeStringify(obj) {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) return "[Circular]";
+      seen.add(value);
+    }
+    return value;
+  }, 2);
+}
+
+//console.log(safeStringify(previousStyleAST));
+//console.log(safeStringify(newStyleAST));
+
+var serializedCSS = stylis.serialize(
+  newStyleAST,
+  stylis.middleware([
+    stylis.stringify
+  ])
+);
+*/
+
+
+//simply.components[name].lastStyleAST = lastStyleAST;
+//var parsedStyle = simply.parseStyle(parsingArgs);            

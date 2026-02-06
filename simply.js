@@ -1,276 +1,263 @@
 simply = {
 	components: {},
+
 	parseTemplate: function (parsingArgs) {
-		window.sss = performance.now();
-		var { template, data, style, state, parent, methods, props, component, dom, methods, lifecycle } = parsingArgs;
+		var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = parsingArgs;
 
-		// condititionals
-		let ifStart = /\<if(\s)cond=\"(.*)\"(\>$)/;
-		let elsifStart = /\<elsif(\s)cond=\"(.*)\"(\>$)/;
-		let customElStart = /<([a-z]{1,10}-[a-z]{1,10})>$/
-		let inTagVar = /:="([^"]+)"$/; // https://regex101.com/r/vzY75x/1
-		let ifCount = 0;
-		let eachCount = 0;
-		let m; // match
-		let bucket = "";
-		const MAX_LENGTH = 150;
-		var recentBucket = "";
-		var processedLetters = "";
-		var capturedLogics = [];
-		var flag = false;
-		var curlyCount = 0;
-		var varBucket = "";
-		var scriptCount = 0;
-		var styleCount = 0;
-		var customEl = 0;
-		var ignoreFlag = false;
+		if (!simply.components[name].templateRenderFn) {
 
-		template = template.replace(/[\r\n]+/g, '');
+			var start = performance.now();
+			template = simply.addUniqueKeys(template, component);
+			var end = performance.now();
+			// console.log("addKeys took " + (end - start) + " ms");
 
-		if (template.includes('${')) {
-			template = template.replace(/\$\{/g, 'minyeli{');
+			template = template.replace(/[\r\n]+/g, '');
+			if (template.includes('${')) {
+				template = template.replace(/\$\{/g, 'minyeli{');
+			}
+
+			const bucketParts = [];
+			const len = template.length;
+
+			// Regex'ler
+			const tagMatchRegex = /(<(?:if\s+cond="([^"]+)"|elsif\s+cond="([^"]+)"|each[^>]*|else|\/(?:each|if|elsif|else))>)/g;
+			// const varRegex = /\{([^{}]+)\}/g;
+
+			// https://claude.ai/chat/4fcf31d4-5be9-404e-a786-89f3b9e9172e
+			//const varRegex = /(?<!\\\s*)\{([^{}]+)\}/g;
+
+			// https://chatgpt.com/c/6981e017-5720-8384-98c6-d5982304bc06
+			const varRegex = /\{\{\s*([^{}]+?)\s*\}\}/g;
+
+			const inTagVarRegex = /:="([^"]+)"/g;
+
+			// Script/style bölgelerini bul ve hariç tut
+			const excludeRanges = [];
+			let scriptMatch;
+			const scriptRegex = /<script[^>]*>([\s\S]*?)<\/script>/gi;
+			while ((scriptMatch = scriptRegex.exec(template)) !== null) {
+				excludeRanges.push([scriptMatch.index, scriptMatch.index + scriptMatch[0].length]);
+			}
+			const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+			while ((scriptMatch = styleRegex.exec(template)) !== null) {
+				excludeRanges.push([scriptMatch.index, scriptMatch.index + scriptMatch[0].length]);
+			}
+
+			function isExcluded(index) {
+				for (const [start, end] of excludeRanges) {
+					if (index >= start && index < end) return true;
+				}
+				return false;
+			}
+
+			// Tüm logic noktalarını topla
+			const logicPoints = [];
+
+			// 1. Custom tag'ları bul
+			let tagMatch;
+			while ((tagMatch = tagMatchRegex.exec(template)) !== null) {
+				if (isExcluded(tagMatch.index)) continue;
+
+				const fullTag = tagMatch[1];
+				let logic = "";
+
+				if (fullTag === '</each>') {
+					logic = "};";
+				} else if (fullTag === '<else>') {
+					logic = "else {";
+				} else if (fullTag === '</if>' || fullTag === '</elsif>' || fullTag === '</else>') {
+					logic = "}";
+				} else if (tagMatch[2]) { // <if cond="...">
+					logic = "if (" + unescape(tagMatch[2]) + ") {";
+				} else if (tagMatch[3]) { // <elsif cond="...">
+					logic = "else if (" + unescape(tagMatch[3]) + ") {";
+				} else if (fullTag.startsWith('<each')) {
+					const groups = parseEachTag(fullTag);
+					const iter = "s" + Math.random().toString(36).slice(2, 7);
+
+					logic = `
+					for (let ${iter} in ${groups.of}) {
+						if (!Object.prototype.hasOwnProperty.call(${groups.of}, ${iter})) continue;
+						const ${groups.as} = ${groups.of}[${iter}];
+						let uniqueItemKey = "${iter}" + ${iter};
+						${groups.key ? `let ${groups.key} = ${iter};` : ""}
+						${groups.index ? `let ${groups.index} = parseInt(${iter});` : ""}`;
+				}
+
+				if (logic) {
+					logicPoints.push({
+						start: tagMatch.index,
+						end: tagMatch.index + fullTag.length,
+						logic
+					});
+				}
+			}
+
+			// 2. Variable'ları bul {data.x}
+			let varMatch;
+			while ((varMatch = varRegex.exec(template)) !== null) {
+				if (isExcluded(varMatch.index)) continue;
+
+				// Zaten tag içinde mi kontrol et
+				let isInsideTag = false;
+				for (const lp of logicPoints) {
+					if (varMatch.index >= lp.start && varMatch.index < lp.end) {
+						isInsideTag = true;
+						break;
+					}
+				}
+				if (isInsideTag) continue;
+
+				let variable = varMatch[1];
+
+				// Object literal check
+				if (/^\{.*\}$/.test(variable)) {
+					variable = '"' + varMatch[0] + '"';
+				}
+
+				logicPoints.push({
+					start: varMatch.index,
+					end: varMatch.index + varMatch[0].length,
+					logic: "ht+=" + variable + ";"
+				});
+			}
+
+			// 3. In-tag variable'ları bul :="expr"
+			let inTagMatch;
+			while ((inTagMatch = inTagVarRegex.exec(template)) !== null) {
+				if (isExcluded(inTagMatch.index)) continue;
+
+				logicPoints.push({
+					start: inTagMatch.index,
+					end: inTagMatch.index + inTagMatch[0].length,
+					logic: "ht+=" + inTagMatch[1] + ";"
+				});
+			}
+
+			// Pozisyona göre sırala
+			logicPoints.sort((a, b) => a.start - b.start);
+
+			// Bucket oluştur
+			let lastEnd = 0;
+			for (const point of logicPoints) {
+				// Statik text
+				if (point.start > lastEnd) {
+					const staticText = template.substring(lastEnd, point.start);
+					if (staticText.trim()) {
+						bucketParts.push("ht+=`" + staticText + "`;");
+					}
+				}
+				bucketParts.push(point.logic);
+				lastEnd = point.end;
+			}
+
+			// Kalan
+			if (lastEnd < len) {
+				const remaining = template.substring(lastEnd).trimEnd();
+				if (remaining) {
+					bucketParts.push("ht+=`" + remaining + "`;");
+				}
+			}
+
+			function parseEachTag(eachTag) {
+				function getAttr(regex) {
+					var m = eachTag.match(regex);
+					return m ? m[1] : undefined;
+				}
+
+				return {
+					of: getAttr(/of="([^"]+)"/),
+					as: getAttr(/as="([^"]+)"/),
+					key: getAttr(/key="([^"]+)"/),
+					index: getAttr(/index="([^"]+)"/)
+				};
+			}
+
+			let bucket = bucketParts.join("").replace(/minyeli/g, '$');
+
+
+			// handi değişken hangi parent içinde bulmak için
+			// https://gemini.google.com/app/970ef2eca93f817e
+			// ama ya varaible methods ile script'ten geliyorsa
+			// zor ve yavaş iş hiç girme bırak morphdom yapsın komple
+
+			simply.components[name].templateRenderFn = new Function(
+				"scope",
+				`var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = scope;
+       let ht = "";
+       ${bucket}
+       return ht;`
+			);
+		}
+		return simply.components[name].templateRenderFn(parsingArgs);
+	},
+
+	addUniqueKeys(template, component) {
+		const excludedTags = new Set(['if', 'elsif', 'else', 'each']);  // Hızlı lookup için Set
+
+		function addKeysInsideEach(template) {
+			let insideEach = 0;
+			let tagIndex = 0;
+			const tagRe = /<\/?([a-zA-Z][\w:-]*)([^>]*)>/g;
+
+			return template.replace(tagRe, (fullTag, tagName, attrs) => {
+				const isClose = fullTag[1] === "/";
+				const lowerName = tagName.toLowerCase();
+
+				if (lowerName === "each") {
+					insideEach += isClose ? -1 : 1;
+					return fullTag;
+				}
+
+				if (insideEach > 0 && !isClose) {
+					if (excludedTags.has(lowerName)) {
+						return fullTag;
+					}
+
+					if (/\bkey\s*=/.test(attrs)) {
+						return fullTag;
+					}
+					tagIndex++;
+					return `<${tagName} key="${component.uid}-${lowerName}${tagIndex}{{uniqueItemKey}}"${attrs}>`;
+				}
+
+				return fullTag;
+			});
 		}
 
+		template = addKeysInsideEach(template);
+
+		// faster version without random
+		let keyi = 0;
+		template = template.replace(/<(?!\/)([a-zA-Z0-9-]+)([^>]*)>/g, (match, tagName, attributes) => {
+			if (excludedTags.has(tagName.toLowerCase()) || attributes.includes('key=')) {
+				return match;
+			}
+			return `<${tagName} key="${component.uid}-${tagName}-${keyi++}"${attributes}>`;
+		});
+
+		// Regex Mantığı:
+		// <        -> Küçüktür işaretiyle başla
+		// (?!\/)   -> (Negative Lookahead) Eğer hemen devamında '/' varsa (yani kapanışsa) bunu GÖRMEZDEN GEL.
+		// ([a-zA-Z0-9-]+) -> Tag ismini yakala (Grup 1)
+		// ([^>]*)  -> Kapanış parantezine kadar olan geri kalan her şeyi (attribute'ları) yakala (Grup 2)
+		// >        -> Büyüktür işaretiyle bitir
+		// add unique key to each opening tag to make morphdom happy and flip animations possible
 		/*
-			Template'i harf harf kontrol edip yakalanan logic' string'leri
-			js'ye çevirip bucket içinde bunları replace ediyor.
-			en sonra ht değişkenini eval edip son halini üretiyor.
+		bucket = bucket.replace(/<(?!\/)([a-zA-Z0-9-]+)([^>]*)>/g, (match, tagName, attributes) => {
+			const rnd = Math.random().toString(36).slice(2, 8);
+			return `<${tagName} key="${tagName}-${rnd}"${attributes}>`;
+		});
+		*/
+		// faster version without random
+		/*
+		let i = 0;
+		bucket = bucket.replace(/<(?!\/)([a-zA-Z0-9-]+)([^>]*)>/g, (match, tagName, attributes) => {
+			return `<${tagName} key="${tagName}-${i++}"${attributes}>`;  // Veya id için: id="${tagName}-${i++}"
+		});
 		*/
 
-		for (var i = 0; i < template.length; i++) {
-			let ch = template[i];
-			processedLetters += ch;
-			bucket += ch;
-			recentBucket += ch;
-			// bu tam bir performance boost. her seferinde substring olmuyor
-			if (recentBucket.length > MAX_LENGTH * 2) { // 300, MAX_LENGTH'in 2 katı olarak
-				recentBucket = recentBucket.substring(MAX_LENGTH);
-			}
-
-			// tag exceptions
-			if (ch == ">") {
-				if (recentBucket.endsWith("<script>")) {
-					scriptCount += 1;
-				}
-				else if (recentBucket.endsWith("<style>")) {
-					styleCount += 1;
-				}
-				// custom element açıldı, dokanma içine. onun kendi lifecycle'ı var
-				else if (!customEl && (m = customElStart.exec(recentBucket)) !== null) {
-					if (customElements.get(m[1])) {
-						customEl = m[1];
-					}
-				}
-				else if (recentBucket.endsWith("</script>")) {
-					scriptCount -= 1;
-				}
-				else if (recentBucket.endsWith("</style>")) {
-					styleCount -= 1;
-				}
-				// açılışı yakalanan custom element kapandı, render'a devam
-				else if (customEl && recentBucket.endsWith(`</${customEl}>`)) {
-					// console.log("Closed:", customEl);
-					customEl = 0;
-				}
-			}
-
-			// exception değilse
-			if (styleCount == 0 && scriptCount == 0 && !customEl) {
-				// attribute içindeki fonksyion ise skip
-				if (recentBucket.endsWith('="function') || recentBucket.endsWith('="(function')) {
-					ignoreFlag = true;
-				}
-
-				if (template[i - 1] !== "\\" && ch == "{") {
-					curlyCount += 1;
-				}
-
-				if (curlyCount > 0 && ignoreFlag === false) {
-					varBucket += ch;
-				}
-
-				if (template[i - 1] !== "\\" && ch == "}") {
-					curlyCount -= 1;
-					if (curlyCount == 0 && ignoreFlag === true) {
-						ignoreFlag = false;
-					}
-				}
-
-				// variable
-				if (curlyCount == 0 && varBucket !== "") {
-					varBucket = varBucket.trim();
-					let variable = varBucket.substring(1, varBucket.length - 1);
-
-					// 1ms Simple check for object-like patterns
-					function isObjectString(str) {
-						return /^\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))+\}))*\}$/.exec(str);
-					}
-
-					if (isObjectString(variable)) {
-						variable = "\"" + varBucket + "\"";
-					}
-
-					logic = "ht+=" + variable + ";";
-					flag = true;
-				}
-				else if (ch == '"' && recentBucket.includes(':="') && (m = inTagVar.exec(recentBucket)) !== null) {
-					logic = "ht+=" + m[1] + ";";
-					flag = true;
-				}
-				else {
-					m = null;
-				}
-
-				// if else elsif each gibi custom tag'lar
-				if (ch == ">") {
-					if (recentBucket.endsWith("</each>")) {
-						m = ["</each>"];
-						eachCount -= 1;
-						logic = "};";
-						flag = true;
-					}
-					else if (recentBucket.endsWith('<else>')) {
-						m = ["<else>"];
-						logic = "else {";
-						flag = true;
-
-					}
-					else if (recentBucket.endsWith('</if>')) {
-						m = ["</if>"];
-						ifCount -= 1;
-						logic = "}";
-						flag = true;
-					}
-					else if (recentBucket.endsWith('</elsif>')) {
-						m = ["</elsif>"];
-						logic = "}";
-						flag = true;
-					}
-					else if (recentBucket.endsWith('</else>')) {
-						m = ["</else>"];
-						logic = "}";
-						flag = true;
-					}
-					else if (recentBucket.includes('<if ') && (m = ifStart.exec(recentBucket)) !== null) {
-						logic = unescape("if (" + m[2] + ") {");
-						//logic = (ifCount == 0 ? 'let ht = "";' + logic : logic);
-						ifCount += 1;
-						flag = true;
-					}
-					else if (recentBucket.includes('<elsif ') && (m = elsifStart.exec(recentBucket)) !== null) {
-						logic = unescape(m[2]); // bu niye 3 tü 
-						logic = "else if (" + logic + ") {";
-						flag = true;
-					}
-					else if (recentBucket.includes("<each") && (m = recentBucket.match(/\<each[^\>]*\>$/)) !== null) {
-						m.groups = parseEachTag(m[0]);
-						// if (eachCount > 0) {} //each içinde each
-						eachCount += 1;
-						try {
-							subject = eval(m.groups.of);
-						} catch (error) {
-							//console.log(lastM + "." + m.groups.of);
-							subject = m.groups.of;
-						}
-
-						var iiii = "s" + Math.random().toString(16).slice(2);
-
-						if (Array.isArray(subject)) {
-							key = m.groups.key ? "let " + m.groups.key + " = " + iiii + ";" : "";
-							index = m.groups.index ? "let " + m.groups.index + " = " + iiii + ";" : "";
-
-							logic = "for (" + iiii + " = 0; " + iiii + " < " + m.groups.of + ".length; " + iiii + "++) { \
-								if (!"+ m.groups.of + "[" + iiii + "]) { continue; }\
-														" + key + " \
-														" + index + " \
-														let " + m.groups.as + "=" + m.groups.of + "[" + iiii + "];";
-						}
-						else {
-							key = m.groups.index ? "let " + m.groups.index + " = " : "";
-
-							logic = "\
-												for (var ii in "+ m.groups.of + ") { \
-													if (typeof "+ m.groups.of + "[ii] == 'function') { continue; }\
-													" + key + "Object.keys(" + m.groups.of + ").indexOf(ii); \
-													let " + m.groups.key + "= ii; \
-													let " + m.groups.as + "=" + m.groups.of + "[ii];";
-						}
-						flag = true;
-						lastM = m.groups.of;
-						lasti = iiii;
-					}
-				}
-			}
-
-			// yakalanan logic var ise
-			if (flag === true) {
-				try {
-					capturedLogics.push(m[0]);
-				} catch (error) {
-					capturedLogics.push(varBucket);
-					varBucket = "";
-				}
-				let logicLine = capturedLogics[capturedLogics.length - 1];
-				let lio = processedLetters.lastIndexOf(logicLine)
-				staticText = processedLetters.substring(0, lio) + "";
-				let replaceThis = staticText + logicLine;
-
-				// if else arasına ht=""; girince hata fırlatıyordu
-				if (staticText.trim() == "") {
-					var withThis = logic;
-				}
-				else {
-					var withThis = "ht+=`" + staticText.replace(/\n/g, "") + "`;" + logic;
-				}
-				/*
-				console.log("name: " + component.name);
-				console.log("replace this: " + replaceThis)
-				console.log("with this: " + withThis);
-				*/
-				// bucket = bucket.replace(replaceThis, withThis);
-
-				bucket = bucket.substring(0, bucket.length - replaceThis.length) + withThis;
-				recentBucket = bucket.substring(bucket.length - MAX_LENGTH);
-
-				//console.log(replaceThis, withThis);
-				flag = false;
-				processedLetters = "";
-			}
-		}
-
-		function parseEachTag(eachTag) {
-			let ofMatch = eachTag.match(/of="([^"]+)"/);
-			let asMatch = eachTag.match(/as="([^"]+)"/);
-			let keyMatch = eachTag.match(/key="([^"]+)"/);
-			let indexMatch = eachTag.match(/index="([^"]+)"/);
-
-			let of = ofMatch ? ofMatch[1] : undefined;
-			let as = asMatch ? asMatch[1] : undefined;
-
-			// Create the result object and conditionally add key and index if they exist
-			let result = { of, as };
-			if (keyMatch) result.key = keyMatch[1];
-			if (indexMatch) result.index = indexMatch[1];
-
-			return result;
-		}
-		var end = performance.now();
-
-		if (processedLetters.trimEnd() !== "") {
-			if (bucket.endsWith(processedLetters)) {
-				bucket =
-					bucket.slice(0, -processedLetters.length) +
-					"ht+=`" + processedLetters.trimEnd() + "`;";
-			}
-		}
-
-		var ht = "";
-		// console.log(bucket); 
-		// console.log(capturedLogics); 
-		bucket = bucket.replace(/minyeli/g, '$');
-
-		eval(bucket);
-		return ht;
+		return template;
 	},
 	/*
 	parseStyle: function (parsingArgs) {
@@ -278,7 +265,7 @@ simply = {
 		let variable = /(\"|\')(\{)([^{}\n]*)\}(\"|\')/;
 		var vars = {};
 		while ((m = variable.exec(style)) !== null) {
-			// This is necessary to avoid infinite loops with zero-width matches
+			// This is necessary to avoid infinite loops with zero-width matches 
 			if (m.index === variable.lastIndex) {
 				variable.lastIndex++;
 			}
@@ -303,6 +290,7 @@ simply = {
 		// fallback
 		return expr.replace(/\W+/g, "-");
 	},
+	/*
 	parseStyle: function (parsingArgs) {
 		let { style, data, state, parent, methods, props, component, dom, lifecycle } = parsingArgs;
 
@@ -391,6 +379,109 @@ simply = {
 
 		return { style: cleanStyle.trim() };
 	},
+	*/
+
+	parseStyle: function (parsingArgs) {
+		var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = parsingArgs;
+
+		// Eğer önbellekte render fonksiyonu yoksa oluştur
+		if (!simply.components[name].styleRenderFn) {
+
+			// --- 1. OPTİMİZE EDİLMİŞ DÖNÜŞTÜRÜCÜ ---
+			function convertConditionals(cssString) {
+				let s = cssString;
+
+				// --- OPTİMİZASYON 1: AKILLI VAR() KONTROLÜ ---
+				// Hedef: Sadece içinde JS mantığı olan var()'ları bulmak.
+				// var(--red) gibi native olanları pas geçmek istiyoruz.
+
+				let hasDynamicVar = false;
+				let pos = s.indexOf('var(');
+
+				while (pos !== -1) {
+					// 'var(' 4 karakter uzunluğunda. Hemen sonrasına bakıyoruz (index 4 ve 5).
+					// 45, ASCII tablosunda '-' (tire) işaretidir.
+					// Eğer var('dan sonra gelen iki karakter '--' değilse, bu bir JS işlemidir!
+					if (s.charCodeAt(pos + 4) !== 45 || s.charCodeAt(pos + 5) !== 45) {
+						hasDynamicVar = true;
+						break; // Bir tane bile bulsak yeter, Regex çalışmalı.
+					}
+					// Sonraki var('ı ara
+					pos = s.indexOf('var(', pos + 1);
+				}
+
+				// Sadece "gerçek" bir JS variable bulduysak Regex çalıştır
+				if (hasDynamicVar) {
+					s = s.replace(/var\(([^()]*(?:\([^()]*(?:\([^()]*(?:\([^()]*\)[^()]*)*\)[^()]*)*\)[^()]*)*)\)/g, (match, content) => {
+						// Regex yine de güvenlik için içeriği kontrol eder (boşluklu yazımlar vs için)
+						if (content.trim().startsWith('--')) return match;
+						return '` + (' + content + ') + `';
+					});
+				}
+
+				// --- OPTİMİZASYON 2: COND KONTROLÜ ---
+				// Sadece cond:[ varsa işlemleri yap
+				if (s.includes('cond:[')) {
+					s = s
+						.replace(/&cond:\[elsif="(.+?)"\]\s*{/g, '`; else if ($1) { ht+=`')
+						.replace(/&cond:\[else\]\s*{/g, '`; else { ht+=`')
+						.replace(/&cond:\[if="(.+?)"\]\s*{/g, '`; if ($1) { ht+=`')
+						.replace(/ht\+=\`\s*`;\s*(else)/g, '$1');
+				}
+
+				return s;
+			}
+
+			// --- 2. OPTİMİZE EDİLMİŞ İŞARETLEYİCİ ---
+			const markConditions = (str) => {
+				let stack = [];
+				let nextIsTarget = false;
+
+				// Regex sadece cond, { ve } arar. 
+				return str.replace(/(cond:\[)|(\{)|(\})/g, (match, trigger, open, close) => {
+					if (trigger) {
+						nextIsTarget = true;
+						return match;
+					}
+					if (open) {
+						stack.push(nextIsTarget);
+						nextIsTarget = false;
+						return match;
+					}
+					if (close) {
+						return stack.pop() ? '`;} ht+=`' : match;
+					}
+				});
+			};
+
+			// --- ANA AKIŞ (MAIN FLOW) ---
+			var processedCSS = parsingArgs.style;
+
+			// HIZ KAZANCI BURADA:
+			// Eğer CSS içinde hiç "cond:[" yoksa, koca bir Lexer/Parser döngüsünü (markConditions)
+			// tamamen atlıyoruz. O(N) -> O(0)
+			if (processedCSS.includes('cond:[')) {
+				processedCSS = markConditions(processedCSS);
+			}
+
+			// convertConditionals içinde de benzer check'ler var, oraya paslıyoruz.
+			var fixiedConditions = convertConditionals(processedCSS);
+
+			// --- RENDER FONKSİYONU OLUŞTURMA ---
+			var renderFunc = "var ht = ``;";
+			renderFunc += "ht += `" + fixiedConditions + "`;";
+
+			simply.components[name].styleRenderFn = new Function(
+				"scope",
+				`var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = scope;
+         ${renderFunc}
+         return ht;`
+			);
+		}
+
+		return simply.components[name].styleRenderFn(parsingArgs);
+	},
+
 	loadJS: function (src, cb, waitBeforeCb) {
 		/*! loadJS: load a JS file asynchronously. [c]2014 @scottjehl, Filament Group, Inc. (Based on http://goo.gl/REQGQ by Paul Irish). Licensed MIT */
 		if (document.querySelectorAll('[src="' + src + '"]').length > 0) {
@@ -429,6 +520,7 @@ simply = {
 		// zaten load ise, sadece run cb
 		return script;
 	},
+
 	get: function (path, name) {
 		simply.gets = simply.gets || [];
 
@@ -457,64 +549,96 @@ simply = {
 		});
 	},
 	loadComponent: function (path, name, callback, triedWithCorsProxy = false) {
-		if (typeof name === "undefined" || !name) {
-			// If proxy URL, get real path after proxy prefix
-			const realPath = path.includes("cors.woebegone.workers.dev/?")
-				? path.split("cors.woebegone.workers.dev/?")[1]
-				: path;
+		var start = performance.now();
+		if (!name) {
+			// proxy temizleme (split yok)
+			const proxy = "cors.woebegone.workers.dev/?";
+			let p = path;
+			let i = p.indexOf(proxy);
+			if (i !== -1) p = p.slice(i + proxy.length);
 
-			// Keep full path for fetching (including query params)
-			path = realPath;
+			path = p;
 
-			// Extract name from path without query and hash
-			const queryIndex = realPath.indexOf('?');
-			const basePath = queryIndex === -1 ? realPath : realPath.slice(0, queryIndex);
-			const cleanPath = basePath.split('#')[0];
-			const filename = cleanPath.split('/').pop();
-			name = filename.split('.').slice(0, -1).join('.');
+			// ? ve # kırp
+			i = p.indexOf("?");
+			if (i !== -1) p = p.slice(0, i);
+			i = p.indexOf("#");
+			if (i !== -1) p = p.slice(0, i);
+
+			// son / sonrası
+			i = p.lastIndexOf("/");
+			if (i !== -1) p = p.slice(i + 1);
+
+			// uzantıyı at
+			i = p.lastIndexOf(".");
+			if (i !== -1) p = p.slice(0, i);
+
+			name = p;
+		} else {
+			// name'den extension at (split yok)
+			let i = name.lastIndexOf(".");
+			if (i !== -1) name = name.slice(0, i);
 		}
-		else {
-			if (name.indexOf(".") > -1) {
-				var ext = name.split(".").pop();
-				name = name.replace("." + ext, "");
-			}
-			else {
-				var ext = "html";
-			}
-		}
+
 
 		const isBlob = path.startsWith("blob:");
-		const fetchUrl = isBlob
-			? path
-			: path + (path.includes("?") ? "&" : "?") + "_v=" + Date.now();
+		// buna gerek kalmadı apache 200 304 yapıyor değişiklikte
+		//const fetchUrl = isBlob
+		//	? path
+		//	: path + (path.includes("?") ? "&" : "?") + "_v=" + Date.now();
 
-		fetch(fetchUrl)
+		const fetchUrl = path;
+
+		fetch(fetchUrl, { cache: "no-cache" })
 			.then(response => {
-				if (!response.ok) throw new Error("Network response was not ok");
+				// HTTP error ≠ CORS
+				if (!response.ok) {
+					console.error("HTTP error:", response.status);
+					return null;
+				}
 				return response.text();
 			})
 			.then(text => {
-				if (!text) throw new Error("Empty response (possible CORS block)");
-				const parsed = simply.splitComponent(text);
+				if (!text) return;
+
+				let parsed;
+				try {
+					parsed = simply.splitComponent(text);
+				} catch (e) {
+					// PARSE HATASI → proxy yok
+					console.error("splitComponent error:", e);
+					return;
+				}
 
 				simply.components[name] = parsed;
+
 				callback({
 					name,
 					template: parsed.template,
-					styles: parsed.styles,
+					style: parsed.style,
 					script: parsed.script,
 					docStr: text
 				});
 			})
 			.catch(error => {
-				// console.warn("Fetch error:", error.message, "(possible CORS block) Trying with proxy one time.");
-				if (!triedWithCorsProxy && !path.startsWith("https://cors.woebegone.workers.dev/")) {
+				// SADECE gerçek network / CORS hatası
+				const isCorsOrNetworkError =
+					error instanceof TypeError &&
+					/failed fetch|network|cors/i.test(error.message);
+
+				if (
+					isCorsOrNetworkError &&
+					!triedWithCorsProxy &&
+					!path.startsWith("https://cors.woebegone.workers.dev/")
+				) {
 					const proxyUrl = "https://cors.woebegone.workers.dev/?" + path;
 					simply.loadComponent(proxyUrl, name, callback, true);
 				} else {
-					// console.error("Could not load component even with proxy:", path);
+					console.error(error);
 				}
 			});
+		var end = performance.now();
+		// console.log("loadComponent for " + name + " took " + (end - start) + " milliseconds.");
 	},
 
 	request: function (url, callback, async = false) {
@@ -536,41 +660,44 @@ simply = {
 		request.send();
 	},
 	splitComponent: function (string) {
-		var txt = document.createElement("textarea");
-		var parser = new DOMParser();
-		var dom = parser.parseFromString(string, "text/html");
-		var template;
-		var styles = {};
-		if (dom.querySelector("style")) {
-			dom.querySelectorAll("style").forEach(styleEl => {
-				txt.innerHTML = styleEl.innerHTML;
-				style = txt.value;
-				string = string.replace(txt.value, "");
-				if (styleEl.getAttribute("global") !== null) {
-					styles["global"] = style;
-				}
-				else {
-					styles["local"] = style;
-				}
-				styleEl.remove();
-			});
+		// https://gemini.google.com/app/9788bd4a4f5bfd35
+		var start = performance.now();
+
+		let template = "";
+		let style = "";
+		let script = "";
+
+		// TEK VE GÜÇLÜ REGEX:
+		// 1. Grup: Tag ismi (html, style veya script)
+		// 2. Grup: İçerik
+		// \1 referansı: Başta hangi tag açıldıysa (örn: style), sonda da o kapatılmalı (</style>)
+		const regex = /<(html|style|script)[^>]*>([\s\S]*?)<\/\1>/gi;
+
+		let match;
+
+		// exec döngüsü string üzerinde "cursor" mantığıyla ilerler.
+		// Stringi kopyalamaz, kesmez, sadece üzerinden geçer.
+		while ((match = regex.exec(string)) !== null) {
+			const tagName = match[1].toLowerCase();
+			const content = match[2];
+
+			if (tagName === 'html') {
+				template = content;
+			} else if (tagName === 'style') {
+				style = content;
+			} else if (tagName === 'script') {
+				script = content;
+			}
 		}
 
-		var script = "";
-		if (dom.querySelector("script")) {
-			var script = dom.querySelector("script");
-			txt.innerHTML = script.innerHTML;
-			script = txt.value;
-			dom.querySelector("script").remove();
-			string = string.replace(txt.value, "");
-		}
-		template = string.replace("<style></style>", "").replace("<style global></style>", "").replace("<script></script>", "");
+		var end = performance.now();
+		// console.log("splitComponent (Single Pass Regex) took " + (end - start) + " ms.");
 
 		return {
 			template,
-			styles,
+			style,
 			script
-		}
+		};
 	},
 	processPropTemplate: function (string) {
 		// clean up  
@@ -671,7 +798,7 @@ simply = {
 			}
 		});
 	},
-	getSettings: function ({ name, template, styles, script, docStr }, callback) {
+	getSettings: function ({ name, template, style, script, docStr }, callback) {
 		//const jsFile = new Blob([script.textContent], { type: 'application/javascript' });
 		//const jsURL = URL.createObjectURL(jsFile);
 		function getListeners(settings) {
@@ -695,570 +822,479 @@ simply = {
 			name: name, //module.default.name,
 			//      listeners,
 			template,
-			styles,
+			style,
 			script,
 			docStr
 			//settings
 		});
 		//});
 	},
-	runGetsReturnClass: function (scr, compName) {
-		var gets;
-		var classRegex = /class(\s+simply)?(\s+)?{/;
-		var classLine = classRegex.exec(scr);
 
-		if (classLine) {
-			var scriptParts = scr.split(classLine[0]);
-			gets = scriptParts[0];
-			var clss = classLine[0] + scriptParts[1];
-			//console.log(clss);
+	framerStaff: function (dom, name, uid, component, props, lifecycle) {
+		// 6. framerComponentObserver
+		const framerComponentObserver = new MutationObserver(mutations => {
+			for (const mutation of mutations) {
+				for (const node of mutation.addedNodes) {
+					if (node.nodeType === Node.ELEMENT_NODE) {
+						if (node.tagName === "FRAMER-COMPONENT" && !node.hasAttribute("uid")) {
+							const framerComponentUid = "id" + Math.random().toString(16).slice(2);
+							const path = node.getAttribute("path");
+							node.setAttribute("uid", framerComponentUid);
+							node.setAttribute("style", "height: auto; width: auto");
+							node.setAttribute("rendered", true);
+
+							window.parent.postMessage({
+								method: "component-request",
+								path,
+								name,
+								framerComponentUid,
+								uid
+							}, "*");
+
+							node.addEventListener("click", e => {
+								if (node.contains(e.target)) {
+									triggerOnTapFromDOM(e.target);
+								}
+							}, { passive: true });
+						}
+					}
+				}
+			}
+		});
+
+		framerComponentObserver.observe(dom, {
+			childList: true,
+			subtree: true
+		});
+
+		function triggerOnTapFromDOM(domElement) {
+			var current = domElement;
+
+			while (current && current.tagName !== "FRAMER-COMPONENT") {
+				var fiberKey = null;
+				try {
+					var keys = Object.keys(current);
+					for (var i = 0; i < keys.length; i++) {
+						if (keys[i].indexOf("__reactFiber$") === 0) {
+							fiberKey = keys[i];
+							break;
+						}
+					}
+				} catch (e) { }
+
+				var fiber = fiberKey ? current[fiberKey] : null;
+
+				try {
+					var onTap = fiber.return.child.pendingProps.onTap;
+					if (typeof onTap === "function") {
+						onTap();
+						setTimeout(() => {
+							try {
+								self.lifecycle.framerComponentClicked(current)
+							} catch (e) { }
+						}, 0);
+						return;
+					}
+				} catch (e) { }
+
+				try {
+					var onTap = fiber.return.child.child.stateNode.props.onTap;
+					if (typeof onTap === "function") {
+						onTap();
+						setTimeout(() => {
+							try {
+								self.lifecycle.framerComponentClicked(current)
+							} catch (e) { }
+						}, 0);
+						return;
+					}
+				} catch (e) { }
+
+				current = current.parentElement;
+			}
+		}
+
+		dom.addEventListener("click", function (e) {
+			const target = e.target;
+			const link = target.closest("a");
+
+			if (link && (link.closest("framer-component") || link.hasAttribute("route-framer"))) {
+				e.preventDefault();
+				e.stopPropagation();
+				window.parent.postMessage({
+					method: 'link-click',
+					link: link.getAttribute("href"),
+					uid,
+					name
+				}, '*');
+			}
+		});
+		// 18. Framer props listener
+		self.framerPropsListener = function (event) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			if (event.data.method === "set-props") {
+				Object.assign(props, event.data.props);
+				if (lifecycle && lifecycle.framerPropsUpdated) {
+					lifecycle.framerPropsUpdated();
+				}
+				component.render();
+			}
+		};
+
+		component.runInFramer = function (codeToRun) {
+			window.parent.postMessage({
+				method: 'run-in-framer',
+				name,
+				uid: uid,
+				code: "return " + codeToRun.toString()
+			}, '*');
+		};
+
+		window.addEventListener("message", self.framerPropsListener);
+		window.parent.postMessage({ method: "simply-ready", uid: uid, name }, "*");
+	},
+
+	findElementWithCB(element) {
+		let current = element;
+		while (current) {
+			if (current.cb && current.cb.state) {
+				return current;
+			}
+			if (current.parentNode) {
+				current = current.parentNode;
+			} else if (current.host) {
+				current = current.host;
+			} else {
+				current = null;
+			}
+		}
+		return null;
+	},
+	classCache: {},
+	getDomParentAndShadow(component) {
+		var shadow = false;
+		if (component.getAttribute("isolated") !== null && component.getAttribute("isolated") !== "false") {
+			shadow = true;
+		}
+
+		var dom, parent;
+		if (shadow) {
+			dom = component.attachShadow({ mode: 'open' });
+			parent = component.getRootNode().host;
+			if (!parent) {
+				parent = simply.findShadowRootOrCustomElement(component);
+			}
 		}
 		else {
-			gets = scr;
+			dom = component;
+			parent = simply.findShadowRootOrCustomElement(component);
 		}
-		var m;
-		var importRegex = /\s*get\((\s+)?(\[)?([\s\S]*?)?(\,)?(\s+)?\]?(\s+)?\)(\;)?/gm
-		while ((m = importRegex.exec(gets)) !== null) {
-			eval(m[0]);
-		}
-		try {
-			if (clss.trim().indexOf(classLine[0]) == 0) {
-				// fix for "class simply {" usage
-				clss = clss = clss.replace(classRegex, "class {");
-				// to fix console line number
-				// var lines = docStr.split('<script>')[0].split("\n");
-				// var lineBreaks = "";
-				// for (let index = 0; index < lines.length - 2; index++) {
-				// 	lineBreaks += "\n"
-				// }			
+		return { dom, parent, shadow };
+	},
 
-				return "//" + compName + "\n\nnew " + clss.trim() + "//@ sourceURL=" + compName + ".html";
+	pathForTemplateSearch(currentPath, prefix) {
+		prefix = prefix || "data";
+
+		// bracket ve indexleri temizle
+		// asd["test"] → asd
+		// asd[0] → asd
+		var clean = currentPath
+			.replace(/\[.*?\]/g, "")
+			.replace(/\?\./g, "."); // optional chaining safety
+
+		var parts = clean.split(".");
+		var out = prefix;
+
+		for (var i = 0; i < parts.length; i++) {
+			var p = parts[i];
+			if (!p) continue;
+
+			out += "." + p;
+			break; // 👈 SADECE BİR NODE
+		}
+
+		return [out];
+	},
+
+	templateUsesAnyChange(template, changes, prefix) {
+		if (template) {
+			var normalized = template.replace(/\?\./g, ".");
+			for (const { currentPath } of changes) {
+				const paths = simply.pathForTemplateSearch(currentPath, prefix);
+				for (const path of paths) {
+					if (normalized.includes(path)) return true;
+				}
 			}
-		} catch (error) {
-			return false;
+		}
+		return false;
+	},
+
+	react: function (changes, from, component, template, style) {
+		if (typeof component.lifecycle !== "undefined") {
+			if (from === "props") {
+				if (typeof component.lifecycle.whenPropChange !== "undefined") {
+					if (component.lifecycle.whenPropChange(changes) === false) {
+						return false;
+					}
+				}
+			} else if (from === "state") {
+				if (component.lifecycle && component.lifecycle.whenStateChange) {
+					if (component.lifecycle.whenStateChange(changes) === false) {
+						return false;
+					}
+				}
+			} else if (typeof component.lifecycle.whenDataChange !== "undefined") {
+				if (component.lifecycle.whenDataChange(changes) === false) {
+					return false;
+				}
+			}
+		}
+
+		if (from === "state") {
+			if (!simply.templateUsesAnyChange(template, changes, "state") && !simply.templateUsesAnyChange(style, changes, "state")) {
+				return false;
+			}
+		}
+		else if (from === "props") {
+			if (!simply.templateUsesAnyChange(template, changes, "props") && !simply.templateUsesAnyChange(style, changes, "props")) {
+				return false;
+			}
+		}
+		else if (from === "data") {
+			if (!simply.templateUsesAnyChange(template, changes, "data") && !simply.templateUsesAnyChange(style, changes, "data")) {
+				return false;
+			}
+		}
+
+		// console.log(changes);
+		component.render(changes);
+	},
+
+	getParentState(parent) {
+		// 12. Parent'tan state al
+		if (parent) {
+			let current = parent;
+			while (current) {
+				if (current.state) {
+					return {
+						state: current.state,
+						cbState: parent.cb.state
+					};
+				}
+				current = current.parent;
+			}
+		}
+		return null;
+	},
+	setupObservableSlims(self) {
+		var t = self.template;
+
+		// DATA
+		var data = ObservableSlim.create({}, .1, function (changes) {
+			if (self.cb.data) {
+				for (const [key, cbFn] of Object.entries(self.cb.data)) {
+					if (cbFn) cbFn(changes);
+				}
+			}
+		});
+
+		if (t.includes("data.") || t.includes("data?.") || self.script.includes("data.") || self.script.includes("data?.")) {
+			self.cb.data = {};
+			self.cb.data[self.uid] = function (changes) { self.react(changes, "data", self, t, self.s) };
+			self.setCbData(self.cb.data);
+		}
+
+		// PROPS
+
+		for (var i = 0; i < self.attributes.length; i++) {
+			var attrib = self.attributes[i];
+			if (attrib.name !== "cb") {
+				self.props[attrib.name] = simply.parseProp(attrib.value).value;
+			}
+		}
+
+		var props = ObservableSlim.create(self.props, false, function (changes) {
+			if (self.cb.props) {
+				for (const [key, cbFn] of Object.entries(self.cb.props)) {
+					if (cbFn) cbFn(changes);
+				}
+			}
+		});
+
+		if (t.includes("props.") || t.includes("props?.") || self.script.includes("props.") || self.script.includes("props?.")) {
+			self.cb.props = {};
+			self.cb.props[self.uid] = function (changes) { self.react(changes, "props", self, t, self.s) };
+		}
+
+		// STATE
+
+		// 19. ObservableSlim - STATE
+		if (!self.state.__isProxy) {
+			var state = ObservableSlim.create({}, false, function (changes) {
+				if (self.cb.state) {
+					for (const [key, cbFn] of Object.entries(self.cb.state)) {
+						if (cbFn) cbFn(changes);
+					}
+				}
+			});
+			self.cb.state = {};
+			self.cb.state[self.uid] = function (changes) { self.react(changes, "state", self, t, self.s) };
+			// ÖNEMLİ: state değişkenini güncelle
+		}
+		else {
+			var state = self.state;
+			if (t.includes("state.") || t.includes("state?.") || self.script.includes("state.") || self.script.includes("state?.", self.s.includes("state.") || self.s.includes("state?."))) {
+				var p = simply.findElementWithCB(self.parent);
+				if (p) {
+					p.cb.state[self.uid] = function (changes) { self.react(changes, "state", self, t, self.s) };
+				}
+			}
+		}
+
+		return { data, props, state }
+	},
+	restoreCache(component) {
+		// 7. cache restore - data
+		if (component.hasAttribute("cache") && component.getAttribute("cache") !== "false") {
+			component.cache = {};
+			try {
+				var cachedData = simply.cache[simply.lastPath][component.elementId].data;
+				if (cachedData) {
+					component.cache.data = cachedData;
+					for (const key in cachedData) {
+						if (Object.hasOwnProperty.call(cachedData, key)) {
+							component.data[key] = cachedData[key];
+						}
+					}
+				}
+			} catch (e) { }
+		}
+
+		// 10. cache restore - props
+		if (component.hasAttribute("cache") && component.getAttribute("cache") !== "false") {
+			try {
+				var cachedProps = simply.cache[simply.lastPath][component.elementId].props;
+				if (cachedProps) {
+					component.cache.props = cachedProps;
+					for (const key in cachedProps) {
+						if (Object.hasOwnProperty.call(cachedProps, key)) {
+							component.props[key] = cachedProps[key];
+						}
+					}
+				}
+			} catch (e) { }
 		}
 	},
-	registerComponent: function ({ template, styles, name, script, docStr, noFile }) {
+	registerComponent: function ({ template, style, name, script, docStr, noFile }) {
 		if (!customElements.get(name)) {
+			script = script.trim();
+			// Class'ı BİR KERE compile et ve cache'le
+			if (script) {
+				if (!simply.classCache[name]) {
+					const className = "simply_" + name.replace(/-/g, "_");
+					script = script.replace(
+						/^class\s+(simply\s*)?\{/,
+						"class " + className + " {"
+					);
+					simply.classCache[name] = new Function(
+						'state', 'methods', 'lifecycle', 'component', 'dom', 'parent', 'simply', 'cb', 'data', 'props',
+						script.trim() + "\nreturn simply_" + name.replace(/-/g, '_') + "; //@ sourceURL=" + name + ".html"
+					);
+				}
+				var CachedClass = simply.classCache[name];
+			}
+
 			class simplyComponent extends HTMLElement {
 				constructor() {
+					// var start = performance.now();
 					super();
 
-					let sfcClass = eval(simply.runGetsReturnClass(script, name));
-					this.sfcClass = sfcClass ? sfcClass : {};
-					// eval("//" + name + lineBreaks + "//" + name + "\n\nnew " + sfcClass.trim() + "//@ sourceURL=" + name + ".html");
+					var { dom, parent, shadow } = simply.getDomParentAndShadow(this);
 
-
-					// before construct event
-					if (typeof this.sfcClass.lifecycle !== "undefined") {
-						if (typeof this.sfcClass.lifecycle.beforeConstruct !== "undefined") {
-							this.sfcClass.lifecycle.beforeConstruct();
-						}
-					}
-					var shadow = false;
-
-					if (this.getAttribute("shadow") !== null && this.getAttribute("shadow") !== "false") {
-						shadow = true;
-					}
-
-					var uid = "id" + Math.random().toString(16).slice(2)
+					var uid = Math.random().toString(36).slice(2, 8);
 					var component = this;
+					var methods = {};
+					var lifecycle = {};
+					var props = {};
+					var cb = {};
+					var sfcClass = {};
+					var settings = {};
 
-					if (shadow) {
-						var dom = this.attachShadow({ mode: 'open' });
-						var parent = this.getRootNode().host;
-						if (!parent) {
-							parent = simply.findShadowRootOrCustomElement(this);
-						}
-					}
-					else {
-						var dom = this;
-						var parent = simply.findShadowRootOrCustomElement(this);
-					}
-					component.elementId = simply.getElementUniqueId(dom);
-
-					var data = this.sfcClass.data ? this.sfcClass.data : {};
-					var props = this.sfcClass.props ? this.sfcClass.props : {};
-					var settings = this.sfcClass.settings ? this.sfcClass.settings : {};
-
-
-					var methods = this.sfcClass.methods;
-					var lifecycle = this.sfcClass.lifecycle;
-					var state;
-					var cb = {}
-
-					this.component = component;
-					this.dom = dom;
-					this.settings = settings;
-
-					const framerComponentObserver = new MutationObserver(mutations => {
-						for (const mutation of mutations) {
-							for (const node of mutation.addedNodes) {
-								if (node.nodeType === Node.ELEMENT_NODE) {
-									if (node.tagName === "FRAMER-COMPONENT" && !node.hasAttribute("uid")) {
-										const framerComponentUid = "id" + Math.random().toString(16).slice(2);
-										const path = node.getAttribute("path");
-										const rendered = node.hasAttribute("rendered");
-										node.setAttribute("uid", framerComponentUid);
-										node.setAttribute("style", "height: auto; width: auto");
-										node.setAttribute("rendered", true);
-
-										// console.warn("framer-component added inside <" + name + ">", node);
-
-										// 🔁 Framer'a mesaj gönder
-										window.parent.postMessage({
-											method: "component-request",
-											path,
-											name,
-											framerComponentUid,
-											uid
-										}, "*");
-
-										// ✅ Sadece bu `dom` içinde click'leri dinle
-										node.addEventListener("click", e => {
-											// console.log("click", e)
-											if (node.contains(e.target)) {
-												triggerOnTapFromDOM(e.target);
-											}
-										}, { passive: true });
-									}
-								}
-							}
-						}
+					Object.assign(this, {
+						component,
+						dom,
+						parent,
+						uid,
+						shadow,
+						template,
+						s: style,
+						script,
+						props: {},
+						cb: {},
+						elementId: simply.getElementUniqueId(dom),
+						react: simply.react,
+						name
 					});
 
-					// DOM veya shadow DOM'u izle
-					framerComponentObserver.observe(dom, {
-						childList: true,
-						subtree: true
-					});
 
-					// bu yakaladığı ilk component' tıklayıp bırakıyor
-					// framer gibi tap'ın parent'larını da tetiklemek istersen
-					// çalışan kod şurada: https://chatgpt.com/s/t_68710b873f9481919232870b0c7eeb32
-					function triggerOnTapFromDOM(domElement) {
-						// console.log("tap")
-						var current = domElement;
+					this.setData = function (newValue) { data = newValue; };
+					this.setCbData = function (newValue) { cb.data = newValue; };
+					this.setState = function (newValue) { state = newValue; };
+					this.setCbState = function (newValue) { cb.state = newValue; };
+					this.setProps = function (newValue) { props = newValue; };
+					this.setCbProps = function (newValue) { cb.props = newValue; };
 
-						while (current && current.tagName !== "FRAMER-COMPONENT") {
-							// __reactFiber$... anahtarını bul
-							var fiberKey = null;
-							try {
-								var keys = Object.keys(current);
-								for (var i = 0; i < keys.length; i++) {
-									if (keys[i].indexOf("__reactFiber$") === 0) {
-										fiberKey = keys[i];
-										break;
-									}
-								}
-							} catch (e) { }
+					const parentState = simply.getParentState(parent);
+					this.state = parentState ? parentState.state : {};
+					if (parentState) this.cb.state = parentState.cbState;
 
-							var fiber = fiberKey ? current[fiberKey] : null;
+					var { data, props, state } = simply.setupObservableSlims(this);
+					Object.assign(this, { data, props, state });
 
-							try {
-								var onTap = fiber.return.child.pendingProps.onTap;
-								if (typeof onTap === "function") {
-									// console.log("✅ Triggering onTap on:", current);
-									onTap();
-									setTimeout(() => {
-										try {
-											dom.lifecycle.framerComponentClicked(current)
-										} catch (e) { }
-									}, 0);
-									return;
-								}
-							} catch (e) { }
+					ObservableSlim.pause(data);
+					ObservableSlim.pause(props);
+					ObservableSlim.pause(state);
 
-							try {
-								var onTap = fiber.return.child.child.stateNode.props.onTap;
-								if (typeof onTap === "function") {
-									// console.log("✅ Triggering onTap on:", current);
-									onTap();
-									setTimeout(() => {
-										try {
-											dom.lifecycle.framerComponentClicked(current)
-										} catch (e) { }
-									}, 0);
-									return;
-								}
-							} catch (e) { }
+					// 4. CachedClass varsa çalıştır
+					if (CachedClass) {
+						var sfcClassDef = CachedClass(state, methods, lifecycle, component, dom, parent, simply, cb, data, props);
+						sfcClass = new sfcClassDef();
 
-							current = current.parentElement;
-						}
-
-						// console.warn("No onTap handler found up to <framer-component>");
+						// sfcClass'tan initial değerleri al
+						Object.assign(data, sfcClass.data || {});
+						Object.assign(props, sfcClass.props || {});
+						Object.assign(methods, sfcClass.methods || {});
+						Object.assign(lifecycle, sfcClass.lifecycle || {});
+						Object.assign(settings, sfcClass.settings || {});
 					}
 
-					dom.addEventListener("click", function (e) {
-						const target = e.target;
-						const link = target.closest("a");
+					// 5. this'e ata
+					Object.assign(this, { sfcClass, settings, lifecycle, methods });
 
-						// Link varsa ve ya "framer-component" içinde ya da "framer-route" attribute'u varsa
-						if (
-							link &&
-							(link.closest("framer-component") || link.hasAttribute("route-framer"))
-						) {
-							// console.log("Send this link to framer for route:", link.getAttribute("href"));
-							e.preventDefault();
-							e.stopPropagation();
-							window.parent.postMessage({
-								method: 'link-click',
-								link: link.getAttribute("href"),
-								uid,
-								name
-							}, '*')
-						}
-					});
-
-					this.lifecycle = lifecycle;
-
-
-					this.propsToObserve = props;
-
-					this.dataToObserve = data;
-					this.data;
-
-					// cache var ise data'yı restore edelim
-					if (this.hasAttribute("cache") && this.getAttribute("cache") !== "false") {
-						this.cache = {}
-						var cache = this.cache;
-						try {
-							var cachedData = simply.cache[simply.lastPath][component.elementId].data;
-						}
-						catch (e) { }
-
-						if (cachedData) {
-							this.cache.data = simply.cache[simply.lastPath][component.elementId].data;
-
-							// console.log("cache hit for data!");
-							for (const key in cachedData) {
-								if (Object.hasOwnProperty.call(cachedData, key)) {
-									component.dataToObserve[key] = cachedData[key];
-								}
-							}
-						}
+					// Component içinde state tanımlıysa ekle
+					if (sfcClass.state) {
+						Object.assign(state, sfcClass.state);
 					}
+					simply.restoreCache(this);
 
-
-					this.methods = methods;
-					this.parent = parent;
-					this.uid = uid;
-					this.shadow = shadow;
-					this.cb = cb;
-
-					var self = this;
-
-					// console.log(name, open);
-
-					var geval = eval;
-					for (var key in sfcClass) {
-						if (!key.match("data|state|methods|lifecycle|props|dom|component|parent")) {
-							var val = sfcClass[key];
-							if (typeof val == "object") {
-								val = simply.customStringify(val);
-							}
-							else if (typeof val == "function") {
-								val = val.toString();
-							}
-							else if (typeof val == "string") {
-								val = "'" + val + "'";
-							}
-							geval("var " + key + "=" + val + ";");
-						}
-					}
-
-					// atribute'ları proplara yazalım
-					for (var i = 0; i < this.attributes.length; i++) {
-						var attrib = this.attributes[i];
-						// console.log("yaz balam ay balam", simply.parseProp(attrib.value));
-						if (attrib.name !== "cb") {
-							self.propsToObserve[attrib.name] = simply.parseProp(attrib.value).value;
-						}
-					}
-
-					if (this.hasAttribute("cache") && this.getAttribute("cache") !== "false") {
-						try {
-							var cachedProps = simply.cache[simply.lastPath][component.elementId].props;
-						}
-						catch (e) { }
-
-						if (cachedProps) {
-							this.cache.props = simply.cache[simply.lastPath][component.elementId].props;
-							// console.log("cache hit for props!");
-							for (const key in cachedProps) {
-								if (Object.hasOwnProperty.call(cachedProps, key)) {
-									component.propsToObserve[key] = cachedProps[key];
-								}
-							}
-						}
-					}
-
-					if (styles.global) {
-						this.globalStyle = styles.global;
-					}
-
-					// anadan babadan gelen state varsa
-					if (parent) {
-
-						if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
-							let current = parent;
-							while (current) {
-								if (current.state) {
-									this.stateToObserve = current.state;
-									this.cb.state = parent.cb.state;
-									break;
-								}
-								current = current.parent;
-							}
-						}
-
-						if (typeof parent.globalStyle !== "undefined") {
-							this.globalStyle = parent.globalStyle;
-						}
-					}
-
-
-					// komponent içinde state tanımlı ise
-					if (typeof this.sfcClass.state !== "undefined") {
-						if (!this.stateToObserve) {
-							this.stateToObserve = {};
-						}
-						var newStates = this.sfcClass.state;
-						for (let key in newStates) {
-							this.stateToObserve[key] = newStates[key];
-						}
-					}
-
-					state = component.state;
-					parent = component.parent;
-					cb = component.cb;
-					// we couldn't get state and parent
-					// bcs they are wrapped with router
-					// this is a fix for that
+					// 14. Getter/Setter'lar
 					Object.defineProperty(this, 'state', {
 						get: function () { return state; },
-						set: function (v) {
-							state = v;
-						}
+						set: function (v) { state = v; }
 					});
 					Object.defineProperty(this, 'parent', {
 						get: function () { return parent; },
 						set: function (v) {
 							parent = v;
-							if (typeof parent.globalStyle !== "undefined") {
-								component.globalStyle = parent.globalStyle;
-							}
 						}
 					});
 
-					this.setData = function (newValue) {
-						data = newValue;
-					};
-					this.setCbData = function (newValue) {
-						cb.data = newValue;
-					};
+					// var end = performance.now();
+					// console.log(`Component ${name} constructed in ${end - start} ms`);
 
-					this.setState = function (newValue) {
-						state = newValue;
-					};
-					this.setCbState = function (newValue) {
-						cb.state = newValue;
-					};
-
-					this.setProps = function (newValue) {
-						props = newValue;
-					};
-					this.setCbProps = function (newValue) {
-						cb.props = newValue;
-					};
-
-					this.react = function (property, newValue, previousValue, prop = false, st_ate = false) {
-						//console.log("react to ", property, previousValue, newValue);
-
-						if (self.data) {
-							if (typeof self.lifecycle !== "undefined") {
-								if (prop) {
-									if (typeof self.lifecycle.whenPropChange !== "undefined") {
-										if (self.lifecycle.whenPropChange(property, newValue, previousValue) === false) {
-											return false;
-										};
-									}
-								}
-								else if (st_ate) {
-									//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-									if (self.lifecycle && self.lifecycle.whenStateChange) {
-										if (self.lifecycle.whenStateChange(property, newValue, previousValue) === false) {
-											return false;
-										};
-									}
-								}
-								else if (typeof self.lifecycle.whenDataChange !== "undefined") {
-									//console.log(self.lifecycle.whenDataChange(name, value, old, parents));
-									if (self.lifecycle.whenDataChange(property, newValue, previousValue) === false) {
-										return false;
-									};
-								}
-							}
-
-							//console.log("key:" + name + ", new value: " + value + ", old value: " + old + ", tree: " + parents);
-							//console.log(name, value, old, parents);
-							// prop değişikliklerini attributes'a yazmak
-							// parent render olurken morph işini bozuyor 
-							// o yüzden sadece one-way (attr -> prop) ile devam
-							/*
-							if (prop) {
-								if (self.props) {
-									console.log("name", name);
-									if (self.props[name]) {
-										//self.setAttribute(name, simply.prepareAttr(self.props[name]));
-									}
-								}
-							}
-							*/
-							// console.log("renderellas", self);
-							self.render();
-						}
-
-					}
-
-					if (this.dataToObserve) {
-						this.data = ObservableSlim.create(this.dataToObserve, .1, function (changes) {
-							// console.log(changes, component, self.cb);
-							for (const [key, cb] of Object.entries(self.cb.data)) {
-								if (cb) {
-									//console.log(key, cb);
-									// console.log(changes);
-									cb(changes);
-									changes.forEach(function (change, key) {
-										// cb(change.property, change.newValue, change.previousValue);
-									})
-								}
-							}
-						});
-
-						if (template.indexOf("data.") > -1 || script.indexOf("data.") > -1) {
-							this.cb.data = {}
-							this.cb.data[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue) };
-							data = this.data;
-							this.setCbData(this.cb.data);
-						}
-					}
-
-
-					if (this.propsToObserve) {
-						this.props = ObservableSlim.create(this.propsToObserve, false, function (changes) {
-							if (self.cb.props) {
-								for (const [key, cb] of Object.entries(self.cb.props)) {
-									if (cb) {
-										cb(changes)
-										changes.forEach(function (change, key) {
-											//cb(change.property, change.newValue, change.previousValue);
-										})
-									}
-								}
-							}
-
-						});
-
-						if (template.indexOf("props") > -1 || script.indexOf("props") > -1) {
-							this.cb.props = {}
-							this.cb.props[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue, true) };
-						}
-					}
-
-					// buna artık gerek yok çünkü mesah ile değil 
-					// direk .props ile yolluyorum
-					self.framerPropsListener = function (event) {
-						event.preventDefault();
-						event.stopPropagation();
-
-						if (event.data.method === "set-props") {
-							// console.log("props from parent", event.data.props);
-							Object.assign(props, event.data.props)
-
-
-							if (lifecycle && lifecycle.framerPropsUpdated) {
-								lifecycle.framerPropsUpdated();
-							}
-							component.render();
-
-						}
-					}
-
-					component.runInFramer = function (codeToRun) {
-						window.parent.postMessage({
-							method: 'run-in-framer',
-							name,
-							uid: uid,
-							code: "return " + codeToRun.toString()
-						}, '*')
-					}
-
-					window.addEventListener("message", self.framerPropsListener);
-					window.parent.postMessage({ method: "simply-ready", uid: uid, name }, "*");
-
-					if (this.stateToObserve) {
-						if (!this.stateToObserve.__isProxy) {
-
-							this.state = ObservableSlim.create(this.stateToObserve, false, function (changes) {
-								// console.log(changes, templateName);
-								if (self.cb.state) {
-									for (const [key, cb] of Object.entries(self.cb.state)) {
-										if (cb) {
-											cb(changes);
-											changes.forEach(function (change, key) {
-												// cb(change.property, change.newValue, change.previousValue);
-											})
-										}
-										//console.log(`${key}: ${value}`);
-									}
-								}
-							});
-							this.cb.state = {}
-							this.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue, false, true) };
-							//this.setCbState(this.cb.state);
-							//console.log("bu bi kere çalışır");
-							// this.state = new Proxy(this.state, handler);
-
-						}
-						else {
-							this.state = this.stateToObserve; // bu daha hızlıdır muhtemelen
-							// this.state = simply.findParentWithState(this).state;
-							if (template.indexOf("state.") > -1 || script.indexOf("state.") > -1) {
-								var p = findElementWithCB(this.parent);
-								// console.log("ppp", p, this.parent, templateName);
-								p.cb.state[this.uid] = function (property, newValue, previousValue) { self.react(property, newValue, previousValue, false, true) };
-								// this.state = new Proxy(this.state, handler);
-							}
-						}
-						// console.log(template.indexOf("state.") > -1, script.indexOf("state.") > -1, name);
-					}
-
-					function findElementWithCB(element) {
-						let current = element;
-
-						while (current) {
-							if (current.cb) {
-								if (current.cb.state) {
-									return current;
-								}
-							}
-
-							// Move up to the parent node, checking if we're in a shadow DOM
-							if (current.parentNode) {
-								current = current.parentNode;
-							} else if (current.host) {
-								current = current.host; // Move to the host of the shadow root
-							} else {
-								current = null;
-							}
-						}
-
-						return null; // No element with `cb` found
-					}
-
-
-					// after construct event
+					// afterConstruct çağır
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.afterConstruct !== "undefined") {
 							this.lifecycle.afterConstruct();
@@ -1268,6 +1304,7 @@ simply = {
 				// invoked each time the custom element is appended
 				// into a document-connected element
 				observeAttrChange(el, callback) {
+					// burası 0ms
 					var self = this;
 					var observer = new MutationObserver(function (mutations) {
 						mutations.forEach(function (mutation) {
@@ -1288,11 +1325,8 @@ simply = {
 					});
 					return observer;
 				}
-				onBeforeEnter(location, commands, router) {
-					//console.log("on before",location, commands, router);
-					//return commands.prevent();
-				}
 				connectedCallback() {
+
 					this.observeAttrChange(this, function (name, newValue) {
 						//console.log("hee");
 						// value öncekiyle aynı değilse
@@ -1323,52 +1357,96 @@ simply = {
 						}
 					});
 
-					var self = this;
-					self.templateName = name;
+					function extractParentBindings(template) {
+						var bindings = {};
+
+						// Tüm parent...data/props pattern'lerini tek seferde bul
+						const regex = /((?:parent\??\.))+(?=(data|props)\??[\.\[])/g;
+
+						let match;
+						while ((match = regex.exec(template)) !== null) {
+							const parentPart = match[0];
+							const bindType = match[2];
+
+							// "parent." veya "parent?." sayısı = depth
+							const depth = (parentPart.match(/parent\??\.?/g) || []).length;
+							const index = depth - 1;
+
+							if (!bindings[index]) bindings[index] = {};
+							bindings[index][bindType] = true;
+						}
+						return bindings;
+					}
 
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
-					if (this.parent) {
-						if (this.parent.data) {
-							if (this.parent.cb) {
-								if (this.parent.cb.data) {
+					var current = this.parent;
+					var self = this;
+					var parentIndex = 0;
 
-									this.parent.cb.data[this.uid] = function (prop, value) { self.react(prop, value) };
-									this.parent.setData = this.parent.data;
-								}
+					// template’ten bağlanacak parent’ları çıkar
+					var bindings = extractParentBindings(template);
+
+					// parent değişkenleri değişince
+					var current = this.parent;
+					var parentIndex = 0;
+
+					while (current) {
+
+						var bind = bindings[parentIndex];
+
+						if (bind && current.cb) {
+
+							// DATA
+							if (bind.data && current.data && current.cb.data) {
+								current.cb.data[this.uid] = function (changes) {
+									self.react(changes, "data", self, template);
+								};
+								current.setData = current.data;
 							}
 
-						}
-
-						if (this.parent.props) {
-							if (this.parent.cb && this.parent.cb.props) {
-								this.parent.cb.props[this.uid] = function (prop, value) { self.react(prop, value) };
-								this.parent.setProps = this.parent.props;
+							// PROPS
+							if (bind.props && current.props && current.cb.props) {
+								current.cb.props[this.uid] = function (changes) {
+									self.react(changes, "props", self, template);
+								};
+								current.setProps = current.props;
 							}
 						}
+
+						current = current.parent;
+						parentIndex++;
 					}
 
+					// 15. initial render
 					this.render();
 				}
 				render() {
+
 					let m;
 					// tüm on.* atribute değerleri için
 					// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
 
-					// new line serbest bırakıldı
+					// new line serbest bırakıldı 
 					// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"']*)(\"|\')/gm;
 
 					// onclick="" içinde ilk tek tırnakta kesilme sorunu düzeltildi
 					// https://chatgpt.com/c/69523d00-8a50-8327-95a2-e14875750a0c
-					let regex = /\s+on[a-z]+(\s*)=(\s*)("(?<match>(?:\\.|[^"])*)"|'(?<match>(?:\\.|[^'])*)')/gm;
 
+					// bir üsttekindeki match eski tarayıcılarda çalışmıyor
+					// https://claude.ai/chat/93a1ea38-c790-4209-a758-fdee9f92d9f3
 
-
+					let regex = /\s+on[a-z]+(\s*)=(\s*)("((?:\\.|[^"])*)"|'((?:\\.|[^'])*)')/gm;
 
 					while ((m = regex.exec(template)) !== null) {
 						if (m.index === regex.lastIndex) {
 							regex.lastIndex++;
 						}
+
+						// m[4] → çift tırnak içindeki değer
+						// m[5] → tek tırnak içindeki değer
+						let capturedMatch = m[4] || m[5];
+
 						if (this.shadow) {
 							var match = "simply.findShadowRootOrCustomElement(this)";
 						}
@@ -1376,7 +1454,7 @@ simply = {
 							var match = "simply.findShadowRootOrCustomElement(this)";
 						}
 
-						if (m.groups["match"].indexOf(match) == -1) {
+						if (capturedMatch.indexOf(match) == -1) {
 							var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
 
 							var newValue = m[0];
@@ -1393,7 +1471,7 @@ simply = {
 
 					let parsingArgs = {
 						template: tmpl,
-						style: styles.local,
+						style,
 						data: this.data,
 						state: this.state,
 						parent: this.parent,
@@ -1402,32 +1480,42 @@ simply = {
 						component: this.component,
 						dom: this.dom,
 						methods: this.methods,
-						lifecycle: this.lifecycle
+						lifecycle: this.lifecycle,
+						name: this.name
 					}
 
-					if (this.globalStyle) {
-						var parsedGlobalStyle = simply.parseStyle({
-							template,
-							style: this.globalStyle,
-							data: this.data,
-							state: this.state,
-							parent: this.parent,
-							methods: this.methods,
-							props: this.props,
-							component: this.component,
-							dom: this.dom,
-							methods: this.methods,
-							lifecycle: this.lifecycle
-						});
-					}
 					var self = this;
 
 
 					if (!this.rendered) {
+						// console.log("initial render for ", name);
 						this.rendered = true;
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
+
+						// console.log(`Initial render for ${name} took ${t1 - t0} ms`);
+
+						var t0 = performance.now();
 						var parsedStyle = simply.parseStyle(parsingArgs);
-						parsedTemplate = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
+						simply.components[name].lastParsedStyle = parsedStyle;
+						parsedTemplate = parsedTemplate;
+						var t1 = performance.now();
+						// console.log(`Style parsing for ${name} took ${t1 - t0} ms`);
+
+						var start = performance.now();
+						this.sheet = new CSSStyleSheet();
+
+						if (!this.shadow) {
+							document.adoptedStyleSheets = [this.sheet, ...document.adoptedStyleSheets];
+
+							var end = performance.now();
+							//console.log(`Adopting sheet to document for ${name} took ${end - start} ms`);
+						}
+						else {
+							this.dom.adoptedStyleSheets = [this.sheet, ...this.dom.adoptedStyleSheets];
+							// console.log("shadow");
+						}
+
+						this.sheet.replaceSync(parsedStyle);
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeRender !== "undefined") {
@@ -1445,8 +1533,6 @@ simply = {
 						}
 
 						// took slot content
-
-
 						if (this.innerHTML && this.innerHTML.trim() !== "") {
 							// console.log(this.innerHTML);
 							this.slotContent = this.innerHTML;
@@ -1464,41 +1550,23 @@ simply = {
 							this.dom.querySelector("simply-slot").innerHTML = parsedSlot;
 						}
 						else {
+							var t0 = performance.now();
 							this.dom.innerHTML = parsedTemplate;
+							var t1 = performance.now();
+							// console.log(`DOM insertion for ${name} took ${t1 - t0} ms`);
 						}
 
+						//const t1 = performance.now();
+						//console.log((t1 - t0) + " put milliseconds.", name);
 
-						try {
-							if (!this.shadow) {
-								//console.log("not open", this);
-								this.sheet = this.dom.getRootNode().querySelector("style[simply-vars]").sheet;
-							}
-							else {
-								//console.log("open", this);
-								this.sheet = this.querySelector("style[simply-vars]").sheet;
-							}
+						ObservableSlim.resume(self.data);
+						ObservableSlim.resume(self.state);
+						ObservableSlim.resume(self.props);
 
-							//console.log(this.dom.getRootNode().styleSheets[1].cssRules[0].style.setProperty"--main-bg-color: yellow;";["--data-topAreaHeight"] = "3px");
-							if (this.shadow) {
-								var vars = ":root {";
-							}
-							else {
-								var vars = ":host {";
-							}
-							if (parsedGlobalStyle) {
-								for (var key in parsedGlobalStyle.vars) {
-									if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue;
-									vars += key + ":" + parsedGlobalStyle.vars[key] + ";";
-								}
-							}
-
-							for (var key in parsedStyle.vars) {
-								if (!parsedStyle.vars.hasOwnProperty(key)) continue;
-								vars += key + ":" + parsedStyle.vars[key] + ";";
-							}
-
-							this.sheet.insertRule(vars + "}", 0);
-						} catch (error) { }
+						if (document.location.href == "about:blank") {
+							// Framer ortamında
+							simply.framerStaff(dom, name, uid, component, props, lifecycle);
+						}
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterFirstRender !== "undefined") {
@@ -1510,6 +1578,7 @@ simply = {
 						var comp = this.component;
 						var p = this.props;
 
+						// bu transition için
 						requestAnimationFrame(() => {
 							// comp'ta tanımlıysa (true/false/undefined olsa bile)
 							// comp'taki değeri kullan, yoksa global'e bak
@@ -1566,41 +1635,36 @@ simply = {
 								comp.completed = true;
 							}
 						});
+
 					}
 					else {
+						var start = performance.now();
+						// console.log("rerender for ", name);
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.beforeRerender !== "undefined") {
 								this.lifecycle.beforeRerender();
 							}
 						}
 
-						// var ddd = this.data;
-						// parsingArgs.data = JSON.parse(JSON.stringify(ddd));
-						const t0 = performance.now();
-						/*
-						try {
-							console.log(parsingArgs.data.browser.length);
-						}
-						catch(e) {
-			
-						}
-						*/
 						let parsedTemplate = simply.parseTemplate(parsingArgs);
-						const t1 = performance.now();
-						// console.log(`parseTemplate took ${t1 - t0} milliseconds.`);
-						/*
-						if (parsedTemplate.indexOf('level="1"') == -1 && name == "browser-comp") {
-							console.log("yakalarım hatayı");
-							console.log(JSON.stringify(this.data.browser));
-							console.log(parsedTemplate);
-						}
-						*/
-						parsedTemplate = parsedTemplate.replace("<html>", "").replace("</html>", "");
+						var end = performance.now();
+						// console.log(`Render function for ${name} took ${end - start} ms`);
+
+						//var start = performance.now();
+						// 0ms now, congrats to me
 						var parsedStyle = simply.parseStyle(parsingArgs);
-						var newDom = parsedTemplate + "<style uno></style><style global>" + (parsedGlobalStyle ? parsedGlobalStyle.style : "") + "</style>" + "<style simply>:host([hoak]) {display: none;} " + parsedStyle.style + "</style><style simply-vars></style>";
-						//console.log("morfingen");
+						//var end = performance.now();
+						//console.log(`Style re parsing for ${name} took ${end - start} ms`);
+
+						if (simply.components[name].lastParsedStyle !== parsedStyle) {
+							var start = performance.now();
+							self.sheet.replaceSync(parsedStyle);
+							var end = performance.now();
+							// console.log(`Style re applying for ${name} took ${end - start} ms`);
+						}
+
 						if (this.shadow) {
-							var newDomAsString = "<" + name + " shadow>" + newDom + "</" + name + ">";
+							var newDomAsString = "<" + name + " shadow>" + parsedTemplate + "</" + name + ">";
 
 							if (document.startViewTransition && this.settings.morphAnimation) {
 								document.startViewTransition(function () {
@@ -1608,13 +1672,12 @@ simply = {
 								});
 							}
 							else {
-								const state = Flip.getState(this.dom.children);
 								morphIt(this.dom, newDomAsString);
 							}
-
 						}
 						else {
-							var newDomAsString = "<" + name + ">" + newDom + "</" + name + ">";
+							var newDomAsString = "<" + name + ">" + parsedTemplate + "</" + name + ">";
+
 							if (document.startViewTransition && this.settings.morphAnimation) {
 								console.log("1", this.settings.morphAnimation);
 								const start = performance.now();
@@ -1636,6 +1699,8 @@ simply = {
 								morphIt(this.dom, newDomAsString);
 							}
 						}
+						//var end = performance.now();
+						//console.log(`Component ${name} rerendered in ${end - start} ms`);
 
 						if (this.slotContent) {
 							// parent var context odur
@@ -1657,14 +1722,21 @@ simply = {
 
 						// console.log(newDomAsString);
 
-
 						function morphIt(dom, newDomAsString) {
-
+							var start = performance.now();
 							simply.morphdom(dom, newDomAsString, {
 
 								childrenOnly: true,
+								getNodeKey(node) {
+									return node.nodeType === 1
+										? (node.getAttribute('key') || node.id)
+										: null;
+								},
+								// component'in root'unda yer alanlar
 								onBeforeElUpdated: function (fromEl, toEl) {
 									// spec - https://dom.spec.whatwg.org/#concept-node-equals	
+
+
 
 									if (fromEl.isSameNode(toEl)) {
 										return false;
@@ -1672,8 +1744,8 @@ simply = {
 									if (fromEl.isEqualNode(toEl)) {
 										return false
 									}
+
 									else if (toEl.tagName === 'FRAMER-COMPONENT') {
-										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
 										return false;
 									}
 
@@ -1698,16 +1770,9 @@ simply = {
 								},
 								onBeforeNodeDiscarded: function (node) {
 								},
+								// component'in root'unun içindekilerin çocuklarında
 								onBeforeElChildrenUpdated: function (fromEl, toEl) {
-									// bu custom element'leri skip etmek için
-									// shadowdom olanlara zaten dokunamıyor da
-									// shadow'suz custom elementleri her seferinde render ediyor yoksa
-									if (customElements.get(fromEl.tagName.toLowerCase())) {
-										return false;
-									}
-									if (toEl.hasAttribute("passive") === true) {
-										return false;
-									}
+
 									if (fromEl.isSameNode(toEl)) {
 										// console.log("same mi node", toEl, fromEl.value, toEl.value)
 										return false;
@@ -1720,6 +1785,16 @@ simply = {
 										}
 										return false
 									}
+									// bu custom element'leri skip etmek için
+									// shadowdom olanlara zaten dokunamıyor da
+									// shadow'suz custom elementleri her seferinde render ediyor yoksa
+									if (customElements.get(fromEl.tagName.toLowerCase())) {
+										return false;
+									}
+									if (toEl.hasAttribute("passive") === true) {
+										return false;
+									}
+
 									if (fromEl.tagName == "CHILD-COMPONENT") {
 										// console.log("dont again");
 									}
@@ -1727,8 +1802,8 @@ simply = {
 										return false;
 										// console.log("dont again");
 									}
-									else if (fromEl.tagName == "STYLE" && fromEl.hasAttribute("global")) {
-										return false;
+									else if (fromEl.tagName == "STYLE" && fromEl.hasAttribute("simply")) {
+										// return false;
 									}
 
 
@@ -1763,30 +1838,10 @@ simply = {
 									//console.log(toEl.tagName);
 								}
 							});
+							var end = performance.now();
+							// console.log(`Morphdom for ${name} took ${end - start} ms`);
 						}
 
-						if (this.globalStyle) {
-							var parsedGlobalStyle = simply.parseStyle({
-								template,
-								style: this.globalStyle,
-								data: this.data,
-								state: this.state,
-								parent: this.parent,
-								methods: this.methods,
-								props: this.props,
-								component: this.component,
-								dom: this.dom,
-								methods: this.methods,
-								lifecycle: this.lifecycle
-							});
-						}
-
-						if (parsedGlobalStyle) {
-							for (var key in parsedGlobalStyle.vars) {
-								if (!parsedGlobalStyle.vars.hasOwnProperty(key)) continue;
-								this.sheet.cssRules[0].style.setProperty(key, parsedGlobalStyle.vars[key]);
-							}
-						}
 						// test
 
 						if (typeof this.lifecycle !== "undefined") {
@@ -1972,8 +2027,12 @@ simply = {
 			var HAS_RANGE_SUPPORT = !!doc && doc.createRange && 'createContextualFragment' in doc.createRange();
 
 			function createFragmentFromTemplate(str) {
+				// bu 5-10ms alıyor ama her şeyin bedeli var
+				var start = performance.now();
 				var template = doc.createElement('template');
 				template.innerHTML = str;
+				var end = performance.now();
+				// console.log(`createFragmentFromTemplate took ${end - start} ms`);
 				return template.content.childNodes[0];
 			}
 
@@ -2820,19 +2879,19 @@ simply = {
 					// execute observer functions on a 10ms setTimeout, this prevents the observer functions from being executed
 					// separately on every change -- this is necessary because the observer functions will often trigger UI updates
 					if (domDelayIsNumber || domDelay === true) {
-						setTimeout(function () {
-							if (numChanges === changes.length) {
+						// setTimeout(function () {
+						if (numChanges === changes.length) {
 
-								// we create a copy of changes before passing it to the observer functions because even if the observer function
-								// throws an error, we still need to ensure that changes is reset to an empty array so that old changes don't persist
-								var changesCopy = changes.slice(0);
-								changes = [];
+							// we create a copy of changes before passing it to the observer functions because even if the observer function
+							// throws an error, we still need to ensure that changes is reset to an empty array so that old changes don't persist
+							var changesCopy = changes.slice(0);
+							changes = [];
 
-								// invoke any functions that are observing changes
-								for (var i = 0; i < observable.observers.length; i++) observable.observers[i](changesCopy);
+							// invoke any functions that are observing changes
+							for (var i = 0; i < observable.observers.length; i++) observable.observers[i](changesCopy);
 
-							}
-						}, (domDelayIsNumber && domDelay > 0) ? domDelay : 10);
+						}
+						// }, (domDelayIsNumber && domDelay > 0) ? domDelay : 10);
 					} else {
 
 						// we create a copy of changes before passing it to the observer functions because even if the observer function
@@ -3976,7 +4035,7 @@ simply = {
 		/**
 		 * Gets the `base`, which depends on whether we are using History or
 		 * hashbang routing.
-	
+		
 		* @api private
 		*/
 		Page.prototype._getBase = function () {
@@ -4410,7 +4469,7 @@ simply = {
 					const stagger = comp.routerSettings && 'stagger' in comp.routerSettings
 						? comp.routerSettings.stagger
 						: (simply.routerSettings && simply.routerSettings.stagger) || 0;
-
+		
 					// if last one, update context
 					contextUpdateFlag = index == exitThose.length - 1;
 					handleTransition(comp, "exit", contextUpdateFlag, index * stagger);
@@ -5051,7 +5110,7 @@ simply = {
 							// son çocuk/target-route değilse/parent'sa ve router > component şeklinde render edilmemişse
 							if (i !== tree.length - 1 && !directChild) {
 								let attrs = [];
-								if (targetParentRoute.settings.shadow_root == true) attrs.push('shadow');
+								if (targetParentRoute.settings.isolated == true) attrs.push('shadow');
 								if (targetParentRoute.settings.cache) attrs.push('cache');
 
 
@@ -5124,7 +5183,7 @@ simply = {
 					else {
 						// console.warn("INNERHTML")
 						let attrs = [];
-						if (settings.shadow_root == true) attrs.push('shadow');
+						if (settings.isolated == true) attrs.push('shadow');
 						if (settings.cache) attrs.push('cache');
 
 
@@ -5753,4 +5812,6 @@ simply = {
 		window.get = this.get;
 	}
 }
+
+
 simply.init();

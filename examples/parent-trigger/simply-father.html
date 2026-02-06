@@ -1,0 +1,31 @@
+<html>
+  <h1>Simply Father</h1>
+  <p>My grand father name is: {parent?.parent?.data?.name}</p>
+  <if cond="parent?.parent?.data?.name == 'Lucius the Grand Father'">
+    selam
+  </if>
+  <each of="parent?.parent?.data.birseyler" as="item">
+    <span>{item.name}</span>
+  </each>
+  <a onclick="parent.parent.data.name = 'Grand father name from Simply Father'">Change Grand Father Name</a>
+  <hr>
+  <simply-child></simply-child>
+</html>
+
+<style>
+  
+</style>
+
+<script>
+  class simply {
+    state = {
+      toto: 1 
+    }
+    methods = {
+      
+    }
+    lifecycle = {
+      
+    }
+  }
+</script>

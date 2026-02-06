@@ -1,0 +1,271 @@
+<html>
+<rectangle color="{state.color}">{state.color}</rectangle>
+<h1>Grand Grand Father</h1>
+<p>Name: {data.name}</p>
+<if cond="1 == 1">
+  <div>Condition is true!</div>
+</if>
+<each
+  of="data.arrays"
+  as="itemo"
+  key="keydur"
+>
+  <div>Array item: {itemo} - {keydur}</div>
+</each>
+
+<each
+  of="data.birseyler"
+  as="item"
+  key="kkk"
+  index="indeks"
+>
+  <div style="color: {item.renk}">{item.name} - {indeks} - {kkk}</div>
+</each>
+
+<each
+  of="data.anotherList"
+  as="item"
+  key="kkk"
+  index="indeks"
+>
+  <div>{kkk} - {item.age} - {indeks}</div>
+</each>
+<a onclick="data.name = 'Gregorian the Grand Grand Father'">Change Name</a>
+<hr>
+<grand-father></grand-father>
+<div class="button">
+  <a>hoy</a>
+</div>
+
+</html>
+
+<style>
+
+  rectangle {
+    position: absolute;
+    background: black;
+    width: 100px;
+    height: 100px;
+    transform: rotate(var(state.deg)deg);
+    transition: all 2250ms ease;
+    color: white;
+  }
+
+  rectangle:hover {
+    background: green;
+  }
+
+  a {
+    background-color: blueviolet;
+    transition: all 250ms ease;
+  }
+
+  a:hover {
+    background-color: aqua;
+  }
+
+  body {
+    background-color: var(state.color);
+  }
+
+  b {
+    color: red;
+    width: var(data.asd==1 && (data.asd==1 || data.asd==2) ? "100px" : "200px");
+    height: var(data.height);
+  }
+
+  &cond:[if="data.number && data.number == 11"] {
+    number {
+      display: block;
+    }
+  }
+  &cond:[else] {
+    number {
+      display: none;
+    }
+  }
+
+  a,
+  b {
+    color: red;
+    width: 100%;
+  }
+
+  a {
+    color: red;
+
+
+    &cond:[if="data.asd && data.asd == 10"] {
+      &cond:[if="data.asd && data.asd == 10"] {
+        hamdi {
+          color: aliceblue;
+
+          &:hover {
+            &cond:[if="1 == 2"] {
+              color: beige;
+              color: hwb(from color h w b);
+            }
+
+            &cond:[elsif="1 == 3"] {
+              &cond:[if="data.asd && data.asd == 10"] {
+                color: bisque;
+                color: rgb(from color r g b);
+              }
+            }
+
+            &cond:[else] {
+              &cond:[if="data.asd && data.asd == 11"] {
+                color: aqua;
+
+                &cond:[if="1 == 1"] {
+                  color: coral;
+                  color: aquamarine;
+                }
+              }
+            }
+
+            color: red;
+          }
+        }
+      }
+    }
+  }
+
+  button {
+    display: flex;
+  }
+
+  button {
+    display: flex;
+  }
+</style>
+
+<script>
+  class simply {
+
+
+
+    state = {
+      alien: "ehehe",
+      color: "cyan"
+    }
+
+    data = {
+      color: "cyan",
+      top: 20,
+      width: "20px",
+      asd: 10,
+      number: 11,
+      name: "Maximus the Grand Grand Father",
+      arrays: [1, 2, 3, 4],
+      birseyler: [
+        { name: "birsey 1", renk: "red" },
+        { name: "birsey 2", renk: "blue" },
+        { name: "birsey 3", renk: "green" }
+      ],
+      anotherList: {
+        asd: {
+          "age": 32,
+        },
+        msd: {
+          "age": 45,
+        },
+        hll: {
+          "age": 43
+        }
+      }
+    }
+
+    methods = {
+startRandomStageDeg(state, interval = 1000) {
+  function update() {
+    state.deg = Math.random() * 360;
+  }
+
+  update(); // ilk değer
+  return setInterval(update, interval);
+},
+startColorCycle(state, speed = 0.5) {
+  let hue = 0;
+
+  function loop() {
+    hue = (hue + speed) % 360;
+    state.color = `hsl(${hue}, 100%, 50%)`;
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+}
+    }
+    lifecycle = {
+
+      afterFirstRender() {
+        // var css = dom.querySelector(":scope > style[simply]").innerText;
+
+(function startManualRotationTest() {
+    // Temizlik
+    const old = document.getElementById('debug-spinner');
+    if (old) old.remove();
+
+    // 1. SPINNER OLUŞTUR (CSS Animasyonu YOK)
+    const spinner = document.createElement('div');
+    spinner.id = 'debug-spinner';
+    spinner.style.cssText = `
+        position: fixed; top: 20px; right: 20px; width: 60px; height: 60px;
+        border: 8px solid #333; /* Koyu Gri Zemin */
+        border-top: 8px solid #00ff55; /* Renkli Başlık */
+        border-radius: 50%;
+        /* animation: YOK - JS ile döndüreceğiz */
+        z-index: 999999; 
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        transition: border-color 0.1s; /* Renk geçişi yumuşak olsun */
+    `;
+    document.body.appendChild(spinner);
+
+    console.log("%c🔥 MANUEL ROTASYON TESTİ 🔥", "font-size: 20px; color: orange;");
+
+    // 2. LAG DEDEKTÖRÜ + ROTASYON MOTORU
+    let lastTime = performance.now();
+    let angle = 0; // Başlangıç açısı
+    let freezeCount = 0;
+
+    function loop() {
+        const now = performance.now();
+        const delta = now - lastTime;
+        
+        // --- MANUEL DÖNDÜRME ---
+        // Her karede açıyı 10 derece artırıyoruz.
+        // Eğer UI kilitlenirse bu kod çalışamayacağı için DÖNME DURACAK.
+        angle = (angle + 15) % 360;
+        spinner.style.transform = `rotate(${angle}deg)`;
+
+        // --- LAG KONTROLÜ ---
+        // 30ms (yaklaşık 30 FPS altı) gecikme varsa uyar
+        if (delta > 60) {
+            freezeCount++;
+            spinner.style.borderTopColor = "red"; // Kasıyorsa Kırmızı
+            
+            // Konsolu çok kirletmemek için sadece ciddi takılmaları yaz
+            if (delta > 60) {
+                console.warn(`⚠️ TAKILMA: ${delta.toFixed(0)}ms (Toplam: ${freezeCount})`);
+            }
+        } else {
+            spinner.style.borderTopColor = "#00ff55"; // Akıcıysa Yeşil
+        }
+
+        lastTime = now;
+        requestAnimationFrame(loop);
+    }
+    loop();
+
+
+
+})();  
+
+        methods.startRandomStageDeg(state, 2000);
+        methods.startColorCycle(state, .5);
+
+      }
+    }
+  }
+</script>
