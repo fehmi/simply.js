@@ -899,7 +899,7 @@
 							var blobUrl = URL.createObjectURL(blob);
 
 							if (document.location.host == "localhost") {// dev env
-								newContent = newContent.replace("https://simply.js.org/simply.min.js", "https://localhost/simply/simply.min.js");
+								newContent = newContent.replace("https://simply.js.org/simply.min.js", "https://localhost/simply/simply.js");
 							}
 
 							blobs[file["filename"]] = {

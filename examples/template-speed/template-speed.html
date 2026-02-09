@@ -13,7 +13,6 @@ accounted for <em>every single</em> HTML5 tag in your stylesheet.
 </p>
 
 <h2>Normal, Basic Stuff headed by this H2 Tag</h2>
-
 <p>
 This is a normal paragraph.  It contains some text.  According to
 <a href="http://www.threestyles.com/tutorials/css-tips-for-better-typography/" title="The ultimate guide to CSS Typography">some sources</a>,
@@ -443,7 +442,7 @@ http://coding.smashingmagazine.com/2007/05/10/70-expert-ideas-for-better-css-cod
 http://www.threestyles.com/tutorials/css-tips-for-better-typography/
 -->
 
-<div class="{data.name}">asdasd</div>
+<div class="{{data.name}}">asdasd</div>
 
 <!-- Need to add form elements and apply styles:
 http://coding.smashingmagazine.com/2007/05/10/70-expert-ideas-for-better-css-coding/
@@ -889,7 +888,7 @@ http://coding.smashingmagazine.com/2007/05/10/70-expert-ideas-for-better-css-cod
 http://www.threestyles.com/tutorials/css-tips-for-better-typography/
 -->
 
-<div class="{data.name}">asdasd</div>
+<div class="{{data.name}}">asdasd</div>
 
 <!-- Need to add form elements and apply styles:
 http://coding.smashingmagazine.com/2007/05/10/70-expert-ideas-for-better-css-coding/
@@ -1335,7 +1334,7 @@ http://coding.smashingmagazine.com/2007/05/10/70-expert-ideas-for-better-css-cod
 http://www.threestyles.com/tutorials/css-tips-for-better-typography/
 -->
 
-<div class="{data.name}">asdasd</div>
+<div class="{{data.name}}">asdasd</div>
 
 <!-- Need to add form elements and apply styles:
 http://coding.smashingmagazine.com/2007/05/10/70-expert-ideas-for-better-css-coding/
@@ -1781,32 +1780,32 @@ http://coding.smashingmagazine.com/2007/05/10/70-expert-ideas-for-better-css-cod
 http://www.threestyles.com/tutorials/css-tips-for-better-typography/
 -->
 <if cond="data.name">
-  <div class="{data.name}">asdasd</div>
+  <div class="{{data.name}}">asdasd</div>
 </if>
 
 <div ehehe>
   <each of="data.list" as="items">
-    <span>heee {items}</span>
-    <div>heee {items}</div>
-    <p>heee {items}</p>
+    <span>heee {{items}}</span>
+    <div>heee {{items}}</div>
+    <p>heee {{items}}</p>
   </each>    
 </div>
 
 <each of="data.list" as="item">
-  <a>heee {item}</a>
-  <a>heee {item}</a>
+  <a>heee {{item}}</a>
+  <a>heee {{item}}</a>
   <each of="data.list" as="items">
-    <span>heee {items}</span>
-    <div>heee {items}</div>
-    <p>heee {item}</p>
+    <span>heee {{items}}</span>
+    <div>heee {{items}}</div>
+    <p>heee {{item}}</p>
   </each>  
 </each>
 
-{data.name}
+{{data.name}}
 <div>
-  {data.hee.a}
+  {{data.hee.a}}
   <each of="data.hee['c']" as="item">
-    {item}
+    {{item}}
   </each>
 </div>
 </html>

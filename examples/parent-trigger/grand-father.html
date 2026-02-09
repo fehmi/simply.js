@@ -1,9 +1,11 @@
 <html>
+  <slot></slot>
+  {{props.some.ehehe}}asd
   <h1>Grand Father</h1>
-  <p>My father name is: {parent.data.name}</p>
+  <p>My father name is: {{parent.data.name}}</p>
   <a onclick="parent.data.name = 'Lucius the Grand Father'; state.color = 'yellow';">Change Father Name</a>
   <hr>
-  <simply-father></simply-father>
+  <simply-father ?hee="{{parent.data.name == 'Lucius the Grand Father'}}"></simply-father>
 </html>
 
 <style>

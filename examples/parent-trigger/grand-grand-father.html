@@ -1,16 +1,17 @@
 <html>
-<rectangle color="{state.color}">{state.color}</rectangle>
+<rectangle color="{{state.color}}">{{state.color}}</rectangle>
 <h1>Grand Grand Father</h1>
-<p>Name: {data.name}</p>
+<p>Nameeeeeeeeeeeeeeeeeeeee: {{data.name}}</p>
 <if cond="1 == 1">
   <div>Condition is true!</div>
 </if>
+
 <each
   of="data.arrays"
   as="itemo"
   key="keydur"
 >
-  <div>Array item: {itemo} - {keydur}</div>
+  <div>Array item: {{itemo}} - {{keydur}}</div>
 </each>
 
 <each
@@ -19,7 +20,7 @@
   key="kkk"
   index="indeks"
 >
-  <div style="color: {item.renk}">{item.name} - {indeks} - {kkk}</div>
+  <div style="color: {{item.renk}}">{{item.name}} - {{indeks}} - {{kkk}}</div>
 </each>
 
 <each
@@ -28,11 +29,13 @@
   key="kkk"
   index="indeks"
 >
-  <div>{kkk} - {item.age} - {indeks}</div>
+  <div>{{kkk}} - {{item.age}} - {{indeks}}</div>
 </each>
 <a onclick="data.name = 'Gregorian the Grand Grand Father'">Change Name</a>
 <hr>
-<grand-father></grand-father>
+<grand-father .some="{{ {"ehehe": data.name} }}" isolated>
+    nnnnnn {{data.name}}
+</grand-father>
 <div class="button">
   <a>hoy</a>
 </div>

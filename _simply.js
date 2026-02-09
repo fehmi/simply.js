@@ -1,56 +1,6 @@
 simply = {
 	components: {},
 
-	compile: function (args) {
-		var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = args;
-		let t = template;
-
-		const context = { ...args };
-		if (!simply.components[name]?.templateRenderFn) {
-			t = t.replace(/`/g, '\\`');
-			t = t.replace(/\{\{([\s\S]*?)\}\}/g, '${$1}');
-
-			// 3. STATIC OPTIMIZATION (Hızlı & Nested Destekli Yöntem)
-			// <static>  ->  ${guard([], () => html`
-			// </static> ->  `)}
-			t = t.replace(/<static>/gi, '${guard([], () => html\`');
-			t = t.replace(/<\/static>/gi, '`)}');
-
-			// --- EACH DÖNGÜSÜ (REPEAT İLE STATE KORUMALI) ---
-			t = t.replace(/<each\s+([^>]+)>/g, (match, attributes) => {
-				const ofAttr = attributes.match(/of="([^"]+)"/)?.[1];
-				const asAttr = attributes.match(/as="([^"]+)"/)?.[1];
-
-				const keyAttr = attributes.match(/key="([^"]+)"/)?.[1];
-				const indexAttr = attributes.match(/index="([^"]+)"/)?.[1];
-
-				if (!ofAttr || !asAttr) return match;
-
-				// Kullanıcı bir değişken ismi vermediyse varsayılanları ata
-				const keyVar = keyAttr || '_key';
-				const indexVar = indexAttr || '_index';
-
-				// REPEAT YAPISI:
-				// 1. Parametre: Dizi -> Object.entries(data)
-				// 2. Parametre: Key Fonksiyonu -> ([keyVar]) => keyVar (Entry'nin key'ini unique id yapar)
-				// 3. Parametre: Template Fonksiyonu -> ([keyVar, asVar], indexVar) => html`...`
-				return '${ repeat(Object.entries(' + ofAttr + ' || {}), ([' + keyVar + ']) => ' + keyVar + ', ([' + keyVar + ', ' + asAttr + '], ' + indexVar + ') => html`';
-			});
-
-			t = t.replace(/<\/each>/g, '`) }');
-			t = t.replace(/<if\s+cond="([^"]+)">/g, '${ $1 ? html`');
-			t = t.replace(/<\/(?:if|elsif)>\s*<elsif\s+cond="([^"]+)">/g, '` : $1 ? html`');
-			t = t.replace(/<\/(?:if|elsif)>\s*<else>/g, '` : html`');
-			t = t.replace(/<\/else>/g, '` }');
-			t = t.replace(/<\/(?:if|elsif)>/g, '` : nothing }');
-
-			simply.components[name] = simply.components[name] || {};
-
-			simply.components[name].templateRenderFn = new Function(...Object.keys(context), 'return html`' + t + '`;');
-		}
-		return simply.components[name].templateRenderFn(...Object.values(context));
-	},
-
 	parseTemplate: function (parsingArgs) {
 		var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = parsingArgs;
 
@@ -248,6 +198,7 @@ simply = {
 			// handi değişken hangi parent içinde bulmak için
 			// https://gemini.google.com/app/970ef2eca93f817e
 			// ama ya varaible methods ile script'ten geliyorsa
+			// zor ve yavaş iş hiç girme bırak morphdom yapsın komple
 
 			simply.components[name].templateRenderFn = new Function(
 				"scope",
@@ -310,6 +261,7 @@ simply = {
 		// ([a-zA-Z0-9-]+) -> Tag ismini yakala (Grup 1)
 		// ([^>]*)  -> Kapanış parantezine kadar olan geri kalan her şeyi (attribute'ları) yakala (Grup 2)
 		// >        -> Büyüktür işaretiyle bitir
+		// add unique key to each opening tag to make morphdom happy and flip animations possible
 		/*
 		bucket = bucket.replace(/<(?!\/)([a-zA-Z0-9-]+)([^>]*)>/g, (match, tagName, attributes) => {
 			const rnd = Math.random().toString(36).slice(2, 8);
@@ -1256,49 +1208,6 @@ simply = {
 	},
 	registerComponent: function ({ template, style, name, script, docStr, noFile }) {
 		if (!customElements.get(name)) {
-			let m;
-			// tüm on.* atribute değerleri için
-			// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
-
-			// new line serbest bırakıldı 
-			// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"']*)(\"|\')/gm;
-
-			// onclick="" içinde ilk tek tırnakta kesilme sorunu düzeltildi
-			// https://chatgpt.com/c/69523d00-8a50-8327-95a2-e14875750a0c
-
-			// bir üsttekindeki match eski tarayıcılarda çalışmıyor
-			// https://claude.ai/chat/93a1ea38-c790-4209-a758-fdee9f92d9f3
-
-			let regex = /\s+on[a-z]+(\s*)=(\s*)("((?:\\.|[^"])*)"|'((?:\\.|[^'])*)')/gm;
-
-			while ((m = regex.exec(template)) !== null) {
-				if (m.index === regex.lastIndex) {
-					regex.lastIndex++;
-				}
-
-				// m[4] → çift tırnak içindeki değer
-				// m[5] → tek tırnak içindeki değer
-				let capturedMatch = m[4] || m[5];
-
-				if (this.shadow) {
-					var match = "simply.findShadowRootOrCustomElement(this)";
-				}
-				else {
-					var match = "simply.findShadowRootOrCustomElement(this)";
-				}
-
-				if (capturedMatch.indexOf(match) == -1) {
-					var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
-
-					var newValue = m[0];
-					builtinVars.forEach(v => {
-						newValue = newValue.replaceAll(v, match + "." + v);
-						newValue = newValue.replaceAll("." + match, "");
-					});
-					template = template.replaceAll(m[0], newValue);
-				}
-			}
-
 			script = script.trim();
 			// Class'ı BİR KERE compile et ve cache'le
 			if (script) {
@@ -1320,48 +1229,7 @@ simply = {
 				constructor() {
 					// var start = performance.now();
 					super();
-					this.onParentDataChange = (changes) => this.handleParentReact(changes, "data");
-					this.onParentPropsChange = (changes) => this.handleParentReact(changes, "props");
-				}
 
-				handleParentReact(changes, type) {
-					// 'this.template' sınıfın özelliğinden gelmeli
-					this.react(changes, type, this, this.template);
-				}
-
-				observeAttrChange(el, callback) {
-					// https://claude.ai/chat/d3aa22ed-1d5b-4f09-8f32-97010c4f1963
-					var observer = new MutationObserver(function (mutations) {
-						// Batch processing yapın - her mutation için ayrı ayrı çağırmayın
-						const changes = new Map();
-
-						mutations.forEach(function (mutation) {
-							if (mutation.type === 'attributes') {
-								var newVal = mutation.target.getAttribute(mutation.attributeName);
-								changes.set(mutation.attributeName, newVal);
-							}
-						});
-
-						// Tek seferde callback çağır
-						changes.forEach((value, name) => {
-							callback(name, value);
-						});
-					});
-
-					observer.observe(el, {
-						attributes: true,
-						childList: false,
-						characterData: false,
-						subtree: false,
-						attributeOldValue: true,
-						characterDataOldValue: false
-					});
-
-					return observer;
-				}
-				connectedCallback() {
-					// eski construct
-					var start = performance.now();
 					var { dom, parent, shadow } = simply.getDomParentAndShadow(this);
 
 					var uid = Math.random().toString(36).slice(2, 8);
@@ -1373,17 +1241,6 @@ simply = {
 					var sfcClass = {};
 					var settings = {};
 
-					const EXCLUDED_KEYS = new Set(['routerSettings', 'ctx']);
-
-					for (const key in this) {
-						if (!EXCLUDED_KEYS.has(key) && this.hasOwnProperty(key)) {
-							Object.defineProperty(props, key, {
-								enumerable: true,
-								get: () => this[key],
-							});
-						}
-					}
-
 					Object.assign(this, {
 						component,
 						dom,
@@ -1393,7 +1250,7 @@ simply = {
 						template,
 						s: style,
 						script,
-						props,
+						props: {},
 						cb: {},
 						elementId: simply.getElementUniqueId(dom),
 						react: simply.react,
@@ -1453,15 +1310,43 @@ simply = {
 						}
 					});
 
+					// var end = performance.now();
+					// console.log(`Component ${name} constructed in ${end - start} ms`);
 
-					// eski afterConstruct sonu
-					// connectedcallback
-
-					var end = performance.now();
-					console.log(`Component ${name} connected in ${end - start} ms`);
-
+					// afterConstruct çağır
+					if (typeof this.lifecycle !== "undefined") {
+						if (typeof this.lifecycle.afterConstruct !== "undefined") {
+							this.lifecycle.afterConstruct();
+						}
+					}
+				}
+				// invoked each time the custom element is appended
+				// into a document-connected element
+				observeAttrChange(el, callback) {
+					// burası 0ms
 					var self = this;
-					this._attrObserver = this.observeAttrChange(this, function (name, newValue) {
+					var observer = new MutationObserver(function (mutations) {
+						mutations.forEach(function (mutation) {
+							if (mutation.type === 'attributes') {
+								var newVal = mutation.target.getAttribute(mutation.attributeName);
+								// console.log(mutation.attributeName, "attribute changed to", newVal, callback);
+								callback(mutation.attributeName, newVal);
+							}
+						});
+					});
+					observer.observe(el, {
+						attributes: true,
+						childList: false,
+						characterData: false,
+						subtree: false,
+						attributeOldValue: true,
+						characterDataOldValue: false
+					});
+					return observer;
+				}
+				connectedCallback() {
+
+					this.observeAttrChange(this, function (name, newValue) {
 						//console.log("hee");
 						// value öncekiyle aynı değilse
 						// console.log(name, newValue, self.props[name], newValue == simply.prepareAttr(self.props[name]));
@@ -1486,6 +1371,8 @@ simply = {
 									self.lifecycle.whenPropChange(name, self.props[name], newValue);
 								}
 							}
+
+
 						}
 					});
 
@@ -1512,47 +1399,92 @@ simply = {
 
 					// parent değişkenleri değişince
 					// velet de tepki versin diye
+					var current = this.parent;
+					var self = this;
+					var parentIndex = 0;
 
 					// template’ten bağlanacak parent’ları çıkar
-					var bindings;
-					if (!simply.components[name].bindingsCache) {
-						bindings = simply.components[name].bindingsCache = extractParentBindings(template);
-					}
-					else {
-						bindings = simply.components[name].bindingsCache;
-					}
+					var bindings = extractParentBindings(template);
 
-					for (const [index, bind] of Object.entries(bindings)) {
-						let current = this.parent;
-						let i = 0;
+					// parent değişkenleri değişince
+					var current = this.parent;
+					var parentIndex = 0;
 
-						// Direkt gerekli parent'a git
-						while (current && i < index) {
-							current = current.parent;
-							i++;
+					while (current) {
+
+						var bind = bindings[parentIndex];
+
+						if (bind && current.cb) {
+
+							// DATA
+							if (bind.data && current.data && current.cb.data) {
+								current.cb.data[this.uid] = function (changes) {
+									self.react(changes, "data", self, template);
+								};
+								current.setData = current.data;
+							}
+
+							// PROPS
+							if (bind.props && current.props && current.cb.props) {
+								current.cb.props[this.uid] = function (changes) {
+									self.react(changes, "props", self, template);
+								};
+								current.setProps = current.props;
+							}
 						}
 
-						if (!current?.cb) continue;
-
-						if (bind.data && current.cb.data) {
-							current.cb.data[this.uid] = this.onParentDataChange;
-						}
-						if (bind.props && current.cb.props) {
-							current.cb.props[this.uid] = this.onParentPropsChange;
-						}
+						current = current.parent;
+						parentIndex++;
 					}
 
 					// 15. initial render
-
-					setTimeout(() => {
-						if (this.lifecycle?.afterConstruct) {
-							this.lifecycle.afterConstruct();
-						}
-						this.render();
-					}, 0);
+					this.render();
 				}
 				render() {
-					// console.log("render for ", name);
+
+					let m;
+					// tüm on.* atribute değerleri için
+					// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
+
+					// new line serbest bırakıldı 
+					// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"']*)(\"|\')/gm;
+
+					// onclick="" içinde ilk tek tırnakta kesilme sorunu düzeltildi
+					// https://chatgpt.com/c/69523d00-8a50-8327-95a2-e14875750a0c
+
+					// bir üsttekindeki match eski tarayıcılarda çalışmıyor
+					// https://claude.ai/chat/93a1ea38-c790-4209-a758-fdee9f92d9f3
+
+					let regex = /\s+on[a-z]+(\s*)=(\s*)("((?:\\.|[^"])*)"|'((?:\\.|[^'])*)')/gm;
+
+					while ((m = regex.exec(template)) !== null) {
+						if (m.index === regex.lastIndex) {
+							regex.lastIndex++;
+						}
+
+						// m[4] → çift tırnak içindeki değer
+						// m[5] → tek tırnak içindeki değer
+						let capturedMatch = m[4] || m[5];
+
+						if (this.shadow) {
+							var match = "simply.findShadowRootOrCustomElement(this)";
+						}
+						else {
+							var match = "simply.findShadowRootOrCustomElement(this)";
+						}
+
+						if (capturedMatch.indexOf(match) == -1) {
+							var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
+
+							var newValue = m[0];
+							builtinVars.forEach(v => {
+								newValue = newValue.replaceAll(v, match + "." + v);
+								newValue = newValue.replaceAll("." + match, "");
+							});
+							template = template.replaceAll(m[0], newValue);
+						}
+					}
+
 
 					var tmpl = template;
 
@@ -1577,15 +1509,14 @@ simply = {
 					if (!this.rendered) {
 						// console.log("initial render for ", name);
 						this.rendered = true;
-						// let parsedTemplate = simply.parseTemplate(parsingArgs);
-						let compiledTemplate = simply.compile(parsingArgs);
-						// console.log(compiledTemplate, "asd");
+						let parsedTemplate = simply.parseTemplate(parsingArgs);
 
 						// console.log(`Initial render for ${name} took ${t1 - t0} ms`);
 
 						var t0 = performance.now();
 						var parsedStyle = simply.parseStyle(parsingArgs);
 						simply.components[name].lastParsedStyle = parsedStyle;
+						parsedTemplate = parsedTemplate;
 						var t1 = performance.now();
 						// console.log(`Style parsing for ${name} took ${t1 - t0} ms`);
 
@@ -1595,19 +1526,11 @@ simply = {
 						if (!this.shadow) {
 							document.adoptedStyleSheets = [this.sheet, ...document.adoptedStyleSheets];
 
-							const sheets = document.adoptedStyleSheets;
-							if (!sheets.includes(this.sheet)) {
-								sheets.push(this.sheet);
-							}
-
 							var end = performance.now();
 							//console.log(`Adopting sheet to document for ${name} took ${end - start} ms`);
 						}
 						else {
-							const sheets = this.dom.adoptedStyleSheets;
-							if (!sheets.includes(this.sheet)) {
-								sheets.push(this.sheet);
-							}
+							this.dom.adoptedStyleSheets = [this.sheet, ...this.dom.adoptedStyleSheets];
 							// console.log("shadow");
 						}
 
@@ -1628,14 +1551,29 @@ simply = {
 							}
 						}
 
-						var t0 = performance.now();
+						// took slot content
+						if (this.innerHTML && this.innerHTML.trim() !== "") {
+							// console.log(this.innerHTML);
+							this.slotContent = this.innerHTML;
 
-						render(
-							compiledTemplate,
-							this.dom
-						);
-						var t1 = performance.now();
-						// console.log(`DOM insertion for ${name} took ${t1 - t0} ms`);
+							// parent var context odur
+							// yok ise context kendisidir
+							const p = this.parent ?? this;
+							const parsedSlot = simply.parseTemplate({
+								template: this.slotContent,
+								...p
+							});
+
+
+							this.dom.innerHTML = parsedTemplate;
+							this.dom.querySelector("simply-slot").innerHTML = parsedSlot;
+						}
+						else {
+							var t0 = performance.now();
+							this.dom.innerHTML = parsedTemplate;
+							var t1 = performance.now();
+							// console.log(`DOM insertion for ${name} took ${t1 - t0} ms`);
+						}
 
 						//const t1 = performance.now();
 						//console.log((t1 - t0) + " put milliseconds.", name);
@@ -1660,15 +1598,13 @@ simply = {
 						var p = this.props;
 
 						// bu transition için
-						// 2. Transition kontrolünü rAF'tan ÖNCE yap (Burası işin sırrı)
-						// Bu işlem senkrondur ve CPU'yu yormaz.
-						const transition = comp.routerSettings && 'transition' in comp.routerSettings
-							? comp.routerSettings.transition
-							: (simply.routerSettings && simply.routerSettings.transition);
-
-						// 3. EĞER Transition varsa pahalı yola (rAF -> setTimeout) gir
-						if (transition) {
-							requestAnimationFrame(() => {
+						requestAnimationFrame(() => {
+							// comp'ta tanımlıysa (true/false/undefined olsa bile)
+							// comp'taki değeri kullan, yoksa global'e bak
+							const transition = comp.routerSettings && 'transition' in comp.routerSettings
+								? comp.routerSettings.transition
+								: (simply.routerSettings && simply.routerSettings.transition);
+							if (transition) {
 								ObservableSlim.pause(p);
 
 								// hack: stop transition to initial values on first render
@@ -1677,6 +1613,8 @@ simply = {
 								setTimeout(() => {
 									comp.style.transition = ""; // extension of the hack
 
+									// comp'ta tanımlıysa (true/false/undefined olsa bile)
+									// comp'taki değeri kullan, yoksa global'e bak
 									var stagger = comp.routerSettings && 'stagger' in comp.routerSettings
 										? comp.routerSettings.stagger
 										: (simply.routerSettings && simply.routerSettings.stagger);
@@ -1685,40 +1623,37 @@ simply = {
 										if (!self.parent) {
 											// ilk seviye, no delay
 											comp.setAttribute("enter", "");
-										} else {
+										}
+										else {
 											comp.stagger = stagger + (self.parent.stagger || 0);
 
 											// parent tamamlanmamışsa bekle
 											if (typeof self.parent.completed === "undefined") {
-												// console.log("stag this", comp);
+												console.log("stag this", comp);
 												comp.staggerFn = setTimeout(() => {
 													comp.setAttribute("enter", "");
 													clearTimeout(comp.staggerFn);
 												}, comp.stagger);
-											} else {
-												// console.log("no stag for this", comp);
+											}
+											else {
+												console.log("no stag for this", comp);
 												comp.setAttribute("enter", "");
 											}
 										}
 									} else {
-										// stagger = 0 ise direkt çalıştır
+										// ✅ stagger = 0 ise direkt çalıştır
 										comp.setAttribute("enter", "");
 									}
 
 									ObservableSlim.resume(p);
 								}, 0);
-							});
-						}
-						// 4. EĞER Transition YOKSA (Hızlı Yol - Fast Path)
-						else {
-							// rAF yok, setTimeout yok, bekleme yok.
-							// Direkt bitti olarak işaretle.
-							comp.completed = true;
-
-							// ÖNEMLİ: Eğer CSS'te elemanın görünmesi [enter] attribute'una bağlıysa
-							// buraya da eklemelisin. Animasyonsuz anında görünsün diye:
-							// comp.setAttribute("enter", ""); 
-						}
+							}
+							else {
+								// parent'ta transition false ise
+								// çocuk transition'a stagger'sız başlasın diye
+								comp.completed = true;
+							}
+						});
 
 					}
 					else {
@@ -1730,8 +1665,7 @@ simply = {
 							}
 						}
 
-						// let parsedTemplate = simply.parseTemplate(parsingArgs);
-						let compiledTemplate = simply.compile(parsingArgs);
+						let parsedTemplate = simply.parseTemplate(parsingArgs);
 						var end = performance.now();
 						// console.log(`Render function for ${name} took ${end - start} ms`);
 
@@ -1742,29 +1676,199 @@ simply = {
 						//console.log(`Style re parsing for ${name} took ${end - start} ms`);
 
 						if (simply.components[name].lastParsedStyle !== parsedStyle) {
-							console.log("stil değişmiş", simply.components[name].lastParsedStyle, parsedStyle);
-							console.log(parsedStyle);
-							let start = performance.now();
-
-							// bu performance düşmanı
+							var start = performance.now();
 							self.sheet.replaceSync(parsedStyle);
-							let end = performance.now();
-							console.log(`Style re applying for ${name} took ${end - start} ms`);
+							var end = performance.now();
+							// console.log(`Style re applying for ${name} took ${end - start} ms`);
 						}
 
+						if (this.shadow) {
+							var newDomAsString = "<" + name + " shadow>" + parsedTemplate + "</" + name + ">";
 
-						render(
-							compiledTemplate,
-							self.dom
-						);
+							if (document.startViewTransition && this.settings.morphAnimation) {
+								document.startViewTransition(function () {
+									morphIt(self.dom, newDomAsString);
+								});
+							}
+							else {
+								morphIt(this.dom, newDomAsString);
+							}
+						}
+						else {
+							var newDomAsString = "<" + name + ">" + parsedTemplate + "</" + name + ">";
+
+							if (document.startViewTransition && this.settings.morphAnimation) {
+								console.log("1", this.settings.morphAnimation);
+								const start = performance.now();
+
+								const transition = document.startViewTransition(function () {
+									// console.log("First Snapshot alındı:", performance.now() - start, "ms");
+									morphIt(self.dom, newDomAsString);
+								});
+
+								transition.ready.then(() => {
+									// console.log("All Snapshots alındı:", performance.now() - start, "ms");
+								});
+
+								transition.finished.then(() => {
+									// console.log("Tüm transition bitti:", performance.now() - start, "ms");
+								});
+							}
+							else {
+								morphIt(this.dom, newDomAsString);
+							}
+						}
+						//var end = performance.now();
+						//console.log(`Component ${name} rerendered in ${end - start} ms`);
+
+						if (this.slotContent) {
+							// parent var context odur
+							// yok ise context kendisidir
+							const p = this.parent ?? this;
+							const parsedSlot = simply.parseTemplate({
+								template: this.slotContent,
+								...p
+							});
+
+							if (document.startViewTransition && this.settings.morphAnimation) {
+								document.startViewTransition(function () {
+									morphIt(self.dom.querySelector("simply-slot"), "<simply-slot>" + parsedSlot + "</simply-slot>");
+								});
+							}
+							else {
+								morphIt(this.dom.querySelector("simply-slot"), "<simply-slot>" + parsedSlot + "</simply-slot>");
+							}
+						}
+
+						// console.log(newDomAsString);
+
+						function morphIt(dom, newDomAsString) {
+							var start = performance.now();
+							simply.morphdom(dom, newDomAsString, {
+
+								childrenOnly: true,
+								getNodeKey(node) {
+									return node.nodeType === 1
+										? (node.getAttribute('key') || node.id)
+										: null;
+								},
+								// component'in root'unda yer alanlar
+								onBeforeElUpdated: function (fromEl, toEl) {
+									// spec - https://dom.spec.whatwg.org/#concept-node-equals	
+
+
+
+									if (fromEl.isSameNode(toEl)) {
+										return false;
+									}
+									if (fromEl.isEqualNode(toEl)) {
+										return false
+									}
+
+									else if (toEl.tagName === 'FRAMER-COMPONENT') {
+										return false;
+									}
+
+									if (toEl.hasAttribute("passive") === true) {
+										return false;
+									}
+									if (fromEl.tagName == "DIALOG") {
+										// console.log(fromEl.getAttribute("open"), toEl.getAttribute("open"));
+										if (fromEl.hasAttribute("open")) {
+											toEl.setAttribute("open", true);
+										}
+										return true;
+										// console.log("dont again");
+									}
+									if (fromEl.hasAttribute("go-active") == true) {
+										toEl.setAttribute("go-active", true);
+									}
+									if (fromEl.hasAttribute("transition") == true) {
+										//toEl.setAttribute("transition", fromEl.getAttribute("transition"));
+									}
+									return true
+								},
+								onBeforeNodeDiscarded: function (node) {
+								},
+								// component'in root'unun içindekilerin çocuklarında
+								onBeforeElChildrenUpdated: function (fromEl, toEl) {
+
+									if (fromEl.isSameNode(toEl)) {
+										// console.log("same mi node", toEl, fromEl.value, toEl.value)
+										return false;
+									}
+									if (fromEl.isEqualNode(toEl)) {
+										// textarea'dan textarea'ya dönüştürürken
+										// eşit mi diye bakarken value'yu hesaba katmıyor diye eklendi
+										if (toEl.tagName == "TEXTAREA" && fromEl.value !== toEl.value) {
+											return true
+										}
+										return false
+									}
+									// bu custom element'leri skip etmek için
+									// shadowdom olanlara zaten dokunamıyor da
+									// shadow'suz custom elementleri her seferinde render ediyor yoksa
+									if (customElements.get(fromEl.tagName.toLowerCase())) {
+										return false;
+									}
+									if (toEl.hasAttribute("passive") === true) {
+										return false;
+									}
+
+									if (fromEl.tagName == "CHILD-COMPONENT") {
+										// console.log("dont again");
+									}
+									if (fromEl.tagName == "SIMPLY-SLOT") {
+										return false;
+										// console.log("dont again");
+									}
+									else if (fromEl.tagName == "STYLE" && fromEl.hasAttribute("simply")) {
+										// return false;
+									}
+
+
+									else if (toEl.tagName === 'INPUT') {
+										if (toEl.type == 'RADIO' || toEl.type == 'CHECKBOX') {
+											return false;
+										}
+										else {
+											toEl.value = fromEl.value;
+										}
+									}
+									else if (toEl.tagName === 'FRAMER-COMPONENT') {
+										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
+										return false;
+									}
+									else if (toEl.tagName === 'ROUTER') {
+										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
+										return false;
+									}
+									else if (toEl.tagName === 'ROUTE') {
+										// DINAMIK BAKMAK LAZIM EL ROUTER MI DIYE
+										return false;
+									}
+									else if (toEl.tagName == 'LABEL') {
+										if (fromEl.isEqualNode(toEl)) {
+											return false;
+										}
+									}
+									else if (toEl.tagName === 'OPTION') {
+										toEl.selected = fromEl.selected;
+									}
+									//console.log(toEl.tagName);
+								}
+							});
+							var end = performance.now();
+							// console.log(`Morphdom for ${name} took ${end - start} ms`);
+						}
+
+						// test
 
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterRerender !== "undefined") {
 								this.lifecycle.afterRerender();
 							}
 						}
-						var end = performance.now();
-						console.log(`Component ${name} rendered in ${end - start} ms`);
 					}
 
 					// cache data and props after every render
@@ -1842,10 +1946,6 @@ simply = {
 						}
 					}
 
-					if (this._attrObserver) {
-						this._attrObserver.disconnect();
-						this._attrObserver = null;
-					}
 
 					if (typeof this.lifecycle !== "undefined") {
 						if (typeof this.lifecycle.disconnected !== "undefined") {
@@ -1867,6 +1967,780 @@ simply = {
 			};
 			return descriptors;
 		}, {}));
+	},
+	morphdom: function () {
+		(function () {
+			"use strict"; var DOCUMENT_FRAGMENT_NODE = 11;
+
+			function morphAttrs(fromNode, toNode) {
+				if (window.customElements.get(fromNode.tagName.toLowerCase())) {
+					//return false;
+				}
+
+
+				var toNodeAttrs = toNode.attributes;
+				var attr;
+				var attrName;
+				var attrNamespaceURI;
+				var attrValue;
+				var fromValue;
+
+				// document-fragments dont have attributes so lets not do anything
+				if (toNode.nodeType === DOCUMENT_FRAGMENT_NODE || fromNode.nodeType === DOCUMENT_FRAGMENT_NODE) {
+					return;
+				}
+
+				// update attributes on original DOM element
+				for (var i = toNodeAttrs.length - 1; i >= 0; i--) {
+					attr = toNodeAttrs[i];
+					attrName = attr.name;
+					attrNamespaceURI = attr.namespaceURI;
+					attrValue = attr.value;
+
+					if (attrNamespaceURI) {
+						attrName = attr.localName || attrName;
+						fromValue = fromNode.getAttributeNS(attrNamespaceURI, attrName);
+
+						if (fromValue !== attrValue) {
+							if (attr.prefix === 'xmlns') {
+								attrName = attr.name; // It's not allowed to set an attribute with the XMLNS namespace without specifying the `xmlns` prefix
+							}
+							fromNode.setAttributeNS(attrNamespaceURI, attrName, attrValue);
+						}
+					} else {
+						fromValue = fromNode.getAttribute(attrName);
+
+						if (fromValue !== attrValue) {
+							fromNode.setAttribute(attrName, attrValue);
+						}
+					}
+				}
+
+				// Remove any extra attributes found on the original DOM element that
+				// weren't found on the target element.
+				var fromNodeAttrs = fromNode.attributes;
+
+				for (var d = fromNodeAttrs.length - 1; d >= 0; d--) {
+					attr = fromNodeAttrs[d];
+					attrName = attr.name;
+					attrNamespaceURI = attr.namespaceURI;
+
+					if (attrNamespaceURI) {
+						attrName = attr.localName || attrName;
+
+						if (!toNode.hasAttributeNS(attrNamespaceURI, attrName)) {
+							fromNode.removeAttributeNS(attrNamespaceURI, attrName);
+						}
+					} else {
+						if (!toNode.hasAttribute(attrName)) {
+							fromNode.removeAttribute(attrName);
+						}
+					}
+				}
+			}
+
+			var range; // Create a range object for efficently rendering strings to elements.
+			var NS_XHTML = 'http://www.w3.org/1999/xhtml';
+
+			var doc = typeof document === 'undefined' ? undefined : document;
+			var HAS_TEMPLATE_SUPPORT = !!doc && 'content' in doc.createElement('template');
+			var HAS_RANGE_SUPPORT = !!doc && doc.createRange && 'createContextualFragment' in doc.createRange();
+
+			function createFragmentFromTemplate(str) {
+				// bu 5-10ms alıyor ama her şeyin bedeli var
+				var start = performance.now();
+				var template = doc.createElement('template');
+				template.innerHTML = str;
+				var end = performance.now();
+				// console.log(`createFragmentFromTemplate took ${end - start} ms`);
+				return template.content.childNodes[0];
+			}
+
+			function createFragmentFromRange(str) {
+				if (!range) {
+					range = doc.createRange();
+					range.selectNode(doc.body);
+				}
+
+				var fragment = range.createContextualFragment(str);
+				return fragment.childNodes[0];
+			}
+
+			function createFragmentFromWrap(str) {
+				var fragment = doc.createElement('body');
+				fragment.innerHTML = str;
+				return fragment.childNodes[0];
+			}
+
+			/**
+			 * This is about the same
+			 * var html = new DOMParser().parseFromString(str, 'text/html');
+			 * return html.body.firstChild;
+			 *
+			 * @method toElement
+			 * @param {String} str
+			 */
+			function toElement(str) {
+				str = str.trim();
+				if (HAS_TEMPLATE_SUPPORT) {
+					// avoid restrictions on content for things like `<tr><th>Hi</th></tr>` which
+					// createContextualFragment doesn't support
+					// <template> support not available in IE
+					return createFragmentFromTemplate(str);
+				} else if (HAS_RANGE_SUPPORT) {
+					return createFragmentFromRange(str);
+				}
+
+				return createFragmentFromWrap(str);
+			}
+
+			/**
+			 * Returns true if two node's names are the same.
+			 *
+			 * NOTE: We don't bother checking `namespaceURI` because you will never find two HTML elements with the same
+			 *       nodeName and different namespace URIs.
+			 *
+			 * @param {Element} a
+			 * @param {Element} b The target element
+			 * @return {boolean}
+			 */
+			function compareNodeNames(fromEl, toEl) {
+				var fromNodeName = fromEl.nodeName;
+				var toNodeName = toEl.nodeName;
+				var fromCodeStart, toCodeStart;
+
+				if (fromNodeName === toNodeName) {
+					return true;
+				}
+
+				fromCodeStart = fromNodeName.charCodeAt(0);
+				toCodeStart = toNodeName.charCodeAt(0);
+
+				// If the target element is a virtual DOM node or SVG node then we may
+				// need to normalize the tag name before comparing. Normal HTML elements that are
+				// in the "http://www.w3.org/1999/xhtml"
+				// are converted to upper case
+				if (fromCodeStart <= 90 && toCodeStart >= 97) { // from is upper and to is lower
+					return fromNodeName === toNodeName.toUpperCase();
+				} else if (toCodeStart <= 90 && fromCodeStart >= 97) { // to is upper and from is lower
+					return toNodeName === fromNodeName.toUpperCase();
+				} else {
+					return false;
+				}
+			}
+
+			/**
+			 * Create an element, optionally with a known namespace URI.
+			 *
+			 * @param {string} name the element name, e.g. 'div' or 'svg'
+			 * @param {string} [namespaceURI] the element's namespace URI, i.e. the value of
+			 * its `xmlns` attribute or its inferred namespace.
+			 *
+			 * @return {Element}
+			 */
+			function createElementNS(name, namespaceURI) {
+				return !namespaceURI || namespaceURI === NS_XHTML ?
+					doc.createElement(name) :
+					doc.createElementNS(namespaceURI, name);
+			}
+
+			/**
+			 * Copies the children of one DOM element to another DOM element
+			 */
+			function moveChildren(fromEl, toEl) {
+				var curChild = fromEl.firstChild;
+				while (curChild) {
+					var nextChild = curChild.nextSibling;
+					toEl.appendChild(curChild);
+					curChild = nextChild;
+				}
+				return toEl;
+			}
+
+			function syncBooleanAttrProp(fromEl, toEl, name) {
+				if (fromEl[name] !== toEl[name]) {
+					fromEl[name] = toEl[name];
+					if (fromEl[name]) {
+						fromEl.setAttribute(name, '');
+					} else {
+						fromEl.removeAttribute(name);
+					}
+				}
+			}
+
+			var specialElHandlers = {
+				OPTION: function (fromEl, toEl) {
+					var parentNode = fromEl.parentNode;
+					if (parentNode) {
+						var parentName = parentNode.nodeName.toUpperCase();
+						if (parentName === 'OPTGROUP') {
+							parentNode = parentNode.parentNode;
+							parentName = parentNode && parentNode.nodeName.toUpperCase();
+						}
+						if (parentName === 'SELECT' && !parentNode.hasAttribute('multiple')) {
+							if (fromEl.hasAttribute('selected') && !toEl.selected) {
+								// Workaround for MS Edge bug where the 'selected' attribute can only be
+								// removed if set to a non-empty value:
+								// https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/12087679/
+								fromEl.setAttribute('selected', 'selected');
+								fromEl.removeAttribute('selected');
+							}
+							// We have to reset select element's selectedIndex to -1, otherwise setting
+							// fromEl.selected using the syncBooleanAttrProp below has no effect.
+							// The correct selectedIndex will be set in the SELECT special handler below.
+							parentNode.selectedIndex = -1;
+						}
+					}
+					syncBooleanAttrProp(fromEl, toEl, 'selected');
+				},
+				/**
+				 * The "value" attribute is special for the <input> element since it sets
+				 * the initial value. Changing the "value" attribute without changing the
+				 * "value" property will have no effect since it is only used to the set the
+				 * initial value.  Similar for the "checked" attribute, and "disabled".
+				 */
+				INPUT: function (fromEl, toEl) {
+					syncBooleanAttrProp(fromEl, toEl, 'checked');
+					syncBooleanAttrProp(fromEl, toEl, 'disabled');
+
+					if (fromEl.value !== toEl.value) {
+						fromEl.value = toEl.value;
+					}
+
+					if (!toEl.hasAttribute('value')) {
+						fromEl.removeAttribute('value');
+					}
+				},
+
+				TEXTAREA: function (fromEl, toEl) {
+					var newValue = toEl.value;
+					if (fromEl.value !== newValue) {
+						fromEl.value = newValue;
+					}
+
+					var firstChild = fromEl.firstChild;
+					if (firstChild) {
+						// Needed for IE. Apparently IE sets the placeholder as the
+						// node value and vise versa. This ignores an empty update.
+						var oldValue = firstChild.nodeValue;
+
+						if (oldValue == newValue || (!newValue && oldValue == fromEl.placeholder)) {
+							return;
+						}
+
+						firstChild.nodeValue = newValue;
+					}
+				},
+				SELECT: function (fromEl, toEl) {
+					if (!toEl.hasAttribute('multiple')) {
+						var selectedIndex = -1;
+						var i = 0;
+						// We have to loop through children of fromEl, not toEl since nodes can be moved
+						// from toEl to fromEl directly when morphing.
+						// At the time this special handler is invoked, all children have already been morphed
+						// and appended to / removed from fromEl, so using fromEl here is safe and correct.
+						var curChild = fromEl.firstChild;
+						var optgroup;
+						var nodeName;
+						while (curChild) {
+							nodeName = curChild.nodeName && curChild.nodeName.toUpperCase();
+							if (nodeName === 'OPTGROUP') {
+								optgroup = curChild;
+								curChild = optgroup.firstChild;
+							} else {
+								if (nodeName === 'OPTION') {
+									if (curChild.hasAttribute('selected')) {
+										selectedIndex = i;
+										break;
+									}
+									i++;
+								}
+								curChild = curChild.nextSibling;
+								if (!curChild && optgroup) {
+									curChild = optgroup.nextSibling;
+									optgroup = null;
+								}
+							}
+						}
+
+						fromEl.selectedIndex = selectedIndex;
+					}
+				}
+			};
+
+			var ELEMENT_NODE = 1;
+			var DOCUMENT_FRAGMENT_NODE$1 = 11;
+			var TEXT_NODE = 3;
+			var COMMENT_NODE = 8;
+
+			function noop() { }
+
+			function defaultGetNodeKey(node) {
+				if (node) {
+					return (node.getAttribute && node.getAttribute('id')) || node.id;
+				}
+			}
+
+			function morphdomFactory(morphAttrs) {
+
+				return function morphdom(fromNode, toNode, options) {
+					if (!options) {
+						options = {};
+					}
+
+					if (typeof toNode === 'string') {
+						if (fromNode.nodeName === '#document' || fromNode.nodeName === 'HTML' || fromNode.nodeName === 'BODY') {
+							var toNodeHtml = toNode;
+							toNode = doc.createElement('html');
+							toNode.innerHTML = toNodeHtml;
+						} else {
+							toNode = toElement(toNode);
+						}
+					} else if (toNode.nodeType === DOCUMENT_FRAGMENT_NODE$1) {
+						toNode = toNode.firstElementChild;
+					}
+
+					var getNodeKey = options.getNodeKey || defaultGetNodeKey;
+					var onBeforeNodeAdded = options.onBeforeNodeAdded || noop;
+					var onNodeAdded = options.onNodeAdded || noop;
+					var onBeforeElUpdated = options.onBeforeElUpdated || noop;
+					var onElUpdated = options.onElUpdated || noop;
+					var onBeforeNodeDiscarded = options.onBeforeNodeDiscarded || noop;
+					var onNodeDiscarded = options.onNodeDiscarded || noop;
+					var onBeforeElChildrenUpdated = options.onBeforeElChildrenUpdated || noop;
+					var skipFromChildren = options.skipFromChildren || noop;
+					var addChild = options.addChild || function (parent, child) { return parent.appendChild(child); };
+					var childrenOnly = options.childrenOnly === true;
+
+					// This object is used as a lookup to quickly find all keyed elements in the original DOM tree.
+					var fromNodesLookup = Object.create(null);
+					var keyedRemovalList = [];
+
+					function addKeyedRemoval(key) {
+						keyedRemovalList.push(key);
+					}
+
+					function walkDiscardedChildNodes(node, skipKeyedNodes) {
+						if (node.nodeType === ELEMENT_NODE) {
+							var curChild = node.firstChild;
+							while (curChild) {
+
+								var key = undefined;
+
+								if (skipKeyedNodes && (key = getNodeKey(curChild))) {
+									// If we are skipping keyed nodes then we add the key
+									// to a list so that it can be handled at the very end.
+									addKeyedRemoval(key);
+								} else {
+									// Only report the node as discarded if it is not keyed. We do this because
+									// at the end we loop through all keyed elements that were unmatched
+									// and then discard them in one final pass.
+									onNodeDiscarded(curChild);
+									if (curChild.firstChild) {
+										walkDiscardedChildNodes(curChild, skipKeyedNodes);
+									}
+								}
+
+								curChild = curChild.nextSibling;
+							}
+						}
+					}
+
+					/**
+					* Removes a DOM node out of the original DOM
+					*
+					* @param  {Node} node The node to remove
+					* @param  {Node} parentNode The nodes parent
+					* @param  {Boolean} skipKeyedNodes If true then elements with keys will be skipped and not discarded.
+					* @return {undefined}
+					*/
+					function removeNode(node, parentNode, skipKeyedNodes) {
+						if (onBeforeNodeDiscarded(node) === false) {
+							return;
+						}
+
+						if (parentNode) {
+							parentNode.removeChild(node);
+						}
+
+						onNodeDiscarded(node);
+						walkDiscardedChildNodes(node, skipKeyedNodes);
+					}
+
+					// // TreeWalker implementation is no faster, but keeping this around in case this changes in the future
+					// function indexTree(root) {
+					//     var treeWalker = document.createTreeWalker(
+					//         root,
+					//         NodeFilter.SHOW_ELEMENT);
+					//
+					//     var el;
+					//     while((el = treeWalker.nextNode())) {
+					//         var key = getNodeKey(el);
+					//         if (key) {
+					//             fromNodesLookup[key] = el;
+					//         }
+					//     }
+					// }
+
+					// // NodeIterator implementation is no faster, but keeping this around in case this changes in the future
+					//
+					// function indexTree(node) {
+					//     var nodeIterator = document.createNodeIterator(node, NodeFilter.SHOW_ELEMENT);
+					//     var el;
+					//     while((el = nodeIterator.nextNode())) {
+					//         var key = getNodeKey(el);
+					//         if (key) {
+					//             fromNodesLookup[key] = el;
+					//         }
+					//     }
+					// }
+
+					function indexTree(node) {
+						if (node.nodeType === ELEMENT_NODE || node.nodeType === DOCUMENT_FRAGMENT_NODE$1) {
+							var curChild = node.firstChild;
+							while (curChild) {
+								var key = getNodeKey(curChild);
+								if (key) {
+									fromNodesLookup[key] = curChild;
+								}
+
+								// Walk recursively
+								indexTree(curChild);
+
+								curChild = curChild.nextSibling;
+							}
+						}
+					}
+
+					indexTree(fromNode);
+
+					function handleNodeAdded(el) {
+						onNodeAdded(el);
+
+						var curChild = el.firstChild;
+						while (curChild) {
+							var nextSibling = curChild.nextSibling;
+
+							var key = getNodeKey(curChild);
+							if (key) {
+								var unmatchedFromEl = fromNodesLookup[key];
+								// if we find a duplicate #id node in cache, replace `el` with cache value
+								// and morph it to the child node.
+								if (unmatchedFromEl && compareNodeNames(curChild, unmatchedFromEl)) {
+									curChild.parentNode.replaceChild(unmatchedFromEl, curChild);
+									morphEl(unmatchedFromEl, curChild);
+								} else {
+									handleNodeAdded(curChild);
+								}
+							} else {
+								// recursively call for curChild and it's children to see if we find something in
+								// fromNodesLookup
+								handleNodeAdded(curChild);
+							}
+
+							curChild = nextSibling;
+						}
+					}
+
+					function cleanupFromEl(fromEl, curFromNodeChild, curFromNodeKey) {
+						// We have processed all of the "to nodes". If curFromNodeChild is
+						// non-null then we still have some from nodes left over that need
+						// to be removed
+						while (curFromNodeChild) {
+							var fromNextSibling = curFromNodeChild.nextSibling;
+							if ((curFromNodeKey = getNodeKey(curFromNodeChild))) {
+								// Since the node is keyed it might be matched up later so we defer
+								// the actual removal to later
+								addKeyedRemoval(curFromNodeKey);
+							} else {
+								// NOTE: we skip nested keyed nodes from being removed since there is
+								//       still a chance they will be matched up later
+								removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */);
+							}
+							curFromNodeChild = fromNextSibling;
+						}
+					}
+
+					function morphEl(fromEl, toEl, childrenOnly) {
+						var toElKey = getNodeKey(toEl);
+
+						if (toElKey) {
+							// If an element with an ID is being morphed then it will be in the final
+							// DOM so clear it out of the saved elements collection
+							delete fromNodesLookup[toElKey];
+						}
+
+						if (!childrenOnly) {
+							// optional
+							if (onBeforeElUpdated(fromEl, toEl) === false) {
+								return;
+							}
+
+							// update attributes on original DOM element first
+							morphAttrs(fromEl, toEl);
+							// optional
+							onElUpdated(fromEl);
+
+							if (onBeforeElChildrenUpdated(fromEl, toEl) === false) {
+								return;
+							}
+						}
+
+						if (fromEl.nodeName !== 'TEXTAREA') {
+							morphChildren(fromEl, toEl);
+						} else {
+							specialElHandlers.TEXTAREA(fromEl, toEl);
+						}
+					}
+
+					function morphChildren(fromEl, toEl) {
+						var skipFrom = skipFromChildren(fromEl, toEl);
+						var curToNodeChild = toEl.firstChild;
+						var curFromNodeChild = fromEl.firstChild;
+						var curToNodeKey;
+						var curFromNodeKey;
+
+						var fromNextSibling;
+						var toNextSibling;
+						var matchingFromEl;
+
+						// walk the children
+						outer: while (curToNodeChild) {
+							toNextSibling = curToNodeChild.nextSibling;
+							curToNodeKey = getNodeKey(curToNodeChild);
+
+							// walk the fromNode children all the way through
+							while (!skipFrom && curFromNodeChild) {
+								fromNextSibling = curFromNodeChild.nextSibling;
+
+								if (curToNodeChild.isSameNode && curToNodeChild.isSameNode(curFromNodeChild)) {
+									curToNodeChild = toNextSibling;
+									curFromNodeChild = fromNextSibling;
+									continue outer;
+								}
+
+								curFromNodeKey = getNodeKey(curFromNodeChild);
+
+								var curFromNodeType = curFromNodeChild.nodeType;
+
+								// this means if the curFromNodeChild doesnt have a match with the curToNodeChild
+								var isCompatible = undefined;
+
+								if (curFromNodeType === curToNodeChild.nodeType) {
+									if (curFromNodeType === ELEMENT_NODE) {
+										// Both nodes being compared are Element nodes
+
+										if (curToNodeKey) {
+											// The target node has a key so we want to match it up with the correct element
+											// in the original DOM tree
+											if (curToNodeKey !== curFromNodeKey) {
+												// The current element in the original DOM tree does not have a matching key so
+												// let's check our lookup to see if there is a matching element in the original
+												// DOM tree
+												if ((matchingFromEl = fromNodesLookup[curToNodeKey])) {
+													if (fromNextSibling === matchingFromEl) {
+														// Special case for single element removals. To avoid removing the original
+														// DOM node out of the tree (since that can break CSS transitions, etc.),
+														// we will instead discard the current node and wait until the next
+														// iteration to properly match up the keyed target element with its matching
+														// element in the original tree
+														isCompatible = false;
+													} else {
+														// We found a matching keyed element somewhere in the original DOM tree.
+														// Let's move the original DOM node into the current position and morph
+														// it.
+
+														// NOTE: We use insertBefore instead of replaceChild because we want to go through
+														// the `removeNode()` function for the node that is being discarded so that
+														// all lifecycle hooks are correctly invoked
+														fromEl.insertBefore(matchingFromEl, curFromNodeChild);
+
+														// fromNextSibling = curFromNodeChild.nextSibling;
+
+														if (curFromNodeKey) {
+															// Since the node is keyed it might be matched up later so we defer
+															// the actual removal to later
+															addKeyedRemoval(curFromNodeKey);
+														} else {
+															// NOTE: we skip nested keyed nodes from being removed since there is
+															//       still a chance they will be matched up later
+															removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */);
+														}
+
+														curFromNodeChild = matchingFromEl;
+														curFromNodeKey = getNodeKey(curFromNodeChild);
+													}
+												} else {
+													// The nodes are not compatible since the "to" node has a key and there
+													// is no matching keyed node in the source tree
+													isCompatible = false;
+												}
+											}
+										} else if (curFromNodeKey) {
+											// The original has a key
+											isCompatible = false;
+										}
+
+										isCompatible = isCompatible !== false && compareNodeNames(curFromNodeChild, curToNodeChild);
+										if (isCompatible) {
+											// We found compatible DOM elements so transform
+											// the current "from" node to match the current
+											// target DOM node.
+											// MORPH
+											morphEl(curFromNodeChild, curToNodeChild);
+										}
+
+									} else if (curFromNodeType === TEXT_NODE || curFromNodeType == COMMENT_NODE) {
+										// Both nodes being compared are Text or Comment nodes
+										isCompatible = true;
+										// Simply update nodeValue on the original node to
+										// change the text value
+										if (curFromNodeChild.nodeValue !== curToNodeChild.nodeValue) {
+											curFromNodeChild.nodeValue = curToNodeChild.nodeValue;
+										}
+
+									}
+								}
+
+								if (isCompatible) {
+									// Advance both the "to" child and the "from" child since we found a match
+									// Nothing else to do as we already recursively called morphChildren above
+									curToNodeChild = toNextSibling;
+									curFromNodeChild = fromNextSibling;
+									continue outer;
+								}
+
+								// No compatible match so remove the old node from the DOM and continue trying to find a
+								// match in the original DOM. However, we only do this if the from node is not keyed
+								// since it is possible that a keyed node might match up with a node somewhere else in the
+								// target tree and we don't want to discard it just yet since it still might find a
+								// home in the final DOM tree. After everything is done we will remove any keyed nodes
+								// that didn't find a home
+								if (curFromNodeKey) {
+									// Since the node is keyed it might be matched up later so we defer
+									// the actual removal to later
+									addKeyedRemoval(curFromNodeKey);
+								} else {
+									// NOTE: we skip nested keyed nodes from being removed since there is
+									//       still a chance they will be matched up later
+									removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */);
+								}
+
+								curFromNodeChild = fromNextSibling;
+							} // END: while(curFromNodeChild) {}
+
+							// If we got this far then we did not find a candidate match for
+							// our "to node" and we exhausted all of the children "from"
+							// nodes. Therefore, we will just append the current "to" node
+							// to the end
+							if (curToNodeKey && (matchingFromEl = fromNodesLookup[curToNodeKey]) && compareNodeNames(matchingFromEl, curToNodeChild)) {
+								// MORPH
+								if (!skipFrom) { addChild(fromEl, matchingFromEl); }
+								morphEl(matchingFromEl, curToNodeChild);
+							} else {
+								var onBeforeNodeAddedResult = onBeforeNodeAdded(curToNodeChild);
+								if (onBeforeNodeAddedResult !== false) {
+									if (onBeforeNodeAddedResult) {
+										curToNodeChild = onBeforeNodeAddedResult;
+									}
+
+									if (curToNodeChild.actualize) {
+										curToNodeChild = curToNodeChild.actualize(fromEl.ownerDocument || doc);
+									}
+									addChild(fromEl, curToNodeChild);
+									handleNodeAdded(curToNodeChild);
+								}
+							}
+
+							curToNodeChild = toNextSibling;
+							curFromNodeChild = fromNextSibling;
+						}
+
+						cleanupFromEl(fromEl, curFromNodeChild, curFromNodeKey);
+
+						var specialElHandler = specialElHandlers[fromEl.nodeName];
+						if (specialElHandler) {
+							specialElHandler(fromEl, toEl);
+						}
+					} // END: morphChildren(...)
+
+					var morphedNode = fromNode;
+					var morphedNodeType = morphedNode.nodeType;
+					var toNodeType = toNode.nodeType;
+
+					if (!childrenOnly) {
+						// Handle the case where we are given two DOM nodes that are not
+						// compatible (e.g. <div> --> <span> or <div> --> TEXT)
+						if (morphedNodeType === ELEMENT_NODE) {
+							if (toNodeType === ELEMENT_NODE) {
+								if (!compareNodeNames(fromNode, toNode)) {
+									onNodeDiscarded(fromNode);
+									morphedNode = moveChildren(fromNode, createElementNS(toNode.nodeName, toNode.namespaceURI));
+								}
+							} else {
+								// Going from an element node to a text node
+								morphedNode = toNode;
+							}
+						} else if (morphedNodeType === TEXT_NODE || morphedNodeType === COMMENT_NODE) { // Text or comment node
+							if (toNodeType === morphedNodeType) {
+								if (morphedNode.nodeValue !== toNode.nodeValue) {
+									morphedNode.nodeValue = toNode.nodeValue;
+								}
+
+								return morphedNode;
+							} else {
+								// Text node to something else
+								morphedNode = toNode;
+							}
+						}
+					}
+
+					if (morphedNode === toNode) {
+						// The "to node" was not compatible with the "from node" so we had to
+						// toss out the "from node" and use the "to node"
+						onNodeDiscarded(fromNode);
+					} else {
+						if (toNode.isSameNode && toNode.isSameNode(morphedNode)) {
+							return;
+						}
+
+						morphEl(morphedNode, toNode, childrenOnly);
+
+						// We now need to loop over any keyed nodes that might need to be
+						// removed. We only do the removal if we know that the keyed node
+						// never found a match. When a keyed node is matched up we remove
+						// it out of fromNodesLookup and we use fromNodesLookup to determine
+						// if a keyed node has been matched up or not
+						if (keyedRemovalList) {
+							for (var i = 0, len = keyedRemovalList.length; i < len; i++) {
+								var elToRemove = fromNodesLookup[keyedRemovalList[i]];
+								if (elToRemove) {
+									removeNode(elToRemove, elToRemove.parentNode, false);
+								}
+							}
+						}
+					}
+
+					if (!childrenOnly && morphedNode !== fromNode && fromNode.parentNode) {
+						if (morphedNode.actualize) {
+							morphedNode = morphedNode.actualize(fromNode.ownerDocument || doc);
+						}
+						// If we had to swap out the from node with a new node because the old
+						// node was not compatible with the target node then we need to
+						// replace the old DOM node in the original DOM tree. This is only
+						// possible if the original DOM node was part of a DOM tree which
+						// we know is the case if it has a parent node.
+						fromNode.parentNode.replaceChild(morphedNode, fromNode);
+					}
+
+					return morphedNode;
+				};
+			}
+
+			var morphdom = morphdomFactory(morphAttrs);
+
+			simply.morphdom = morphdom;
+		})();
 	},
 	findShadowRootOrCustomElement: function (element) {
 		// console.log(element);
@@ -4947,447 +5821,9 @@ simply = {
 			simply.go.base(base_href);
 		}
 	},
-	lit: function () {
-		window.LitCore = (() => {
-			var __defProp = Object.defineProperty;
-			var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-			var __getOwnPropNames = Object.getOwnPropertyNames;
-			var __hasOwnProp = Object.prototype.hasOwnProperty;
-			var __export = (target, all) => {
-				for (var name in all)
-					__defProp(target, name, { get: all[name], enumerable: true });
-			};
-			var __copyProps = (to, from, except, desc) => {
-				if (from && typeof from === "object" || typeof from === "function") {
-					for (let key of __getOwnPropNames(from))
-						if (!__hasOwnProp.call(to, key) && key !== except)
-							__defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-				}
-				return to;
-			};
-			var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-
-			// src/lit-umd-entry.js
-			var lit_umd_entry_exports = {};
-			__export(lit_umd_entry_exports, {
-				guard: () => i4,
-				html: () => b,
-				nothing: () => A,
-				render: () => D,
-				repeat: () => c2
-			});
-
-			// node_modules/lit-html/lit-html.js
-			var t = globalThis;
-			var i = (t4) => t4;
-			var s = t.trustedTypes;
-			var e = s ? s.createPolicy("lit-html", { createHTML: (t4) => t4 }) : void 0;
-			var h = "$lit$";
-			var o = `lit$${Math.random().toFixed(9).slice(2)}$`;
-			var n = "?" + o;
-			var r = `<${n}>`;
-			var l = document;
-			var c = () => l.createComment("");
-			var a = (t4) => null === t4 || "object" != typeof t4 && "function" != typeof t4;
-			var u = Array.isArray;
-			var d = (t4) => u(t4) || "function" == typeof t4?.[Symbol.iterator];
-			var f = "[ 	\n\f\r]";
-			var v = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g;
-			var _ = /-->/g;
-			var m = />/g;
-			var p = RegExp(`>|${f}(?:([^\\s"'>=/]+)(${f}*=${f}*(?:[^ 	
-		\f\r"'\`<>=]|("|')|))|$)`, "g");
-			var g = /'/g;
-			var $ = /"/g;
-			var y = /^(?:script|style|textarea|title)$/i;
-			var x = (t4) => (i5, ...s3) => ({ _$litType$: t4, strings: i5, values: s3 });
-			var b = x(1);
-			var w = x(2);
-			var T = x(3);
-			var E = /* @__PURE__ */ Symbol.for("lit-noChange");
-			var A = /* @__PURE__ */ Symbol.for("lit-nothing");
-			var C = /* @__PURE__ */ new WeakMap();
-			var P = l.createTreeWalker(l, 129);
-			function V(t4, i5) {
-				if (!u(t4) || !t4.hasOwnProperty("raw")) throw Error("invalid template strings array");
-				return void 0 !== e ? e.createHTML(i5) : i5;
-			}
-			var N = (t4, i5) => {
-				const s3 = t4.length - 1, e4 = [];
-				let n2, l2 = 2 === i5 ? "<svg>" : 3 === i5 ? "<math>" : "", c3 = v;
-				for (let i6 = 0; i6 < s3; i6++) {
-					const s4 = t4[i6];
-					let a2, u4, d2 = -1, f2 = 0;
-					for (; f2 < s4.length && (c3.lastIndex = f2, u4 = c3.exec(s4), null !== u4);) f2 = c3.lastIndex, c3 === v ? "!--" === u4[1] ? c3 = _ : void 0 !== u4[1] ? c3 = m : void 0 !== u4[2] ? (y.test(u4[2]) && (n2 = RegExp("</" + u4[2], "g")), c3 = p) : void 0 !== u4[3] && (c3 = p) : c3 === p ? ">" === u4[0] ? (c3 = n2 ?? v, d2 = -1) : void 0 === u4[1] ? d2 = -2 : (d2 = c3.lastIndex - u4[2].length, a2 = u4[1], c3 = void 0 === u4[3] ? p : '"' === u4[3] ? $ : g) : c3 === $ || c3 === g ? c3 = p : c3 === _ || c3 === m ? c3 = v : (c3 = p, n2 = void 0);
-					const x2 = c3 === p && t4[i6 + 1].startsWith("/>") ? " " : "";
-					l2 += c3 === v ? s4 + r : d2 >= 0 ? (e4.push(a2), s4.slice(0, d2) + h + s4.slice(d2) + o + x2) : s4 + o + (-2 === d2 ? i6 : x2);
-				}
-				return [V(t4, l2 + (t4[s3] || "<?>") + (2 === i5 ? "</svg>" : 3 === i5 ? "</math>" : "")), e4];
-			};
-			var S = class _S {
-				constructor({ strings: t4, _$litType$: i5 }, e4) {
-					let r2;
-					this.parts = [];
-					let l2 = 0, a2 = 0;
-					const u4 = t4.length - 1, d2 = this.parts, [f2, v3] = N(t4, i5);
-					if (this.el = _S.createElement(f2, e4), P.currentNode = this.el.content, 2 === i5 || 3 === i5) {
-						const t5 = this.el.content.firstChild;
-						t5.replaceWith(...t5.childNodes);
-					}
-					for (; null !== (r2 = P.nextNode()) && d2.length < u4;) {
-						if (1 === r2.nodeType) {
-							if (r2.hasAttributes()) for (const t5 of r2.getAttributeNames()) if (t5.endsWith(h)) {
-								const i6 = v3[a2++], s3 = r2.getAttribute(t5).split(o), e5 = /([.?@])?(.*)/.exec(i6);
-								d2.push({ type: 1, index: l2, name: e5[2], strings: s3, ctor: "." === e5[1] ? I : "?" === e5[1] ? L : "@" === e5[1] ? z : H }), r2.removeAttribute(t5);
-							} else t5.startsWith(o) && (d2.push({ type: 6, index: l2 }), r2.removeAttribute(t5));
-							if (y.test(r2.tagName)) {
-								const t5 = r2.textContent.split(o), i6 = t5.length - 1;
-								if (i6 > 0) {
-									r2.textContent = s ? s.emptyScript : "";
-									for (let s3 = 0; s3 < i6; s3++) r2.append(t5[s3], c()), P.nextNode(), d2.push({ type: 2, index: ++l2 });
-									r2.append(t5[i6], c());
-								}
-							}
-						} else if (8 === r2.nodeType) if (r2.data === n) d2.push({ type: 2, index: l2 });
-						else {
-							let t5 = -1;
-							for (; -1 !== (t5 = r2.data.indexOf(o, t5 + 1));) d2.push({ type: 7, index: l2 }), t5 += o.length - 1;
-						}
-						l2++;
-					}
-				}
-				static createElement(t4, i5) {
-					const s3 = l.createElement("template");
-					return s3.innerHTML = t4, s3;
-				}
-			};
-			function M(t4, i5, s3 = t4, e4) {
-				if (i5 === E) return i5;
-				let h3 = void 0 !== e4 ? s3._$Co?.[e4] : s3._$Cl;
-				const o2 = a(i5) ? void 0 : i5._$litDirective$;
-				return h3?.constructor !== o2 && (h3?._$AO?.(false), void 0 === o2 ? h3 = void 0 : (h3 = new o2(t4), h3._$AT(t4, s3, e4)), void 0 !== e4 ? (s3._$Co ??= [])[e4] = h3 : s3._$Cl = h3), void 0 !== h3 && (i5 = M(t4, h3._$AS(t4, i5.values), h3, e4)), i5;
-			}
-			var R = class {
-				constructor(t4, i5) {
-					this._$AV = [], this._$AN = void 0, this._$AD = t4, this._$AM = i5;
-				}
-				get parentNode() {
-					return this._$AM.parentNode;
-				}
-				get _$AU() {
-					return this._$AM._$AU;
-				}
-				u(t4) {
-					const { el: { content: i5 }, parts: s3 } = this._$AD, e4 = (t4?.creationScope ?? l).importNode(i5, true);
-					P.currentNode = e4;
-					let h3 = P.nextNode(), o2 = 0, n2 = 0, r2 = s3[0];
-					for (; void 0 !== r2;) {
-						if (o2 === r2.index) {
-							let i6;
-							2 === r2.type ? i6 = new k(h3, h3.nextSibling, this, t4) : 1 === r2.type ? i6 = new r2.ctor(h3, r2.name, r2.strings, this, t4) : 6 === r2.type && (i6 = new Z(h3, this, t4)), this._$AV.push(i6), r2 = s3[++n2];
-						}
-						o2 !== r2?.index && (h3 = P.nextNode(), o2++);
-					}
-					return P.currentNode = l, e4;
-				}
-				p(t4) {
-					let i5 = 0;
-					for (const s3 of this._$AV) void 0 !== s3 && (void 0 !== s3.strings ? (s3._$AI(t4, s3, i5), i5 += s3.strings.length - 2) : s3._$AI(t4[i5])), i5++;
-				}
-			};
-			var k = class _k {
-				get _$AU() {
-					return this._$AM?._$AU ?? this._$Cv;
-				}
-				constructor(t4, i5, s3, e4) {
-					this.type = 2, this._$AH = A, this._$AN = void 0, this._$AA = t4, this._$AB = i5, this._$AM = s3, this.options = e4, this._$Cv = e4?.isConnected ?? true;
-				}
-				get parentNode() {
-					let t4 = this._$AA.parentNode;
-					const i5 = this._$AM;
-					return void 0 !== i5 && 11 === t4?.nodeType && (t4 = i5.parentNode), t4;
-				}
-				get startNode() {
-					return this._$AA;
-				}
-				get endNode() {
-					return this._$AB;
-				}
-				_$AI(t4, i5 = this) {
-					t4 = M(this, t4, i5), a(t4) ? t4 === A || null == t4 || "" === t4 ? (this._$AH !== A && this._$AR(), this._$AH = A) : t4 !== this._$AH && t4 !== E && this._(t4) : void 0 !== t4._$litType$ ? this.$(t4) : void 0 !== t4.nodeType ? this.T(t4) : d(t4) ? this.k(t4) : this._(t4);
-				}
-				O(t4) {
-					return this._$AA.parentNode.insertBefore(t4, this._$AB);
-				}
-				T(t4) {
-					this._$AH !== t4 && (this._$AR(), this._$AH = this.O(t4));
-				}
-				_(t4) {
-					this._$AH !== A && a(this._$AH) ? this._$AA.nextSibling.data = t4 : this.T(l.createTextNode(t4)), this._$AH = t4;
-				}
-				$(t4) {
-					const { values: i5, _$litType$: s3 } = t4, e4 = "number" == typeof s3 ? this._$AC(t4) : (void 0 === s3.el && (s3.el = S.createElement(V(s3.h, s3.h[0]), this.options)), s3);
-					if (this._$AH?._$AD === e4) this._$AH.p(i5);
-					else {
-						const t5 = new R(e4, this), s4 = t5.u(this.options);
-						t5.p(i5), this.T(s4), this._$AH = t5;
-					}
-				}
-				_$AC(t4) {
-					let i5 = C.get(t4.strings);
-					return void 0 === i5 && C.set(t4.strings, i5 = new S(t4)), i5;
-				}
-				k(t4) {
-					u(this._$AH) || (this._$AH = [], this._$AR());
-					const i5 = this._$AH;
-					let s3, e4 = 0;
-					for (const h3 of t4) e4 === i5.length ? i5.push(s3 = new _k(this.O(c()), this.O(c()), this, this.options)) : s3 = i5[e4], s3._$AI(h3), e4++;
-					e4 < i5.length && (this._$AR(s3 && s3._$AB.nextSibling, e4), i5.length = e4);
-				}
-				_$AR(t4 = this._$AA.nextSibling, s3) {
-					for (this._$AP?.(false, true, s3); t4 !== this._$AB;) {
-						const s4 = i(t4).nextSibling;
-						i(t4).remove(), t4 = s4;
-					}
-				}
-				setConnected(t4) {
-					void 0 === this._$AM && (this._$Cv = t4, this._$AP?.(t4));
-				}
-			};
-			var H = class {
-				get tagName() {
-					return this.element.tagName;
-				}
-				get _$AU() {
-					return this._$AM._$AU;
-				}
-				constructor(t4, i5, s3, e4, h3) {
-					this.type = 1, this._$AH = A, this._$AN = void 0, this.element = t4, this.name = i5, this._$AM = e4, this.options = h3, s3.length > 2 || "" !== s3[0] || "" !== s3[1] ? (this._$AH = Array(s3.length - 1).fill(new String()), this.strings = s3) : this._$AH = A;
-				}
-				_$AI(t4, i5 = this, s3, e4) {
-					const h3 = this.strings;
-					let o2 = false;
-					if (void 0 === h3) t4 = M(this, t4, i5, 0), o2 = !a(t4) || t4 !== this._$AH && t4 !== E, o2 && (this._$AH = t4);
-					else {
-						const e5 = t4;
-						let n2, r2;
-						for (t4 = h3[0], n2 = 0; n2 < h3.length - 1; n2++) r2 = M(this, e5[s3 + n2], i5, n2), r2 === E && (r2 = this._$AH[n2]), o2 ||= !a(r2) || r2 !== this._$AH[n2], r2 === A ? t4 = A : t4 !== A && (t4 += (r2 ?? "") + h3[n2 + 1]), this._$AH[n2] = r2;
-					}
-					o2 && !e4 && this.j(t4);
-				}
-				j(t4) {
-					t4 === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t4 ?? "");
-				}
-			};
-			var I = class extends H {
-				constructor() {
-					super(...arguments), this.type = 3;
-				}
-				j(t4) {
-					this.element[this.name] = t4 === A ? void 0 : t4;
-				}
-			};
-			var L = class extends H {
-				constructor() {
-					super(...arguments), this.type = 4;
-				}
-				j(t4) {
-					this.element.toggleAttribute(this.name, !!t4 && t4 !== A);
-				}
-			};
-			var z = class extends H {
-				constructor(t4, i5, s3, e4, h3) {
-					super(t4, i5, s3, e4, h3), this.type = 5;
-				}
-				_$AI(t4, i5 = this) {
-					if ((t4 = M(this, t4, i5, 0) ?? A) === E) return;
-					const s3 = this._$AH, e4 = t4 === A && s3 !== A || t4.capture !== s3.capture || t4.once !== s3.once || t4.passive !== s3.passive, h3 = t4 !== A && (s3 === A || e4);
-					e4 && this.element.removeEventListener(this.name, this, s3), h3 && this.element.addEventListener(this.name, this, t4), this._$AH = t4;
-				}
-				handleEvent(t4) {
-					"function" == typeof this._$AH ? this._$AH.call(this.options?.host ?? this.element, t4) : this._$AH.handleEvent(t4);
-				}
-			};
-			var Z = class {
-				constructor(t4, i5, s3) {
-					this.element = t4, this.type = 6, this._$AN = void 0, this._$AM = i5, this.options = s3;
-				}
-				get _$AU() {
-					return this._$AM._$AU;
-				}
-				_$AI(t4) {
-					M(this, t4);
-				}
-			};
-			var j = { M: h, P: o, A: n, C: 1, L: N, R, D: d, V: M, I: k, H, N: L, U: z, B: I, F: Z };
-			var B = t.litHtmlPolyfillSupport;
-			B?.(S, k), (t.litHtmlVersions ??= []).push("3.3.2");
-			var D = (t4, i5, s3) => {
-				const e4 = s3?.renderBefore ?? i5;
-				let h3 = e4._$litPart$;
-				if (void 0 === h3) {
-					const t5 = s3?.renderBefore ?? null;
-					e4._$litPart$ = h3 = new k(i5.insertBefore(c(), t5), t5, void 0, s3 ?? {});
-				}
-				return h3._$AI(t4), h3;
-			};
-
-			// node_modules/lit-html/directive.js
-			var t2 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
-			var e2 = (t4) => (...e4) => ({ _$litDirective$: t4, values: e4 });
-			var i2 = class {
-				constructor(t4) {
-				}
-				get _$AU() {
-					return this._$AM._$AU;
-				}
-				_$AT(t4, e4, i5) {
-					this._$Ct = t4, this._$AM = e4, this._$Ci = i5;
-				}
-				_$AS(t4, e4) {
-					return this.update(t4, e4);
-				}
-				update(t4, e4) {
-					return this.render(...e4);
-				}
-			};
-
-			// node_modules/lit-html/directive-helpers.js
-			var { I: t3 } = j;
-			var i3 = (o2) => o2;
-			var s2 = () => document.createComment("");
-			var v2 = (o2, n2, e4) => {
-				const l2 = o2._$AA.parentNode, d2 = void 0 === n2 ? o2._$AB : n2._$AA;
-				if (void 0 === e4) {
-					const i5 = l2.insertBefore(s2(), d2), n3 = l2.insertBefore(s2(), d2);
-					e4 = new t3(i5, n3, o2, o2.options);
-				} else {
-					const t4 = e4._$AB.nextSibling, n3 = e4._$AM, c3 = n3 !== o2;
-					if (c3) {
-						let t5;
-						e4._$AQ?.(o2), e4._$AM = o2, void 0 !== e4._$AP && (t5 = o2._$AU) !== n3._$AU && e4._$AP(t5);
-					}
-					if (t4 !== d2 || c3) {
-						let o3 = e4._$AA;
-						for (; o3 !== t4;) {
-							const t5 = i3(o3).nextSibling;
-							i3(l2).insertBefore(o3, d2), o3 = t5;
-						}
-					}
-				}
-				return e4;
-			};
-			var u2 = (o2, t4, i5 = o2) => (o2._$AI(t4, i5), o2);
-			var m2 = {};
-			var p2 = (o2, t4 = m2) => o2._$AH = t4;
-			var M2 = (o2) => o2._$AH;
-			var h2 = (o2) => {
-				o2._$AR(), o2._$AA.remove();
-			};
-
-			// node_modules/lit-html/directives/repeat.js
-			var u3 = (e4, s3, t4) => {
-				const r2 = /* @__PURE__ */ new Map();
-				for (let l2 = s3; l2 <= t4; l2++) r2.set(e4[l2], l2);
-				return r2;
-			};
-			var c2 = e2(class extends i2 {
-				constructor(e4) {
-					if (super(e4), e4.type !== t2.CHILD) throw Error("repeat() can only be used in text expressions");
-				}
-				dt(e4, s3, t4) {
-					let r2;
-					void 0 === t4 ? t4 = s3 : void 0 !== s3 && (r2 = s3);
-					const l2 = [], o2 = [];
-					let i5 = 0;
-					for (const s4 of e4) l2[i5] = r2 ? r2(s4, i5) : i5, o2[i5] = t4(s4, i5), i5++;
-					return { values: o2, keys: l2 };
-				}
-				render(e4, s3, t4) {
-					return this.dt(e4, s3, t4).values;
-				}
-				update(s3, [t4, r2, c3]) {
-					const d2 = M2(s3), { values: p3, keys: a2 } = this.dt(t4, r2, c3);
-					if (!Array.isArray(d2)) return this.ut = a2, p3;
-					const h3 = this.ut ??= [], v3 = [];
-					let m3, y2, x2 = 0, j2 = d2.length - 1, k2 = 0, w2 = p3.length - 1;
-					for (; x2 <= j2 && k2 <= w2;) if (null === d2[x2]) x2++;
-					else if (null === d2[j2]) j2--;
-					else if (h3[x2] === a2[k2]) v3[k2] = u2(d2[x2], p3[k2]), x2++, k2++;
-					else if (h3[j2] === a2[w2]) v3[w2] = u2(d2[j2], p3[w2]), j2--, w2--;
-					else if (h3[x2] === a2[w2]) v3[w2] = u2(d2[x2], p3[w2]), v2(s3, v3[w2 + 1], d2[x2]), x2++, w2--;
-					else if (h3[j2] === a2[k2]) v3[k2] = u2(d2[j2], p3[k2]), v2(s3, d2[x2], d2[j2]), j2--, k2++;
-					else if (void 0 === m3 && (m3 = u3(a2, k2, w2), y2 = u3(h3, x2, j2)), m3.has(h3[x2])) if (m3.has(h3[j2])) {
-						const e4 = y2.get(a2[k2]), t5 = void 0 !== e4 ? d2[e4] : null;
-						if (null === t5) {
-							const e5 = v2(s3, d2[x2]);
-							u2(e5, p3[k2]), v3[k2] = e5;
-						} else v3[k2] = u2(t5, p3[k2]), v2(s3, d2[x2], t5), d2[e4] = null;
-						k2++;
-					} else h2(d2[j2]), j2--;
-					else h2(d2[x2]), x2++;
-					for (; k2 <= w2;) {
-						const e4 = v2(s3, v3[w2 + 1]);
-						u2(e4, p3[k2]), v3[k2++] = e4;
-					}
-					for (; x2 <= j2;) {
-						const e4 = d2[x2++];
-						null !== e4 && h2(e4);
-					}
-					return this.ut = a2, p2(s3, v3), E;
-				}
-			});
-
-			// node_modules/lit-html/directives/guard.js
-			var e3 = {};
-			var i4 = e2(class extends i2 {
-				constructor() {
-					super(...arguments), this.ot = e3;
-				}
-				render(r2, t4) {
-					return t4();
-				}
-				update(t4, [s3, e4]) {
-					if (Array.isArray(s3)) {
-						if (Array.isArray(this.ot) && this.ot.length === s3.length && s3.every((r2, t5) => r2 === this.ot[t5])) return E;
-					} else if (this.ot === s3) return E;
-					return this.ot = Array.isArray(s3) ? Array.from(s3) : s3, this.render(s3, e4);
-				}
-			});
-			return __toCommonJS(lit_umd_entry_exports);
-		})();
-
-		Object.assign(window, LitCore);
-		/*! Bundled license information:
-
-		lit-html/lit-html.js:
-		lit-html/directive.js:
-		lit-html/directives/repeat.js:
-			(**
-			* @license
-			* Copyright 2017 Google LLC
-			* SPDX-License-Identifier: BSD-3-Clause
-			*)
-
-		lit-html/directive-helpers.js:
-			(**
-			* @license
-			* Copyright 2020 Google LLC
-			* SPDX-License-Identifier: BSD-3-Clause
-			*)
-
-		lit-html/directives/guard.js:
-			(**
-			* @license
-			* Copyright 2018 Google LLC
-			* SPDX-License-Identifier: BSD-3-Clause
-			*)
-		*/
-
-	},
 	init: function () {
 		//console.clear();
-		this.lit();
+		this.morphdom();
 		this.observableSlim();
 
 		// simply.go() load edilmemişse 
@@ -5398,10 +5834,4 @@ simply = {
 }
 
 
-
-
-
 simply.init();
-
-
-
