@@ -1804,11 +1804,13 @@ http://www.threestyles.com/tutorials/css-tips-for-better-typography/
 {{data.name}}
 <div>
   {{data.hee.a}}
-  <each of="data.hee['c']" as="item">
-    {{item}}
+  <each of="data.hee" as="item">
+    <div>{{item}}</div>
   </each>
 </div>
 </html>
+
+<buttom onclick="methods.mamboJambo()">mambo jambo</buttom>
 
 <style>
   
@@ -1821,9 +1823,17 @@ http://www.threestyles.com/tutorials/css-tips-for-better-typography/
       hee: {
         a: 1,
         b: 2,
-        c: [1,2,3]
+        c: [1,2,3],
+        d: "ahmeh"
       },
-      list: [1,2,3,4,5]
+      list: [{
+        name: "asdasd",
+        id: "this"
+      },{
+        name: "asdasd"
+      },{
+        name: "asdasd"
+      }]
     }
     state = {
       
@@ -1832,7 +1842,14 @@ http://www.threestyles.com/tutorials/css-tips-for-better-typography/
       
     }
     lifecycle = {
-      
+      afterConstruct() {
+        data.name = "asdasd",
+        data.name = "asdasdasd"
+        data.name = "2222"
+      },
+      afterRender() {
+
+      }
     }
   }
 </script>

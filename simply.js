@@ -1,4 +1,13 @@
 simply = {
+	itemKeyMap: new WeakMap(),
+	itemKeyCounter: 0,
+	getUniqueId(item) {
+		if (typeof item !== 'object' || item === null) return null;
+		if (!this.itemKeyMap.has(item)) {
+			this.itemKeyMap.set(item, 'autoid-' + (++this.itemKeyCounter));
+		}
+		return this.itemKeyMap.get(item);
+	},
 	components: {},
 
 	compile: function (args) {
@@ -10,46 +19,84 @@ simply = {
 			t = t.replace(/`/g, '\\`');
 			t = t.replace(/\{\{([\s\S]*?)\}\}/g, '${$1}');
 
-			// 3. STATIC OPTIMIZATION (Hızlı & Nested Destekli Yöntem)
-			// <static>  ->  ${guard([], () => html`
-			// </static> ->  `)}
+			const EXCLUDED_TAGS = new Set(['if', 'else', 'elsif', 'each', 'static', 'guard', 'slot', 'br', 'hr', 'img', 'input']);
+
+			let localCounter = simply.components[name]._tagCounter || 0;
+
+			// Animate ayarını baştan kontrol edelim
+			const isAnimate = component?.settings?.animate;
+			const uid = component.uid || 'uid';
+
+			t = t.replace(/<(?!\/)([a-zA-Z0-9-]+)/g, (match, tagName) => {
+				const lower = tagName.toLowerCase();
+				if (EXCLUDED_TAGS.has(lower)) return match;
+
+				// Eğer animate kapalıysa, etiketi olduğu gibi bırak (sid/sf ekleme)
+				if (!isAnimate) return match;
+
+				localCounter++;
+
+				// Base ID'yi oluştur (Örn: "sUID-5")
+				const baseSid = `s${uid}-${localCounter}`;
+
+				// RUNTIME MANTIĞI:
+				// uniqueItemKey içinde 'np' var mı?
+				// VARSA (-1'den büyükse) -> undefined dön (Lit attribute'u siler).
+				// YOKSA -> baseSid + uniqueItemKey birleştirip bas.
+				return `<${tagName} sid="\${ uniqueItemKey.indexOf('np') > -1 ? undefined : '${baseSid}' + uniqueItemKey }"`;
+			});
+
+			simply.components[name]._tagCounter = localCounter;
+
 			t = t.replace(/<static>/gi, '${guard([], () => html\`');
 			t = t.replace(/<\/static>/gi, '`)}');
 
-			// --- EACH DÖNGÜSÜ (REPEAT İLE STATE KORUMALI) ---
+			// --- EACH DÖNGÜSÜ ---
 			t = t.replace(/<each\s+([^>]+)>/g, (match, attributes) => {
 				const ofAttr = attributes.match(/of="([^"]+)"/)?.[1];
 				const asAttr = attributes.match(/as="([^"]+)"/)?.[1];
-
 				const keyAttr = attributes.match(/key="([^"]+)"/)?.[1];
 				const indexAttr = attributes.match(/index="([^"]+)"/)?.[1];
 
 				if (!ofAttr || !asAttr) return match;
 
-				// Kullanıcı bir değişken ismi vermediyse varsayılanları ata
 				const keyVar = keyAttr || '_key';
 				const indexVar = indexAttr || '_index';
 
-				// REPEAT YAPISI:
-				// 1. Parametre: Dizi -> Object.entries(data)
-				// 2. Parametre: Key Fonksiyonu -> ([keyVar]) => keyVar (Entry'nin key'ini unique id yapar)
-				// 3. Parametre: Template Fonksiyonu -> ([keyVar, asVar], indexVar) => html`...`
-				return '${ repeat(Object.entries(' + ofAttr + ' || {}), ([' + keyVar + ']) => ' + keyVar + ', ([' + keyVar + ', ' + asAttr + '], ' + indexVar + ') => html`';
+				// UniqueKey Hesaplama Mantığı (Runtime'da çalışacak kod stringi):
+				// ID yoksa 'np' kullan.
+				const uniqueKeyLogic = `(Array.isArray(${ofAttr}) ? (typeof ${asAttr} === 'object' && ${asAttr} && 'id' in ${asAttr} ? ${asAttr}.id : 'np') : ${keyVar})`;
+
+				return '${ repeat(Object.entries(' + ofAttr + ' || {}), ([' + keyVar + ']) => ' + keyVar + ', ([' + keyVar + ', ' + asAttr + '], ' + indexVar + ') => { ' +
+					'return ((pKey) => { ' +
+					// uniqueItemKey burada hesaplanır: Örn: "-12" veya "-np"
+					'const uniqueItemKey = pKey + "-" + ' + uniqueKeyLogic + ';' +
+					'return html`';
 			});
 
-			t = t.replace(/<\/each>/g, '`) }');
+			t = t.replace(/<\/each>/g, '` })(uniqueItemKey); }) }');
 			t = t.replace(/<if\s+cond="([^"]+)">/g, '${ $1 ? html`');
 			t = t.replace(/<\/(?:if|elsif)>\s*<elsif\s+cond="([^"]+)">/g, '` : $1 ? html`');
 			t = t.replace(/<\/(?:if|elsif)>\s*<else>/g, '` : html`');
-			t = t.replace(/<\/else>/g, '` }');
+			t = t.replace(/<\/else>/g, '` }'); // undefined veya nothing gerekmez, blok kapanıyor
 			t = t.replace(/<\/(?:if|elsif)>/g, '` : nothing }');
 
 			simply.components[name] = simply.components[name] || {};
 
-			simply.components[name].templateRenderFn = new Function(...Object.keys(context), 'return html`' + t + '`;');
+			const fnBody = `
+        var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = scope;
+        // Root seviyesinde uniqueItemKey boştur.
+        let uniqueItemKey = ""; 
+        return html\`${t}\`;
+      `;
+
+			simply.components[name].templateRenderFn = new Function("scope", fnBody);
 		}
-		return simply.components[name].templateRenderFn(...Object.values(context));
+
+		return simply.components[name].templateRenderFn(context);
 	},
+
+
 
 	parseTemplate: function (parsingArgs) {
 		var { template, data, style, state, parent, props, component, dom, methods, lifecycle, name } = parsingArgs;
@@ -781,7 +828,6 @@ simply = {
 	},
 	parseProp: function (contentString) {
 		var type, value, parsed, content;
-
 		// atrribute'dan alıp parse edip obj çıkacak
 		// escape edilmemiş single quote'ları double yapıyor
 		// escape edilmiş single quote'ları kurtarıyor
@@ -813,6 +859,7 @@ simply = {
 				type = "string";
 				value = contentString;
 			}
+
 			return {
 				"type": type,
 				"value": value,
@@ -821,7 +868,6 @@ simply = {
 		}
 	},
 	prepareAttr: function (value) {
-
 		let type = typeof value;
 		if (Array.isArray(value) || type == "object" || type == "number" || type == "boolean") {
 			// attribute'a yazacak, onun için hazırlık
@@ -1254,81 +1300,83 @@ simply = {
 			} catch (e) { }
 		}
 	},
+
+	replaceEventAttrs(template) {
+		let m;
+		// tüm on.* atribute değerleri için
+		// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
+
+		// new line serbest bırakıldı 
+		// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"']*)(\"|\')/gm;
+
+		// onclick="" içinde ilk tek tırnakta kesilme sorunu düzeltildi
+		// https://chatgpt.com/c/69523d00-8a50-8327-95a2-e14875750a0c
+
+		// bir üsttekindeki match eski tarayıcılarda çalışmıyor
+		// https://claude.ai/chat/93a1ea38-c790-4209-a758-fdee9f92d9f3
+
+		let regex = /\s+on[a-z]+(\s*)=(\s*)("((?:\\.|[^"])*)"|'((?:\\.|[^'])*)')/gm;
+
+		while ((m = regex.exec(template)) !== null) {
+			if (m.index === regex.lastIndex) {
+				regex.lastIndex++;
+			}
+
+			// m[4] → çift tırnak içindeki değer
+			// m[5] → tek tırnak içindeki değer
+			let capturedMatch = m[4] || m[5];
+
+			var match = "simply.findShadowRootOrCustomElement(this)";
+
+			if (capturedMatch.indexOf(match) == -1) {
+				var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
+
+				var newValue = m[0];
+				builtinVars.forEach(v => {
+					newValue = newValue.replaceAll(v, match + "." + v);
+					newValue = newValue.replaceAll("." + match, "");
+				});
+				template = template.replaceAll(m[0], newValue);
+			}
+		}
+		return template;
+	},
+
+	getClass(script, name) {
+		script = script.trim();
+		// Class'ı BİR KERE compile et ve cache'le
+		if (script) {
+			if (!simply.classCache[name]) {
+				const className = "simply_" + name.replace(/-/g, "_");
+				script = script.replace(
+					/^class\s+(simply\s*)?\{/,
+					"class " + className + " {"
+				);
+				simply.classCache[name] = new Function(
+					'state', 'methods', 'lifecycle', 'component', 'dom', 'parent', 'simply', 'cb', 'data', 'props',
+					script.trim() + "\nreturn simply_" + name.replace(/-/g, '_') + "; //@ sourceURL=" + name + ".html"
+				);
+			}
+			return simply.classCache[name];
+		}
+	},
+
 	registerComponent: function ({ template, style, name, script, docStr, noFile }) {
 		if (!customElements.get(name)) {
-			let m;
-			// tüm on.* atribute değerleri için
-			// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"\n]*)(\"|\')/gm;
 
-			// new line serbest bırakıldı 
-			// let regex = /\s+on[a-z]+(\s+)?\=(\s+)?(\"|\')(?<match>[^"']*)(\"|\')/gm;
-
-			// onclick="" içinde ilk tek tırnakta kesilme sorunu düzeltildi
-			// https://chatgpt.com/c/69523d00-8a50-8327-95a2-e14875750a0c
-
-			// bir üsttekindeki match eski tarayıcılarda çalışmıyor
-			// https://claude.ai/chat/93a1ea38-c790-4209-a758-fdee9f92d9f3
-
-			let regex = /\s+on[a-z]+(\s*)=(\s*)("((?:\\.|[^"])*)"|'((?:\\.|[^'])*)')/gm;
-
-			while ((m = regex.exec(template)) !== null) {
-				if (m.index === regex.lastIndex) {
-					regex.lastIndex++;
-				}
-
-				// m[4] → çift tırnak içindeki değer
-				// m[5] → tek tırnak içindeki değer
-				let capturedMatch = m[4] || m[5];
-
-				if (this.shadow) {
-					var match = "simply.findShadowRootOrCustomElement(this)";
-				}
-				else {
-					var match = "simply.findShadowRootOrCustomElement(this)";
-				}
-
-				if (capturedMatch.indexOf(match) == -1) {
-					var builtinVars = ["state.", "parent.", "methods.", "lifecycle.", "data.", "props.", "component.", "dom."];
-
-					var newValue = m[0];
-					builtinVars.forEach(v => {
-						newValue = newValue.replaceAll(v, match + "." + v);
-						newValue = newValue.replaceAll("." + match, "");
-					});
-					template = template.replaceAll(m[0], newValue);
-				}
-			}
-
-			script = script.trim();
-			// Class'ı BİR KERE compile et ve cache'le
-			if (script) {
-				if (!simply.classCache[name]) {
-					const className = "simply_" + name.replace(/-/g, "_");
-					script = script.replace(
-						/^class\s+(simply\s*)?\{/,
-						"class " + className + " {"
-					);
-					simply.classCache[name] = new Function(
-						'state', 'methods', 'lifecycle', 'component', 'dom', 'parent', 'simply', 'cb', 'data', 'props',
-						script.trim() + "\nreturn simply_" + name.replace(/-/g, '_') + "; //@ sourceURL=" + name + ".html"
-					);
-				}
-				var CachedClass = simply.classCache[name];
-			}
+			template = simply.replaceEventAttrs(template);
+			var CachedClass = simply.getClass(script, name);
 
 			class simplyComponent extends HTMLElement {
 				constructor() {
-					// var start = performance.now();
 					super();
 					this.onParentDataChange = (changes) => this.handleParentReact(changes, "data");
 					this.onParentPropsChange = (changes) => this.handleParentReact(changes, "props");
 				}
 
 				handleParentReact(changes, type) {
-					// 'this.template' sınıfın özelliğinden gelmeli
 					this.react(changes, type, this, this.template);
 				}
-
 				observeAttrChange(el, callback) {
 					// https://claude.ai/chat/d3aa22ed-1d5b-4f09-8f32-97010c4f1963
 					var observer = new MutationObserver(function (mutations) {
@@ -1400,7 +1448,6 @@ simply = {
 						name
 					});
 
-
 					this.setData = function (newValue) { data = newValue; };
 					this.setCbData = function (newValue) { cb.data = newValue; };
 					this.setState = function (newValue) { state = newValue; };
@@ -1458,7 +1505,7 @@ simply = {
 					// connectedcallback
 
 					var end = performance.now();
-					console.log(`Component ${name} connected in ${end - start} ms`);
+					// console.log(`Component ${name} connected in ${end - start} ms`);
 
 					var self = this;
 					this._attrObserver = this.observeAttrChange(this, function (name, newValue) {
@@ -1634,6 +1681,7 @@ simply = {
 							compiledTemplate,
 							this.dom
 						);
+
 						var t1 = performance.now();
 						// console.log(`DOM insertion for ${name} took ${t1 - t0} ms`);
 
@@ -1742,14 +1790,14 @@ simply = {
 						//console.log(`Style re parsing for ${name} took ${end - start} ms`);
 
 						if (simply.components[name].lastParsedStyle !== parsedStyle) {
-							console.log("stil değişmiş", simply.components[name].lastParsedStyle, parsedStyle);
-							console.log(parsedStyle);
+							simply.components[name].lastParsedStyle = parsedStyle;
+							//console.log("stil değişmiş", simply.components[name].lastParsedStyle, parsedStyle);
 							let start = performance.now();
 
 							// bu performance düşmanı
 							self.sheet.replaceSync(parsedStyle);
 							let end = performance.now();
-							console.log(`Style re applying for ${name} took ${end - start} ms`);
+							// console.log(`Style re applying for ${name} took ${end - start} ms`);
 						}
 
 
@@ -1758,13 +1806,14 @@ simply = {
 							self.dom
 						);
 
+
 						if (typeof this.lifecycle !== "undefined") {
 							if (typeof this.lifecycle.afterRerender !== "undefined") {
 								this.lifecycle.afterRerender();
 							}
 						}
 						var end = performance.now();
-						console.log(`Component ${name} rendered in ${end - start} ms`);
+						// console.log(`Component ${name} rendered in ${end - start} ms`);
 					}
 
 					// cache data and props after every render
@@ -4946,6 +4995,9 @@ simply = {
 			var base_href = base.getAttribute("href").replace(/\/$/, "");
 			simply.go.base(base_href);
 		}
+	},
+	unsafeHTML: function (htmlString) {
+		return document.createRange().createContextualFragment(htmlString);
 	},
 	lit: function () {
 		window.LitCore = (() => {
