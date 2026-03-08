@@ -1694,7 +1694,7 @@ simply = {
 
 						if (document.location.href == "about:blank") {
 							// Framer ortamında
-							simply.framerStaff(dom, name, uid, component, props, lifecycle);
+							simply.framerStaff(this.dom, name, this.uid, this.component, this.props, this.lifecycle);
 						}
 
 						if (typeof this.lifecycle !== "undefined") {
