@@ -1213,7 +1213,7 @@ simply = {
 			}
 		});
 
-		if (t.includes("data.") || t.includes("data?.") || self.script.includes("data.") || self.script.includes("data?.")) {
+		if (t.includes("data.") || t.includes("data?.") || t.includes("data[") || self.script.includes("data.") || self.script.includes("data?.") || self.script.includes("data[") || self.s.includes("data.") || self.s.includes("data?.") || self.s.includes("data[")) {
 			self.cb.data = {};
 			self.cb.data[self.uid] = function (changes) { self.react(changes, "data", self, t, self.s) };
 			self.setCbData(self.cb.data);
@@ -1236,7 +1236,7 @@ simply = {
 			}
 		});
 
-		if (t.includes("props.") || t.includes("props?.") || self.script.includes("props.") || self.script.includes("props?.")) {
+		if (t.includes("props.") || t.includes("props?.") || t.includes("props[") || self.script.includes("props.") || self.script.includes("props?.") || self.script.includes("props[") || self.s.includes("props.") || self.s.includes("props?.") || self.s.includes("props[")) {
 			self.cb.props = {};
 			self.cb.props[self.uid] = function (changes) { self.react(changes, "props", self, t, self.s) };
 		}
@@ -1258,7 +1258,7 @@ simply = {
 		}
 		else {
 			var state = self.state;
-			if (t.includes("state.") || t.includes("state?.") || self.script.includes("state.") || self.script.includes("state?.", self.s.includes("state.") || self.s.includes("state?."))) {
+			if (t.includes("state.") || t.includes("state?.") || t.includes("state[") || self.script.includes("state.") || self.script.includes("state?.") || self.script.includes("state[") || self.s.includes("state.") || self.s.includes("state?.") || self.s.includes("state[")) {
 				var p = simply.findElementWithCB(self.parent);
 				if (p) {
 					p.cb.state[self.uid] = function (changes) { self.react(changes, "state", self, t, self.s) };

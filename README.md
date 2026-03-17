@@ -9,11 +9,11 @@
 
 ## What is simply.js
 
-Simply.js is a web-component library for developing user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions of design systems. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
+Simply JS is a simply framework for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
 
-It has a built-in super-fast declarative template engine that coded from scratch. Some parts of simply.js are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router.
+It has a built-in super-fast declarative template engine that coded from scratch. Some parts of Simply JS are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router.
 
-Long story short, simply.js is the name of the brand new template engine and the bridge between the adopted tools.
+Long story short, Simply JS is the name of the brand new template engine and the bridge between the adopted tools.
 
 ## How it works
 
@@ -36,15 +36,11 @@ While you are working with simply.js, everything will run in the browser of the 
 
 ## Playground
 
-The REPL of simply.js is at the [Playground](playground) section. This is the fastest way to get started using simply.js. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
+The REPL of Simply JS is at the [Playground](playground) section. This is the fastest way to get started using Simply JS. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
 
-## simply.js in the wild
+## Simply JS in the wild
 
 - [Edit Image](https://editimage.studio)
 - [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager)
 - [Reframer](https://reframer.net)
 - [Port FM](https://fehmi.ozuseven.com/port)
-
-<hr>
-
-Made with :heart: in Istanbul
