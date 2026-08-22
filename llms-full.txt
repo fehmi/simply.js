@@ -1,0 +1,4186 @@
+# Simply.js — Full Documentation (LLM-ready, single file)
+
+> Generated from https://github.com/fehmi/simply.js/tree/main/docs — do not edit by hand, edit the source .md files and re-run `node scripts/build-llms.mjs`.
+> Canonical human docs: https://simply.js.org — Source: https://simply.js.org/llms.txt
+
+## Contents
+
+- [About](#about)  <!-- Introduction -->
+- [Getting Started](#getting-started)  <!-- Introduction -->
+- [Structure](#component-structure)  <!-- Component Syntax -->
+- [Template](#template)  <!-- Component Syntax -->
+- [Style](#style)  <!-- Component Syntax -->
+- [Script](#script)  <!-- Component Syntax -->
+- [Variables](#variables)  <!-- Template Syntax -->
+- [Conditionals](#conditionals)  <!-- Template Syntax -->
+- [Each Loops](#loops)  <!-- Template Syntax -->
+- [DOM Events](#dom-events)  <!-- Template Syntax -->
+- [Nested Components](#nested-components)  <!-- Template Syntax -->
+- [Slot](#slot)  <!-- Template Syntax -->
+- [Load Components](#loadcomponent)  <!-- Script Syntax -->
+- [Component Communication](#component-communication)  <!-- Script Syntax -->
+- [Props](#props)  <!-- Script Syntax -->
+- [Lifecycle](#lifecycle)  <!-- Script Syntax -->
+- [Reactivity](#reactivity)  <!-- Script Syntax -->
+- [State Management](#state)  <!-- Script Syntax -->
+- [Variables](#style-variables)  <!-- Style -->
+- [Conditions](#style-conditions)  <!-- Style -->
+- [Scope & Encapsulation](#style-scope)  <!-- Style -->
+- [Go (Router)](#router)  <!-- Router -->
+- [Framer](#framer)  <!-- Integrations -->
+- [Electron](#electron)  <!-- Integrations -->
+- [Chrome](#chrome)  <!-- Integrations -->
+- [Agents & AI](#agents-agents)  <!-- Agents -->
+- [AI Docs](#agents-ai-docs)  <!-- Agents -->
+- [REPL API](#agents-repl-api)  <!-- Agents -->
+- [Icon](#components-s-icon)  <!-- Components -->
+
+---
+
+<a id="about"></a>
+
+<p>
+<img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release">
+<img src="https://img.shields.io/badge/License-MIT-green">
+<img src="https://img.shields.io/badge/Gzipped-20KB-green">
+</p>
+
+## About
+
+## What is simply.js
+
+Simply JS is a simple web-component library for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
+
+It has a built-in super-fast declarative template engine that coded from scratch. Some parts of Simply JS are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router. So, simply.js is the name of its template engine and the bridge between the adopted tools.
+
+Development on simply.js began in 2021. Over the years, it has been put through rigorous battle-testing by building numerous plugins and web applications. This hands-on process allowed identifying gaps, fixing bugs, and continuously refining the architecture. The library is now approaching maturity with very few features left to add. Moving forward, the focus shifts to integrating AI into the development loop, concentrating on ongoing improvement, maintenance, and producing reusable components.
+
+## How it works
+
+In the past, developing with simply.js required a basic understanding of [HTML](https://www.w3schools.com/html/default.asp), [CSS](https://www.w3schools.com/css/default.asp), and [JavaScript](https://www.w3schools.com/js/default.asp). But we are in a completely different era now. The days of Toshihiko Nakago [hand-writing](https://gist.github.com/1wErt3r/4048722) Super Mario in 6502 assembly over 40 years ago are far behind us. Today, you can just let AI write the code for you.
+
+While having some foundational knowledge is still useful if you ever need to jump in and make manual tweaks, it is no longer a strict requirement. You can simply point your AI agent to this documentation and describe what you want to build. 
+
+Whether you write it yourself or prompt an AI, simply.js still runs entirely in the user's browser. No compilers, no bundlers, no builders, and no config files needed. Just good old plain HTML, CSS, vanilla JavaScript, and your [favourite text editor](https://code.visualstudio.com/). That's all!
+
+## Features
+
+- Lighting fast template engine<br>
+- Reactive DOM<br>
+- Single file components<br>
+- State management<br>
+- Electron support<br>
+- Router<br>
+- Zero dependency<br>
+- No compiler, bundler or builder<br>
+- Lightweight (20 KB gzipped)<br>
+- All green browsers
+
+## Playground
+
+The REPL of Simply JS is at the [Playground](playground) section. This is the fastest way to get started using Simply JS. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
+
+## Simply JS in the wild
+
+- [Edit Image](https://editimage.studio)
+- [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager)
+- [Reframer](https://reframer.net)
+- [Port FM](https://fehmi.ozuseven.com/port)
+
+---
+
+<a id="getting-started"></a>
+
+## Getting Started
+
+
+## Add it to your app
+
+You can integrate Simply.js into your application by adding a `<script>` tag. Ensure it is placed just before the closing `</body>` tag.
+
+```html
+<script src="https://simply.js.org/simply.min.js"></script>
+```
+
+## Create a Component
+
+Your page is now ready to interact with Simply.js components. Simply.js components are structured into three main sections: `template`, `style`, and `script`. While more details are available in the [component structure](#component-structure) section, let's quickly get started. Create a `hello-world.html` file with the content below and save it to the same folder as the application where you initially added Simply.js.
+
+```html
+<html>
+  <h1>Hello World!</h1>
+  <p>Greetings from {data.name}</p>
+</html>
+
+<style>
+  h1 {
+    font-family: Arial, Helvetica;
+  	color: #4197b9;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      name: "simply.js"
+    }
+  }
+</script>
+```
+
+## Use the Component
+
+You can use Simply.js's `get()` function to load your component anywhere in your application or page, as shown below.
+
+```js
+get("hello-world.html");
+```
+
+Once your component is loaded, its filename (without the extension) will serve as its custom tag name, allowing you to place the component anywhere by simply using the tag, like this:
+
+```html
+<hello-world></hello-world>
+```
+
+## Everything Together
+
+You now have two files, structured as shown below. For a quicker start, you can download them directly instead of creating them manually.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+## Preview Your App
+
+When you have these files you can start a server to preview your app. You can use any web server but here are some suggestions for you.
+<br>
+- #### Python
+If Python is installed, you can easily run:
+```bash
+#python 2
+cd hello-world && python -m SimpleHTTPServer 8000
+```
+```bash
+#python 3
+cd hello-world && python3 -m http.server 8080
+```
+
+- #### Node.js HTTP Server
+  You can install [http-server](https://www.npmjs.com/package/http-server) package if you want to continue with node.js.<br>
+```bash
+npm install --global http-server
+```
+  Then you will be able to start the server by
+```bash
+http-server [path] [options]
+```
+
+---
+
+<a id="component-structure"></a>
+
+## Component Syntax
+
+The component concept is central to Simply.js, with all other functionalities built around it. Simply.js facilitates communication and orchestration between components. A component is a simple HTML file comprising three parts: `html`, `style`, and `script`. Let's examine what a component looks like.
+
+> **Note:** All three of these tags are optional. For instance, your component can contain only a `<script>` tag, only an `<html>` tag, or only a `<style>` tag.
+
+## Component Structure
+
+In the example below, the letter "S" is present in the DOM because it is defined within the template tag. Its color is blue, as specified in the style tag. Additionally, clicking on it triggers an alert, as a click event is defined in the script tag.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head> <!--asdasd-->
+    <title>simply.js - Hello World!</title>
+  </head>
+  <body>
+    <a-letter></a-letter>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("a-letter.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:a-letter.html
+<html>
+  <h1 onclick="methods.anAlert();">{{data.letter}}</h1>
+</html>
+
+<style> 
+  h1 {
+  	color: blue;
+    font-size: 70vw;
+  }
+</style>
+
+<script>
+  class simply { //hello
+    data = {
+      letter: "S"
+    }
+    methods = {
+    	anAlert: function() {
+        	alert(data.letter);
+        }
+    }
+  }
+</script>
+```
+
+> **Warning:** Custom element tag names **must** contain a hyphen (`-`). The filename (without the extension) becomes the tag name, so name your component files like `a-letter.html` to get `<a-letter>`, not `letter.html` which would produce `<letter>` and fail to register.
+
+## Context of Built-in Data
+
+`data`, `props`, `state`, `methods`, `component`, `parent`, `dom` and `lifecycle` are available in every part of a component. You can access them directly without using `this.` prefix:
+
+- **`<html>`** — `{{data.name}}`, `{{methods.fullName()}}`
+- **`<style>`** — `var(state.color)`
+- **`<script>`** — `data.name`, `state.counter`, `methods.foo()`
+
+The library injects these names into the scope of each part, so you never have to write `this.data` or `this.state`. In fact, `this` is **not** available in any part of a component. Always use the bare names.
+
+---
+
+## Static Template
+
+A component doesn't have to contain all three parts. This one consists of only a template.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Hello World!</title>
+  </head>
+  <body>
+    <static-template></static-template>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("static-template.html"); 
+    </script>
+  </body>
+</html>
+```
+
+```html:static-template.html
+<html>
+	This is just a template without any dynamic or style parts in it.
+</html>
+```
+
+---
+
+## Component Attributes
+
+You can customize how a component is mounted by adding attributes to its tag:
+
+- **`isolated`** — creates a Shadow Root and keeps the component's styles encapsulated, isolating it from parent styles.
+- **`cache`** — keeps the component's `data` and `props` across route navigation. See [Router Cache](#router).
+
+```html
+<my-component isolated cache></my-component>
+```
+
+> **Note:** By default, custom elements don't use Shadow DOM, so they inherit parent styles and remain accessible via JavaScript from anywhere. This also makes it easy to create custom form element components and serialize them before sending data to the backend.
+
+---
+
+<a id="template"></a>
+
+## Template
+
+This section describes the rendering portion of a component. Elements within the `<html>` tag are mounted to the DOM after being processed by the template syntax. While most components include an `<html>` tag, it is not mandatory; some components may only contain a `<script>` tag with their logic.
+
+The Simply.js template syntax operates within the `<html>` tag, functioning as a superset of HTML. This syntax supports [conditionals](#conditionals), [each loops](#loops), [reactive variables](#variables), [DOM events](#dom-events), [slots](#slot), and [nested components](#nested-components).
+
+> **Note:** Reactive variables are written with double curly braces, like `{{data.name}}`. You can reach all of `{{data}}`, `{{props}}`, `{{state}}`, `{{parent}}`, `{{dom}}`, `{{methods}}`, `{{component}}`, `{{lifecycle}}` and `{{name}}` defined in the script tag.
+
+## A Simple Example
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <greeting-comp></greeting-comp>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("greeting-comp.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:greeting-comp.html
+<html>
+  <h1>Hello, {{data.name}}!</h1>
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "World"
+    }
+  }
+</script>
+```
+
+> **Note:** Custom element tags can be written self-closing, like `<greeting-comp/>`, but some older browsers require an explicit closing tag: `<greeting-comp></greeting-comp>`. Using the explicit form is the safest choice for maximum compatibility.
+
+## The `<static>` Tag
+
+Content wrapped inside a `<static>` tag is rendered only once. Even if a reactive variable inside it changes later, the static part will not be re-rendered. This is useful for performance when a part of the template never changes.
+
+```html
+<html>
+  <static>
+    <h1>This header is rendered once</h1>
+  </static>
+  <p>{{data.counter}}</p>
+</html>
+```
+
+You can learn more about the syntax in the [template syntax](#variables) section.
+
+---
+
+<a id="style"></a>
+
+## Style
+
+The `<style>` tag of a component is processed by Simply.js' own style engine, which extends plain CSS with reactive values and conditions:
+
+- **Dynamic variables** — inject reactive values with `var(data.color)`, `var(state.deg)` or any expression.
+- **Conditions** — toggle rule blocks with `&cond:[if="..." ]`, `&cond:[elsif="..." ]` and `&cond:[else]`.
+
+Everything else behaves like standard CSS, including native custom properties such as `var(--my-token)`.
+
+> **Note:** By default components render **without** Shadow DOM, so `:host` only works when the `isolated` attribute is present. See [Scope & Encapsulation](#style-scope).
+
+## A Simple Example
+
+Styles defined inside a component's `<style>` tag style the template rendered by the component.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <styled-box></styled-box>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("styled-box.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:styled-box.html
+<html>
+  <h1>Hello from the style tag!</h1>
+</html>
+
+<style>
+  h1 {
+    color: var(data.color);
+    font-family: sans-serif;
+  }
+
+  &cond:[if="data.big"] {
+    h1 {
+      font-size: 64px;
+    }
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      color: "#6c5ce7",
+      big: true
+    }
+  }
+</script>
+```
+
+> **Warning:** Reactive CSS is more expensive than reactive HTML: every change re-renders the whole layout. Modern browsers are very fast, but use it cautiously — prefer static CSS and native custom properties (`var(--token)`) where possible.
+
+---
+
+## Learn More
+
+- [Style Variables](#style-variables) — reactive `var(...)` expressions
+- [Style Conditions](#style-conditions) — `&cond:[...]` blocks
+- [Scope & Encapsulation](#style-scope) — `isolated`, `:host`, linking CSS files
+
+---
+
+<a id="script"></a>
+
+## Script
+
+The `<script>` tag contains the entire logic and data of a component. It is written as a `class simply {}` object. The class can define `props`, `data`, `state`, `methods`, `lifecycle` and `settings`.
+
+## The Class
+
+Here is the class of a component script:
+
+```js
+class simply {
+  props = {} // Reactive props object set by attributes.
+  data = {} // Reactive data object.
+  state = {} // Reactive state object shared with the entire component tree. 
+  methods = {} // Functions, callable from templates and lifecycle hooks.
+  lifecycle = {
+    afterConstruct() {} // Called after the component is constructed.
+    beforeRender() {} // Called before each render. 
+    beforeFirstRender() {} // Called before the first render.
+    afterFirstRender() {} // Called after the first render.
+    beforeRerender() {} // Called before a re-render.
+    afterRerender() {} // Called after a re-render.
+    afterRender() {} // Called after every render.
+    disconnected() {} // Called when the component is removed from the DOM.
+    whenDataChange(changes) {} // Called when data changes.
+    whenStateChange(changes) {} // Called when state changes.
+    whenPropChange(changes) {} // Called when a prop changes.
+  }
+  settings = {
+    animate: true // Enables the animation/transition attribute system.
+  }
+}
+```
+
+## A Simple Example
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <greeting-comp some-prop="hello"></greeting-comp>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("greeting-comp.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:greeting-comp.html
+<html>
+  <h1>Hello World!</h1>
+  <p>Greetings from {{data.name}}</p>
+  <p>The value of prop is {{props["some-prop"]}}</p>
+  <button onclick="methods.change()">Change name</button>
+</html>
+
+<style>
+  h1 {
+    font-family: Arial, Helvetica;
+    color: var(state.color);
+  }
+</style>
+
+<script>
+  class simply {
+    props = {
+      // Props available in <html>
+    }
+    data = {
+      // Data available in <html>
+      name: "simply.js"
+    }
+    state = {
+      // State available for the entire component tree
+      color: "purple"
+    }
+    methods = {
+      // Component functions
+      change: function() {
+        data.name = "another name"
+      }
+    }
+    lifecycle = {
+      // Lifecycle events
+      afterFirstRender() {
+        console.log("The component is rendered");
+      },
+      whenDataChange(changes) {
+        // Hook for data changes
+        console.log("data changed", changes);
+      }
+    }
+  }
+</script>
+```
+
+> **Note:** Reactive variables in the template are written with double curly braces, like `{{data.name}}`. In the style tag, use `var(data.color)` instead.
+
+---
+
+## Learn More
+
+- [Load Components](#loadcomponent)
+- [Component Communication](#component-communication)
+- [Lifecycle](#lifecycle)
+- [Reactivity](#reactivity)
+- [State Management](#state)
+
+---
+
+<a id="variables"></a>
+
+## Variables
+
+You can define your variables within the `data` section of your component, as shown below. You can also use `props`, `state`, values returned from `methods`, globals like `window`, and anything on `component`. `data`, `props` and `state` are **reactive** — when they change, the template re-renders.
+
+## Where Variables Live
+
+- `data` — the component's own reactive data.
+- `props` — reactive props passed as attributes on the component tag.
+- `state` — reactive state shared with the entire component tree.
+- `methods` — functions that return values, e.g. `{{methods.fullName()}}`.
+- `window` — any global is reachable, e.g. `{{window.innerWidth}}` or `{{Math.round(data.x)}}`.
+- `component` — anything on the element instance, e.g. `{{component.someProp}}`.
+
+> **Note:** Only `data`, `props` and `state` are reactive. `methods` return values, globals and `component` properties are read at render time but do not trigger a re-render on their own. See [Reactivity](#reactivity) for details.
+
+> **Warning:** Never assign a value inside the template, such as `{{data.name = "x"}}`. Assignments cause an infinite render loop. Change variables from `methods` or lifecycle hooks instead.
+
+
+
+## A Simple Example
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <greeting-comp some-prop="World"></greeting-comp>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("greeting-comp.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:greeting-comp.html
+<html>
+  <h1>Hello, {{data.name}}!</h1>
+  <p>Prop: {{props["some-prop"]}}</p>
+  <p>State: {{state.counter}}</p>
+  <p>Method: {{methods.fullName()}}</p>
+  <p>Global: {{window.innerWidth}}px</p>
+  <button onclick="methods.change()">Increment</button>
+</html>
+
+<script>
+  class simply {
+    props = {
+      // Props available in <html>
+    }
+    data = {
+      // Data available in <html>
+      name: "Simply"
+    }
+    state = {
+      // State available in <html>
+      counter: 0
+    }
+    methods = {
+      // Functions available in <html>
+      fullName: function() {
+        return data.name + " JS";
+      },
+      change: function() {
+        state.counter++;
+      }
+    }
+  }
+</script>
+```
+
+## Expressions
+
+Anything valid in JavaScript can be written inside `{{...}}` — math, ternaries, string methods and function calls:
+
+```html
+<html>
+  <p>{{data.age + 10}}</p>
+  <p>{{data.name.toUpperCase()}}</p>
+  <p>{{data.count > 5 ? "many" : "few"}}</p>
+  <p>{{methods.fullName()}}</p>
+</html>
+```
+
+## Binding Values to Attributes
+
+You can bind any value to an attribute with `{{...}}`. Three syntaxes are supported and they all become props on your component:
+
+- `attr="{{...}}"`<br>
+  String attribute. Values are written as strings, but Simply will convert them to the necessary types (Object, Boolean, Number, etc.) in the component's `props`.
+- `.prop="{{...}}"`<br>
+  JS property. Sets the property directly without serialization. Recommended for objects, arrays, and complex data, and required for form state (`checked`, `value`, `selected`, `enabled`, etc.).
+- `?attr="{{...}}"`<br>
+  Boolean attribute. Toggles by adding or removing the attribute. Use for declarative booleans like `hidden`/`open` — do not use for `checked`, `value`, `selected`, etc.
+
+```html
+<html>
+  <!-- string attribute -->
+  <child-comp title="{{data.title}}"></child-comp>
+
+  <!-- JS property — recommended for objects/arrays/numbers/booleans AND for form state -->
+  <child-comp .settings="{{data.settings}}"></child-comp>
+  <input type="checkbox" .checked="{{data.enabled}}">
+  <input .value="{{data.name}}">
+
+  <!-- Toggle attribute by a boolean -->
+  <button ?disabled="{{data.disabled}}">Submit</button>
+  <div ?hidden="{{data.hidden}}">Panel</div>
+</html>
+```
+
+> **Note:** You can pass objects/arrays via a string attribute with `simply.objToPropString()` and single quotes (`settings='{{simply.objToPropString(data.settings)}}'`), but it is a legacy API. For JS properties, `.prop="{{...}}"` is recommended — no stringification needed.
+
+## Variables in `<static>`
+
+Content inside a `<static>` tag is rendered only once. Even if a reactive variable inside it changes later, the static part is not re-rendered. Use it for parts of the template that never change.
+
+```html
+<html>
+  <static>
+    <p>Rendered once: {{data.name}}</p>
+  </static>
+  <p>Re-rendered: {{data.counter}}</p>
+</html>
+```
+
+---
+
+## Learn More
+
+- [Template](#template)
+- [Style](#style) — in the style tag use `var(data.color)`, not `{{...}}`
+- [Each Loops](#loops) — inside an `each` loop you access items directly
+- [Reactivity](#reactivity)
+- [DOM Events](#dom-events)
+
+---
+
+<a id="conditionals"></a>
+
+## Conditionals
+
+Conditional statements are defined using special HTML tags such as `<if>`, `<elsif>`, and `<else>`. This approach allows IDEs to easily colorize syntax and format the code without issues.
+
+## If
+
+Use `<if>` to conditionally render a block whenever its `cond` expression evaluates to truthy.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <if-demo/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("if-demo.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:if-demo.html
+<html>
+  <a onclick="data.show = !data.show;">Toggle</a>
+  <if cond="data.show">
+    <p>This paragraph is only rendered when `data.show` is truthy.</p>
+  </if>
+</html>
+
+<script>
+  class simply {
+    data = {
+      show: true
+    }
+  }
+</script>
+```
+
+> **Note:** Please remember that every `if` statement must be closed with an `</if>` tag.
+
+## Elsif
+
+Add `<elsif>` to check additional conditions in sequence; it must be placed immediately after an `<if>` (or another `<elsif>`) block.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <elsif-demo/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("elsif-demo.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:elsif-demo.html
+<html>
+  <a onclick="data.score = (data.score + 1) % 3;">Next score</a>
+  <if cond="data.score == 2">
+    <p>Excellent!</p>
+  </if>
+  <elsif cond="data.score == 1">
+    <p>Good!</p>
+  </elsif>
+  <elsif cond="data.score == 0">
+    <p>Keep going!</p>
+  </elsif>
+</html>
+
+<script>
+  class simply {
+    data = {
+      score: 1
+    }
+  }
+</script>
+```
+
+## Else
+
+Use `<else>` to render a fallback block when none of the preceding conditions match.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <else-demo/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("else-demo.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:else-demo.html
+<html>
+  <a onclick="data.available = !data.available;">Toggle status</a>
+  <if cond="data.available">
+    <p>Available</p>
+  </if>
+  <else>
+    <p>Unavailable</p>
+  </else>
+</html>
+
+<script>
+  class simply {
+    data = {
+      available: true
+    }
+  }
+</script>
+```
+
+## Nested Conditionals
+
+Conditionals can be nested inside one another to express more complex logic.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <nested-demo/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("nested-demo.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:nested-demo.html
+<html>
+  <if cond="data.loggedIn">
+    <h3>Welcome, {{data.username}}</h3>
+    <if cond="data.isAdmin">
+      <p>You have admin privileges.</p>
+    </if>
+  </if>
+  <else>
+    <p>Please log in.</p>
+  </else>
+</html>
+
+<script>
+  class simply {
+    data = {
+      loggedIn: true,
+      isAdmin: false,
+      username: "simply"
+    }
+  }
+</script>
+```
+
+> **Note:** You can write any `if` statement that you would typically write with Vanilla JS, as shown below.
+
+```html
+
+  <if cond="data.who == 'Red Bird' && data.age == 3">
+    ...
+  </if>  
+
+  <if cond="(data.a + 1) > 5 || data.a < 12">
+    ...
+  </if>
+
+```
+
+---
+
+<a id="loops"></a>
+
+## Each Loops
+
+It is possible to iterate through an array or object.
+
+## Simple Form of Each Loops
+
+Use `<each>` to iterate over an array or object.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <hobby-list/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("hobby-list.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:hobby-list.html
+<html>
+  <each of="data.hobbies" as="hobby">
+    <li>{{hobby}}</li>
+  </each>
+</html>
+
+<script>
+  class simply {
+    data = {
+      hobbies: {
+        Music: "Daily",
+        Gaming: "Weekly",
+        Sports: "Monthly",
+      }
+    }
+  }
+</script>
+```
+
+## Keys and Indexes
+
+It is also possible to access keys and indexes.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <hobby-list/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("hobby-list.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:hobby-list.html
+<html>
+  <each of="data.hobbies" as="hobby" key="key" index="index">
+    <li>{{hobby}} : {{key}} : {{index}}</li>
+  </each>
+</html>
+
+<script>
+  class simply {
+    data = {
+      hobbies: {
+        Music: "Daily",
+        Gaming: "Weekly",
+        Sports: "Monthly",
+      }
+    }
+  }
+</script>
+```
+
+> **Note:** Within a loop, you can directly access variables without specifying the root node (e.g., `data.variable`).
+
+## Nested Loops
+
+You can nest as many loops as needed.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <hobby-list/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("hobby-list.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:hobby-list.html
+<html>
+  <each of="data.hobbies" as="hobby" key="key" index="index">
+    <each of="hobby" as="item">
+      <li>{{item}}</li>
+    </each>
+  </each>
+</html>
+
+<script>
+  class simply {
+    data = {
+      hobbies: {
+        Music: ["Drum", "Guitar", "Keyboard"],
+        Gaming: ["Spelunky", "Gunpoint", "Portal 2"],
+        Sports: ["Swimming", "Cycling", "Walking"]
+      }
+    }
+  }
+</script>
+```
+
+---
+
+<a id="dom-events"></a>
+
+## DOM Events
+
+There is nothing unique about writing DOM events in Simply.js compared to Vanilla JavaScript. You can use any native event attribute (`onclick`, `onmouseover`, ...) and pass values from `data`, `props` or `state` directly to your methods.
+
+> **Note:** Inside event attributes, variables are written **without** curly braces — `methods.alert(data.message)`, not `methods.alert({{data.message}})`. Curly braces (`{{ }}`) are only used in the template body and attribute values.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <event-demo/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("event-demo.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:event-demo.html
+<html>
+  <button onclick="methods.alert(data.message)">Alert</button>
+  <button onclick="methods.handle(event)">Handle</button> 
+</html>
+
+<script>
+  class simply {
+    data = {
+      message: "hello"
+    }
+    methods = {
+      alert: function (message) {
+        alert(message);
+      },
+      handle: function (event) {
+        console.log(event);
+      }
+    }
+  }
+</script>
+```
+
+> **Note:** Avoid using `this` as a parameter name in your method's parameter, as `this` is reserved for the component's constructor. Use `el` or another suitable variable name when receiving the event.
+
+---
+
+<a id="nested-components"></a>
+
+## Nested Components
+
+You can embed other components within your components. Load the nested component with the `get` function, then use its tag inside your template — just like any other element. There is no limit to the number of nested components. Here is an example of `child-component` that calls `grand-child-component`.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Hello World!</title>
+  </head>
+  <body>
+    <child-component></child-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("child-component.html");
+      get("grand-child-component.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:child-component.html
+<html>
+  Hello from child
+  <br>
+  <grand-child-component></grand-child-component>
+</html>
+```
+
+```html:grand-child-component.html
+<html>
+  Hello from grand-child
+</html>
+```
+
+
+> **Note:** For details on how nested components communicate with each other, see [Component Communication](#component-communication).
+
+---
+
+<a id="slot"></a>
+
+## Slot
+
+You can pass content to a component by placing it directly inside the component's tag. Simply.js uses the **native Web Components slot** mechanism, so slots only work on components that are mounted with a Shadow Root — i.e. components marked with the `isolated` attribute.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <page-component></page-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("page-component.html");
+      get("card-component.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:page-component.html
+<html>
+  <card-component isolated>
+    <h2 slot="title">{{data.title}}</h2>
+    <p>{{data.message}}</p>
+  </card-component>
+</html>
+
+<script>
+  class simply {
+    data = {
+      title: "Dynamic page title",
+      message: "This content comes from the parent's data."
+    }
+  }
+</script>
+```
+
+```html:card-component.html
+<html>
+  <div class="card">
+    <slot name="title"></slot>
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  .card {
+    border: 2px solid #6c5ce7;
+    border-radius: 8px;
+    padding: 16px;
+  }
+</style>
+```
+
+## How It Works
+
+- **`isolated` is required**<br>
+  Only components with the `isolated` attribute (Shadow DOM) support slots. Without it, the component renders in the light DOM and `<slot>` has no effect.
+
+- **Native behavior**<br>
+  Usage is identical to native Web Components: define `<slot>` in the component's template and place the content inside the component's tag.
+
+- **Default slot**<br>
+  `<slot></slot>` renders all content placed inside the tag.
+
+- **Named slots**<br>
+  `<slot name="title">` matches content marked with `slot="title"`.
+
+- **Fallback content**<br>
+  Content written inside `<slot>` is shown when nothing is passed: `<slot>Default text</slot>`.
+
+## Slot Content Uses the Parent's Scope
+
+Slot content is part of the **parent's** template, so it can use the parent's `data`, `props` and `state` — not the child's. In the example above, `{{data.title}}` and `{{data.message}}` refer to `page-component`'s data, even though they are rendered inside `card-component`.
+
+---
+
+<a id="loadcomponent"></a>
+
+## Load Components
+
+Components are loaded using the `get()` function. The filename without its extension becomes your custom element's tag name — `the-component-to-get.html` results in the tag `<the-component-to-get>`, and the file's content is mounted to this element.
+
+## Single Component
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Hello World!</title>
+  </head>
+  <body>
+    <the-component-to-get></the-component-to-get>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("the-component-to-get.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:the-component-to-get.html
+<html>
+  The component
+</html>
+```
+
+## Get Multiple Components
+
+You can also load multiple components by passing an array to the `get()` function.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Hello World!</title>
+  </head>
+  <body>
+    <the-component-to-get></the-component-to-get>
+    <br>
+    <another-component></another-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get([
+        "the-component-to-get.html",
+        "another-component.html"
+      ]);
+    </script>
+  </body>
+</html>
+```
+
+```html:the-component-to-get.html
+<html>
+  The component
+</html>
+```
+
+```html:another-component.html
+<html>
+  Another component
+</html>
+```
+
+## Custom Tag Name
+
+You can specify a custom tag name as the second argument of `get()`. The component file is loaded, but registered under the tag name you provide.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Hello World!</title>
+  </head>
+  <body>
+    <merhaba-dunya></merhaba-dunya>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("hello-world.html", "merhaba-dunya");
+    </script>
+  </body>
+</html>
+```
+
+```html:hello-world.html
+<html>
+  <h1>Hello World!</h1>
+  <p>Greetings from {{data.name}}</p>
+</html>
+
+<style>
+  h1 {
+    font-family: Arial, Helvetica;
+    color: blue;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      name: "simply.js"
+    }
+  }
+</script>
+```
+
+## Call `get()` Anywhere
+
+`get()` can be called from anywhere in your application — not just the main page. You can load all components at once on the app's main page, or call it inside a component's `afterConstruct` hook or any method. Once `get()` fetches and defines a component, any `<the-component>` tag anywhere in the application is populated with it.
+
+`get()` is asynchronous: it internally uses the native [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) API (with `{ cache: "no-cache" }`) to load the component file, so it never blocks the main thread. On a CORS or network error, it automatically retries through the `cors.woebegone.workers.dev` proxy. Note that `get()` is callback-based, not Promise-based, so it cannot be awaited directly — the component is registered and rendered as soon as the fetch resolves, no matter where the call was made.
+
+> **Warning:** Custom element tag names **must** contain a hyphen (`-`). The filename (without the extension) becomes the tag name, so name your component files like `first-component.html` to get `<first-component>`, not `first.html` which would produce `<first>` and fail to register.
+
+---
+
+<a id="component-communication"></a>
+
+## Parent to Child
+
+Using `component.querySelector("child-component")` you can directly access a child component's scope — read its data, call its methods, or change its data to trigger reactivity inside it. Everything in that child's scope is reachable, and you can keep chaining `querySelector` to reach deeper children.
+
+```js
+// Read a variable from child's data
+component.querySelector("child-component").data.name;
+
+// Change a variable in child's data (triggers reactivity in the child)
+component.querySelector("child-component").data.name = "New name";
+
+// Call a method from a child
+component.querySelector("child-component").methods.functionName();
+
+// Access a grandchild through the child
+var child = component.querySelector("child-component");
+child.querySelector("grand-child").data.name = "New name";
+child.querySelector("grand-child").methods.functionName();
+```
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Parent to Child Communication</title>
+  </head>
+  <body>
+    <parent-component></parent-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get(["parent-component.html", "child-component.html", "grand-child.html"]);
+    </script>
+  </body>
+</html>
+```
+
+```html:parent-component.html
+<html>
+  <h2>Parent</h2>
+  <child-component></child-component>
+  <br>
+  <button onclick="methods.talkToChild()">Talk to child</button>
+</html>
+
+<script>
+  class simply {
+    methods = {
+      talkToChild: function () {
+        // Read a variable from child's data
+        var child = component.querySelector("child-component");
+        console.log(child.data.name); // => "Child"
+
+        // Change a variable in child's data (triggers reactivity)
+        child.data.name = "New name";
+
+        // Call a method from the child
+        child.methods.sayHello();
+
+        // Access the grandchild through the child
+        var grandChild = child.querySelector("grand-child");
+        grandChild.data.name = "New name";
+        grandChild.methods.sayHello();
+      }
+    }
+  }
+</script>
+```
+
+```html:child-component.html
+<html>
+  <h3>Child: {{data.name}}</h3>
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "Child"
+    }
+    methods = {
+      sayHello: function () {
+        console.log("Hello from the child");
+      }
+    }
+  }
+</script>
+```
+
+```html:grand-child.html
+<html>
+  <h3>Grand Child: {{data.name}}</h3>
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "Grand Child"
+    }
+    methods = {
+      sayHello: function () {
+        console.log("Hello from the grand child");
+      }
+    }
+  }
+</script>
+```
+
+## Props
+
+Another way to pass data from a parent to a child is through **props** — attributes on the component tag. The child accesses them via `props` in its template, script or style.
+
+```html
+<child-component message="This is a message from parent"></child-component>
+```
+
+```html:child-component.html
+<html>
+  <p>{{props.message}}</p>
+</html>
+```
+
+Props are reactive — when the parent changes the attribute, the child re-renders. For details on defining, passing and overriding props, see [Props](#props).
+
+## Child to Parent
+
+It is possible to communicate directly with parent components using `component.parent`. The same scope as parent-to-child applies — you can read the parent's data, call its methods, or change its data to trigger reactivity in the parent.
+
+```js
+// Read a variable from parent's data
+component.parent.data.name;
+
+// Change a variable in parent's data (triggers reactivity in the parent)
+component.parent.data.name = "Changed by a child component";
+
+// Call a method in parent's methods
+component.parent.methods.functionName();
+```
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Child to Parent Communication</title>
+  </head>
+  <body>
+    <parent-component></parent-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get(["parent-component.html", "child-component.html"]);
+    </script>
+  </body>
+</html>
+```
+
+```html:parent-component.html
+<html>
+  <h2>Parent: {{data.name}}</h2>
+  <child-component></child-component>
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "Parent"
+    }
+    methods = {
+      sayHello: function () {
+        console.log("Hello from the parent");
+      }
+    }
+  }
+</script>
+```
+
+```html:child-component.html
+<html>
+  <h3>Child: {{data.name}}</h3>
+  <button onclick="methods.talkToParent()">Talk to parent</button>
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "Child"
+    }
+    methods = {
+      talkToParent: function () {
+        // Read a variable from parent's data
+        console.log(component.parent.data.name); // => "Parent"
+
+        // Change a variable in parent's data (triggers reactivity)
+        component.parent.data.name = "Changed by child";
+
+        // Call a method in parent's methods
+        component.parent.methods.sayHello();
+      }
+    }
+  }
+</script>
+```
+
+> **Note:** You can chain component.parent to reach any ancestor like `component.parent.parent`. Also you can reach siblings with `component.parent.querySelector("sibling-component")`
+
+---
+
+<a id="props"></a>
+
+## Props
+
+Props are reactive values passed as attributes on the component tag. In Simply.js, attributes are synchronized with properties (props) — if you define an attribute value, the corresponding prop will also be defined.
+
+```html
+<child-component message="This is a message from parent"/>
+```
+
+You can then access it in the template section of the child component as follows:
+
+```html
+<html> {props.message} </html>
+```
+
+You can assign any type of value to attributes, including `Object`, `Array`, `String`, `Boolean`, `Number`, and even `Function`.
+
+Like Lit, three binding syntaxes are supported and they all become props on the component:
+
+- `attr="{{...}}"`<br>
+  String attribute. Values are written as strings, but Simply will convert them to the necessary types (Object, Boolean, Number, etc.) in the component's `props`.
+- `.prop="{{...}}"`<br>
+  JS property. Sets the property directly without serialization. Recommended for objects, arrays, and complex data, and required for form state (`checked`, `value`, `selected`, `enabled`, etc.).
+- `?attr="{{...}}"`<br>
+  Boolean attribute. Toggles by adding or removing the attribute. Use for declarative booleans like `hidden`/`open` — do not use for `checked`, `value`, `selected`, etc.
+
+> **Warning:** Do not use `?checked`/`?value` — use `.checked`/`.value` instead, otherwise list re-rendering reuses DOM nodes and the checked state appears to shift to the next item.
+
+In the legacy API for string attributes, complex values need to be stringified and wrapped in single quotes with `simply.objToPropString()`.
+
+```html
+<my-app myProp='{a: "b"}'/>
+<test-comp settings='{{simply.objToPropString(data.settings)}}'/>
+```
+
+With `.prop="{{}}"` you can pass the value directly — no stringification needed. The same applies to form state:
+
+```html
+<test-comp .settings="{{data.settings}}"></test-comp>
+<input type="checkbox" .checked="{{data.enabled}}">
+<input .value="{{data.name}}">
+```
+
+> **Warning:** Using `?checked="{{data.enabled}}"` only sets the initial `checked` *attribute*. For live checkbox, radio, and select state, always use `.checked`/`.value`/`.selected` — otherwise deleting or reordering a list makes the checked state shift to the next DOM node.
+
+Alternatively, you can access your predefined attributes as props from anywhere within the script section of the component, as shown below:
+
+```html
+<script>
+  class {
+    lifecycle = {
+      afterFirstRender() {
+        alert("The message from parent is " + props.message);
+      }
+    }
+  }
+</script>
+```
+
+> **Warning:** Do not change attributes directly using `setAttribute`, as this can disrupt the DOM's rendering algorithm.
+
+## Where Props Live
+
+There are three primary ways to reach, define and modify props.
+
+1.  **As an inline attribute directly in HTML:**<br>
+    `<my-app myProp='hello'>`
+
+2.  **Within a component class:**<br>
+    `class { props = {"myProp": "myValue"} }`
+
+3.  **Within the component's logic:**<br>
+    In methods, lifecycle hooks etc like `props.myProp = "myValue"`
+
+> **Note:** The prop changes inside script (class, logic) overrides the props defined in inline attributes.
+
+## Example
+
+Everything above in a single example — props passed as inline attributes (including a complex object via `simply.objToPropString()`), accessed in the template and in the script, and overridden inside the component.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Props</title>
+  </head>
+  <body>
+    <parent-component></parent-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("parent-component.html");
+      get("child-component.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:parent-component.html
+<html>
+  <child-component
+    title="From parent"
+    message="Hello from parent"
+    count="3"
+    settings='{{simply.objToPropString(data.settings)}}'
+  ></child-component>
+</html>
+
+<script>
+  class simply {
+    data = {
+      settings: {
+        theme: "dark",
+        items: [1, 2, 3]
+      }
+    }
+  }
+</script>
+```
+
+```html:child-component.html
+<html>
+  <h3>Title: {{props.title}}</h3>
+  <p>Message: {{props.message}}</p>
+  <p>Count: {{props.count}}</p>
+  <p>Theme: {{props.settings.theme}}</p>
+  <p>Items: {{props.settings.items.join(", ")}}</p>
+  <p>Via method: {{methods.getTitle()}}</p>
+</html>
+
+<script>
+  class simply {
+    props = {
+      // Overrides the inline attribute
+      title: "Overridden in class"
+    }
+    methods = {
+      getTitle: function () {
+        // Props are accessible anywhere in the script
+        return props.title;
+      }
+    }
+  }
+</script>
+```
+
+---
+
+## Learn More
+
+- [Script](#script)
+- [Component Communication](#component-communication)
+- [Variables](#variables)
+
+---
+
+<a id="lifecycle"></a>
+
+## Lifecycle Events
+
+Lifecycle events let you hook into the different stages of a component's life — from construction, to rendering, to being removed from the DOM. Define them inside the `lifecycle` object of your component class.
+
+| Event              | Description                                        |
+|:-------------------|:---------------------------------------------------|
+| **afterConstruct** | After creating and initializing the component      |
+| **beforeFirstRender**| Before the component is rendered to the DOM for the first time|
+| **afterFirstRender**| After the component is rendered to the DOM for the first time |
+| **beforeRender**   | Before every render                                |
+| **afterRender**    | After every render                                 |
+| **beforeRerender** | Before the component is re-rendered/updated on the DOM|
+| **afterRerender**  | After the component is re-rendered/updated on the DOM |
+| **whenDataChange** | After a variable in the component's data object is changed|
+| **whenPropChange** | After a prop is changed                            |
+| **whenStateChange** | After a state is changed                            |
+| **disconnected**   | Triggered when the component is removed from the DOM|
+| **routerEnter**   | Triggered when the router enter with the component  |
+| **framerPropsUpdated**   | When a prop is changed in Framer             |
+| **framerComponentClicked**   | When a Framer component is clicked       |
+
+
+
+> **Warning:** DOM and state variables are not available during the "construct" phase. You can only access them in "render" events, especially if you are using routers.
+
+## Logging Lifecycle Events
+
+The following example logs every lifecycle event to a `data.log` array and renders it with an `each` loop. Click the buttons to trigger `data`, `prop` and `state` changes.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body style="margin: 0">
+    <lifecycle-log count="0" isolated/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("lifecycle-log.html");
+    </script>
+  </body>
+</html>
+
+```
+
+```html:lifecycle-log.html
+<html>
+  <div class="controls">
+    <button onclick="methods.updateData()">Update data</button>
+    <button onclick="methods.updateProp()">Update prop</button>
+    <button onclick="methods.updateState()">Update state</button>
+  </div>
+  <div class="values">
+    <span>data: {{data.counter}}</span>
+    <span>prop: {{props.count}}</span>
+    <span>state: {{state.counter}}</span>
+  </div>
+  <div class="log">
+    <each of="data.log" as="entry">
+      <div class="entry">{{entry.time}} → {{entry.type}}</div>
+    </each>
+  </div>
+</html>
+
+<style>
+  :host {
+    display: flex;
+    font-family: monospace;
+    background: #131010;
+    color: rgb(216 221 226);
+    padding: 10px;
+    font-size: 12px;
+    height: 100%;
+    box-sizing: border-box;
+    flex-direction: column;
+  }
+  .controls {
+    margin-bottom: 8px;
+  }
+  .controls button {
+    margin-right: 6px;
+    font-family: monospace;
+    font-size: 12px;
+    background: #2a2525;
+    color: rgb(216 221 226);
+    border: 1px solid #3d3838;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  .values {
+    margin-bottom: 8px;
+    color: #82aaff;
+  }
+  .values span {
+    margin-right: 12px;
+  }
+  .log {
+    overflow: auto;
+    border: 1px solid #3d3838;
+    padding: 8px;
+    flex: 1;
+  }
+  .entry {
+    padding: 2px 0;
+    border-bottom: 1px solid #2b2929;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      log: [],
+      counter: 0
+    }
+    state = {
+      counter: 0
+    }
+    methods = {
+      // log push'u rerender tetiklediğinde hook'ların tekrar push
+      // etmesini engelleyen guard bayrağı (sonsuz döngüyü önler)
+      logging: false,
+      log(type) {
+        if (this.logging) return;
+        var d = new Date();
+        var time = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0");
+        data.log.unshift({ time, type });
+      },
+      updateData() {
+        data.counter++;
+      },
+      updateProp() {
+        props.count++;
+      },
+      updateState() {
+        state.counter++;
+      }
+    }
+    lifecycle = {
+      afterConstruct() { methods.log("afterConstruct"); },
+      beforeRender() { methods.log("beforeRender"); },
+      beforeFirstRender() { methods.log("beforeFirstRender"); },
+      afterFirstRender() { methods.log("afterFirstRender"); },
+      afterRender() { if (!methods.logging) methods.log("afterRender"); methods.logging = false; },
+      beforeRerender() { if (!methods.logging) methods.log("beforeRerender"); },
+      afterRerender() { if (!methods.logging) methods.log("afterRerender"); },
+      whenDataChange(changes) {
+        var hasLog = changes.some(c => c.currentPath.includes("log"));
+        var hasOther = changes.some(c => !c.currentPath.includes("log"));
+        // önce log'la (hasOther), sonra guard'ı kur (sadece log değişimiyse)
+        if (hasOther) methods.log("whenDataChange");
+        if (hasLog && !hasOther) methods.logging = true;
+      },
+      whenPropChange() { methods.log("whenPropChange"); },
+      whenStateChange() { methods.log("whenStateChange"); }
+    }
+  }
+</script>
+```
+
+---
+
+<a id="reactivity"></a>
+
+## Reactivity
+
+All variables defined in the `data` section of your component are automatically reactive — and so are `props` and `state`. Anytime you change a variable, your template is re-rendered if necessary.
+
+Reactivity flows top-down for `data` and `props`. Children that read `parent.data` or `parent.props` stay up to date when those change. This includes grandchildren and deeper. The reverse is not true. If a parent reads a child's value directly (e.g. `component.querySelector("child-component").data.something`) and that value changes, the parent is not notified. In that case use [state management](#state) instead. `state` is reactive across the entire component tree.
+
+## The `<static>` Tag
+
+You can disable reactivity for specific parts of your template with the `<static>` tag. Content inside it is rendered only once — even if a reactive variable inside it changes later, the static part is not re-rendered. This is useful for performance when part of the template never changes.
+
+```html
+<html>
+  <static>
+    <h1>This header is rendered once</h1>
+  </static>
+  <p>{{data.counter}}</p>
+</html>
+```
+
+## Update without re-render
+
+> **Note:** This approach might be unnecessary as the new template and reactivity engine are fast enough to handle such cases. Further testing is required. This section may be removed after more comprehensive battle tests.
+
+It can be helpful for performance reasons. In such scenarios, make your changes without triggering a reaction, and then render manually when finished.
+
+You can use a built-in method to set data without triggering a render. You can then manually render for increased performance.
+
+```js
+simply.setWithoutRender(data, {
+  total: response.response.headers["X-WP-Total"],
+  offset: data.offset + data.perPage,
+  themes: response.meta.themes,
+  meta: response.meta,
+});
+component.render(); // or component.react()
+```
+
+You can also pause/resume reactivity for this. Data, state, and properties are supported.
+
+```js
+ObservableSlim.pause(data);
+result.results.forEach(function (entry, i) {
+  const imageObj = images[i];
+  const uid = imageObj.uid;
+  const alt = entry && entry.alt_text;
+
+  const imageItem = methods.findFeImageObjByUid(uid);
+
+  if (alt) {
+    methods.changeAlt(alt, uid);
+  }
+
+  if (imageItem) {
+    imageItem.status = alt ? "idle" : "error";
+  }
+
+  state.bulk.current = i + 1;
+});
+ObservableSlim.resume(data);
+```
+
+Or just do
+
+```
+data.__getTarget.currentZoomPercent = 100; 
+```
+
+You can also make changes without triggering render by replacing the property descriptors:
+
+```js
+// make changes without triggering render
+const allUpdates = { ...data, name: "hede" };
+const changes = Object.getOwnPropertyDescriptors(allUpdates);
+Object.defineProperties(data, changes);
+```
+
+## Assigning reactive variables
+
+Each node in `data`, `state`, or `props` is a reactive proxy object. Assigning one to another can be problematic and may break the reactivity engine by causing infinite loops. For example, assigning `data.person = state.person` or vice versa can lead to a "Maximum call stack size exceeded" error.
+
+While it might work the first time you assign it, subsequent assignments can trigger these issues.
+
+To prevent this, you should first **remove the existing reference** before reassigning it. You can do this by either:
+
+```js
+delete data.person;
+```
+
+or
+
+```js
+data.person = {};
+```
+
+After that, it is safe to assign it again as you did the first time:
+
+```js
+data.person = state.person;
+```
+
+This ensures that the assignment doesn't recursively trigger reactive updates between proxies.
+
+---
+
+---
+
+<a id="state"></a>
+
+## State Management
+
+State management is straightforward in Simply.js. When you define a `state` in a component, all child components share that same state and can retrieve or modify it. Any manipulation of the state — no matter where it happens in the component tree — affects every component sharing that state, causing them all to react to the new value.
+
+> **Note:** The key difference between `data`/`props` and `state` is that changes to `data` or `props` affect the current component and its children, but not its parents. Changes to `state` affect every component in the tree — both children and parents.
+
+## How State Works
+
+- **One shared object**
+<br>The first component in the tree that defines a `state` creates it. Every descendant reuses that same object instead of creating its own, so there is only ever one source of truth.
+- **Read & write from anywhere**<br>Any component in the tree can read `state.counter` or write `state.counter = 5`.
+- **Reacts everywhere**<br>When the state changes, every component that references the changed value in its template or style re-renders automatically.
+- **Merging**<br>If a child component defines its own `state` keys in its class, they are merged into the shared state object and become visible to the whole tree.
+- **`whenStateChange(changes)`**<br>A lifecycle hook that fires whenever the state changes. Returning `false` from it prevents the re-render.
+
+## Example
+
+This example has a parent and two children sharing a single state. Click the parent's button and watch every component react; click a child's button and the parent reacts too.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - State Management</title>
+    <style>
+      body {
+        background: #1a1718;
+        color: #f2eded;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <parent-component></parent-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get(["parent-component.html", "child-component.html"]);
+    </script>
+  </body>
+</html>
+```
+
+```html:parent-component.html
+<html>
+  <div class="parent-box">
+    <h2>Parent</h2>
+    <p>Counter: <strong>{{state.counter}}</strong></p>
+    <button onclick="methods.increment()">+1 from parent</button>
+    <child-component></child-component>
+    <child-component></child-component>
+  </div>
+</html>
+
+<style>
+  .parent-box {
+    border: 2px solid #b8b2b2;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 8px;
+    background: #2a2526;
+    color: #f2eded;
+  }
+  h2 {
+    margin-top: 0;
+  }
+  button {
+    background: #b8b2b2;
+    color: #1a1718;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  class simply {
+    state = {
+      counter: 0
+    }
+    methods = {
+      increment: function () {
+        state.counter++;
+      }
+    }
+    lifecycle = {
+      whenStateChange(changes) {
+        console.log("State changed:", changes);
+      }
+    }
+  }
+</script>
+```
+
+```html:child-component.html
+<html>
+  <div class="child-box">
+    <h3>Child</h3>
+    <p>Counter: <strong>{{state.counter}}</strong></p>
+    <button onclick="methods.increment()">+1 from child</button>
+  </div>
+</html>
+
+<style>
+  .child-box {
+    border: 2px solid #b8b2b2;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 8px;
+    background: #1a1718;
+    color: #b8b2b2;
+  }
+  h3 {
+    margin-top: 0;
+  }
+  button {
+    background: #b8b2b2;
+    color: #1a1718;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  class simply {
+    methods = {
+      increment: function () {
+        state.counter++;
+      }
+    }
+  }
+</script>
+```
+
+---
+
+## Learn More
+
+- [Variables](#variables)
+- [Reactivity](#reactivity)
+- [Component Communication](#component-communication)
+
+---
+
+<a id="style-variables"></a>
+
+## Style Variables
+
+Reactive JavaScript values can be injected anywhere inside the style tag with `var()`. The expression is evaluated against the component scope (`data`, `state`, `props`, ...) and the result is re-applied automatically when the underlying value changes.
+
+```css
+color: var(data.color);
+transform: rotate(var(state.deg)deg);
+width: var(data.asd == 1 && (data.asd == 1 || data.asd == 2) ? "100px" : "200px");
+```
+
+> **Note:** Only `var(...)` calls whose expression does **not** start with `--` are treated as JavaScript. Native CSS custom properties like `var(--my-token)` keep their standard meaning.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <dynamic-color></dynamic-color>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("dynamic-color.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:dynamic-color.html
+<html>
+  <div class="box" onclick="state.color = state.color === 'tomato' ? '#0984e3' : 'tomato';">Toggle Color</div>
+</html>
+
+<style>
+  .box {
+    width: 120px;
+    height: 120px;
+    color: white;
+    font-family: sans-serif;
+    border-radius: 12px;
+    background: var(state.color);
+    transform: rotate(var(state.deg)deg);
+    transition: all 250ms ease;
+  }
+  a {
+    color: var(data.linkColor);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      linkColor: "#6c5ce7"
+    }
+    state = {
+      color: "tomato",
+      deg: 12
+    }
+  }
+</script>
+```
+
+See [Style](#style) for an overview of component styling.
+
+---
+
+<a id="style-conditions"></a>
+
+## Style Conditions
+
+Rules can be wrapped in `&cond:[if="..." ]`, `&cond:[elsif="..." ]` and `&cond:[else]` blocks and are only applied when the expression is truthy. Conditions can be nested.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <badge-comp/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("badge-comp.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:badge-comp.html
+<html>
+  <span class="badge">Rank</span>
+  <a onclick="data.level = (data.level + 1) % 3;">Level up</a>
+</html>
+
+<style>
+  .badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: white;
+  }
+
+  &cond:[if="data.level >= 2"] {
+    .badge {
+      background: #f1c40f;
+    }
+  }
+
+  &cond:[elsif="data.level >= 1"] {
+    .badge {
+      background: #95a5a6;
+    }
+  }
+
+  &cond:[else] {
+    .badge {
+      background: #cd7f32;
+    }
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      level: 1
+    }
+  }
+</script>
+```
+
+Conditions can also be nested, and combined with dynamic variables:
+
+```css
+&cond:[if="data.asd && data.asd == 10"] {
+  .status {
+    background: var(data.color);
+  }
+
+  &cond:[if="data.loggedIn"] {
+    .status {
+      border: 2px solid white;
+    }
+  }
+}
+```
+
+See [Style](#style) for an overview of component styling.
+
+---
+
+<a id="style-scope"></a>
+
+## Scope & Encapsulation
+
+## Light DOM
+
+Custom elements render **without** a Shadow DOM by default. In this mode the component's style sheet is adopted by the whole document, so a plain selector like `h1 { }` can affect matching elements anywhere on the page — not just inside the component. They are also affected by any stylesheet added to the main document, as long as they are not inside a shadow root.
+
+## Shadow DOM
+
+Adding the `isolated` attribute mounts the component with a Shadow Root instead. The style sheet is then scoped to that shadow root: the component's styles no longer leak to the page.
+
+> **Note:** Inherited styles from the document (for example `color` or `font` on `body`) still cascade into the component. Encapsulation only stops the component's own styles from leaking out.
+
+## Host
+
+The `:host` selector targets the component's own element. It is only available when the component is rendered with a Shadow Root, i.e. when its tag has the `isolated` attribute. Without `isolated` there is no Shadow Root, so a bare `:host { }` rule matches nothing.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <host-demo isolated></host-demo>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("host-demo.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:host-demo.html
+<html>
+  <p>I live inside a shadow root 🛡️</p>
+</html>
+
+<style>
+  /* Only applies when the component has the isolated attribute */
+  :host {
+    display: block;
+    padding: 16px;
+    border-radius: 8px;
+    background: #dfe6e9;
+  }
+
+  /* Covers both modes: :host (isolated) + host-demo (light DOM) */
+  :host, host-demo {
+    border: 2px solid #6c5ce7;
+  }
+
+  p {
+    color: #2d3436;
+  }
+</style>
+```
+
+To write a rule that works in **both** modes, repeat the selector with the component's tag name:
+
+```css
+:host, host-demo {
+  border: 2px solid #6c5ce7;
+}
+```
+
+- When `isolated` is present, `:host` matches the component element inside the shadow root.
+- When it is not, the `host-demo` selector matches the element in the light DOM.
+
+## Linking a CSS File
+
+You can link an external stylesheet from inside the component's template tag, or via `@import` at the beginning of the `<style>` tag. This is a clean way to share design tokens across components.
+
+Since Shadow DOM is off by default, a `:host {}` block inside the linked file only takes effect when the component uses the `isolated` attribute — otherwise define the tokens on `:root` (or on the component's tag name) so they apply in the light DOM.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <styled-comp isolated></styled-comp>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("styled-comp.html");
+      get("another-comp.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:styled-comp.html
+<html>
+  <link rel="stylesheet" href="tokens.css" />
+  <h1>Hello World!</h1>
+  <p>Greetings from {{data.name}}</p> 
+  <another-comp/>
+</html>
+
+<style>
+  h1 {
+    color: var(--s-color-accent);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      name: "simply.js"
+    }
+  }
+</script>
+```
+
+```html:another-comp.html
+<html>
+  <h1>Child component</h1>
+  <p>Greetings from child component</p> 
+</html>
+
+<style>
+  h1 {
+    color: var(--s-color-accent);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      name: "simply.js"
+    }
+  }
+</script>
+```
+
+```css:tokens.css
+:host {
+  --s-color-accent: #0984e3;
+  --s-color-bg: #dfe6e9;
+}
+```
+
+Because custom properties follow normal CSS inheritance, the tokens defined on the parent's `:host` cascade into every nested component's shadow root — that's why `another-comp` can use `var(--s-color-accent)` without loading `tokens.css` itself.
+
+- **Custom properties** (`--s-color-*`) cross the shadow boundary — inherited properties and custom properties pass through.
+- **Regular selectors** (`button { }`) do not — the shadow boundary still protects the child from the parent's other rules.
+- A child can **override** a token by redefining it on its own `:host`:
+
+```css
+:host {
+  --s-color-accent: red; /* overrides the inherited token for this subtree */
+}
+```
+
+See [Style](#style) for an overview of component styling.
+
+---
+
+<a id="router"></a>
+
+## Go
+
+**Go** is the full-featured SPA router of Simply JS, forked from **Page.js**. It’s tightly integrated with the template syntax and reactivity system.
+
+In addition to the default Page.js features, it supports **nested routes**, **dynamic route creation**, **enter/exit transitions**, auto **web component integration**. 
+
+Before anything else, you need to define a `<base>` tag in your HTML, like this:
+
+
+
+```html
+<base href="/simply/examples/page/">
+```
+
+Then, add the `<route>` placeholder in the `<body>` or inside a component.
+
+```html
+<body>
+	<route></route>
+</body>
+```
+
+After that, you are ready to define your routes.
+
+```js
+simply.go.setup(
+	{
+		transition: true,
+		stagger: 75,
+		preserveParams: ["mode"],
+		redirects: [
+			{
+				from: "/",
+				to: "/subpage/10"
+			}
+		]		
+	},
+	[
+		{
+			path: "/", // The path of the route
+			component: "home-page", // The component's tag name
+			isolated: true, // Default: false — use shadow DOM
+			cache: true, // Default: false — keep data/props in memory, restore on revisit
+			same_page_refresh: true, // Default: false — re-render on same-route navigation
+			title: "Home Page" // Sets the document title after routing
+		}
+	])
+```
+
+`simply.go.setup()` calls `simply.go()` for you — no extra init needed.
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+## Route via Code
+
+Use `simply.go("/about")` for that.
+
+## Redirection
+
+You can define a redirection when setup lie below.
+
+```js
+simply.go.setup(
+	{
+		redirects: [
+			{
+				from: "/",
+				to: "/subpage/10"
+			}
+		]		
+	},
+	[
+		...routes
+	])
+```
+
+## Replacing Current Route
+
+It's as easy as `simply.go.replace("new-path")`.
+
+## Cache
+
+Cache keeps a routed component's `data`/`props` in memory and restores them on revisit — no re-fetch.
+
+### Via router
+
+Recommended. Enable per route.
+
+```js
+simply.go.setup({}, [
+  { path: "/photos", component: "cache-photos", cache: true, title: "Photos" }
+])
+```
+
+This renders the component as `<cache-photos cache>` — the `cache` attribute is added automatically. You don't need to write it in your HTML.
+
+### Via component tag
+
+Anywhere, not only routes.
+
+```html
+<my-component cache></my-component>
+```
+
+### Check for restored data
+
+Framework restores `data`/`props` synchronously before `afterConstruct`. Check the generic `component.cache.data` (works for any cached field) in `afterConstruct` — if it exists, you were restored from cache and can skip fetching:
+
+```js
+class simply {
+  data = { photos: [], fetchedAt: "" }
+  methods = {
+    fetchPhotos() {
+      // fetch remote data, assign to data.photos / data.fetchedAt
+    }
+  }
+  lifecycle = {
+    afterConstruct() {
+      if (component.cache.data) {
+        // cache hit — data.photos already restored, no fetch needed
+        return;
+      }
+      methods.fetchPhotos();
+    }
+  }
+}
+```
+
+> **Note:** Cache is keyed by route path + element identity (`simply.cache[path][elementId]`). Framework uses `simply.ctx.path` (current route) as primary key — the stale `simply.lastPath` (previous route) is not used for restores at construction time.
+
+See `examples/08-go/cache/` for a live demo: initial visit fetches, second visit restores without network.
+
+## Nested Routes
+
+You can define child routes inside a `children` array. Nesting can be as deep as you want. Simply.js will look for a `<route></route>` tag inside the parent component to render the nested component. All properties available for top-level routes can also be applied to children.
+
+```js
+simply.go.setup([
+	{
+		path: "/component",
+		component: "company-page",
+		children: [
+			{
+				path: "/about",
+				component: "about-page"
+			},
+			{
+				path: "/contact",
+				component: "contact-page",
+				children: [
+					{
+						path: "/istanbul",
+						component: "contact-istanbul",
+					},
+					{
+						path: "/amsterdam",
+						component: "contact-amsterdam",
+					},
+				]
+			},
+		]
+	},
+	...
+]
+```
+
+## Detect Popstate
+
+You can detect if a route change was triggered by the browser's back/forward buttons by checking `ctx.state.popstate` (e.g. inside `lifecycle.routerEnter(ctx)` or via `simply.ctx.state.popstate`).
+
+## Same Page Refresh
+
+By default, when you click a link for the page you are already on, Simply will ignore it. Enable re-render on same-route navigation per route via `same_page_refresh`:
+
+```js
+simply.go.setup(
+	{
+		// global settings
+	},
+	[
+		{
+			path: "/",
+			component: "home-page",
+			root: document.querySelector("route"),
+			same_page_refresh: true,
+			title: "Home"
+		}
+	]
+)
+```
+
+## Carry Params Between Routes
+
+You may want to preserve URL parameters across all routes. You can enable this in settings when setop:
+
+```js 
+simply.go.setup(
+	{
+		preserveParams: ["mode", "utm"]		
+	},
+	[
+		...routes
+	])
+```
+
+For example, if you land on a page with parameters like `?mode=canvas&ts=1749752255326` and you want to carry them to another page, like `/other-page`, this feature is for you. When the user navigates to `/other-page`, the URL will become `/other-page?mode=canvas&ts=1749752255326`. This can be useful when developing a Framer plugin, where the `mode` parameter is essential.
+
+## Router Enter
+
+If a component is defined in your router definitions, you can run code when that route is entered, like this:
+
+```js
+class simply {
+	lifecycle = {
+		routerEnter(ctx) {
+			console.log("hello", ctx);
+		}
+	}
+}
+```
+
+`ctx` is the router's context object, and it contains all data related to the current route. 
+
+> **Warning:** **`ctx.query` is populated asynchronously.** The router fills `ctx.query` (via `simply.qs.parse`) in a `setTimeout`, so it may not be ready yet inside `routerEnter(ctx)`. If you need the query there, parse it directly from the URL instead:
+
+```js
+class simply {
+	lifecycle = {
+		routerEnter(ctx) {
+			state.query = simply.qs.parse(location.search.slice(1));
+		}
+	}
+}
+```
+
+## Reading URL Parameters
+
+You can access URL parameters at any time from anywhere in your code via `simply.ctx.params.id`.
+
+## Context
+
+After the first navigation, framework exposes two globals:
+
+| Global | What it holds | Example |
+|---|---|---|
+| `simply.ctx` | Current route's **Context** object — same `ctx` you receive in `routerEnter(ctx)` | `simply.ctx.path`, `simply.ctx.params`, … |
+| `simply.lastPath` | Previous route's **path string** (set at end of each navigation) | `"/photos"` → `"/about"` |
+
+Use `simply.ctx` for everything about the current route; use `simply.lastPath` only when you need the *previous* path (e.g. save scroll position).
+
+**`simply.ctx` fields (from `Context` constructor + router):**
+
+| Field | Type | Source | Description |
+|---|---|---|---|
+| `path` | `string` | `ctx.path` | Current path without base, e.g. `"/photos/2?foo=bar#sec"` → `"/photos/2"` (hash stripped, base stripped) |
+| `canonicalPath` | `string` | `ctx.canonicalPath` | Full path including base, e.g. `"/simply/examples/08-go/album/photos/2"` |
+| `pathname` | `string` | `ctx.pathname` | Decoded pathname without query/hash |
+| `params` | `object` | `ctx.params` | Route params, e.g. `{ page: "2" }` for `"/photos/:page"` |
+| `query` | `object` | `ctx.query` | Parsed query via `simply.qs.parse(location.search)` — set to `{}` if no query |
+| `querystring` | `string` | `ctx.querystring` | Raw querystring without `?`, e.g. `"foo=bar"` |
+| `hash` | `string` | `ctx.hash` | Fragment without `#`, e.g. `"sec"` for `#sec` |
+| `state` | `object` | `ctx.state` | History state — includes `state.path` (original `canonicalPath`) and `state.popstate` on back/forward |
+| `title` | `string` | `ctx.title` | `document.title` at navigation time |
+| `routePath` | `string` | `ctx.routePath` | Matched route pattern, e.g. `"/photos/:page"` |
+| `handled` | `boolean` | `ctx.handled` | Whether route was handled |
+| `params` | `object` | `simply.ctx.params` / `ctx.params` | Shorthand — same as above, accessible anywhere via `simply.ctx` |
+
+```js
+// Anywhere (component, console, utility)
+console.log(simply.ctx.path);        // "/photos/2"
+console.log(simply.ctx.params.page); // "2"
+console.log(simply.ctx.query);       // { foo: "bar" }
+console.log(simply.ctx.hash);        // "sec"
+console.log(simply.ctx.state.popstate); // true on back/forward
+console.log(simply.lastPath);        // "/photos" (previous route)
+```
+
+```js
+// Inside a routed component
+class simply {
+  lifecycle = {
+    routerEnter(ctx) {
+      // same object as simply.ctx
+      console.log(ctx.params, ctx.query, ctx.hash, ctx.state);
+    }
+  }
+}
+```
+
+## Hash
+
+The router parses the URL fragment into `ctx.hash` (without `#`) and does **not** scroll automatically — you decide where to scroll and how.
+
+Hash-only links (`/#a`, `#b`) on the **same path** are ignored by the router and fall back to native browser scrolling. Because the library renders components asynchronously, you may need to handle scrolling in the `routerEnter(ctx)` hook. 
+
+| Anchor location | Lookup |
+|---|---|
+| Shell (`<route>` outside, in index.html) | `document.getElementById(hash)` |
+| Component's own template | `dom.querySelector('#' + hash)` |
+| Nested child component | chain through `component.querySelector(...)` yourself |
+
+A robust pattern that covers both shell and component anchors:
+
+```js
+class simply {
+  lifecycle = {
+    routerEnter(ctx) {
+      if (!ctx.hash) return;
+      var el = dom.querySelector('#' + ctx.hash)        // inside this component
+            || document.getElementById(ctx.hash);       // or in the shell
+      if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }
+}
+```
+
+> **Note:** Use `behavior: 'instant'` if the target may re-render right after (smooth scroll can be interrupted). If your anchor is inside an `isolated` child, query its shadow root via `component.querySelector('child').shadowRoot.querySelector('#hash')`.
+
+Live demo: `examples/08-go/hash/` — shell anchors (`#a`/`#b`) use native scroll; `section?name=tana#subsection` navigates and scrolls via `routerEnter`.
+
+## Hashbang
+
+Hashbang mode puts all routes after `#!` in the URL (`/page/#!/about`) instead of using the History API path (`/page/about`). Everything after `#!` is client-side only — **no server rewrites needed**. Useful for static hosting, `file://` usage, or legacy environments.
+
+### Enabling via setup
+
+Set `hashbang: true` in the settings object:
+
+```js
+simply.go.setup(
+	{
+		hashbang: true
+	},
+	[
+		{ path: "/", component: "hashbang-index", title: "Hashbang" },
+		{ path: "/about", component: "hashbang-about", title: "About" },
+		{ path: "/contact/:contactName", component: "hashbang-contact", title: "Contact" },
+		{ path: "*", component: "hashbang-notfound", title: "Not Found" }
+	]
+)
+```
+
+URLs become:
+
+- `/about` → `/#!/about`
+- `/contact/me` → `#!/contact/me`
+- Query strings ride along: `/not-found?foo=bar` → `#!/not-found?foo=bar`
+
+### Notes
+
+- **`ctx.hash` is not parsed in hashbang mode:** the fragment *is* the route, so there is no separate anchor hash. The Context constructor only splits `#` when hashbang is off.
+- **Deep links work:** on load, `start()` reads `loc.hash` (`#!/contact/me`) and dispatches `/contact/me`.
+- **Root stays clean:** for `path === "/"`, pushState writes the plain canonical path without `#!`.
+
+Live demo: `examples/08-go/hashbang/`
+
+## Current Route
+
+Simply automatically adds a `go-active` attribute to any `<a>` tags that match the current route, including nested routes. This allows you to style active links without any extra JavaScript.
+
+For example, you can style the active link like this:
+
+```css
+a[go-active] {
+	opacity: .5;
+  pointer-events: none; /* Optional: disable clicks on the active link */
+}
+```
+
+## Transitions
+
+```js
+simply.go.setup( 
+  {
+    transition: true,
+  },
+  [...routes]
+)
+```
+
+When you set `transition` to `true` in the Go settings, Simply automatically adds an empty `enter` attribute to the root node of the component defined in the routes when the route enters, and removes it when the route exits. This lets you freely define enter and exit transitions in your component's CSS. Live example: `examples/08-go/nested/`.
+
+```css
+company-page > line {
+	width: 0;
+	
+	/* EXIT duration — shrink before the next route mounts */
+	transition: width 400ms ease-in-out;
+}
+
+company-page[enter] > line {
+	width: 100%;
+
+	/* ENTER duration — grow while the page appears */
+	transition: width 800ms cubic-bezier(.22, 1, .36, 1);
+}
+```
+
+With this setup the line grows from 0 → 100% (**800ms**) when entering, and shrinks back 100 → 0 (**400ms**) when exiting. Once the transition finishes, Simply switches to the next route.
+
+### How Simply times a transition
+
+After transition `[enter]`, simply collects the component plus all of its light-DOM descendants (`<route>` and `<style>` elements are skipped) and reads each element's computed `transition-duration` **and** `transition-delay`. It listens for `transitionend` on every element whose total is greater than zero, and only then mounts the next route. On **exit** there is also a fallback timer of `maxDuration + stagger delay`, so navigation never deadlocks if an event is missed.
+
+Two consequences:
+
+1. Every animated element must actually change a property between the `[enter]` and non-`[enter]` states — otherwise its `transitionend` never fires and Simply has to fall back to the timeout.
+2. The measured totals include delays, so a "small" element with a long delay can silently become the longest transition in the chain.
+
+### Adding fx animations to content elements
+
+You can fade/rise the content pieces together with the line by giving them a class and animating it:
+
+```html
+<h2 class="fx d1">{{data.title}}</h2>
+<p class="tagline fx d2">{{data.tagline}}</p>
+<nav class="links fx d3">...</nav>
+```
+
+```css
+/* 
+ * IMPORTANT: We must prevent transitions defined within a component 
+ * from leaking to parent or child components. If the component is 
+ * not isolated, we can achieve this by strictly using the child 
+ * combinator (>) to select the relevant elements. 
+ */
+company-page > .fx {
+	opacity: 0;
+	transform: translateY(8px);
+
+	/* EXIT: no delay */
+	transition: opacity .25s ease, transform .25s ease;
+}
+company-page[enter] > .fx {
+	opacity: 1;
+	transform: none;
+
+	/* ENTER: longer + delayed cascade is fine */
+	transition: opacity .45s ease, transform .45s cubic-bezier(.22, 1, .36, 1);
+}
+/* delays only in the [enter] state — exits stay snappy. */
+company-page[enter] > .fx.d1 { transition-delay: .12s; }
+company-page[enter] > .fx.d2 { transition-delay: .22s; }
+company-page[enter] > .fx.d3 { transition-delay: .32s; }
+```
+
+> **Warning:** Total duration of an exit fx inside a component must be less than its parent’s or container’s total duration to prevent animation cuts.
+
+
+### Empty nested outlets
+
+Nested hubs render a `<route></route>` outlet. To avoid an empty bordered box when no child route is active, hide empty outlets globally — one rule is enough since components are light DOM:
+
+```css
+route:empty { display: none; }
+```
+
+### Stagger
+
+You can also add a **stagger effect** for nested routes by setting a millisecond value in the settings, like this:
+
+```js
+simply.go.setup(
+	{
+		transition: true,
+		stagger: 75,
+	},
+	[
+		...routes
+	]
+)
+```
+
+This adds a small delay (in milliseconds) between transitions of nested routes, creating a smoother, cascading animation effect.
+
+---
+
+<a id="framer"></a>
+
+## Framer Integration with Simply.js
+
+## Contents
+
+- [Code Components](#code-components)
+  - [First Code Component](#your-first-code-component)
+  - [Supported Properties](#supported-property-types)
+  - [Writing Simply.js Components](#writing-a-simplyjs-component)
+  - [Using Props](#accessing-props)
+  - [Prevent Flicker (FOUC)](#prevent-flicker-fouc)
+  - [Mount Framer Components](#mount-framer-components-inside-simplyjs)
+  - [Component Interactions](#framer-component-interactions)
+  - [Collections](#collections)
+    - [Multiple Queries in Collections](#multiple-queries-for-collection-references)
+  - [Run Custom Code](#run-custom-code-in-framer)
+  - [Scroll Event Listener](#listen-scroll-event)
+  - [Multiple Instances on One Page](#multiple-simplyjs-instances-in-the-same-framer-page)
+  - [Links](#links)
+  - [Disable SSR](#disable-SSR)
+  - [Limitations](#limitations)
+- [Plugins](#plugins)
+
+You can use Simply.js to build Framer plugins and code components. This guide explains how to integrate Simply.js components within Framer and develop plugins using Simply.js.
+
+## Code Components
+
+To enable this integration, I developed a package called **Simply Loader**. This package loads Simply.js components within Framer code components inside an encapsulated environment. It also passes all properties, including component instances and collections, from Framer to your Simply.js component.
+
+### Your First Code Component
+
+To get started, import `SimplyLoader` and return it within your code component. Here is an example:
+
+```js
+import { addPropertyControls, ControlType } from "framer";
+import SimplyLoader from "https://framer.com/m/simplyLoader-YmpY.js";
+
+export default function myComponent(props) {
+  return <SimplyLoader {...props} />;
+}
+
+addPropertyControls(Testcomponent, {
+  simply: {
+    // Mandatory
+    type: ControlType.String,
+    displayTextArea: true,
+    description: "Simply.js component URL.",
+  },
+  scripts: {
+    // Optional
+    type: ControlType.Array,
+    control: {
+      type: ControlType.String,
+      displayTextArea: true,
+    },
+  },
+});
+```
+
+- **`simply`** is required and should point to the URL of your Simply.js component.
+- **`scripts`** is optional and allows you to inject additional scripts.
+
+All Framer property types are supported and accessible inside your Simply.js component via the `props` variable.
+
+### Supported Property Types
+
+- `string`: `ControlType.String`
+- `boolean`: `ControlType.Boolean`
+- `number`: `ControlType.Number`
+- `color`: `ControlType.Color`
+- `array`: `ControlType.Array`
+- `date`: `ControlType.Date`
+- `file`: `ControlType.File`
+- `image`: `ControlType.ResponsiveImage`
+- `enum`: `ControlType.Enum`
+- `object`: `ControlType.Object`
+- `transition`: `ControlType.Transition`
+- `link`: `ControlType.Link`
+- `padding`: `ControlType.Padding`
+- `borderRadius`: `ControlType.BorderRadius`
+- `border`: `ControlType.Border`
+- `shadow`: `ControlType.BoxShadow`
+- `cursor`: `ControlType.Cursor`
+- `font`: `ControlType.Font`
+- `alignX`: `ControlType.Enum`
+- `alignY`: `ControlType.Enum`
+- `component`: `ControlType.ComponentInstance`
+- `collection`: `ControlType.Array`
+
+For details, refer to [Framer’s official property controls docs](https://www.framer.com/developers/property-controls).
+
+### Writing a Simply.js Component
+
+Example:
+
+```html
+<html>
+  {props.message}
+</html>
+```
+
+Save this on a public server and set its URL in the `simply` property in Framer.
+
+> **Note:** If a CORS error occurs, Simply.js will attempt to fetch the file using a proxy. A random parameter is also added to the URL to prevent caching and always fetch the latest version.
+
+The value of the message property is passed to our Simply.js component.
+
+<img src="docs/images/framer-hello-world.jpg">
+
+### Accessing Props
+
+All properties defined in your Framer code component are accessible from within your Simply.js component. When any of these properties change in Framer, the corresponding values in your Simply.js component are automatically updated.
+
+Additionally, you can monitor property changes by defining a special method named `framerPropsUpdated()` within your component. Here's how:
+
+```html
+<html>
+  <h1>Reach the props!</h1>
+  <p>{props.message}</p>
+</html>
+
+<script>
+  class simply {
+    lifecycle = {
+      framerPropsUpdated() {
+        console.log("Props updated!", props);
+      },
+    };
+  }
+</script>
+```
+
+### Prevent Flicker (FOUC)
+
+To prevent flickering (Flash of Unstyled Content) during loading, use a conditional based on property availability or set a `data.ready` flag.
+
+```html
+<html>
+  <if cond="data.ready">
+    <h1>Reach the props!</h1>
+    <p>{props.message}</p>
+  </if>
+</html>
+
+<script>
+  class simply {
+    data = {
+      ready: false,
+    };
+    lifecycle = {
+      framerPropsUpdated() {
+        console.log("Props updated!", props);
+      },
+    };
+  }
+</script>
+```
+
+OR
+
+```html
+<if cond="props.message">
+  <p>{props.message}</p>
+</if>
+```
+
+This prevents the user from experiencing flickering of pre-compiled content, including curly braces, during page loading.
+
+### Mount Framer Components inside Simply.js
+
+When you bind a component instance (such as a component, collection, or frame) to a property in your Framer code component, you can mount that instance inside your Simply.js component.
+
+To achieve this, use a special tag in your HTML: `<framer-component path="props.component">`. The `path` attribute should point to the property where the component is assigned in Framer.
+
+For example, if you have connected a component to your code component as follows:
+
+```js
+import { addPropertyControls, ControlType } from "framer";
+import SimplyLoader from "https://framer.com/m/simplyLoader-YmpY.js";
+
+export default function MountComponent(props) {
+  return <SimplyLoader {...props} />;
+}
+
+addPropertyControls(MountComponent, {
+  simply: {
+    type: ControlType.String,
+    displayTextArea: true,
+    description: "Simply.js component URL",
+  },
+  component: {
+    type: ControlType.ComponentInstance,
+  },
+});
+```
+
+<img src="docs/images/mount-component.jpg">
+
+You can then mount it in your Simply.js component using this code:
+
+```html
+<html>
+  <h1>Mount Component</h1>
+  <framer-component path="props.component"></framer-component>
+</html>
+```
+
+When this is done, Simply Loader will locate the React component and mount it inside the `<framer-component path="props.component">` tag. All styles, fonts, and even hover or overlay effects will be preserved. In preview mode, your Framer component will be fully rendered within the Simply.js environment.
+
+<img src="docs/images/mount-component-preview.gif">
+
+> **Note:** 💡 The mounted component will not be affected by Simply.js’s reactive engine or re-renders.
+
+You can also access additional data about the component through the `props` object. It will look like this:
+
+```js
+{
+  "open": true,
+  "component": ["html string of the component"],
+  "height": "100%",
+  "id": "Cs8UvUQCp",
+  "simply": "https://fehmi.ozuseven.com/framer/components/mount-component.html",
+  "style": {
+    "height": "100%",
+    "width": "100%"
+  },
+  "width": "100%",
+  "isOnCanvas": false
+}
+```
+
+After each mount, Framer executes a function named `framerComponentMounted()` defined within the `lifecycle` of your Simply.js component. You can handle it as follows:
+
+```html
+<html>
+  <h1>Mount Component 2</h1>
+  <framer-component path="props.component"></framer-component>
+</html>
+
+<style></style>
+
+<script>
+  class simply {
+    lifecycle = {
+      framerComponentMounted(framerComponent) {
+        console.log("framer component mounted", framerComponent);
+      },
+    };
+  }
+</script>
+```
+
+### Framer Component Interactions
+
+Variants and their interactions, such as `hover` and `click`, will function automatically. You may also want to detect the current variant state when a component is clicked. You can use `framerComponentClicked(framerComponent)` for this purpose. Here is an example:
+
+```html
+<html>
+  <h1>Interaction</h1>
+  <framer-component path="props.component" id="myComp"></framer-component>
+</html>
+
+<script>
+  class simply {
+    lifecycle = {
+      framerComponentClicked(framerComponent) {
+        var variant =
+          framerComponent.getAttribute("data-framer-name") || "default";
+        console.log(
+          "this one clicked baby",
+          framerComponent,
+          "turned to ",
+          variant
+        );
+      },
+    };
+  }
+</script>
+```
+
+<img src="docs/images/framer-interactions.gif">
+
+### Collections
+
+You can also connect collections as component instances in Framer. These are special instances that include additional information, accessible through `props` in your Simply.js component.
+
+Mounting functions exactly as described above. All entries in the collection will be returned and mounted automatically. It is up to you to filter or display them as needed within your Simply.js component. You can use the `framerPropsUpdated()` hook to manage this.
+
+<img src="docs/images/mount-collection.jpg">
+
+You will also receive additional useful data when mounting a collection, which will be available in the `props` object as shown below:
+
+```js
+{
+  decodedQueryData: [
+    {
+      "Categories": [],
+      "Category": "AsAmBReo9",
+      "Content": "<p>content</p>",
+      "Count": 34,
+      "Featured": false,
+      "File": "https://framerusercontent.com/assets/doOdgR64Pal5raWCAxqcSFeVEs.jpg",
+      "Gallery": [
+        // Gallery images
+      ],
+      "Image": {
+        "src": "https://framerusercontent.com/images/doOdgR64Pal5raWCAxqcSFeVEs.jpg",
+        "srcSet": "https://framerusercontent.com/images/doOdgR64Pal5raWCAxqcSFeVEs.jpg 1600w",
+        "pixelWidth": 1600,
+        "pixelHeight": 1200
+      },
+      "Link": {
+        "webPageId": "T5iu82oix"
+      },
+      "Next": {
+        "Title": "Getting Started Copy",
+        "Slug": "getting-started-copy",
+        "Content": "<p>content</p>",
+        "Link": {
+          // example link
+        },
+        "Image": {
+          // example image
+        }
+      },
+      "Option": "Option 2",
+      "Previous": null,
+      "Slug": "getting-started-copy-copy",
+      "Title": "Getting Started Copy Copy",
+      "id": "eKWosqAED",
+      "color": "rgb(191, 0, 255)"
+    }
+    // ...other items
+  ],
+  el: [...], // html strings of collection items
+  from: {...}, // collection data for internal queries
+  limit: {...}, // limit info, always get all
+  queryData: [...], // encoded query data, similar to decodedQueryData
+  select: [ // identifiers to select entries with from node
+    {name: 'bvaSsPg31', type: 'Identifier'}
+    {name: 'liNndhvu5', type: 'Identifier'}
+    {name: 'oYZHvIA9G', type: 'Identifier'}
+    ...
+  ]
+}
+```
+
+Simply.js will also insert all this data into the corresponding DOM elements as attributes, as illustrated below.
+
+<img src="docs/images/dom-attributes.png">
+
+#### Multiple Queries for Collection References
+
+You may notice that the `category` and `categories` fields in the decoded items are empty or contain encoded data. This is because these values originate from reference collections.
+
+To include them properly, instead of defining a single component instance, define an array of component instances. Then, add the reference collections immediately after the main collection instance in that array.
+
+```js
+collection: {
+    type: ControlType.Array,
+    description: "Add collection and its references.",
+    control: {
+        type: ControlType.ComponentInstance,
+    },
+},
+```
+
+<img src="docs/images/multiple-queries2.jpg">
+
+After this, the encoded or empty values in `props` will be replaced with decoded real data retrieved from the reference collections.
+
+Since multiple collections are queried, the main data will now be available under an array named `multipleQueries` within `props`.
+
+<img src="docs/images/multiple-queries.jpg">
+
+Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom Simply.js components, apply any desired filters, and create custom layouts for rendering.
+
+> **Note:** Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom Simply.js components, apply any desired filters, and create custom layouts for rendering. ⚡ This setup also supports localization — all data is automatically filtered and provided based on the user's or site's current language preference within `props`.
+
+### Run Custom Code In Framer
+
+Another powerful feature allows you to send custom JavaScript code from Simply.js to execute within the parent Framer component via Simply Loader. This is easily achieved using Simply.js's built-in `component.runInFramer(codeToRun)` function. Here's an example:
+
+```html
+<html>
+  <h1>Run In Framer</h1>
+  <if cond="data.result"> Result: {data.result} </if>
+</html>
+
+<script>
+  class simply {
+    lifecycle = {
+      runInFramerResult(result) {
+        data.result = JSON.stringify(result);
+        console.log("the result", result);
+      },
+      afterConstruct() {
+        var codeToRun = function () {
+          var data;
+          if (!isOnCanvas) {
+            const queryData = getCmsQueryData(props.collection[0]);
+            data = useQueryData({
+              ...queryData.query,
+              select: queryData.query.select,
+            });
+          } else {
+            data = "can't query on canvas";
+          }
+
+          // this is optionally where we return data
+          useEffect(() => {
+            component.lifecycle.runInFramerResult(data);
+          }, [data]);
+        };
+
+        setTimeout(() => {
+          component.runInFramer(codeToRun);
+        }, 1000);
+      },
+    };
+  }
+</script>
+```
+
+The line `component.lifecycle.runInFramerResult(data);` within the `useEffect` hook passes the collected data back into your current Simply.js `component`. Here, `component` refers to your Simply.js component instance, and calling its method allows you to send data to any function defined within its `methods`.
+
+> The following variables and hooks are available inside the Framer component’s runtime scope:
+>
+> - `React`
+> - `props`
+> - `useQueryData`
+> - `getCmsQueryData`
+> - `useEffect`
+> - `useMemo`
+> - `useState`
+> - `useRef`
+> - `useCurrentLocation`
+> - `useLocaleInfo`
+> - `useRouter`
+> - `renderToString`
+> - `iframeRef`
+> - `componentNameRef`
+> - `processedProps`
+> - `originalProps`
+> - `setRenderThisTemporarily`
+> - `renderThisTemporarily`
+> - `isOnCanvas`
+> - `component`
+
+### Listen Scroll Event
+
+To listen for scroll events from Framer within your Simply.js component, define a method named `framerOnScroll()` inside your component's `lifecycle` block.
+
+Here’s how to set it up:
+
+```js
+class simply {
+  lifecycle = {
+    framerOnScroll(data) {
+      console.log(data);
+    },
+  };
+}
+```
+
+The `data` object you receive will contain detailed scroll information, structured as follows:
+
+```json
+{
+  "clientHeight": 477,
+  "clientWidth": 936,
+  "originalEvent": {
+    "isTrusted": true,
+    "type": "scroll",
+    "target": "document",
+    "currentTarget": null,
+    "eventPhase": 0,
+    "bubbles": false,
+    "cancelable": false,
+    "defaultPrevented": false,
+    "composed": false
+  },
+  "scrollBottom": 230,
+  "scrollHeight": 1000,
+  "scrollLeft": 0,
+  "scrollRight": -15,
+  "scrollTop": 293,
+  "scrollWidth": 921
+}
+```
+
+This data can be used to trigger actions based on scroll position, such as detecting when the user is near the bottom of the page.
+
+### Multiple Simply.js instances in a same Framer page
+
+The powerful features extend further. You can also create multiple Simply.js components on the same Framer page and enable them to communicate with each other.
+
+<img src="docs/images/multiple-simply-instances.gif">
+
+To send a message to other Simply.js instances, use the code below. This will broadcast the message to all Simply.js instances on the current page, excluding the sender.
+
+```js
+      sendMessage() {
+        window.parent.postMessage({
+          method: 'simply-message',
+          name: dom.tagName.toLowerCase(),
+          uid: component.uid,
+          message: "hello world!"
+        }, '*')
+```
+
+Then, in other instances, you can listen for messages as follows:
+
+```js
+window.addEventListener("message", function (e) {
+  if (e.data.method == "simply-message" && e.data.name == "masonry-layout") {
+    // do anything you want with it
+    data.message = e.data.message;
+  }
+});
+```
+
+### Links
+
+All links within mounted components or collections will function seamlessly. Simply.js intercepts click events and forwards them to Framer's internal router. You can also make any link in your Simply.js component trigger Framer navigation by adding the `route-framer` attribute, as shown:
+
+```html
+<a href="./somepage" route-framer>Go!</a>
+```
+
+This will trigger routing within Framer and open the corresponding page.
+
+### Disable SSR
+
+When the breakpoint changes due to a window resize or a property update, you may experience the component unmounting and remounting with a momentary flash effect. This behavior is caused by Server-Side Rendering (SSR). You can disable SSR and prevent this by implementing the following:
+
+```js
+export default function Voltron(props) {
+  if (!window) return null;
+  return <SimplyLoader {...props} />;
+}
+```
+
+OR
+
+```js
+export default function Voltron(props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
+
+  return <SimplyLoader {...props} />;
+}
+```
+
+---
+
+## Plugins
+
+You can easily develop Framer plugins using Simply.js. As a proof of concept, you can refer to my latest plugin: [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager/preview/).
+
+<img src="docs/images/framer-plugin.webp" alt="Image Alt Manager Preview" />
+
+> **Warning:** This section of the documentation will soon be updated with a boilerplate you can start from.
+
+---
+
+<a id="electron"></a>
+
+## Electron Integration
+
+Simply works inside Electron out of the box. The key is **hashbang routing** (`hashbang: true`): routes live after `#!` in the URL, so everything works on the `file://` protocol — no server, no rewrites.
+
+A complete runnable example lives in `examples/electron/` (main process + app folder). Run it with:
+
+```bash
+cd examples/electron
+npm install
+npm start
+```
+
+### index.html
+
+Point the `<base>` tag at `index.html`. simply.js reads this tag and sets the router base from it, so every route resolves against `index.html` on any protocol. With this base, links must start with `/`.
+
+```html
+<head>
+  <base href="index.html">
+</head>
+```
+
+### Router setup
+
+Load your components, then enable hashbang in `setup()` settings:
+
+```js
+get("home.html");
+get("about.html");
+get("contact.html");
+get("not-found.html");
+
+simply.go.setup(
+  {
+    hashbang: true
+  },
+  [
+    { path: "/", component: "home", title: "Home" },
+    { path: "/about", component: "about", title: "About" },
+    { path: "/contact/:contactName", component: "contact", title: "Contact" },
+    { path: "*", component: "not-found", title: "Not Found" }
+  ]
+);
+```
+
+### Links
+
+Links start with `/` — the router turns them into `index.html#!/…` URLs automatically:
+
+```html
+<a href="/">Home</a>
+<a href="/about">About</a>
+<a href="/contact/kim">Contact Kim</a>
+```
+
+Resulting URLs look like:
+
+```
+file:///…/app/index.html#!/about
+file:///…/app/index.html#!/contact/kim
+```
+
+> **Note:** Deep links work too: opening `index.html#!/contact/kim` directly renders the contact route with `ctx.params.contactName = "kim"`.
+
+### Notes
+
+- **Keep `<base>` pointing at a file (`index.html`), not a directory:** with hashbang routing the router prepends the base to route paths; a directory base would produce broken URLs.
+- **No server needed:** `hashbang: true` makes all navigation happen in the fragment, which is why this setup is ideal for Electron's `file://` loading via `win.loadFile()`.
+- **Component fetching:** simply.js loads `.html` components with `fetch()`. On `file://`, either launch Electron with `webSecurity: false` for local development or serve components through a custom protocol for production.
+
+Live demo: `examples/09-electron/`
+
+That completes the setup!
+
+---
+
+<a id="chrome"></a>
+
+## Chrome Extension Integration
+
+Simply works inside a Chrome extension (Manifest V3). The key is the same **hashbang routing** (`hashbang: true`) used by the [Electron integration](#electron): routes live after `#!` in the URL, so everything works on the `chrome-extension://` protocol — no server, no rewrites.
+
+One extra step is required: MV3 extension pages **cannot** use `'unsafe-eval'`, but simply.js needs `eval`/`new Function` to render templates. The solution is to run the app inside a **sandboxed page** — sandboxed pages get a separate, lenient CSP that allows `'unsafe-eval'`.
+
+A complete runnable example lives in `examples/11-chrome/`. Load it unpacked from `chrome://extensions` (enable **Developer mode** → **Load unpacked** → select the folder).
+
+### manifest.json
+
+The popup is declared via `action.default_popup`. The simply.js app lives in `sandbox.html`, which is listed under `sandbox.pages`. The `content_security_policy.sandbox` value is the default sandbox CSP — it allows `'unsafe-eval'`:
+
+```json
+{
+  "manifest_version": 3,
+  "name": "Simply.js Popup",
+  "version": "1.0.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Simply.js"
+  },
+  "sandbox": {
+    "pages": ["sandbox.html"]
+  },
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self'"
+  }
+}
+```
+
+> **Warning:** **Do not put `'unsafe-eval'` in `extension_pages`.** Chrome rejects the manifest at load time (`Insecure CSP value "'unsafe-eval'"`). The sandbox CSP is the only place `'unsafe-eval'` is allowed.
+
+### popup.html
+
+The popup itself is a normal extension page (no `eval` needed) — it just hosts the sandboxed app in an iframe:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    iframe { width: 640px; height: 500px; border: none; }
+  </style>
+</head>
+<body>
+  <iframe src="sandbox.html"></iframe>
+</body>
+</html>
+```
+
+### sandbox.html
+
+The simply.js app runs here. Point the `<base>` tag at `sandbox.html` — simply.js reads this tag and sets the router base from it, so every route resolves against `sandbox.html` on the `chrome-extension://` protocol. With this base, links must start with `/`.
+
+MV3 blocks **inline scripts** on extension pages, so the setup lives in an external file (`sandbox.js`):
+
+```html
+<head>
+  <base href="sandbox.html">
+</head>
+<body>
+  <div class="shell">
+    <h1>Simply in Chrome</h1>
+    <div class="links">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/contact/kim">Contact Kim</a>
+    </div>
+    <route></route>
+  </div>
+
+  <script src="simply.js"></script>
+  <script src="sandbox.js"></script>
+</body>
+```
+
+### Router setup
+
+Load your components, then enable hashbang in `setup()` settings — exactly like the [Electron example](#electron):
+
+```js
+get("chrome-home.html");
+get("chrome-about.html");
+get("chrome-contact.html");
+get("chrome-notfound.html");
+
+simply.go.setup(
+  {
+    hashbang: true
+  },
+  [
+    { path: "/", component: "chrome-home", title: "Home" },
+    { path: "/about", component: "chrome-about", title: "About" },
+    { path: "/contact/:contactName", component: "chrome-contact", title: "Contact" },
+    { path: "*", component: "chrome-notfound", title: "Not Found" }
+  ]
+);
+```
+
+### Links
+
+Links start with `/` — the router turns them into `chrome-extension://…/sandbox.html#!/…` URLs automatically:
+
+```html
+<a href="/">Home</a>
+<a href="/about">About</a>
+<a href="/contact/kim">Contact Kim</a>
+```
+
+Resulting URLs look like:
+
+```
+chrome-extension://<id>/sandbox.html#!/about
+chrome-extension://<id>/sandbox.html#!/contact/kim
+```
+
+### Using chrome.* APIs from the sandbox
+
+Sandboxed pages have a unique origin and **no access to `chrome.*` APIs**. To use them, talk to `popup.html` via `postMessage` and let the popup call the APIs.
+
+`popup.html` (a normal extension page) listens for messages from the sandbox iframe and calls `chrome.storage` on its behalf. MV3 blocks inline scripts on extension pages, so the bridge lives in an external file (`popup.js`):
+
+```js
+// popup.js
+const iframe = document.querySelector("iframe");
+
+window.addEventListener("message", (event) => {
+  if (event.source !== iframe.contentWindow) return;
+  const { type, key, value, id } = event.data || {};
+
+  if (type === "storage:get") {
+    chrome.storage.local.get(key, (result) => {
+      iframe.contentWindow.postMessage({ type: "storage:get:result", id, value: result[key] }, "*");
+    });
+  } else if (type === "storage:set") {
+    chrome.storage.local.set({ [key]: value }, () => {
+      iframe.contentWindow.postMessage({ type: "storage:set:done", id }, "*");
+    });
+  }
+});
+```
+
+```html
+<!-- popup.html -->
+<iframe src="sandbox.html"></iframe>
+<script src="popup.js"></script>
+```
+
+On the sandbox side, small helpers (`bridge.js`) wrap the `postMessage` round-trip in promises:
+
+```js
+function storageGet(key) {
+  return new Promise((resolve) => {
+    const id = Math.random().toString(36).slice(2);
+    const onMessage = (event) => {
+      if (event.data && event.data.type === "storage:get:result" && event.data.id === id) {
+        window.removeEventListener("message", onMessage);
+        resolve(event.data.value);
+      }
+    };
+    window.addEventListener("message", onMessage);
+    window.parent.postMessage({ type: "storage:get", key, id }, "*");
+  });
+}
+
+function storageSet(key, value) {
+  return new Promise((resolve) => {
+    const id = Math.random().toString(36).slice(2);
+    const onMessage = (event) => {
+      if (event.data && event.data.type === "storage:set:done" && event.data.id === id) {
+        window.removeEventListener("message", onMessage);
+        resolve();
+      }
+    };
+    window.addEventListener("message", onMessage);
+    window.parent.postMessage({ type: "storage:set", key, value, id }, "*");
+  });
+}
+```
+
+### Restoring the last route
+
+A popup is destroyed when it closes, so the next open starts at `/`. To reopen on the last route, save `simply.ctx.path` on navigation and restore it before starting the router:
+
+```js
+// sandbox.js
+storageGet("route").then((savedRoute) => {
+  simply.go.setup({ hashbang: true }, [ /* routes */ ]);
+  if (savedRoute && savedRoute !== "/") simply.go(savedRoute);
+});
+
+// Save the route whenever it changes (a component is rendered into <route>).
+let lastSavedRoute = null;
+new MutationObserver(() => {
+  const path = simply.ctx && simply.ctx.path;
+  if (path && path !== lastSavedRoute) {
+    lastSavedRoute = path;
+    storageSet("route", path);
+  }
+}).observe(document.querySelector("route"), { childList: true, subtree: true });
+```
+
+### Persisting state across popup opens
+
+A popup is destroyed when it closes, so component `data`/state is lost. To keep it, save to `chrome.storage` (via the bridge) and restore on open.
+
+Component `data`/`state`/`props` are **ObservableSlim proxies** — serializing them directly would recurse forever. Unwrap them with `__getTarget` to get the plain object:
+
+```js
+const plain = JSON.parse(JSON.stringify(data.__getTarget));
+```
+
+The example's `chrome-counter` shows the minimal boilerplate: it saves its count on every change and restores it in `afterConstruct`. You decide what to save and when — there's no automatic session system:
+
+```js
+class simply {
+  data = { count: 0 }
+  methods = {
+    increment() {
+      data.count++;
+      storageSet("count", data.count);   // save what you want, when you want
+    }
+  }
+  lifecycle = {
+    afterConstruct() {
+      storageGet("count").then((value) => {
+        if (typeof value === "number") data.count = value;   // restore manually
+      });
+    }
+  }
+}
+```
+
+For more complex state, serialize the whole `data`/`state`/`props` with `__getTarget` and restore by assigning through the proxies:
+
+```js
+// save
+storageSet("my-component", {
+  data: JSON.parse(JSON.stringify(data.__getTarget)),
+  state: JSON.parse(JSON.stringify(state.__getTarget))
+});
+
+// restore (in afterConstruct)
+storageGet("my-component").then((saved) => {
+  if (!saved) return;
+  Object.assign(data, saved.data);
+  Object.assign(state, saved.state);
+});
+```
+
+> **Note:** There's no built-in session persistence — save/restore is left to you so you control exactly what survives a popup close/reopen.
+
+Try it: open the popup, go to **Counter**, click `+1` a few times, close the popup, reopen it — the count is restored.
+
+Live demo: `examples/11-chrome/`
+
+That completes the setup!
+
+---
+
+<a id="agents-agents"></a>
+
+## Agents & AI
+
+> This section explains how AI agents — LLMs, coding assistants, and agentic browser tools — can interact with Simply.js. All content here is a work in progress; endpoints and URLs marked as `TBD` are placeholders to be filled in as the backend is developed.
+
+Simply.js exposes two main surfaces for AI agents:
+
+## 1. Documentation Access
+
+AIs can pull the full documentation as machine-friendly input instead of crawling the site.
+
+- [AI Docs](ai-docs.md) — the documentation access URL and the planned single, complete Markdown version of the entire documentation for AI consumption.
+
+## 2. REPL API
+
+Programmatic access to the REPL's saved examples — listing, searching, saving, and reading them by id.
+
+- [REPL API](repl-api.md) — endpoints for listing (with pagination), searching by keyword, saving new examples, and reading an example by id.
+
+---
+
+## Planned Capabilities
+
+| Capability | Status |
+| --- | --- |
+| Single complete Markdown doc for AIs | TBD |
+| List saved examples (pagination) | TBD |
+| Search saved examples by keyword | TBD |
+| Save a new example | TBD |
+| Read an example by id | TBD |
+
+---
+
+## Design Goals (for AI consumers)
+
+- **`curl`-friendly** — every endpoint should be callable with a plain `curl` from the terminal, no auth required (unless rate-limiting requires a key).
+- **JSON everywhere** — consistent JSON request/response bodies, UTF-8 encoded.
+- **Browser-ready URLs** — responses for saved examples include a URL an agentic browser tool can open directly.
+- **No scraping needed** — the single Markdown doc is designed so an LLM can ingest the entire library in one fetch.
+
+> **Note:** Everything on this page is a placeholder until the backend work lands. When endpoints are finalized, the `TBD` values below will be replaced with concrete URLs, parameters, and examples.
+
+---
+
+<a id="agents-ai-docs"></a>
+
+## AI Docs Access
+
+> Placeholder — the single complete Markdown version is planned but not yet generated.
+
+This page describes how AI agents can access the Simply.js documentation. The goal is a **single, complete Markdown file** covering the entire library, so an LLM can ingest everything in one request instead of crawling dozens of pages.
+
+## Current Documentation Site
+
+The interactive docs (for humans) live at:
+
+```
+https://simply.js.org/
+```
+
+- Human-readable, multi-page, docsify-based.
+- Suitable for browsing, not ideal for LLM ingestion (many pages, navigation, embedded demos).
+
+## Single Markdown Version (Planned)
+
+> TBD — URL not finalized yet.
+
+Once generated, AIs will fetch the entire documentation from one URL:
+
+```
+https://simply.js.org/docs/ai/simply.md   <!-- TBD -->
+```
+
+**Planned characteristics:**
+
+| Field | Value |
+| --- | --- |
+| URL | `TBD` |
+| Format | Single Markdown file (`.md`) |
+| Content | All doc pages concatenated: component syntax, template, style, script, lifecycle, reactivity, state, router, REPL API, etc. |
+| Encoding | UTF-8 |
+| Caching | Stable — content changes infrequently, safe for AIs to cache |
+
+**Planned table of contents (sections that will be included):**
+
+1. Getting Started
+2. Component Syntax (Structure, Template, Style, Script)
+3. Template Syntax (Variables, Conditionals, Loops, DOM Events, Nested Components, Slot)
+4. Script Syntax (Load Components, Communication, Lifecycle, Reactivity, State)
+5. Style (Variables, Conditions, Scope & Encapsulation)
+6. Router
+7. Integrations (Framer, Electron)
+8. REPL API (see [REPL API](repl-api.md))
+
+## Suggested Usage for AI Agents
+
+```bash
+# Fetch the entire library documentation in one shot (TBD)
+curl https://simply.js.org/docs/ai/simply.md   <!-- TBD -->
+```
+
+Then feed the response directly into the model context as a reference.
+
+> TODO: Generate the single Markdown file from the docs source and publish it. The URL above is a placeholder.
+
+---
+
+<a id="agents-repl-api"></a>
+
+## REPL API
+
+> Placeholder — the new REPL backend endpoints are planned but not yet implemented. All URLs, parameters, and response shapes below are **TBD** and will be filled in as development lands.
+
+The REPL API gives AI agents programmatic access to examples saved via the [REPL](https://simply.js.org/#/playground) playground. Every response is designed to be agent-friendly: JSON bodies, `curl`-callable, and including a browser-ready URL that agentic browser tools can open directly.
+
+## Base URL
+
+```
+https://simply.js.org/api/repl   <!-- TBD -->
+```
+
+## Common Response Format (Planned)
+
+All successful responses return JSON with a consistent envelope:
+
+```json
+{
+  "success": true,
+  "data": { },
+  "meta": { }
+}
+```
+
+Errors return a consistent shape with an HTTP status code:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "string",
+    "message": "human readable message"
+  }
+}
+```
+
+> TODO: Finalize and document status codes (200/201/400/404/500), CORS policy, and any rate limiting.
+
+---
+
+## 1. List Examples (with pagination)
+
+List saved REPL examples, newest first.
+
+**Endpoint** (TBD):
+
+```
+GET /api/repl/examples
+```
+
+**Query parameters (planned):**
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| `page` | number | `1` | Page number (1-based). |
+| `limit` | number | `20` | Number of items per page (max `TBD`). |
+| `sort` | string | `newest` | `newest` or `oldest`. |
+
+**Response (planned):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "examples": [
+      {
+        "id": "string",
+        "title": "string",
+        "files": [ "index.html" ],
+        "createdAt": "ISO-8601",
+        "replUrl": "https://simply.js.org/#/playground?<id>",
+        "browserUrl": "https://simply.js.org/#/playground?<id>"
+      }
+    ]
+  },
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 123,
+    "totalPages": 7
+  }
+}
+```
+
+**Example request (planned):**
+
+```bash
+curl "https://simply.js.org/api/repl/examples?page=1&limit=20"
+```
+
+> TODO: Define the exact fields returned per example (id, title, file names, timestamps, URLs).
+
+---
+
+## 2. Search Examples by Keyword
+
+Search saved examples whose title or file contents match a keyword.
+
+**Endpoint** (TBD):
+
+```
+GET /api/repl/examples/search
+```
+
+**Query parameters (planned):**
+
+| Param | Type | Required | Description |
+| --- | --- | --- | --- |
+| `q` | string | yes | Keyword to search for. |
+| `page` | number | no | Page number (default `1`). |
+| `limit` | number | no | Items per page (default `20`). |
+
+**Response (planned):** same shape as [List Examples](#1-list-examples-with-pagination), with `examples` filtered to matches.
+
+**Example request (planned):**
+
+```bash
+curl "https://simply.js.org/api/repl/examples/search?q=router"
+```
+
+> TODO: Decide whether search is case-insensitive, whether it covers file contents or only titles, and which fields are highlighted.
+
+---
+
+## 3. Save a New Example
+
+Create a new REPL example and get back its URLs.
+
+**Endpoint** (TBD):
+
+```
+POST /api/repl/examples
+```
+
+**Request — `application/json` body (planned):**
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `title` | string | yes | Example title. |
+| `files` | array | yes | Array of files, each with `filename` and `content`. |
+| `files[].filename` | string | yes | e.g. `index.html`. |
+| `files[].content` | string | yes | Raw file content. |
+| `selected` | boolean | no | Which file is selected on load (default `false`). |
+
+**Response (planned):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "string",
+    "title": "string",
+    "replUrl": "https://simply.js.org/#/playground?<id>",
+    "browserUrl": "https://simply.js.org/#/playground?<id>"
+  }
+}
+```
+
+The response includes **two URLs for agentic use:**
+
+| Field | Purpose |
+| --- | --- |
+| `replUrl` | The REPL page URL where the example is loaded in the editor. |
+| `browserUrl` | A browser-ready URL for **agentic browser tools** — open this to render the example and inspect it. |
+
+**Example request (planned):**
+
+```bash
+curl -X POST "https://simply.js.org/api/repl/examples" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Hello World",
+    "files": [
+      { "filename": "index.html", "content": "<h1>Hello</h1>", "selected": true }
+    ]
+  }'
+```
+
+> TODO: Decide whether `replUrl` and `browserUrl` differ, and confirm the response `Content-Type` and HTTP status (`201 Created`).
+
+---
+
+## 4. Read an Example by ID
+
+Fetch a single saved example by its id.
+
+**Endpoint** (TBD):
+
+```
+GET /api/repl/examples/{id}
+```
+
+**Path parameters (planned):**
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `id` | string | The example id returned by the save endpoint or list. |
+
+**Response (planned):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "string",
+    "title": "string",
+    "files": [
+      {
+        "filename": "index.html",
+        "content": "<h1>Hello</h1>",
+        "selected": true
+      }
+    ],
+    "createdAt": "ISO-8601",
+    "replUrl": "https://simply.js.org/#/playground?<id>",
+    "browserUrl": "https://simply.js.org/#/playground?<id>"
+  }
+}
+```
+
+**Errors (planned):** `404` with `error.code: "not_found"` if the id does not exist.
+
+**Example request (planned):**
+
+```bash
+curl "https://simply.js.org/api/repl/examples/<id>"
+```
+
+---
+
+## Suggested Additions (nice-to-have)
+
+These are extra capabilities that would make the API even more useful for AI agents — not yet confirmed:
+
+- **Delete endpoint** — `DELETE /api/repl/examples/{id}` to clean up test examples.
+- **Update endpoint** — `PATCH /api/repl/examples/{id}` to edit an existing example.
+- **Batch fetch** — `GET /api/repl/examples?ids=a,b,c` to fetch several examples in one request.
+- **Rendered HTML preview** — a URL that returns the compiled HTML so agents can verify output without a browser.
+- **Content-Type negotiation** — allow `Accept: application/json` for JSON and optional raw text responses.
+- **Auth / rate limiting** — if the public API needs protection, document the mechanism (API key, IP limit) here.
+- **CORS policy** — document allowed origins so browser-based agents can call the API client-side.
+
+---
+
+> TODO: Replace all `TBD` values above with the finalized endpoint URLs, parameter names, and response shapes once the REPL backend is implemented.
+
+---
+
+<a id="components-s-icon"></a>
+
+## Iconify
+
+The icon component is a wrapper around beautiful [Iconify](https://docs.iconify.design/iconify-icon/#attributes) web-component. The purpose of the wrapper is to be able to use custom styles in the future and make curation with selected icons for a brend new UI kit and design system.
+
+You can use all official attributes of Iconify component in the icon component like this:
+
+> _Interactive component demo on the docs site (not reproduced in this text export)._
+
+
+
+> _Interactive live demo on the docs site (not reproduced in this text export)._
+
+- mode, string sets icon rendering mode. Seee rendering modes. (svg, style, bg, mask)
+- inline, boolean changes vertical alignment. See vertical alignment. (style="vertical-align: -0.125em" or inline attribute)
+- width, string | number icon width. See icon dimensions.
+- height, string | number icon height. See icon dimensions.
+- flip, string flip icon. See icon transformations.
+- rotate, number | string rotates icon. See icon transformations.
+
+## Icon Browsers
+
+[Iconify](https://icon-sets.iconify.design/)
+[Icones](https://icones.js.org/)

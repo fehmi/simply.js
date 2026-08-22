@@ -49,6 +49,3 @@
   - [Agents & AI](docs/agents/agents.md)
   - [AI Docs](docs/agents/ai-docs.md)
   - [REPL API](docs/agents/repl-api.md)
-
-- <br>Components
-  - [Icon](docs/components/s-icon.md)

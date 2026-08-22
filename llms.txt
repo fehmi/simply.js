@@ -1,0 +1,59 @@
+# Simply.js
+
+> Zero-dependency web-component library for building interactive UIs with plain HTML, CSS and JavaScript. Single-file components (`<html>`/`<style>`/`<script>` in one `.html` file), a reactive template engine, router and state management. No compiler, bundler, or build step — everything runs directly in the browser.
+
+Use this file to decide which page(s) to fetch. Every link is a plain Markdown file you can `curl`/fetch directly — this is a static site, no JavaScript execution required to read the docs. For one-shot ingestion of the whole library, fetch [llms-full.txt](https://simply.js.org/llms-full.txt) instead of crawling page by page.
+
+## Introduction
+- [About](https://simply.js.org/docs/): What simply.js is, design goals, and how it works.
+- [Getting Started](https://simply.js.org/docs/getting-started.md): Add the script tag, create your first component, serve it locally.
+
+## Component Syntax
+- [Structure](https://simply.js.org/docs/component-structure.md): The `<html>`/`<style>`/`<script>` single-file component format.
+- [Template](https://simply.js.org/docs/template.md): The template tag and what the template engine supports.
+- [Style](https://simply.js.org/docs/style.md): The `<style>` tag: scoping, variables, conditions.
+- [Script](https://simply.js.org/docs/script.md): The `<script>` tag: the `class simply { ... }` shape.
+
+## Template Syntax
+- [Variables](https://simply.js.org/docs/variables.md): Reactive `{{ }}` variables: data, props, state, methods, etc.
+- [Conditionals](https://simply.js.org/docs/conditionals.md): Conditional rendering in templates.
+- [Each Loops](https://simply.js.org/docs/loops.md): `each` loops over arrays/objects in templates.
+- [DOM Events](https://simply.js.org/docs/dom-events.md): Binding DOM events (`onclick`, etc.) in templates.
+- [Nested Components](https://simply.js.org/docs/nested-components.md): Composing components inside components.
+- [Slot](https://simply.js.org/docs/slot.md): Slot-based content projection.
+
+## Script Syntax
+- [Load Components](https://simply.js.org/docs/loadcomponent.md): Loading/registering components with `get()`.
+- [Component Communication](https://simply.js.org/docs/component-communication.md): Parent/child communication patterns.
+- [Props](https://simply.js.org/docs/props.md): Passing props into components.
+- [Lifecycle](https://simply.js.org/docs/lifecycle.md): Component lifecycle hooks.
+- [Reactivity](https://simply.js.org/docs/reactivity.md): How the reactive data layer works.
+- [State Management](https://simply.js.org/docs/state.md): Cross-component state management.
+
+## Style
+- [Variables](https://simply.js.org/docs/style-variables.md): CSS variables driven by component state.
+- [Conditions](https://simply.js.org/docs/style-conditions.md): Conditional CSS classes/styles.
+- [Scope & Encapsulation](https://simply.js.org/docs/style-scope.md): Style scoping and Shadow DOM encapsulation.
+
+## Router
+- [Go (Router)](https://simply.js.org/docs/router.md): The `go` client-side router.
+
+## Integrations
+- [Framer](https://simply.js.org/docs/framer.md): Using simply.js inside Framer.
+- [Electron](https://simply.js.org/docs/electron.md): Using simply.js inside Electron apps.
+- [Chrome](https://simply.js.org/docs/chrome.md): Using simply.js to build Chrome extensions.
+
+## Agents
+- [Agents & AI](https://simply.js.org/docs/agents/agents.md): Overview of how AI agents/LLMs can consume these docs and (planned) APIs.
+- [AI Docs](https://simply.js.org/docs/agents/ai-docs.md): Where to fetch machine-readable docs (this file's own index).
+- [REPL API](https://simply.js.org/docs/agents/repl-api.md): Planned REPL API for programmatic example access (TBD, not live yet).
+
+## Components
+- [Icon](https://simply.js.org/docs/components/s-icon.md): The built-in `<s-icon>` component (Iconify wrapper).
+
+## Optional
+
+- [Full documentation, single file](https://simply.js.org/llms-full.txt): the entire library documentation concatenated into one Markdown file.
+- [Examples gallery](https://simply.js.org/docs/examples.md): links to the runnable examples in the `examples/` folder of the repo.
+- [Playground](https://simply.js.org/docs/playground.md): in-browser REPL to try simply.js without setting up a project.
+- [Source repository](https://github.com/fehmi/simply.js): source code, issues, and the `examples/` folder referenced above.
