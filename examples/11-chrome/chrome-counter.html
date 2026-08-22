@@ -1,0 +1,72 @@
+<html>
+<div class="panel current">
+  <strong>Persistent Counter</strong>
+  <p class="muted small" style="margin:8px 0 0">
+    Count: <code>{{data.count}}</code>
+    <button onclick="methods.increment()">+1</button>
+  </p>
+  <p class="muted small" style="margin:8px 0 0">
+    Saved to <code>chrome.storage</code> via the popup bridge — close and reopen the popup to see it persist.
+  </p>
+</div>
+</html>
+
+<style>
+  chrome-counter {
+    display: block;
+    font-family: system-ui, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+  .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+    margin: 16px 0;
+  }
+  .panel.current {
+    border-color: #3b82f6;
+    background: #f8fafc;
+  }
+  .muted { color: #64748b; }
+  .small { font-size: 12px; }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    margin-left: 8px;
+  }
+  button:hover { background: #1e293b; }
+</style>
+
+<script>
+  class simply {
+    data = {
+      count: 0
+    }
+    methods = {
+      increment() {
+        data.count++;
+        storageSet("count", data.count);
+      }
+    }
+    lifecycle = {
+      afterConstruct() {
+        storageGet("count").then((value) => {
+          if (typeof value === "number") data.count = value;
+        });
+      }
+    }
+  }
+</script>

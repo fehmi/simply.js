@@ -1,0 +1,236 @@
+<html>
+
+<head>
+	<title>Nested — simply.go</title>
+	<base href="/simply/examples/08-go/nested/">
+	<meta charset="UTF-8">
+</head>
+
+<body>
+	<div class="shell">
+		<nav class="crumb">
+			<a href="../">« Examples</a> <span>Nested</span>
+		</nav>
+		<h1>Nested Routes</h1>
+		<p class="intro">
+			<code>simply.go.setup()</code> with <code>transition</code> + <code>stagger</code> — routes render into <code>&lt;route&gt;</code> and nested levels cascade in one by one.
+		</p>
+
+		<div class="panel">
+			<div class="links">
+				<a href="./">home</a>
+				<a href="project/20">project</a>
+				<a href="agency">agency</a>
+				<a href="agency/contact/istanbul">istanbul</a>
+				<a href="company">company</a>
+				<a href="company/products/mac">mac</a>
+				<a href="unknown">404</a>
+			</div>
+		</div>
+
+		<div class="stage">
+			<route></route>
+		</div>
+	</div>
+
+	<style>
+		body {
+			margin: 0;
+			font-family: system-ui, sans-serif;
+			color: #1e293b;
+			line-height: 1.6;
+		}
+		.shell {
+			max-width: 640px;
+			margin: 0 auto;
+			padding: 24px;
+		}
+		h1 {
+			font-size: 28px;
+			margin: 0 0 8px;
+			color: #3b82f6;
+		}
+		.intro {
+			color: #64748b;
+			margin: 0 0 24px;
+		}
+		.crumb {
+			font-size: 13px;
+			margin-bottom: 12px;
+			color: #64748b;
+		}
+		.crumb a {
+			color: #3b82f6;
+			text-decoration: none;
+		}
+		.crumb span {
+			margin-left: 8px;
+		}
+		.panel {
+			border: 1px solid #e2e8f0;
+			border-radius: 12px;
+			padding: 16px;
+			background: #f8fafc;
+			margin: 16px 0;
+		}
+		.links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px 16px;
+		}
+		.links a {
+			color: #0f172a;
+		}
+		.links a[go-active] {
+			color: #3b82f6;
+			font-weight: 600;
+		}
+		.stage {
+			border: 1px dashed #cbd5e1;
+			border-radius: 12px;
+			padding: 16px;
+			background: #f8fafc;
+			min-height: 120px;
+		}
+		code {
+			background: #f1f5f9;
+			padding: 2px 6px;
+			border-radius: 4px;
+			font-size: 12px;
+		}
+
+		/* light DOM: one global rule is enough — empty outlets shouldn't render as empty boxes */
+		route:empty {
+			display: none;
+		}
+	</style>
+
+	<script src="../../../simply.js"></script>
+	<script>
+		get("my-app.html");
+		get("home-page.html");
+		get("project-page.html");
+		get("agency-page.html");
+		get("sub-page3.html");
+		get("contact-page.html");
+		get("contact-istanbul.html");
+		get("contact-amsterdam.html");
+		get("company-page.html");
+		get("products-page.html");
+		get("iphone-page.html");
+		get("mac-page.html");
+		get("not-found.html");
+		get("about-page.html");
+		get("info-page.html");
+
+		simply.go.setup( 
+			{
+				transition: true,
+				stagger: 75,
+				redirects: [
+					/*
+					{
+						from: "/",
+						to: "/subpage/10"
+					}
+					*/
+				]
+			},
+			[
+				{
+					path: "/",
+					component: "home-page",
+					isolated: false,
+					cache: true,
+					root: document.querySelector("route"),
+					same_page_refresh: false,
+					title: "Home page",
+				},
+				{
+					path: "/project/:id",
+					component: "project-page",
+					isolated: false,
+					cache: false,
+					root: document.querySelector("route"),
+					title: "Project",
+				},
+				{
+					path: "/agency",
+					component: "agency-page",
+					isolated: false,
+					cache: true,
+					title: "Agency",
+					children: [
+						{
+							path: "/about",
+							component: "about-page",
+							title: "Agency > About",
+						},
+						{
+							path: "/contact",
+							component: "contact-page",
+							isolated: false,
+							title: "Agency > Contact",
+							children: [
+								{
+									path: "/istanbul",
+									component: "contact-istanbul",
+									cache: true,
+									title: "Agency > Contact > Istanbul",
+								},
+								{
+									path: "/amsterdam",
+									component: "contact-amsterdam",
+									title: "Agency > Contact > Amsterdam",
+								},
+							]
+						},
+					]
+				},
+				{
+					path: "/company",
+					component: "company-page",
+					isolated: false,
+					cache: true,
+					same_page_refresh: false,
+					title: "Company",
+					children: [
+						{
+							path: "/info",
+							component: "info-page",
+							title: "Company > Info",
+						},
+						{
+							path: "/products",
+							component: "products-page",
+							isolated: false,
+							title: "Company > Products",
+							children: [
+								{
+									path: "/iphone",
+									component: "iphone-page",
+									cache: true,
+									title: "Company > Products > Iphone",
+								},
+								{
+									path: "/mac",
+									component: "mac-page",
+									title: "Company > Products > Mac",
+								},
+							]
+						},
+					]
+				},
+				{
+					path: "*",
+					component: "not-found",
+					isolated: false,
+					root: document.querySelector("route"),
+					title: "404 Not Found",
+				},
+			])
+
+	</script>
+</body>
+
+</html>

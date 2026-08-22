@@ -6,11 +6,11 @@
 - <br>Component Syntax
 
   - [Structure](docs/component-structure.md)
-  - [HTML](docs/html.md)
+  - [Template](docs/template.md)
   - [Style](docs/style.md)
   - [Script](docs/script.md)
 
-- <br>Template Engine
+- <br>Template Syntax
 
   - [Variables](docs/variables.md)
   - [Conditionals](docs/conditionals.md)
@@ -23,13 +23,16 @@
 
   - [Load Components](docs/loadcomponent.md)
   - [Component Communication](docs/component-communication.md)
+  - [Props](docs/props.md)
   - [Lifecycle](docs/lifecycle.md)
   - [Reactivity](docs/reactivity.md)
   - [State Management](docs/state.md)
 
 - <br>Style
 
-  - [Design Tokens](docs/design-tokens.md)
+  - [Variables](docs/style-variables.md)
+  - [Conditions](docs/style-conditions.md)
+  - [Scope & Encapsulation](docs/style-scope.md)
 
 - <br>Router
 
@@ -39,6 +42,13 @@
 
   - [Framer](docs/framer.md)
   - [Electron](docs/electron.md)
+  - [Chrome](docs/chrome.md)
+
+- <br>Agents
+
+  - [Agents & AI](docs/agents/agents.md)
+  - [AI Docs](docs/agents/ai-docs.md)
+  - [REPL API](docs/agents/repl-api.md)
 
 - <br>Components
   - [Icon](docs/components/s-icon.md)

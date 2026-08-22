@@ -1,0 +1,121 @@
+<html>
+<h1>Props</h1>
+<p class="intro">Values passed as attributes on a component tag become <code>props</code> in the child — reactive, typed, and accessible in template, style, and script. Complex objects are passed via <code>simply.objToPropString()</code> wrapped in single quotes.</p>
+
+<h2>String / Number / Boolean</h2>
+<div class="panel">
+  <div class="actions">
+    <button onclick="data.title = 'Title #' + (Math.floor(Math.random()*900)+100)">Randomize title</button>
+    <button onclick="data.count++">Count ++ ({{data.count}})</button>
+    <button onclick="data.enabled = !data.enabled">Toggle enabled ({{data.enabled}})</button>
+    <button onclick="data.message = data.message === 'Hello from parent' ? 'Updated from parent ✦' : 'Hello from parent'">Toggle message</button>
+  </div>
+  <p class="muted small">Inline attributes: <code>title="..."</code> <code>count="..."</code> <code>enabled="..."</code> <code>message="..."</code></p>
+  <props-card title="{{data.title}}" message="{{data.message}}" count="{{data.count}}" enabled="{{data.enabled}}" settings='{{simply.objToPropString(data.settings)}}' .haydar="{{true}}" hamdi="1"></props-card>
+</div>
+
+<h2>Object via <code>simply.objToPropString</code></h2>
+<div class="panel">
+  <p>Theme: <strong>{{data.settings.theme}}</strong> · Items: <strong>{{data.settings.items.join(", ")}}</strong></p>
+  <div class="actions">
+    <button onclick="methods.toggleTheme()">Toggle theme</button>
+    <button onclick="methods.addItem()">Add item</button>
+    <button onclick="methods.removeItem()">Remove item</button>
+  </div>
+  <p class="muted small">Passed as <code>settings='{{"{{"}}simply.objToPropString(data.settings){{"}}"}}'</code> — single quotes are required for objects/arrays.</p>
+</div>
+
+<h2>Notes</h2>
+<ul class="notes">
+  <li><code>props.title</code> — read a prop in template or script; overridden by <code>props = { ... }</code> in the child class if defined.</li>
+  <li>Any type works: <code>String</code>, <code>Number</code>, <code>Boolean</code>, <code>Object</code>, <code>Array</code>, even <code>Function</code>.</li>
+  <li>Changing the parent's <code>data.*</code> re-renders the child with the new prop values — fully reactive.</li>
+</ul>
+</html>
+
+<style>
+  :host {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(data.color);
+  }
+  .intro {
+    color: #64748b;
+    margin: 0 0 24px;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(data.color);
+    color: #0f172a;
+  }
+  p { margin: 8px 0; }
+  .muted { color: #64748b; }
+  .small { font-size: 13px; }
+  .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #f8fafc;
+    margin: 12px 0;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover { background: #1e293b; }
+  .notes {
+    padding-left: 20px;
+    margin: 8px 0;
+    color: #334155;
+  }
+  .notes li { margin: 4px 0; }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      title: "From parent",
+      message: "Hello from parent",
+      count: 3,
+      enabled: true,
+      color: "#3b82f6",
+      settings: {
+        theme: "dark",
+        items: [1, 2, 3]
+      }
+    }
+    methods = {
+      toggleTheme() { data.settings.theme = data.settings.theme === 'dark' ? 'light' : 'dark'; },
+      addItem() { data.settings.items = [...data.settings.items, data.settings.items.length + 1]; },
+      removeItem() { data.settings.items = data.settings.items.slice(0, -1); }
+    }
+  }
+</script>

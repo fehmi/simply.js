@@ -1,29 +1,72 @@
 # Style
 
-Encapsulated style definitions only affect elements within the component's template tag. However, there is one exception: inherited styles from the document can affect all child components. For example, if you define the `color` property of the `body` as `red` in the root document (index.html), then the text of all components within that document will be `red` unless otherwise defined within a component's style tag. Here is an example:
+The `<style>` tag of a component is processed by Simply.js' own style engine, which extends plain CSS with reactive values and conditions:
 
-<repl-component id="56ezen3ypsn2w7v" download="true"></repl-component>
+- **Dynamic variables** — inject reactive values with `var(data.color)`, `var(state.deg)` or any expression.
+- **Conditions** — toggle rule blocks with `&cond:[if="..." ]`, `&cond:[elsif="..." ]` and `&cond:[else]`.
 
-### Styling Component Container
+Everything else behaves like standard CSS, including native custom properties such as `var(--my-token)`.
 
-To style the component's container from within the component itself, you can use the `:host` selector. You can also define your CSS variables within it.
+?> By default components render **without** Shadow DOM, so `:host` only works when the `isolated` attribute is present. See [Scope & Encapsulation](docs/style-scope.md).
 
-<repl-component id="bzr1zokh1i7udmw" download="true"></repl-component>
+## A Simple Example
 
-### Link a CSS file
+Styles defined inside a component's `<style>` tag style the template rendered by the component.
 
-You can link a CSS file inside the component's template tag as follows. Since the external CSS file you import contains CSS variables within its `:host{}` section, these variables will be available to the current component and all its children. This is a good approach for maintaining your design tokens.
+<details>
+  <summary><ins>Live demo</ins></summary>
+  <repl-component id="kpryxkvrikhsij6"/>
+</details>
 
-<repl-component id="xugiyk48m90e56s" download="true"></repl-component>
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <styled-box></styled-box>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("styled-box.html");
+    </script>
+  </body>
+</html>
+```
 
-### JavaScript Variables
+```html:styled-box.html
+<html>
+  <h1>Hello from the style tag!</h1>
+</html>
 
-One of the key advantages of styling is the ability to use reactive JavaScript variables within style tags. The syntax is as follows: `color: "{data.color}";` and `width: "{data.width ? data.width : '100%'}";`.
+<style>
+  h1 {
+    color: var(data.color);
+    font-family: sans-serif;
+  }
 
-?> Remember to enclose the variable name within apostrophes, like `"{data.color}"`.
+  &cond:[if="data.big"] {
+    h1 {
+      font-size: 64px;
+    }
+  }
+</style>
 
-### Conditions
+<script>
+  class simply {
+    data = {
+      color: "#6c5ce7",
+      big: true
+    }
+  }
+</script>
+```
 
-You can also use Simply.js conditions, as shown in the example below.
+!> Reactive CSS is more expensive than reactive HTML: every change re-renders the whole layout. Modern browsers are very fast, but use it cautiously — prefer static CSS and native custom properties (`var(--token)`) where possible.
 
-<repl-component id="g8ey7ye01fp3g5z" download="true"></repl-component>
+---
+
+## Learn More
+
+- [Style Variables](docs/style-variables.md) — reactive `var(...)` expressions
+- [Style Conditions](docs/style-conditions.md) — `&cond:[...]` blocks
+- [Scope & Encapsulation](docs/style-scope.md) — `isolated`, `:host`, linking CSS files

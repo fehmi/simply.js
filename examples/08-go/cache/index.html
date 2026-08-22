@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cache — simply.go</title>
+  <base href="/simply/examples/08-go/cache/">
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div class="shell">
+    <nav class="crumb">
+      <a href="../">« Examples</a> <span>Cache</span>
+    </nav>
+    <h1>Cache</h1>
+    <p class="intro">
+      Route <code>cache</code> — revisit a cached component and it restores <code>data</code> without re-fetching. Initial render fetches remote data; second visit reads from <code>cache.data</code> in <code>afterConstruct</code>. Uses Album's <code>picsum.photos</code> endpoint.
+    </p>
+
+    <div class="panel">
+      <h2>Navigate</h2>
+      <div class="links">
+        <a href="./">/</a>
+        <a href="./photos">Photos (cache)</a>
+        <a href="./about">About (no cache)</a>
+      </div>
+      <p class="muted small">
+        Go to Photos → leave to About → back to Photos. Second visit should be instant (cached).
+      </p>
+    </div>
+
+    <route></route>
+  </div>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .shell {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: #3b82f6;
+    }
+    .intro {
+      color: #64748b;
+      margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #3b82f6;
+      color: #0f172a;
+    }
+    .crumb {
+      font-size: 13px;
+      margin-bottom: 12px;
+      color: #64748b;
+    }
+    .crumb a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .crumb span {
+      margin-left: 8px;
+    }
+    .panel {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      margin: 16px 0;
+    }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .links a {
+      color: #0f172a;
+    }
+    .links a[go-active] {
+      color: #3b82f6;
+      font-weight: 600;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .muted {
+      color: #64748b;
+    }
+    .small {
+      font-size: 12px;
+    }
+  </style>
+
+  <script src="../../../simply.js"></script>
+  <script>
+    get("cache-home.html");
+    get("cache-photos.html");
+    get("cache-about.html");
+    get("cache-notfound.html");
+
+    simply.go.setup(
+      {},
+      [
+        { path: "/", component: "cache-home", title: "Cache — Home" },
+        { path: "/photos", component: "cache-photos", cache: true, title: "Cache — Photos" },
+        { path: "/about", component: "cache-about", title: "Cache — About" },
+        { path: "*", component: "cache-notfound", title: "Cache — Not Found" }
+      ]
+    );
+  </script>
+</body>
+</html>

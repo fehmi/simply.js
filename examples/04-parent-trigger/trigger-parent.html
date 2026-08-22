@@ -1,0 +1,147 @@
+<html>
+<div class="parent-card">
+  <h3>Parent — <code>trigger-parent</code></h3>
+  <p class="muted small">This component is <code>isolated</code> — <code>props.label</code> / <code>props.count</code> come from the root. It can also read and write the root's data directly via <code>parent.data.*</code>.</p>
+
+  <div class="grid">
+    <div class="field">
+      <span class="label">props.label (root → parent)</span>
+      <strong>{{props.label}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">props.count (root → parent)</span>
+      <strong>{{props.count}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.data.name (root data)</span>
+      <strong>{{parent.data.name}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.data.counter (root counter)</span>
+      <strong>{{parent.data.counter}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">own data.note</span>
+      <strong>{{data.note}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.state.color</span>
+      <span class="color-badge" style="background: {{parent.state.color}}">{{parent.state.color}}</span>
+    </div>
+  </div>
+
+  <div class="slot-box">
+    <span class="slot-label">slot</span>
+    <slot></slot>
+  </div>
+
+  <div class="actions">
+    <button onclick="parent.data.name = 'Parent → ' + Date.now().toString().slice(-4)">Change root name from parent</button>
+    <button onclick="parent.data.counter++">Root counter ++ (from parent)</button>
+    <button onclick="data.note = 'Parent note @ ' + new Date().toLocaleTimeString()">Change own note</button>
+  </div>
+
+  <trigger-child></trigger-child>
+</div>
+</html>
+
+<style>
+  trigger-parent {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .parent-card {
+    border: 2px solid #3b82f6;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #f8fafc;
+    margin: 16px 0;
+  }
+  h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: #0f172a;
+  }
+  .muted { color: #64748b; }
+  .small { font-size: 13px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .field {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  strong {
+    font-size: 14px;
+    color: #0f172a;
+  }
+  .color-badge {
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .slot-box {
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fff;
+    margin: 12px 0;
+    position: relative;
+  }
+  .slot-label {
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    background: #f8fafc;
+    padding: 0 6px;
+    font-size: 11px;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0 6px;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button:hover { background: #1e293b; }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      note: "Parent's local note"
+    }
+  }
+</script>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hash — simply.go</title>
+  <base href="/simply/examples/08-go/hash/">
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div class="shell">
+    <nav class="crumb">
+      <a href="../">« Examples</a> <span>Hash</span>
+    </nav>
+    <h1>Hash</h1>
+    <p class="intro">
+      <code>ctx.hash</code> / <code>ctx.querystring</code> / <code>ctx.query</code> via <code>simply.go.setup()</code> + <code>&lt;route&gt;</code>.
+    </p>
+
+    <div class="panel">
+      <h2>Navigate</h2>
+      <div class="links">
+        <a href="./">/</a>
+        <a href="./#a">#a (hash only — native scroll)</a>
+        <a href="./#b">#b (hash only — native scroll)</a>
+        <a href="./section">section</a>
+        <a href="./section?name=tana">section?name=tana</a>
+        <a href="./section?name=tana#subsection">section?name=tana#subsection</a>
+      </div>
+    </div>
+
+    <div class="panel" id="hash-anchors">
+      <h2>Hash anchors</h2>
+      <p id="a" class="anchor"><strong>A</strong> — hash <code>#a</code> scrolls here <a href="#top">↑ top</a></p>
+      <p id="b" class="anchor"><strong>B</strong> — hash <code>#b</code> scrolls here <a href="#top">↑ top</a></p>
+      <p class="muted small">
+        These anchors live in the shell (outside <code>&lt;route&gt;</code>), so hash-only links work via native scroll. Router ignores hash-only navigation on the same path — see <code>simply.js</code> <code>if (!this._hashbang && this._samePath(el) && (el.hash …)) return;</code>
+      </p>
+    </div>
+
+    <route></route>
+  </div>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .shell {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: #3b82f6;
+    }
+    .intro {
+      color: #64748b;
+      margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #3b82f6;
+      color: #0f172a;
+    }
+    .crumb {
+      font-size: 13px;
+      margin-bottom: 12px;
+      color: #64748b;
+    }
+    .crumb a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .crumb span {
+      margin-left: 8px;
+    }
+    .panel {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      margin: 16px 0;
+    }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .links a {
+      color: #0f172a;
+    }
+    .links a[go-active] {
+      color: #3b82f6;
+      font-weight: 600;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .muted {
+      color: #64748b;
+    }
+    .small {
+      font-size: 12px;
+    }
+    .anchor {
+      margin: 10px 0;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .anchor a {
+      float: right;
+      font-size: 13px;
+    }
+  </style>
+
+  <script src="../../../simply.js"></script>
+  <script>
+    get("hash-index.html");
+    get("hash-section.html");
+    get("hash-notfound.html");
+
+    simply.go.setup({}, [
+      { path: "/", component: "hash-index", title: "Hash" },
+      { path: "/:section", component: "hash-section", title: "Hash — Section" },
+      { path: "*", component: "hash-notfound", title: "Hash — Not Found" }
+    ]);  </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Go — Router Examples — simply</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+      background: #fff;
+    }
+    .wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: #3b82f6;
+    }
+    .intro {
+      color: #64748b;
+      margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #3b82f6;
+      color: #0f172a;
+    }
+    p {
+      margin: 8px 0;
+    }
+    .muted { color: #64748b; }
+    .small { font-size: 13px; }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .card {
+      display: block;
+      text-decoration: none;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      background: #f8fafc;
+      color: inherit;
+      transition: border-color 150ms, background 150ms;
+    }
+    .card:hover {
+      border-color: #3b82f6;
+      background: #fff;
+    }
+    .card strong {
+      display: block;
+      font-size: 14px;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .card span {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .card code {
+      font-size: 11px;
+    }
+    .full { grid-column: 1 / -1; }
+    .note {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      margin-top: 16px;
+    }
+    .note strong {
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Go — Router Examples</h1>
+    <p class="intro">
+      Simply's SPA router (<code>simply.go</code>, forked from Page.js). Each example is a standalone page — open them directly. See <a href="../../docs/router.md">docs/router.md</a> for API.
+    </p>
+
+    <h2>Core</h2>
+    <div class="grid">
+      <a class="card" href="basic/">
+        <strong>Basic</strong>
+        <span>params, redirect, <code>*</code> catch-all + <code>ctx.query</code> — the minimal setup</span>
+      </a>
+      <a class="card" href="album/">
+        <strong>Album</strong>
+        <span>paginated <code>:page</code> param</span>
+      </a>
+    </div>
+
+    <h2>Patterns</h2>
+    <div class="grid">
+      <a class="card" href="cache/">
+        <strong>Cache</strong>
+        <span><code>cache: true</code> — restore <code>data</code> on revisit</span>
+      </a>
+    </div>
+
+    <h2>Navigation</h2>
+    <div class="grid">
+      <a class="card" href="hash/">
+        <strong>Hash</strong>
+        <span><code>ctx.hash</code> / <code>ctx.querystring</code></span>
+      </a>
+      <a class="card" href="hashbang/">
+        <strong>Hashbang</strong>
+        <span><code>hashbang: true</code></span>
+      </a>
+      <a class="card" href="nested/">
+        <strong>Nested ★</strong>
+        <span><code>simply.go.setup()</code> + <code>&lt;route&gt;</code> + children</span>
+      </a>
+    </div>
+
+    <div class="note">
+      <strong>Note</strong>
+      <p class="small muted" style="margin:6px 0 0">All examples use <code>simply.go</code> (not <code>page.*</code>). Legacy <code>page.*</code> calls were migrated — see each folder's <code>app.js</code> / <code>index.html</code>. The canonical Simply example is <code>nested/</code>.</p>
+    </div>
+  </div>
+</body>
+</html>

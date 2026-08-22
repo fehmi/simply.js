@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simply — Electron</title>
+  <meta charset="UTF-8">
+  <!--
+    <base> pointing at index.html is the old-API trick:
+    simply.js reads this tag and sets the router base to it, so every
+    route resolves against index.html on any protocol (file:// included).
+    With this base, links must start with "/" (e.g. href="/about").
+  -->
+  <base href="index.html">
+</head>
+<body>
+  <div class="shell">
+    <h1>Simply in Electron</h1>
+    <p class="intro">Basic navigation + <code>hashbang: true</code> — routes live after <code>#!</code>, so routing works on the <code>file://</code> protocol without a server.</p>
+
+    <div class="panel">
+      <h2>Navigate</h2>
+      <div class="links">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact/kim">Contact Kim</a>
+        <a href="/nope">Missing (→ *)</a>
+      </div>
+      <p class="muted small" style="margin:8px 0 0">URLs become <code>index.html#!/about</code>, <code>index.html#!/contact/kim</code> etc.</p>
+    </div>
+
+    <route></route>
+  </div>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .shell {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: #3b82f6;
+    }
+    .intro {
+      color: #64748b;
+      margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #3b82f6;
+      color: #0f172a;
+    }
+    .panel {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      margin: 16px 0;
+    }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .links a {
+      color: #0f172a;
+    }
+    .links a[go-active] {
+      color: #3b82f6;
+      font-weight: 600;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .muted {
+      color: #64748b;
+    }
+    .small {
+      font-size: 12px;
+    }
+  </style>
+
+  <!-- simply.js lives at the repo root: app/ → electron/ → examples/ → root -->
+  <script src="../../../simply.js"></script>
+  <script>
+    get("electron-home.html");
+    get("electron-about.html");
+    get("electron-contact.html");
+    get("electron-notfound.html");
+
+    simply.go.setup(
+      {
+        hashbang: true
+      },
+      [
+        { path: "/", component: "electron-home", title: "Home" },
+        { path: "/about", component: "electron-about", title: "About" },
+        { path: "/contact/:contactName", component: "electron-contact", title: "Contact" },
+        { path: "*", component: "electron-notfound", title: "Not Found" }
+      ]
+    );
+  </script>
+</body>
+</html>

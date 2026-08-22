@@ -1,0 +1,38 @@
+{
+  "name": "simply-js",
+  "displayName": "Simply JS",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "grammars": [
+      {
+        "scopeName": "simply.js",
+        "path": "./syntaxes/mytemplate-html-inject.tmLanguage.json",
+        "injectTo": [
+          "text.html.basic",
+          "text.html.derivative"
+        ]
+      }
+    ],
+    "configurationDefaults": {
+      "editor.tokenColorCustomizations": {
+        "textMateRules": [
+          {
+            "scope": [
+              "punctuation.definition.template-expression.begin.simply",
+              "punctuation.definition.template-expression.end.simply"
+            ],
+            "settings": {
+              "foreground": "#da70d6"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

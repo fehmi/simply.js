@@ -1,0 +1,111 @@
+<html>
+<h2>Photos — page {{data.page}}</h2>
+<p class="muted small">Showing {{data.from}}–{{data.to}} of {{data.total}} · <code>:page={{data.page}}</code> · <code>perPage={{data.perPage}}</code></p>
+
+<div class="photos">
+  <each of="data.photos" as="photo">
+    <img src="{{photo}}" alt="photo" loading="lazy" />
+  </each>
+</div>
+
+<div class="pager">
+  <a id="prev" href="./photos/{{data.page - 1}}" style="display: {{data.hasPrev ? 'inline-block' : 'none'}}">← prev</a>
+  <a id="next" href="./photos/{{data.page + 1}}" style="display: {{data.hasNext ? 'inline-block' : 'none'}}">next →</a>
+</div>
+<p class="muted small">View more <a href="https://www.google.com/search?q=grim+fandango" target="_blank" rel="noopener">Grim Fandango</a> photos.</p>
+</html>
+<style>
+  album-page {
+    display: block;
+    font-family: system-ui, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #3b82f6;
+    color: #0f172a;
+  }
+  .muted {
+    color: #64748b;
+  }
+  .small {
+    font-size: 12px;
+  }
+  .photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .photos img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+  .pager {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .pager a {
+    color: #0f172a;
+    text-decoration: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    background: #f8fafc;
+  }
+  .pager a[go-active] {
+    color: #3b82f6;
+    border-color: #3b82f6;
+    background: #fff;
+  }
+  .pager a:hover {
+    border-color: #3b82f6;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+<script>
+  class simply {
+    data = {
+      perPage: 6,
+      total: 32,
+      page: 0,
+      from: 0,
+      to: 0,
+      photos: [],
+      hasPrev: false,
+      hasNext: true
+    }
+    lifecycle = {
+      routerEnter(ctx) {
+        const images = Array.from({ length: data.total }, (_, i) => 'https://picsum.photos/200/300?random=' + (i + 1));
+        const page = Math.max(0, parseInt(ctx.params.page || '0', 10) || 0);
+        const maxPage = Math.ceil(data.total / data.perPage) - 1;
+        const clamped = Math.min(page, maxPage);
+        const from = clamped * data.perPage;
+        const to = Math.min(from + data.perPage, data.total);
+        data.page = clamped;
+        data.from = from;
+        data.to = to;
+        data.photos = images.slice(from, to);
+        data.hasPrev = clamped > 0;
+        data.hasNext = clamped < maxPage;
+        // if url was beyond last page, correct it without adding history entry
+        if (page !== clamped) {
+          simply.go.replace('/photos/' + clamped);
+        }
+      }
+    }
+  }
+</script>

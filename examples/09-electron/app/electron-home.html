@@ -1,0 +1,42 @@
+<html>
+<div class="panel current">
+  <strong>Home</strong>
+  <p class="muted small" style="margin:8px 0 0">path: <code>{{simply.ctx.path}}</code></p>
+</div>
+</html>
+
+<style>
+  electron-home {
+    display: block;
+    font-family: system-ui, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+  .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+    margin: 16px 0;
+  }
+  .panel.current {
+    border-color: #3b82f6;
+    background: #f8fafc;
+  }
+  .muted {
+    color: #64748b;
+  }
+  .small {
+    font-size: 12px;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+
+<script>
+  class simply {}
+</script>

@@ -1,0 +1,51 @@
+<html>
+<div class="panel current" style="border-color:#ef4444;">
+  <strong>not found</strong>
+  <p class="muted small" style="margin:8px 0 0">
+    path: <code>{{simply.ctx.path}}</code> — caught by <code>*</code>
+  </p>
+  <a href="#!/">← home</a>
+</div>
+</html>
+
+<style>
+  electron-notfound {
+    display: block;
+    font-family: system-ui, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+  .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    background: #fff;
+    margin: 16px 0;
+  }
+  .panel.current {
+    border-color: #3b82f6;
+    background: #f8fafc;
+  }
+  .muted {
+    color: #64748b;
+  }
+  .small {
+    font-size: 12px;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .panel.current {
+    border-color: #ef4444;
+  }
+  a {
+    color: #3b82f6;
+  }
+</style>
+
+<script>
+  class simply {}
+</script>

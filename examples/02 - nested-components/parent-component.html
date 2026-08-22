@@ -1,0 +1,137 @@
+<html>
+<h1>Nested Components</h1>
+<p class="intro">Components can be nested inside each other and share a single reactive state.</p>
+
+<h2>State</h2>
+<p>User: <strong>{{state.user.name}}</strong></p>
+<p>Volume: <strong>{{state.volume.level}}</strong></p>
+<button onclick="methods.rename()">Rename user</button>
+
+<h2>Nested Component</h2>
+<child-component></child-component>
+
+<h2>Nested Each</h2>
+<each of="data.personalities" as="personality" key="key" index="index">
+  <div class="row">
+    <strong>{{index}}.</strong> {{personality}}
+    <each of="data.hobbies" as="frequency" key="hobby">
+      <span class="tag">{{hobby}}: {{frequency}}</span>
+    </each>
+  </div>
+</each>
+
+<h2>Nested If</h2>
+<each of="data.personalities" as="personality">
+  <if cond="personality == 'Calm'">
+    <p class="highlight">{{personality}} — stays calm under pressure.</p>
+  </if>
+  <elsif cond="personality == 'Creative'">
+    <p class="highlight">{{personality}} — always has new ideas.</p>
+  </elsif>
+  <else>
+    <p class="muted">{{personality}} — full of energy.</p>
+  </else>
+</each>
+
+</html>
+
+<style>
+  parent-component {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(data.color);
+  }
+  .intro {
+    color: #64748b;
+    margin: 0 0 24px;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(data.color);
+    color: #0f172a;
+  }
+  p {
+    margin: 8px 0;
+  }
+  .muted {
+    color: #64748b;
+  }
+  .highlight {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover {
+    background: #1e293b;
+  }
+  .row {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 8px 0;
+  }
+  .tag {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 6px;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      color: "#3b82f6",
+      personalities: ["Calm", "Creative", "Passionate"],
+      hobbies: {
+        "Music Producing": "Occasionally",
+        Gaming: "Weekly",
+        Sports: "Rarely"
+      }
+    }
+    state = {
+      user: {
+        name: "Fehmi"
+      },
+      volume: {
+        level: 80
+      }
+    }
+    methods = {
+      rename: function() {
+        const names = [
+          "Ada Lovelace",
+          "Alan Turing",
+          "Grace Hopper",
+          "Linus Torvalds",
+          "Margaret Hamilton"
+        ];
+        state.user.name = names[Math.floor(Math.random() * names.length)];
+      }
+    }
+  }
+</script>

@@ -1,5 +1,41 @@
 # Nested Components
 
-You can embed other components within your components. This follows the same principle as your main component. You can achieve this by using the `get` function at the beginning of your parent component's script tag. Then, you can call the nested component using its tag (`child-component`) within your template tag. There is no limit to the number of nested components. Here is an example of `child-component` content that calls `grand-child-component`.
+You can embed other components within your components. Load the nested component with the `get` function, then use its tag inside your template — just like any other element. There is no limit to the number of nested components. Here is an example of `child-component` that calls `grand-child-component`.
 
-<repl-component id="n7ns3fu6ogtptf2" download="true"></repl-component>
+<details>
+  <summary><ins>Live demo</ins></summary>
+  <repl-component id=""/>
+</details>
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Hello World!</title>
+  </head>
+  <body>
+    <child-component></child-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("child-component.html");
+      get("grand-child-component.html");
+    </script>
+  </body>
+</html>
+```
+
+```html:child-component.html
+<html>
+  Hello from child
+  <br>
+  <grand-child-component></grand-child-component>
+</html>
+```
+
+```html:grand-child-component.html
+<html>
+  Hello from grand-child
+</html>
+```
+
+
+?> For details on how nested components communicate with each other, see [Component Communication](docs/component-communication.md).

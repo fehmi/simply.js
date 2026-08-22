@@ -6,7 +6,7 @@
 	<title>simply.js</title>
 	<link
 		rel="icon"
-		href="docs/images/fav.png"
+		href="docs/images/fav-white.png"
 	/>
 	<meta
 		http-equiv="X-UA-Compatible"
@@ -30,6 +30,10 @@
 		href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css"
 		title="vue"
 	/>
+	
+
+	<link rel="stylesheet" href="https://unpkg.com/docsify-plugin-toc@1.3.1/dist/light.css">
+
 
 	<style>
 		html {
@@ -45,14 +49,14 @@
 		}
 
 		body {
-			font-size: 18px;
+			font-size: 17px;
 			font-family: system-ui, Helvetica, Arial, sans-serif;
 		}
 
 		.markdown-section ol,
 		.markdown-section p,
 		.markdown-section ul {
-			line-height: 1.8rem;
+			line-height: 1.7rem;
 		}
 
 		.sidebar ul li a {
@@ -81,7 +85,8 @@
 
 		.markdown-section>* {
 			display: block;
-			max-width: 60%;
+			width: 100%;
+			max-width: 800px;
 			margin-left: auto !important;
 			margin-right: auto !important;
 		}
@@ -97,7 +102,7 @@
 		}
 
 		section.cover {
-			background: aliceblue !important;
+			background: #131010 !important;
 			align-items: flex-start;
 			/* margin-top: 60px; */
 			height: 100%;
@@ -115,12 +120,14 @@
 			margin: -20px 16px 0;
 			text-align: center;
 			position: relative;
-			background: aliceblue !important;
+			background: #131010 !important;
 			padding-bottom: 60px;
 		}
 
 		section.cover h1 {
 			margin-bottom: 10px;
+			font-weight: 500;
+			color: white;
 		}
 
 		section.cover blockquote {
@@ -162,10 +169,6 @@
 			box-shadow: 0 -0.4rem 0.9rem 0.2rem rgb(0 0 0 / 30%);
 		}
 
-		.anchor {
-			pointer-events: none;
-		}
-
 		nav.app-nav>ul:first-child {
 			flex: 1;
 			justify-content: left;
@@ -185,7 +188,7 @@
 		}
 
 		nav.app-nav>ul:first-child img {
-			width: 170px;
+			width: 78px;
 		}
 
 		.sidebar li.active {
@@ -198,6 +201,10 @@
 
 		.sidebar {
 			margin-top: 60px;
+			/* sticky sınıfı olmadan da sidebar'ı sabit tut (docsify'ın
+			   scroll-spy'i sidebar scroll'unu sıfırlamasın diye sticky'yı
+			   body'den kaldırıyoruz, bu yüzden burada sabitliyoruz) */
+			position: fixed !important;
 		}
 
 		.sidebar .app-name-link {
@@ -205,7 +212,10 @@
 		}
 
 		body[data-page=docs\/playground\.md] .sidebar,
-		body[data-page=docs\/playground\.md] .sidebar-toggle {
+		body[data-page=docs\/playground\.md] .sidebar-toggle,
+		body[data-page=docs\/examples\.md] .sidebar,
+		body[data-page=docs\/examples\.md] .sidebar-toggle,
+		body[data-page=docs\/examples\.md] .toc-nav {
 			display: none;
 		}
 
@@ -292,7 +302,7 @@
 		}
 
 		.sidebar li.collapse .app-sub-sidebar {
-			display: block;
+			display: none;
 		}
 
 		.markdown-section h1 {
@@ -341,6 +351,10 @@
 			margin: 2em auto 1em auto !important;
 		}
 
+		.pagination-item {
+				margin-top: 0!important;
+		}
+
 		.pagination-item-subtitle {
 			margin-top: 5px !important;
 		}
@@ -375,9 +389,7 @@
 		}
 
 		body:not([data-page="docs/playground.md"]) section:not(.cover) repl-component {
-			width: calc(100% + 50%);
-			margin-left: calc(-25% - 5px);
-			margin-top: 50px;
+			margin-top: 20px;
 			margin-bottom: 50px;
 		}
 
@@ -397,9 +409,12 @@
 		}
 
 		.markdown-section table {
+			/*
 			width: 90% !important;
 			margin-left: calc(5% - 5px) !important;
 			max-width: calc(100%) !important;
+			*/
+			display: block!important;
 		}
 
 		code {
@@ -423,6 +438,541 @@
 		.search .search-keyword {
 			color: cyan;
 		}
+
+	.markdown-section output:after,
+	.markdown-section pre:after {
+		font-size: .6rem;
+    font-weight: 600;
+    height: 15px;
+    line-height: 15px;
+    padding: 5px 9px;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    top: 0;
+    content: attr(data-lang);
+    background: #34495d;
+    color: #9d9d9d;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    background: none;
+    border: 1px solid #555962;
+    border-right: none;
+    border-top: none;
+	}		
+
+			.markdown-section repl-component pre:after {
+				content: none;
+			}	
+
+			.docsify-copy-code-button {
+				padding: 5px!important;
+				top: 34px!important;
+				right: 8px!important;
+				font-size: 13px !important;
+				background: white!important;
+				color: black!important;
+			}
+
+			.docsify-copy-code-button.error .error, .docsify-copy-code-button.success .success {
+					right: 0!important;
+					top: 0!important;
+					opacity: 1;
+					transform: unset!important;
+					font-size: 13px !important;
+					padding: 5px;
+					z-index: 2;
+					transition: none!important;
+					border-radius: 0!important;
+			}
+		
+			.markdown-section h2 {
+				margin: 3.6rem auto .8rem auto!important
+			}
+
+			.markdown-section figure, .markdown-section p {
+				margin: 1.8em auto 1.2em auto!important;
+			}
+
+			.markdown-section h2 + p {
+					margin: 1em auto 1.2em auto !important;
+			}			
+
+			.app-sub-sidebar {
+				display: none;
+			}
+
+			/* new theme */
+			:root {
+					--theme-color: #f2eded;
+			}
+
+			nav.app-nav {
+				background: #131010;
+				color: #b8b2b2;
+				box-shadow: none;
+				border-bottom: 1px #3d3838 solid;				
+			}
+
+			.page_toc div {
+				border-left-color: #3d3838;
+			}
+
+			.page_toc div.active {
+					border-left-color: var(--theme-color);
+			}			
+
+			.page_toc div.active a span {
+					color: #f2eded !important;
+			}			
+
+			.page_toc div[class^="lv"] a {
+					color: #b8b2b2;
+			}		
+			
+			.page_toc div[class^="lv"] a:hover span {
+					color: var(--theme-color);
+			}			
+
+			aside.toc-nav {
+				font-size: 16px;
+			}			
+
+			.sidebar {
+				border-right: 1px #3d3838 solid;
+			}
+
+			.sidebar, body {
+				background: #131010;
+				color: #b8b2b2;
+			}
+
+			.anchor span {
+				color: #f2eded;
+			}
+
+			.markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section strong {
+				color: white!important;
+			}
+
+			.search {
+					border-bottom: 1px solid #3d3838!important;
+					padding: 6px 6px 6px 18px!important;
+			}			
+
+			.sidebar-nav>ul {
+					margin: 35px 0px 10px 26px;
+			}			
+
+			.sidebar ul li.active:before {
+					content: "";
+					position: absolute;
+					width: 100%;
+					height: 37px;
+					background: #1b1818;
+					left: 0;
+					outline-width: 10px 10px 10px 10px;
+					z-index: -1;
+					box-shadow: inset 3px 0 0 white;
+			}
+
+			.sidebar ul li ul {
+					margin: 0;
+			}
+
+			.sidebar li>p {
+					font-size: 12px;
+					opacity: .4;
+			}			
+
+			li.active>a {
+				background-size: 12px;
+			}
+
+			.markdown-section code, .markdown-section pre {
+				background-color: #1a1718;
+			}
+
+			.markdown-section pre {
+				border: 1px solid #555962;
+			}
+
+.markdown-section pre>code,
+.markdown-section pre>code {
+    color: #d6deeb;
+}
+
+.token.cdata,
+.token.comment,
+.token.doctype,
+.token.prolog {
+    color: #637777;
+    font-style: italic;
+}
+
+.token.boolean,
+.token.number {
+    color: #f78c6c;
+}
+
+.token.punctuation {
+    color: #d6deeb;
+}
+
+.token.property {
+    color: #7fdbca;
+}
+
+.token.tag {
+    color: #7fdbca;
+}
+
+.token.string {
+    color: #ecc48d;
+}
+
+.token.selector {
+    color: #c792ea;
+    font-style: italic;
+}
+
+.token.attr-name {
+    color: #7fdbca;
+}
+
+.language-css .token.string,
+.style .token.string,
+.token.entity,
+.token.url {
+    color: #ecc48d;
+}
+
+.token.attr-value,
+.token.control,
+.token.directive,
+.token.unit {
+    color: #ecc48d;
+}
+
+.token.function {
+    color: #82aaff;
+}
+
+.token.keyword {
+    color: #c792ea;
+}
+
+.token.atrule,
+.token.regex,
+.token.statement {
+    color: #addb67;
+}
+
+.token.placeholder,
+.token.variable {
+    color: #d6deeb;
+}
+
+.token.class-name {
+    color: #addb67;
+    font-style: italic;
+}
+
+.token.important {
+    color: #f78c6c;
+}
+
+.markdown-section>:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) code {
+    line-height: 1.5rem;
+		font-size: .8rem;
+}
+
+.markdown-section :not(pre) > code {
+    color: white;
+    border: 1px solid rgba(255, 255, 255, .2);
+    padding: 0px 4px 2px;
+    background: none;
+}
+
+.markdown-section p.warn, .markdown-section p.tip, .markdown-section p.note {
+    border: none;
+    background: #3347ff;
+    color: white;
+    font-family: 'Roboto Mono';
+    font-size: 14px;
+    line-height: 1.6em;
+    padding: 16px 16px 16px 47px;
+}
+
+.markdown-section p.tip {
+    background: #40224e;
+}
+
+.markdown-section p.warn:before, .markdown-section p.tip:before, .markdown-section p.note:before {
+    font-size: 14px;
+    left: 13px;
+    line-height: 18px;
+    height: 18px;
+    width: 18px;
+    top: 15px;
+    background: none;
+    border: 1px solid white;
+}
+
+.markdown-section p.tip code {
+    background-color: transparent!important;
+}
+
+.markdown-section hr {
+    border-bottom: 1px solid #3d3838;
+}
+
+.search {
+	position: fixed;
+	left: -10000px;
+}
+
+.search:has(.results-panel.show), .search:has(input[type="search"]:focus) {
+    position: fixed;
+    margin: auto;
+    height: 500px;
+    overflow: hidden;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    background: black;
+    scrollbar-width: thin;
+    width: 100%;
+    max-width: 584px;
+    border: 1px solid #555962;
+    background: #131010;
+		z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;		
+}
+
+.search .results-panel.show {
+    flex: 1;
+    overflow: auto;
+    scrollbar-width: thin;
+    padding: 0px 28px 28px 28px;
+}
+
+main:has(.results-panel.show, input[type="search"]:focus) {
+		z-index: 1000;
+}
+
+.app-name {
+	display: none;
+}
+
+.sidebar-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: calc(100% - 32px);
+    margin: 16px 16px 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+    width: fit-content;
+    gap: 8px;
+}
+
+.sidebar-search-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-search-btn span {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar-search-btn kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
+  font-family: inherit;
+	margin: 0;
+}
+
+body:has(.results-panel.show, input[type="search"]:focus) nav,
+body:has(.results-panel.show, input[type="search"]:focus) .content,
+body:has(.results-panel.show, input[type="search"]:focus) .sidebar > *:not(.search) {
+	filter: blur(8px);
+}
+
+body:has(.results-panel.show, input[type="search"]:focus) .sidebar {
+	overflow: hidden;
+	border-color: transparent;
+}
+
+.clear-button circle {
+    display: none;
+}
+
+.search .clear-button {
+	margin-right: 8px;
+}
+
+.search .clear-button svg {
+    transform: scale(1.2)!important;
+}
+
+.search input {
+    padding: 0.6em 28px!important;
+}
+
+.search .input-wrap {
+	border-bottom: 1px solid #3d3838!important;
+}
+
+.search .matching-post {
+    border-bottom: 1px solid #3d3838!important;
+}
+
+.search p {
+    margin-top: 0px;
+		margin-bottom: 0px;
+		color: #b8b2b2;
+}
+
+.search h2 {
+    margin: 0px!important;
+		margin-bottom: 6px !important;
+}
+
+.search .search-keyword {
+    color: white!important;
+}
+
+.search a {
+    text-decoration: none;
+    color: inherit;
+    padding: 20px 0px;
+    display: block;
+}
+
+details:has(repl-component) summary {
+    background: white;
+    display: list-item;
+    width: fit-content;
+    color: black;
+    padding: 5px 10px;
+		font-size: 14px;
+}
+
+details:has(repl-component) repl-component {
+    margin-top: 0px !important;
+    box-shadow: none;
+}
+
+details > summary {
+	cursor: pointer;
+}
+
+details > summary ins {
+	text-decoration: none;
+	margin-left: 3px;
+}
+
+.markdown-section ul {
+		gap: 8px;
+    display: flex;
+    flex-direction: column;
+    padding-left: 15px;
+}
+
+.markdown-section td, .markdown-section th {
+    border: 1px solid #555962;
+}
+
+.markdown-section td, .markdown-section th {
+    border: 1px solid #555962;
+}
+
+.markdown-section tr:nth-child(2n) {
+    background-color: #1f1f1f;
+}
+
+.pagination-item:not(:last-child) a .pagination-item-subtitle {
+    opacity: .3;
+    transition: all .2s;
+}
+
+ .pagination-item-label, .pagination-item a:hover .pagination-item-label {
+    opacity: .5;
+}
+
+/* 1. Arkadaki highlight bar */
+.sidebar ul li:is(.active, :has(> ul.app-sub-sidebar > li.active))::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 37px;
+    background: #1b1818;
+    left: 0;
+    z-index: -1;
+    box-shadow: inset 3px 0 0 white;
+}
+
+/* 2. Link rengi / border */
+.sidebar ul li:is(.active, :has(> ul.app-sub-sidebar > li.active)) > a {
+    border-right: 2px solid;
+    color: var(--theme-color, #42b983);
+    font-weight: 600;
+}
+
+/* 3. Beyaz ok ikonu + beyaz yazı */
+li:is(.active, :has(> ul.app-sub-sidebar > li.active)) > a {
+    color: white !important;
+    border-right: 4px solid white !important;
+    background: transparent;
+    border: none !important;
+    background-position: right;
+    background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml,%3C!-- Generator: Adobe Illustrator 25.2.0, SVG Export Plug-In --%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='18.4px' height='17.4px' viewBox='0 0 18.4 17.4' style='overflow:visible;enable-background:new 0 0 18.4 17.4;' xml:space='preserve'%3E%3Cstyle type='text/css'%3E .st0%7Bfill-rule:evenodd;clip-rule:evenodd;fill:%23FFFFFF;%7D%0A%3C/style%3E%3Cdefs%3E%3C/defs%3E%3Cg%3E%3Cpath class='st0' d='M14.6,9.7H0v-2h14.6L8.3,1.4L9.7,0l8.7,8.7l-8.7,8.7L8.3,16L14.6,9.7z'/%3E%3C/g%3E%3C/svg%3E%0A");
+    margin-right: 10px;
+		background-size: 16px;
+}
+
+.markdown-section h3 + p {
+    margin-top: 8px !important;
+}
+
+.markdown-section td, .markdown-section th {
+    border: 1px solid #555962;
+    text-align: left;
+    padding: 13px;
+}
+
+.markdown-section h3 {
+    margin-top: 42px;
+    font-size: 1.3rem;
+}
+
+.page_toc:has(> .lv1:only-child) {
+    display: none;
+}
+
+aside.toc-nav {
+  max-height: -webkit-fill-available;
+}
+
 	</style>
 </head>
 
@@ -430,12 +980,23 @@
 	<div id="app">Loading ...</div>
 	<script>
 		window.$docsify = {
+		copyCode: {
+			buttonText: 'Copy',
+			errorText: 'Error',
+			successText: 'Copied',
+		},			
+  toc: {
+    tocMaxLevel: 5,
+    target: 'h1, h2, h3, h4, h5, h6',
+    ignoreHeaders:  ['<!-- {docsify-ignore} -->', '<!-- {docsify-ignore-all} -->']
+  },		
 			alias: {
 				'.*/sidebar.md': 'docs/sidebar.md',
 				'.*/navbar.md': 'docs/navbar.md',
 				'/docs/': 'README.md',
 				'/README.MD': 'README.md',
 				'/playground': 'docs/playground.md',
+				'/examples': 'docs/examples.md',
 				'.*?/changelog': 'https://raw.githubusercontent.com/docsifyjs/docsify/master/CHANGELOG.md',
 				'/zh-cn/(.*)':
 					'https://raw.githubusercontent.com/docsifyjs/docs-zh/master/$1',
@@ -506,8 +1067,8 @@
 						var editHtml = '\n<br><span class="edit">[:memo: Edit Document](' + url + ')</span>';
 						return (
 							html +
-							editHtml +
-							''
+							//editHtml +
+							'\n<hr>'
 						);
 					}),
 						hook.afterEach(function (html) {
@@ -515,8 +1076,94 @@
 								return html;
 							}
 							return `${html}`;
-						});
+						})
 				},
+				function (hook, vm) {
+        hook.mounted(function () {
+          // Sidebar scroll'unu koru: docsify'ın scroll-spy'i (highlight) sayfadaki
+          // h2'ler viewport'a girip çıkarken aktif link değişince sidebar scroll'unu
+          // başa sıfırlıyor. Submenüler display:none olduğu için bu highlight'a gerek
+          // yok; sticky sınıfını body'den uzak tutarak bu davranışı devre dışı bırak.
+          document.body.classList.remove('sticky');
+          const stickyObserver = new MutationObserver(() => {
+            if (document.body.classList.contains('sticky')) {
+              document.body.classList.remove('sticky');
+            }
+          });
+          stickyObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+          const sidebar = document.querySelector('.sidebar');
+          if (!sidebar) return;
+
+          // Search butonunu oluştur
+          const btn = document.createElement('button');
+          btn.className = 'sidebar-search-btn';
+          btn.innerHTML = `
+					<!--
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+						-->
+            <span>Search</span>
+            <kbd>⌘K</kbd>
+          `;
+
+          // Sidebar'ın en üstüne ekle
+          sidebar.insertBefore(btn, sidebar.firstChild);
+
+          // Docsify'ın gizli arama input'unu bulup focusla
+          function focusSearchInput() {
+            const input = document.querySelector('.search input[type="search"]');
+            if (input) {
+              input.focus();
+              input.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+
+          btn.addEventListener('click', focusSearchInput);
+
+          // Cmd+K / Ctrl+K global kısayolu
+          document.addEventListener('keydown', function (e) {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+							const input = document.querySelector('.search input[type="search"]');
+							const isFocused = document.activeElement === input;
+
+              e.preventDefault();
+
+							if (isFocused || document.querySelector('.results-panel.show')) {
+								if (input) input.blur();
+							}
+							else {
+								focusSearchInput();
+							}
+
+							return;
+            }
+
+
+						
+							if (e.key === 'Escape' && (isFocused || document.querySelector('.results-panel.show'))) {
+							const input = document.querySelector('.search input[type="search"]');
+							const isFocused = document.activeElement === input;
+
+							// Input focus'ta ve içinde yazı varsa: tarayıcının native "clear" davranışına
+							// izin ver, henüz kapatma. Bir sonraki Escape'te input boş olacağı için kapanacak.
+							if (isFocused && input && input.value !== '') {
+								return;
+							}
+
+							e.preventDefault();
+							if (input) input.blur();
+						}
+				
+          });
+
+document.addEventListener('keydown', (e) => {
+
+});					
+        });
+      },				
 			],
 		};
 	</script>
@@ -525,9 +1172,13 @@
 	<script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
 	<script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markdown.min.js"></script>
 	<script src="//cdn.jsdelivr.net/npm/docsify-plugin-carbon@1/index.min.js"></script>
+	<script src="https://unpkg.com/docsify-copy-code@2"></script>
+
 	<!-- <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script> -->
 	<script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
 	<script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+	<script src="https://unpkg.com/docsify-plugin-toc@1.3.1/dist/docsify-plugin-toc.min.js"></script>
+
 
 	<script>
 		(function (w) {
@@ -571,10 +1222,7 @@
 		})();
 	</script>
 
-	<script
-		type="module"
-		src="https://jspm.dev/api-viewer-element@1.0.0-pre.8"
-	></script>
+
 
 	<script>
 		loadJS("simply.js", function () {

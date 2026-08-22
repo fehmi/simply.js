@@ -1,0 +1,149 @@
+<html>
+<nav class="crumb"><a href="../">« Examples</a> <span>Hash</span> <a href="./">Home</a></nav>
+<h2>Section</h2>
+
+<div class="panel">
+  <h3>Context for this route</h3>
+  <div class="grid">
+    <div class="field">
+      <span class="label">ctx.path</span>
+      <code>{{simply.ctx.path}}</code>
+    </div>
+    <div class="field">
+      <span class="label">ctx.pathname</span>
+      <code>{{simply.ctx.pathname}}</code>
+    </div>
+    <div class="field">
+      <span class="label">ctx.params.section</span>
+      <code>{{simply.ctx.params.section || '(none)'}}</code>
+    </div>
+    <div class="field">
+      <span class="label">ctx.querystring</span>
+      <code>{{simply.ctx.querystring || '(empty)'}}</code>
+    </div>
+    <div class="field">
+      <span class="label">ctx.query</span>
+      <code>{{JSON.stringify(simply.ctx.query)}}</code>
+    </div>
+    <div class="field">
+      <span class="label">ctx.hash</span>
+      <code>{{simply.ctx.hash || '(empty)'}}</code>
+    </div>
+    <div class="field">
+      <span class="label">ctx.canonicalPath</span>
+      <code>{{simply.ctx.canonicalPath}}</code>
+    </div>
+  </div>
+  <p class="muted small" style="margin:8px 0 0">
+    Try <a href="./section?name=tana">section?name=tana</a> or <a href="./section?name=tana#subsection">section?name=tana#subsection</a>
+  </p>
+</div>
+
+<div class="panel">
+  <h3>Sections</h3>
+  <p id="a" class="section"><strong>A</strong> <a href="#top">top</a></p>
+  <p id="b" class="section"><strong>B</strong> <a href="#top">top</a></p>
+  <p id="subsection" class="section"><strong>C — subsection</strong> <a href="#top">top</a></p>
+</div>
+</html>
+<style>
+  hash-section {
+    display: block;
+    font-family: system-ui, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #3b82f6;
+    color: #0f172a;
+  }
+  h3 {
+    font-size: 15px;
+    margin: 0 0 8px;
+    color: #0f172a;
+  }
+  .crumb {
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: #64748b;
+  }
+  .crumb a {
+    color: #3b82f6;
+    text-decoration: none;
+  }
+  .crumb span {
+    margin-left: 8px;
+  }
+  .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    background: #f8fafc;
+    margin: 16px 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .field {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    word-break: break-all;
+  }
+  .muted {
+    color: #64748b;
+  }
+  .small {
+    font-size: 12px;
+  }
+  a {
+    color: #3b82f6;
+  }
+  .section {
+    height: 220px;
+    margin: 12px 0;
+    padding: 16px;
+    line-height: 28px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 18px;
+  }
+  .section a {
+    float: right;
+    font-size: 13px;
+  }
+</style>
+<script>
+  class simply {
+    lifecycle = {
+      routerEnter(ctx) {
+        if (!ctx.hash) return;
+        var el = null;
+        el = document.getElementById(ctx.hash);
+        if (el) el.scrollIntoView({ behavior: 'instant', block: 'start' });
+      }
+    }
+  }
+</script>

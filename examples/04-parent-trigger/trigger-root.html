@@ -1,0 +1,139 @@
+<html>
+<h1>Parent Trigger</h1>
+<p class="intro">Child components can read and write an ancestor's <code>data</code> / <code>state</code> / <code>props</code> via the <code>parent</code> chain — every layer updates instantly.</p>
+
+<h2>Root Data &amp; Props</h2>
+<div class="panel">
+  <p>Root name: <strong>{{data.name}}</strong></p>
+  <p>Shared color (state): <span class="color-badge" style="background: {{state.color}}">{{state.color}}</span></p>
+  <p>Counter: <strong>{{data.counter}}</strong></p>
+  <div class="actions">
+    <button onclick="data.name = 'Root — ' + Date.now().toString().slice(-4)">Rename from root</button>
+    <button onclick="state.color = state.color === '#3b82f6' ? '#10b981' : '#3b82f6'">Toggle color (state)</button>
+    <button onclick="data.counter++">Counter ++ (root)</button>
+  </div>
+</div>
+
+<h2>Props → Parent</h2>
+<p class="muted small">Root sends <code>.label</code> and <code>.count</code> to the parent as props. They can also be mutated from inside the parent.</p>
+<trigger-parent .label="{{data.name}}" .count="{{data.counter}}" isolated>
+  <span class="slot-hint">Slot content — projected into the parent's <code>&lt;slot&gt;</code></span>
+</trigger-parent>
+
+<h2>Notes</h2>
+<ul class="notes">
+  <li><code>parent.data.name</code> — reads the parent component's data</li>
+  <li><code>parent.parent.data.name</code> — reads data two levels up</li>
+  <li><code>parent.data.name = '...'</code> — writes to the ancestor's data, the whole tree re-renders</li>
+  <li><code>props.label</code> — prop received from the parent, isolated scope via <code>isolated</code></li>
+</ul>
+</html>
+
+<style>
+  trigger-root {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(data.color);
+  }
+  .intro {
+    color: #64748b;
+    margin: 0 0 24px;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(data.color);
+    color: #0f172a;
+  }
+  p { margin: 8px 0; }
+  .muted { color: #64748b; }
+  .small { font-size: 13px; }
+  .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #f8fafc;
+  }
+  .color-badge {
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover { background: #1e293b; }
+  .slot-hint {
+    display: inline-block;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #fff;
+    font-size: 13px;
+    color: #64748b;
+  }
+  .notes {
+    padding-left: 20px;
+    margin: 8px 0;
+    color: #334155;
+  }
+  .notes li { margin: 4px 0; }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      name: "Ada Lovelace",
+      counter: 0,
+      color: "#3b82f6"
+    }
+    state = {
+      color: "#3b82f6"
+    }
+    methods = {
+      syncColor() {
+        state.color = data.color;
+      }
+    }
+    lifecycle = {
+      afterFirstRender() {
+        methods.syncColor();
+      },
+      whenDataChange(changes) {
+        if (changes.some(c => c.currentPath.includes("color"))) {
+          methods.syncColor();
+        }
+      }
+    }
+  }
+</script>

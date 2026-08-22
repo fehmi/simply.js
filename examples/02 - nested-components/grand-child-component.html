@@ -1,0 +1,36 @@
+<html>
+<h3>Grand Child Component</h3>
+<p>Nested two levels deep — still shares the same state:</p>
+<p>User: <strong>{{state.user.name}}</strong></p>
+<p>Volume: <strong>{{state.volume.level}}</strong></p>
+</html>
+
+<style>
+  grand-child-component {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+    border: 2px dashed #10b981;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    background: #fff;
+  }
+  h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    color: #0f172a;
+  }
+  p {
+    margin: 8px 0;
+  }
+</style>
+
+<script>
+  class simply {
+    lifecycle = {
+      afterFirstRender() {
+
+      }
+    }
+  }
+</script>

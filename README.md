@@ -2,24 +2,25 @@
 <img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release">
 <img src="https://img.shields.io/badge/License-MIT-green">
 <img src="https://img.shields.io/badge/Gzipped-20KB-green">
-<img src="https://img.shields.io/github/commit-activity/m/fehmi/simply.js?label=Commits">
 </p>
 
 # About
 
 ## What is simply.js
 
-Simply JS is a simply framework for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
+Simply JS is a simple web-component library for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
 
-It has a built-in super-fast declarative template engine that coded from scratch. Some parts of Simply JS are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router.
+It has a built-in super-fast declarative template engine that coded from scratch. Some parts of Simply JS are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router. So, simply.js is the name of its template engine and the bridge between the adopted tools.
 
-Long story short, Simply JS is the name of the brand new template engine and the bridge between the adopted tools.
+Development on simply.js began in 2021. Over the years, it has been put through rigorous battle-testing by building numerous plugins and web applications. This hands-on process allowed identifying gaps, fixing bugs, and continuously refining the architecture. The library is now approaching maturity with very few features left to add. Moving forward, the focus shifts to integrating AI into the development loop, concentrating on ongoing improvement, maintenance, and producing reusable components.
 
 ## How it works
 
-You will need to have basic understanding with [HTML](https://www.w3schools.com/html/default.asp), [CSS](https://www.w3schools.com/css/default.asp) and [JavaScript](https://www.w3schools.com/js/default.asp) to develop with simply.js. They are relatively easy to learn languages when you think Super Mario was [hand-written](https://gist.github.com/1wErt3r/4048722) with 6502 assembly 40 years ago by Toshihiko Nakago. So, don't worry about to jump in to learn them. [W3Schools](https://www.w3schools.com/) is a great stating point. You don't have to learn every details. The big part of programming is to know how to search things on Google and ChatGPT nowadays :)
+In the past, developing with simply.js required a basic understanding of [HTML](https://www.w3schools.com/html/default.asp), [CSS](https://www.w3schools.com/css/default.asp), and [JavaScript](https://www.w3schools.com/js/default.asp). But we are in a completely different era now. The days of Toshihiko Nakago [hand-writing](https://gist.github.com/1wErt3r/4048722) Super Mario in 6502 assembly over 40 years ago are far behind us. Today, you can just let AI write the code for you.
 
-While you are working with simply.js, everything will run in the browser of the user. So, no compiler, no bundler, no builder and no config files needed. Just good old plain HTML, CSS, vanilla JavaScript and your [favourite text editor](https://code.visualstudio.com/). That's all!
+While having some foundational knowledge is still useful if you ever need to jump in and make manual tweaks, it is no longer a strict requirement. You can simply point your AI agent to this documentation and describe what you want to build. 
+
+Whether you write it yourself or prompt an AI, simply.js still runs entirely in the user's browser. No compilers, no bundlers, no builders, and no config files needed. Just good old plain HTML, CSS, vanilla JavaScript, and your [favourite text editor](https://code.visualstudio.com/). That's all!
 
 ## Features
 
@@ -32,7 +33,7 @@ While you are working with simply.js, everything will run in the browser of the 
 - Zero dependency<br>
 - No compiler, bundler or builder<br>
 - Lightweight (20 KB gzipped)<br>
-- Edge, Chrome, Firefox, Safari
+- All green browsers
 
 ## Playground
 

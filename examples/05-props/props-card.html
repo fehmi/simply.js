@@ -1,0 +1,142 @@
+<html>
+<div class="card">
+  <h3>Child — <code>props-card</code></h3>
+  <p class="muted small">All values below come from <code>props.*</code> — passed as inline attributes from the parent.</p>
+
+  <div class="grid">
+    <div class="field">
+      <span class="label">props.title</span>
+      <strong>{{props.title}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">props.message</span>
+      <strong>{{props.message}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">props.count (Number)</span>
+      <strong>{{props.count}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">props.enabled (Boolean)</span>
+      <span class="badge" data-on="{{props.enabled}}">{{props.enabled ? "enabled" : "disabled"}}</span>
+    </div>
+    <div class="field">
+      <span class="label">props.settings.theme (Object)</span>
+      <strong>{{props.settings.theme}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">props.settings.items (Array)</span>
+      <strong>{{props.settings.items.join(", ")}}</strong>
+    </div>
+    <div class="field full">
+      <span class="label">via method: methods.getTitle()</span>
+      <strong>{{methods.getTitle()}}</strong>
+    </div>
+  </div>
+
+  <div class="hint">
+    <span class="hint-label">lifecycle</span>
+    <p class="muted small">Check console — <code>whenPropChange</code> fires when any prop changes.</p>
+  </div>
+</div>
+</html>
+
+<style>
+  props-card {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .card {
+    border: 2px solid #3b82f6;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #fff;
+    margin-top: 12px;
+  }
+  h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    color: #0f172a;
+  }
+  .muted { color: #64748b; }
+  .small { font-size: 13px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .field {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .field.full { grid-column: 1 / -1; }
+  .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  strong {
+    font-size: 14px;
+    color: #0f172a;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: #64748b;
+  }
+  .badge[data-on="true"] { background: #10b981; }
+  .hint {
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    position: relative;
+    margin-top: 8px;
+  }
+  .hint-label {
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    background: #fff;
+    padding: 0 6px;
+    font-size: 11px;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+
+<script>
+  class simply {
+    props = {
+      // Overrides the inline attribute if defined; comment out to see parent's value
+      // title: "Overridden in class"
+    }
+    methods = {
+      getTitle: function() {
+        return props.title;
+      }
+    }
+    lifecycle = {
+      whenPropChange(name, oldVal, newVal) {
+        console.log("[props-card] whenPropChange:", name, oldVal, "→", newVal);
+      }
+    }
+  }
+</script>

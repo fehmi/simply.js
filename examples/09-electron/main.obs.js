@@ -1,0 +1,2 @@
+// @ts-nocheck
+const{app:app,BrowserWindow:BrowserWindow}=require("electron"),path=require("path");function createWindow(){new BrowserWindow({width:900,height:700,webPreferences:{contextIsolation:!0,webSecurity:!1}}).loadFile(path.join(__dirname,"app","index.html"))}app.whenReady().then(createWindow),app.on("window-all-closed",()=>{"darwin"!==process.platform&&app.quit()});

@@ -1,0 +1,434 @@
+<html>
+<div class="header">
+  <h1>Stress Test — Reactive Style</h1>
+  <p class="intro">Every tick mutates <code>state</code> and the style reacts via <code>var(state.*)</code> and <code>&amp;cond:[]</code>. Watch rotation, color, and conditional blocks stay smooth.</p>
+</div>
+
+<div class="panel">
+  <div class="controls">
+    <button onclick="methods.toggleRunning()">{{state.running ? "Pause" : "Run"}}</button>
+    <button onclick="methods.toggleColorCycle()">{{state.colorRunning ? "Stop color" : "Start color"}}</button>
+    <button onclick="methods.reset()">Reset</button>
+    <span class="badge" data-on="{{state.running}}">{{state.running ? "running" : "paused"}}</span>
+    <span class="badge" data-on="{{state.colorRunning}}">{{state.colorRunning ? "color: on" : "color: off"}}</span>
+  </div>
+
+  <div class="stage">
+    <div class="rect">
+      <span class="rect-label">{{state.color}}</span>
+    </div>
+    <div class="spinner" aria-hidden="true"></div>
+  </div>
+
+  <div class="stats">
+    <div class="field">
+      <span class="label">state.deg</span>
+      <strong>{{Math.round(state.deg)}}°</strong>
+    </div>
+    <div class="field">
+      <span class="label">state.color</span>
+      <strong>{{state.color}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">data.name</span>
+      <strong>{{data.name}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">data.counter</span>
+      <strong>{{data.counter}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">data.asd</span>
+      <strong>{{data.asd}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">state.alien</span>
+      <strong>{{state.alien}}</strong>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="data.name = 'Root — ' + Date.now().toString().slice(-4)">Rename root</button>
+    <button onclick="data.counter++">Counter ++</button>
+    <button onclick="data.asd = data.asd === 10 ? 11 : 10">Toggle data.asd (10↔11)</button>
+  </div>
+
+  <h2>Conditional Style — &amp;cond:[]</h2>
+  <p class="muted small">Via <code>&amp;cond:[]</code> on <code>data.asd</code> and <code>data.number</code>:</p>
+  <div class="cond-demo">
+    <div class="cond-box">
+      <number>number block — visible when data.number == 11</number>
+      <div class="cond-a">A — shows when data.asd == 10</div>
+      <div class="cond-b">B — shows when data.asd == 11</div>
+    </div>
+  </div>
+
+  <h2>Loops — each</h2>
+  <div class="loops">
+    <div class="tags">
+      <each of="data.arrays" as="itemo" key="keydur">
+        <span class="tag">{{itemo}} · {{keydur}}</span>
+      </each>
+    </div>
+    <div class="items">
+      <each of="data.birseyler" as="item" key="kkk" index="indeks">
+        <span class="pill" style="border-color: {{item.renk}}">{{item.name}} — {{indeks}} — {{kkk}}</span>
+      </each>
+    </div>
+    <div class="kvs">
+      <each of="data.anotherList" as="item" key="kkk" index="indeks">
+        <span class="kv">{{kkk}} → age {{item.age}} · #{{indeks}}</span>
+      </each>
+    </div>
+  </div>
+
+  <stress-child></stress-child>
+</div>
+
+<p class="muted small footer">Tip: open the console — the green/red spinner border shows frame health. Children read parent via <code>parent.data.*</code> / <code>parent.state.*</code> and stay in sync under rapid mutations.</p>
+</html>
+
+<style>
+  stress-root {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: #3b82f6;
+  }
+  .intro {
+    color: #64748b;
+    margin: 0 0 24px;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #3b82f6;
+    color: #0f172a;
+  }
+  h3 {
+    font-size: 15px;
+    margin: 0 0 8px;
+    color: #0f172a;
+  }
+  .panel {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    background: #f8fafc;
+  }
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button:hover {
+    background: #1e293b;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+  }
+  .badge[data-on="true"] {
+    background: #10b981;
+    color: #fff;
+    border-color: #0ea071;
+  }
+
+  .stage {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin: 12px 0 16px;
+  }
+  .rect {
+    width: 110px;
+    height: 110px;
+    background: var(state.color);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    transform: rotate(var(state.deg)deg);
+    transition: all 450ms ease;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  }
+  .rect-label {
+    background: rgba(0, 0, 0, .28);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .spinner {
+    width: 56px;
+    height: 56px;
+    border: 6px solid #e2e8f0;
+    border-top-color: #0f172a;
+    border-radius: 50%;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .field {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  strong {
+    font-size: 13px;
+    color: #0f172a;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+
+  .cond-demo { margin-top: 8px; }
+  .cond-box {
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 12px;
+    background: #fff;
+  }
+  number {
+    display: none;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .cond-a, .cond-b {
+    display: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  .cond-a {
+    background: #eef2ff;
+    color: #4338ca;
+  }
+  .cond-b {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &cond:[if="data.number && data.number == 11"] {
+    number { display: block; }
+  }
+  &cond:[else] {
+    number { display: none; }
+  }
+  &cond:[if="data.asd && data.asd == 10"] {
+    .cond-a { display: block; }
+  }
+  &cond:[else] {
+    .cond-b { display: block; }
+  }
+
+  .loops { margin-top: 16px; }
+  /* h3 defined above */
+  .tags, .items, .kvs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+  }
+  .tag {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .pill {
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    background: #fff;
+  }
+  .kv {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .muted { color: #64748b; }
+  .small { font-size: 12px; }
+  .footer { margin-top: 12px; }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* subtle page tint — keep readable */
+  stress-root { background: #fff; }
+  /* keep page readable: override host bg with card */
+  .panel { background: #f8fafc; }
+</style>
+
+<script>
+  class simply {
+    state = {
+      alien: "ehehe",
+      color: "cyan",
+      deg: 0,
+      running: true,
+      colorRunning: true
+    }
+    data = {
+      color: "cyan",
+      top: 20,
+      width: "20px",
+      asd: 10,
+      number: 11,
+      name: "Maximus — Stress Root",
+      counter: 0,
+      arrays: [1, 2, 3, 4],
+      birseyler: [
+        { name: "item 1", renk: "red" },
+        { name: "item 2", renk: "blue" },
+        { name: "item 3", renk: "green" }
+      ],
+      anotherList: {
+        asd: { age: 32 },
+        msd: { age: 45 },
+        hll: { age: 43 }
+      }
+    }
+    methods = {
+      _degTimer: null,
+      _colorRaf: 0,
+      _hue: 0,
+      hslToHex(h, s, l) {
+        s /= 100; l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        const toHex = x => Math.round(x * 255).toString(16).padStart(2, "0");
+        return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+      },
+      startRandomDeg(interval = 900) {
+        clearInterval(methods._degTimer);
+        const tick = () => { state.deg = Math.random() * 360; };
+        tick();
+        methods._degTimer = setInterval(tick, interval);
+      },
+      stopRandomDeg() {
+        clearInterval(methods._degTimer);
+        methods._degTimer = null;
+      },
+      startColorCycle(speed = 0.7) {
+        cancelAnimationFrame(methods._colorRaf);
+        const loop = () => {
+          methods._hue = (methods._hue + speed) % 360;
+          state.color = methods.hslToHex(Math.round(methods._hue), 100, 50);
+          methods._colorRaf = requestAnimationFrame(loop);
+        };
+        loop();
+      },
+      stopColorCycle() {
+        cancelAnimationFrame(methods._colorRaf);
+        methods._colorRaf = 0;
+      },
+      toggleRunning() {
+        state.running = !state.running;
+        if (state.running) methods.startRandomDeg(900);
+        else methods.stopRandomDeg();
+      },
+      toggleColorCycle() {
+        state.colorRunning = !state.colorRunning;
+        if (state.colorRunning) methods.startColorCycle(0.7);
+        else methods.stopColorCycle();
+      },
+      reset() {
+        state.deg = 0;
+        state.color = "cyan";
+        data.color = "cyan";
+        methods._hue = 0;
+        data.name = "Maximus — Stress Root";
+        data.counter = 0;
+        data.asd = 10;
+        data.number = 11;
+      }
+    }
+    lifecycle = {
+      afterFirstRender() {
+        // keep old stress feel but without the debug overlay
+        methods.startRandomDeg(900);
+        methods.startColorCycle(0.7);
+
+        // spinner: fixed high-contrast color so jank is obvious; no state.color tint
+        const spinner = dom.querySelector(".spinner");
+        let angle = 0;
+        let last = performance.now();
+        let freezeCount = 0;
+        const frame = (now) => {
+          const delta = now - last;
+          if (state.running) {
+            angle = (angle + 12) % 360;
+            if (spinner) spinner.style.transform = `rotate(${angle}deg)`;
+            if (delta > 60) {
+              freezeCount++;
+              if (spinner) spinner.style.borderTopColor = "red";
+            } else {
+              if (spinner) spinner.style.borderTopColor = "#0f172a";
+            }
+          }
+          last = now;
+          requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+        // expose for debugging
+        component._stressSpinner = { get freezeCount() { return freezeCount; } };
+      }
+    }
+  }
+</script>

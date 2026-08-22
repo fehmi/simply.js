@@ -1,0 +1,36 @@
+  <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+
+<div cond="aasd == 1 && bbsd != 2 || ccsd >= 3 && ddsd <= 4"></div>
+{{selam.naber}}
+
+<input-radio
+  label="Status"
+  name="crtStatus"
+  check="false"
+  options='
+    {
+      "On": true,
+      "Off": false
+    }
+  '>
+</input-radio>
+
+<my-component items='["item1", "item2", "item3"]'></my-component>
+{{ user.getName() }}
+{{ order.totalPrice + order.tax }}
+<my-component config='
+{
+  "enabled": true,
+  "count": 42,
+  "nested": {
+    "key": "value"
+  }
+}
+'></my-component>
+
+<script>
+  var a = "";
+  function test() {
+
+  }
+</script>

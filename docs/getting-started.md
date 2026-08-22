@@ -27,7 +27,7 @@ Your page is now ready to interact with Simply.js components. Simply.js componen
 </style>
 
 <script>
-  class {
+  class simply {
     data = {
       name: "simply.js"
     }
@@ -55,13 +55,6 @@ You now have two files, structured as shown below. For a quicker start, you can 
 
 <repl-component download="true" id="10fcijpwru4j34e"></repl-component>
 
-## Inline Components
-You can also define and use your component while writing them inline without a need of an external file. 
-<repl-component download="true" id="nvrh9n07asl89ed"></repl-component>
-
-This method can also be used to manipulate single-file components after they are loaded. Refer to [inline components](#/docs/inline-components) for more information.
-
-
 ## Preview Your App
 
 When you have these files you can start a server to preview your app. You can use any web server but here are some suggestions for you.
@@ -86,7 +79,3 @@ npm install --global http-server
 ```bash
 http-server [path] [options]
 ```
-
-- #### Other Options
-
-  Other options to start a server can be [XAMPP](https://www.apachefriends.org/), [MAMP](https://www.mamp.info/), [Prepros](https://prepros.io/) or [Codekit](https://codekitapp.com/).

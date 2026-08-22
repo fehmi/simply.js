@@ -1,0 +1,2 @@
+// @ts-nocheck
+const iframe=document.querySelector("iframe"),storage=chrome.storage&&chrome.storage.local;window.addEventListener("message",e=>{if(e.source!==iframe.contentWindow)return;const{type:t,key:o,value:r,id:s}=e.data||{};if("storage:get"===t){if(!storage)return;storage.get(o,e=>{iframe.contentWindow.postMessage({type:"storage:get:result",id:s,value:e[o]},"*")})}else if("storage:set"===t){if(!storage)return;storage.set({[o]:r},()=>{iframe.contentWindow.postMessage({type:"storage:set:done",id:s},"*")})}});

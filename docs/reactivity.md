@@ -1,26 +1,29 @@
 # Reactivity
 
-## Reactivity of Variables
+All variables defined in the `data` section of your component are automatically reactive — and so are `props` and `state`. Anytime you change a variable, your template is re-rendered if necessary.
 
-All variables defined in the `data` section of your component will automatically be reactive. Anytime you change a variable, your template will be re-rendered if necessary.
+Reactivity flows top-down for `data` and `props`. Children that read `parent.data` or `parent.props` stay up to date when those change. This includes grandchildren and deeper. The reverse is not true. If a parent reads a child's value directly (e.g. `component.querySelector("child-component").data.something`) and that value changes, the parent is not notified. In that case use [state management](docs/state) instead. `state` is reactive across the entire component tree.
 
-!> When data or a property changes in a parent component, all children react to that change. However, children do not react to changes in their grandparents. If you need this functionality, use [state management](docs/state) instead.
+## The `<static>` Tag
 
-## Element exception
+You can disable reactivity for specific parts of your template with the `<static>` tag. Content inside it is rendered only once — even if a reactive variable inside it changes later, the static part is not re-rendered. This is useful for performance when part of the template never changes.
 
-You can disable reactivity for specific elements in your template, as shown below. The `div` element with the "passive" parameter will remain passive after the first render. It and its children will not be affected by data changes.
+```html
+<html>
+  <static>
+    <h1>This header is rendered once</h1>
+  </static>
+  <p>{{data.counter}}</p>
+</html>
+```
 
-<repl-component id="k3lkxbulmflvlm9" download="true"></repl-component>
-
-## Make changes without triggering react/render
+## Update without re-render
 
 ?> This approach might be unnecessary as the new template and reactivity engine are fast enough to handle such cases. Further testing is required. This section may be removed after more comprehensive battle tests.
 
 It can be helpful for performance reasons. In such scenarios, make your changes without triggering a reaction, and then render manually when finished.
 
-<repl-component id="t509ixnfmmbk0n5" donwload="true"></repl-component>
-
-You can also use a built-in method to set data without triggering a render. You can then manually render for increased performance.
+You can use a built-in method to set data without triggering a render. You can then manually render for increased performance.
 
 ```js
 simply.setWithoutRender(data, {
@@ -62,7 +65,16 @@ Or just do
 data.__getTarget.currentZoomPercent = 100; 
 ```
 
-## Assigning a reactive variable to another reactive variable
+You can also make changes without triggering render by replacing the property descriptors:
+
+```js
+// make changes without triggering render
+const allUpdates = { ...data, name: "hede" };
+const changes = Object.getOwnPropertyDescriptors(allUpdates);
+Object.defineProperties(data, changes);
+```
+
+## Assigning reactive variables
 
 Each node in `data`, `state`, or `props` is a reactive proxy object. Assigning one to another can be problematic and may break the reactivity engine by causing infinite loops. For example, assigning `data.person = state.person` or vice versa can lead to a "Maximum call stack size exceeded" error.
 
@@ -88,78 +100,4 @@ data.person = state.person;
 
 This ensures that the assignment doesn't recursively trigger reactive updates between proxies.
 
-Perfect — here’s a refined version of your section title and description, inspired by the tone and style of the `getNodeKey` documentation:
-
 ---
-
-### Preserve Elements Using `id` to Avoid Re-Spawning
-
-By default, when elements shift position due to conditional rendering, morphdom may destroy and re-create them—even if they already exist in the DOM. This can cause loss of internal state or loaded content.
-
-For example:
-
-```html
-<html>
-  <if cond="state.something">
-    <div>something</div>
-  </if>
-  <route></route>
-</html>
-```
-
-When `state.something` becomes `true`, the `<div>` is inserted before `<route>`, causing `<route>` to be destroyed and re-added. If `<route>` has already loaded content, that content will be lost.
-
-To prevent this, assign a unique `id` to the element. This allows morphdom to track the element and move it instead of re-spawning it:
-
-```html
-<route id="backbone"></route>
-```
-
-This works because `morphdom` uses the element’s `id` as a stable key by default (via `getNodeKey`) to preserve it during DOM updates.
-
-## Morph Animation
-
-When a reactive variable changes, the DOM updates instantly. You can add animations to these updates by enabling the `morphAnimation` setting in your component class, like this:
-
-```js
-class simply {
-	settings = {
-		morphAnimation: true 
-	}
-
-	data = {}
-	methods = {}
-}
-```
-
-Simply uses the **View Transition API** under the hood. The default effect is a fade in/out, but you can customize it using transition API pseudo-selectors.
-Learn more at [Chrome Developers – View Transitions](https://developer.chrome.com/docs/web-platform/view-transitions/same-document).
-
-For example, the following CSS changes the animation duration. You can also create your own custom animations:
-
-```css
-::view-transition-group(root),
-::view-transition-old(root),
-::view-transition-new(root) { 
-	animation-duration: 1250ms;
-}
-```
-
-You can disable morph animation for specific elements as well:
-
-```css
-/* Disable morph animation */
-::view-transition-group(nmp),
-::view-transition-old(nmp),
-::view-transition-new(nmp) {
-	animation: none;
-}
-
-::view-transition-old(nmp) {
-	display: none;
-}
-
-[no-morph-animation] {
-	view-transition-name: nmp;
-}
-```

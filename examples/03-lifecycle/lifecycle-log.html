@@ -1,0 +1,62 @@
+<html>
+	<div class="controls">
+		<button onclick="methods.updateData()">Update data</button>
+		<button onclick="methods.updateProp()">Update prop</button>
+		<button onclick="methods.updateState()">Update state</button>
+	</div>
+	<div class="values">
+		<span>data: {{data.counter}}</span>
+		<span>prop: {{props.count}}</span>
+		<span>state: {{state.counter}}</span>
+	</div>
+	<div class="log">
+		<each of="data.log" as="entry">
+			<div class="entry">{{entry.time}} → {{entry.type}}</div>
+		</each>
+	</div>
+</html>
+
+<style>
+	:host {
+		display: block;
+		font-family: monospace;
+		background: #131010;
+		color: rgb(216 221 226);
+		padding: 10px;
+		font-size: 12px;
+	}
+	.controls {
+		margin-bottom: 8px;
+	}
+	.controls button {
+		margin-right: 6px;
+		font-family: monospace;
+		font-size: 12px;
+		background: #2a2525;
+		color: rgb(216 221 226);
+		border: 1px solid #3d3838;
+		padding: 4px 8px;
+		cursor: pointer;
+	}
+	.values {
+		margin-bottom: 8px;
+		color: #82aaff;
+	}
+	.values span {
+		margin-right: 12px;
+	}
+	.log {
+		max-height: 300px;
+		overflow: auto;
+		border: 1px solid #3d3838;
+		padding: 8px;
+	}
+	.entry {
+		padding: 2px 0;
+		border-bottom: 1px solid #2b2929;
+	}
+</style>
+
+<script>
+class simply{data={log:[],counter:0};state={counter:0};methods={logging:!1,log(e){if(!this.logging){var t=new Date,o=t.getHours()+":"+String(t.getMinutes()).padStart(2,"0")+":"+String(t.getSeconds()).padStart(2,"0");data.log.push({time:o,type:e})}},updateData(){data.counter++},updateProp(){props.count++},updateState(){state.counter++}};lifecycle={afterConstruct(){methods.log("afterConstruct")},beforeRender(){methods.log("beforeRender")},beforeFirstRender(){methods.log("beforeFirstRender")},afterFirstRender(){methods.log("afterFirstRender")},afterRender(){methods.logging||methods.log("afterRender"),methods.logging=!1},beforeRerender(){methods.logging||methods.log("beforeRerender")},afterRerender(){methods.logging||methods.log("afterRerender")},whenDataChange(e){var t=e.some(e=>e.currentPath.includes("log")),o=e.some(e=>!e.currentPath.includes("log"));o&&methods.log("whenDataChange"),t&&!o&&(methods.logging=!0)},whenPropChange(){methods.log("whenPropChange")},whenStateChange(){methods.log("whenStateChange")}}}
+</script>

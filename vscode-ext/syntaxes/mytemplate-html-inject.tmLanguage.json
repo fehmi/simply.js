@@ -1,0 +1,237 @@
+{
+  "scopeName": "simply.js",
+  "injectionSelector": "L:text.html.basic, L:text.html.derivative",
+  "patterns": [
+    {
+      "comment": "cond=\"...\" attribute with JS",
+      "begin": "(?i)\\b(cond)(=)(\")",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "contentName": "meta.embedded.line.js",
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "comment": "cond='...' attribute with JS",
+      "begin": "(?i)\\b(cond)(=)(')",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "'",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "contentName": "meta.embedded.line.js",
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "comment": "of=\"...\" attribute with JS",
+      "begin": "(?i)\\b(of)(=)(\")",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "contentName": "meta.embedded.line.js",
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "comment": "of='...' attribute with JS",
+      "begin": "(?i)\\b(of)(=)(')",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "'",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "contentName": "meta.embedded.line.js",
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "comment": ":=\"...\" attribute with JS",
+      "begin": "(:)(=)(\")",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "contentName": "meta.embedded.line.js",
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "comment": ":='...' attribute with JS",
+      "begin": "(:)(=)(')",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "'",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "contentName": "meta.embedded.line.js",
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "comment": "{{...}} interpolation with JS",
+      "begin": "(\\{\\{)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.template-expression.begin.simply"
+        }
+      },
+      "end": "(\\}\\})",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.template-expression.end.simply"
+        }
+      },
+      "contentName": "meta.embedded.line.js",
+      "patterns": [
+        {
+          "include": "source.js"
+        }
+      ]
+    },
+    {
+      "comment": "Single-line attribute='...' without { or [ - normal string",
+      "begin": "(?i)\\b(?!cond|of)([a-zA-Z_][a-zA-Z0-9_-]*)(=)(')(?=[^'{\\[\\n]*')",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "'",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "contentName": "string.quoted.single.html"
+    },
+    {
+      "comment": "Multi-line or JSON attribute='...' - JSON highlighting",
+      "begin": "(?i)\\b(?!cond|of)([a-zA-Z_][a-zA-Z0-9_-]*)(=)(')",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.other.attribute-name.html"
+        },
+        "2": {
+          "name": "punctuation.separator.key-value.html"
+        },
+        "3": {
+          "name": "punctuation.definition.string.begin.html"
+        }
+      },
+      "end": "'",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.end.html"
+        }
+      },
+      "patterns": [
+        {
+          "include": "source.json"
+        }
+      ]
+    }
+  ]
+}

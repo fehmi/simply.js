@@ -1,0 +1,126 @@
+<html>
+	<line></line>
+	<h2 class="fx d1">{{data.title}}</h2>
+	<p class="tagline fx d2">{{data.tagline}}</p>
+	<p class="badge fx d2">opening project <code>#{{data.id}}</code></p>
+	<nav class="links fx d3">
+		<a href="./">← home</a>
+		<a href="project/42">open project 42</a>
+		<a href="project/99">open project 99</a>
+	</nav>
+</html>
+
+<style>
+	/* root selector = component tag name — this component is not shadow-isolated */
+	project-page {
+		display: block;
+		font-family: system-ui, sans-serif;
+		color: #1e293b;
+		line-height: 1.6;
+	}
+
+	/* progress line — grows on enter, shrinks on exit */
+	project-page > line {
+		display: block;
+		height: 4px;
+		border-radius: 999px;
+		margin-bottom: 14px;
+		background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+		box-shadow: 0 0 12px rgba(139, 92, 246, .35);
+
+		width: 0;
+		transition: width 400ms ease-in-out;
+	}
+	project-page[enter] > line {
+		width: 100%;
+		transition: width 800ms cubic-bezier(.22, 1, .36, 1);
+	}
+
+	/* content pieces fade + rise while the line grows.
+	   SAFE FX RULES:
+	   - exit total (250ms, no delay) stays under the line's 400ms exit
+	   - enter totals (delay + 450ms) stay under the line's 800ms enter
+	     d1 120+450=570 · d2 220+450=670 · d3 320+450=770 */
+	project-page > .fx {
+		opacity: 0;
+		transform: translateY(8px);
+		transition: opacity .25s ease, transform .25s ease;
+	}
+	project-page[enter] > .fx {
+		opacity: 1;
+		transform: none;
+		transition: opacity .45s ease, transform .45s cubic-bezier(.22, 1, .36, 1);
+	}
+	project-page[enter] > .fx.d1 {
+		transition-delay: .12s;
+	}
+	project-page[enter] > .fx.d2 {
+		transition-delay: .22s;
+	}
+	project-page[enter] > .fx.d3 {
+		transition-delay: .32s;
+	}
+
+	project-page h2 {
+		margin: 0 0 4px;
+		font-size: 20px;
+		color: #0f172a;
+	}
+	project-page .tagline {
+		margin: 0 0 10px;
+		color: #64748b;
+		font-size: 13px;
+	}
+	project-page .badge {
+		margin: 0 0 14px;
+		font-size: 13px;
+	}
+	project-page code {
+		background: #f1f5f9;
+		padding: 2px 6px;
+		border-radius: 4px;
+		font-size: 12px;
+	}
+	project-page .links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	project-page .links a {
+		padding: 6px 12px;
+		border: 1px solid #e2e8f0;
+		border-radius: 999px;
+		background: #f8fafc;
+		color: #0f172a;
+		text-decoration: none;
+		font-size: 13px;
+	}
+	project-page .links a:hover {
+		border-color: #3b82f6;
+		color: #3b82f6;
+	}
+	project-page .links a[go-active] {
+		color: #3b82f6;
+		border-color: #3b82f6;
+		background: #fff;
+		font-weight: 600;
+	}
+</style>
+
+<script>
+	class simply {
+		data = {
+			title: "Project",
+			tagline: "A dynamic :id route — every number opens a different project.",
+			id: "?"
+		}
+		lifecycle = {
+			afterConstruct() {
+				console.log("project page constructed");
+			},
+			routerEnter(ctx) {
+				data.id = ctx.params.id || "?";
+			}
+		}
+	}
+</script>

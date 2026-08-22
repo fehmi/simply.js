@@ -1,77 +1,163 @@
 <html>
-<div class="hello" onclick="bcd()">
-  { data.age * (2) }
-  <p onclick="methods.asd(); event.stopPropagation();">Hello, world! My name is <slot></slot>.</p>
-  <if cond="self.count == 1">
-    <h1>hahahha {name}</h1>
-    <h1>joker misin mübarek {name}</h1>
-  </if>
+<h1>Hello World</h1>
+<p class="intro">Welcome to Simply.js — build reactive web components with vanilla.</p>
 
-  <elsif cond="self.count==2">
-    zero fucks given
-  </elsif>
+<h2>Variable</h2>
+<p>Hello, {{data.name}}! You are {{data.age}} years old. In two years you will be {{data.age + 2}}.</p>
+<p>Favorite color: <span class="color-badge" style="background: {{data.color}}">{{data.color}}</span></p>
 
-  <else>
-    hamdiiiiii
-  </else>
-
-  <if cond="data.name == 'deneme'">
-    <h1>hahahha {data.name} ddd</h1>
-    <h1>joker misin mübarek {data.name} ddd</h1>
-  </if>
-
+<h2>Event</h2>
+<p>Click to interact with reactive data:</p>
+<div class="actions">
+  <button onclick="methods.greet()">Say hello</button>
+  <button onclick="data.count++">Clicked {{data.count}} times</button>
 </div>
-<if cond="data.name == 'fehmi'">
-  <h1>hahahha {data.name}</h1>
-  <h1>joker misin mübarek {data.name}</h1>
-</if>
 
-<each of="data.personalities" as="personality" key="key" index="index">
-  <each of="data.personalities" as="p" key="key" index="index">
-    <if cond="p == 'Calm'">
-      <h1>hay yaşa calm</h1>
-    </if>
-    {p}
-    {data.name}
-    <each of="data.hobbies" as="hobby" key="index">
-      <each of="data.hobbies" as="hobbie" key="index">
-        <li>{key}:{hobbie}:{index}</li>
-      </each>
-      <li>{hobby}{key}{index}</li>
-    </each>
+<h2>Condition</h2>
+<if cond="data.count === 0">
+  <p class="muted">Try clicking the button above to see conditional rendering.</p>
+</if>
+<elsif cond="data.count === 1">
+  <p>Nice — first click! 🎉</p>
+</elsif>
+<else>
+  <p>You clicked {{data.count}} times — keep going!</p>
+</else>
+
+<h2>Slot</h2>
+<p>Content projected from the parent via <code>&lt;slot&gt;</code>:</p>
+<div class="slot-box"><slot></slot></div>
+<p class="muted small">Parent usage: <code>&lt;hello-world isolated&gt;Your content here&lt;/hello-world&gt;</code></p>
+
+<h2>Each</h2>
+<p>Personalities:</p>
+<div class="tags">
+  <each of="data.personalities" as="personality">
+    <span class="tag">{{personality}}</span>
   </each>
-  {key}{index}
-</each>
+</div>
+
+<p>Hobbies:</p>
+<ul>
+  <each of="data.hobbies" as="frequency" key="hobby">
+    <li><strong>{{hobby}}:</strong> {{frequency}}</li>
+  </each>
+</ul>
 
 </html>
 
 <style>
-  p {
-    background: aquamarine;
-    border-radius: 30px;
-    padding: 20px;
-    font-size: 20px;
-    text-align: center;
-    width: 300px;
+  :host {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 640px;
     margin: 0 auto;
-    color: aquamarine;
-    color: "{data.color}";
+    padding: 24px;
+    line-height: 1.6;
+    color: #1e293b;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: var(data.color);
+  }
+  .intro {
+    color: #64748b;
+    margin: 0 0 24px;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(data.color);
+    color: #0f172a;
+  }
+  p {
+    margin: 8px 0;
+  }
+  .muted {
+    color: #64748b;
+  }
+  .small {
+    font-size: 13px;
+  }
+  .color-badge {
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin: 8px 0;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover {
+    background: #1e293b;
+  }
+  .slot-box {
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    min-height: 20px;
+  }
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  ul {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+  li {
+    margin: 4px 0;
+  }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
   }
 </style>
 
 <script>
-  class {
+  class simply {
     data = {
-      name: "fehmi",
-      age: 37,
+      name: "Fehmi",
+      age: 27,
+      count: 0,
       personalities: ["Calm", "Creative", "Passionate"],
       hobbies: {
-        "Music Producing": "Kırk yılda bir",
-        Gaming: "Aydı yılda bir",
-        Sports: "Meeeh",
+        "Music Producing": "Occasionally",
+        Gaming: "Weekly",
+        Sports: "Rarely"
       },
-      color: "blue"
+      color: "#3b82f6"
     }
-
+    methods = {
+      greet: function() {
+        alert("Hello, " + data.name + "!");
+      }
+    }
   }
 </script>

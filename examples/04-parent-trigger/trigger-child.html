@@ -1,0 +1,120 @@
+<html>
+<div class="child-card">
+  <h4>Child — <code>trigger-child</code></h4>
+  <p class="muted small">The deepest layer. Accesses the root via <code>parent.parent.data.*</code> and the parent via <code>parent.data.*</code>. Writes bubble upward and every layer reflects instantly.</p>
+
+  <div class="grid">
+    <div class="field">
+      <span class="label">parent.parent.data.name (root)</span>
+      <strong>{{parent.parent.data.name}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.data.note (parent)</span>
+      <strong>{{parent.data.note}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.parent.data.counter (root)</span>
+      <strong>{{parent.parent.data.counter}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.parent.state.color</span>
+      <span class="color-badge" style="background: {{parent.parent.state.color}}">{{parent.parent.state.color}}</span>
+    </div>
+    <div class="field">
+      <span class="label">own data.mood</span>
+      <strong>{{data.mood}}</strong>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="parent.parent.data.name = 'Child → ' + Date.now().toString().slice(-4)">Change root name from child</button>
+    <button onclick="parent.parent.data.counter++">Root counter ++ (from child)</button>
+    <button onclick="parent.data.note = 'Child touched parent @ ' + new Date().toLocaleTimeString()">Change parent note from child</button>
+    <button onclick="data.mood = data.mood === 'Calm' ? 'Excited' : 'Calm'">Own mood toggle</button>
+  </div>
+
+  <p class="muted small" style="margin-top: 10px;">Tip: click the buttons above and watch the <em>root</em> and <em>parent</em> fields update instantly — every layer shares the same reactive tree.</p>
+</div>
+</html>
+
+<style>
+  trigger-child {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .child-card {
+    border: 2px dashed #10b981;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #fff;
+    margin-top: 14px;
+  }
+  h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    color: #0f172a;
+  }
+  .muted { color: #64748b; }
+  .small { font-size: 13px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .field {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  strong {
+    font-size: 14px;
+    color: #0f172a;
+  }
+  .color-badge {
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button:hover { background: #1e293b; }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      mood: "Calm"
+    }
+  }
+</script>

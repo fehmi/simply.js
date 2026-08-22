@@ -1,32 +1,50 @@
 # DOM Events
 
-There is nothing unique about writing DOM events in Simply.js compared to Vanilla JavaScript.
+There is nothing unique about writing DOM events in Simply.js compared to Vanilla JavaScript. You can use any native event attribute (`onclick`, `onmouseover`, ...) and pass values from `data`, `props` or `state` directly to your methods.
 
-<repl-component id="djygyzm2tvkhfkp" download="true"></repl-component>
+?> Inside event attributes, variables are written **without** curly braces — `methods.alert(data.message)`, not `methods.alert({{data.message}})`. Curly braces (`{{ }}`) are only used in the template body and attribute values.
 
-## `event` and `this`
-You can pass them directly to your methods. However, avoid using `this` as a parameter in your method's signature, as `this` is reserved for the component's constructor. Use `el` or another suitable variable name when needed, as shown below:
+<details>
+  <summary><ins>Live demo</ins></summary>
+  <repl-component id="g9bcbmc7r077s43"/>
+</details>
 
-<repl-component id="1y6zj50s9suk23f" download="true"></repl-component>
+```html:index.html
+<html>
+  <head>
+    <title>simply.js</title>
+  </head>
+  <body>
+    <event-demo/>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get("event-demo.html");
+    </script>
+  </body>
+</html>
+```
 
+```html:event-demo.html
+<html>
+  <button onclick="methods.alert(data.message)">Alert</button>
+  <button onclick="methods.handle(event)">Handle</button> 
+</html>
 
-## Most Used DOM Events
+<script>
+  class simply {
+    data = {
+      message: "hello"
+    }
+    methods = {
+      alert: function (message) {
+        alert(message);
+      },
+      handle: function (event) {
+        console.log(event);
+      }
+    }
+  }
+</script>
+```
 
-| Event   |      Description      |
-|----------|:-------------|
-| **onclick** |  The user clicks an HTML element |
-| **onmouseover** |    The user moves the mouse over an HTML element   |
-| **onmouseout** | The user moves the mouse away from an HTML element |
-| **onkeydown** | The user pushes a keyboard key |
-
-Source: [w3schools](https://www.w3schools.com/js/js_events.asp)<br>
-Full List of Events: [w3schools](https://www.w3schools.com/js/js_events.asp) / [MDN](https://developer.mozilla.org/en-US/docs/Web/Events)
-
-## Inline Self Executing Anonymous Functions
-<repl-component id="ab5dj9lvdajdkfe" download="true"></repl-component>
-
-## Stop Propagation & Prevent Default
-
-You can use the native `stopPropagation()` and `preventDefault()` methods after your event function. You can pass `event` or a reference to `this` in the value of an inline `on*` event definition.
-
-<repl-component id="7hi32zis90kg7g9" download="true"></repl-component>
+?> Avoid using `this` as a parameter name in your method's parameter, as `this` is reserved for the component's constructor. Use `el` or another suitable variable name when receiving the event.

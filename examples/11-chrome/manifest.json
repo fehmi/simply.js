@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Simply.js Popup",
+  "version": "1.0.0",
+  "description": "A simply.js powered Chrome extension popup with hashbang routing.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Simply.js"
+  },
+  "sandbox": {
+    "pages": [
+      "sandbox.html"
+    ]
+  },
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self'"
+  }
+}

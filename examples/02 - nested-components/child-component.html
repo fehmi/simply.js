@@ -1,0 +1,55 @@
+<html>
+<h2>Child Component</h2>
+<p>This is a nested component. It reads the shared state:</p>
+<p>User: <strong>{{state.user.name}}</strong></p>
+<p>Volume: <strong>{{state.volume.level}}</strong></p>
+<button onclick="methods.lowerVolume()">Lower volume</button>
+<button onclick="methods.increaseVolume()">Increase volume</button>
+
+<grand-child-component></grand-child-component>
+</html>
+
+<style>
+  child-component {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    background: #f8fafc;
+  }
+  h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: #0f172a;
+  }
+  p {
+    margin: 8px 0;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover {
+    background: #1e293b;
+  }
+</style>
+
+<script>
+  class simply {
+    methods = {
+      lowerVolume: function() {
+        state.volume.level = Math.max(0, state.volume.level - 10);
+      },
+      increaseVolume: function() {
+        state.volume.level = Math.min(100, state.volume.level + 10);
+      }
+    }
+  }
+</script>

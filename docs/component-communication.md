@@ -1,136 +1,209 @@
-## Parent to Child Communication
+## Parent to Child
 
-### Direct Manipulation
-
-You can directly modify a variable in a child component or invoke a function on it, as shown below:
+Using `component.querySelector("child-component")` you can directly access a child component's scope — read its data, call its methods, or change its data to trigger reactivity inside it. Everything in that child's scope is reachable, and you can keep chaining `querySelector` to reach deeper children.
 
 ```js
-// Change a variable in child's data
-component.dom.querySelector("child-component").data.name = "New name";
+// Read a variable from child's data
+component.querySelector("child-component").data.name;
+
+// Change a variable in child's data (triggers reactivity in the child)
+component.querySelector("child-component").data.name = "New name";
 
 // Call a method from a child
-component.dom.querySelector("child-component").methods.functionName();
+component.querySelector("child-component").methods.functionName();
 
-// Change a variable in grand child's data
-var child = component.dom.querySelector("child-component");
+// Access a grandchild through the child
+var child = component.querySelector("child-component");
 child.querySelector("grand-child").data.name = "New name";
-
-// Call a method from a grand child
-var child = component.dom.querySelector("child-component");
-cchild.querySelector("grand-child").methods.functionName();
+child.querySelector("grand-child").methods.functionName();
 ```
 
-Here is a working example:
-<repl-component id="4g6y3ikfl9ihlgb" download="true"></repl-component>
+<details>
+  <summary><ins>Live demo</ins></summary>
+  <repl-component id="xcjmqha6hl04p3r"/>
+</details>
 
-## Child to Parent Communication
-
-It is possible to communicate directly with parent components.
-
-```js
-// To change a variable in parent's data
-component.parent.data.name = "This changed by a child component";
-
-// To call a method in parent's methods
-component.parent.methods.functionName();
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Parent to Child Communication</title>
+  </head>
+  <body>
+    <parent-component></parent-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get(["parent-component.html", "child-component.html", "grand-child.html"]);
+    </script>
+  </body>
+</html>
 ```
 
-<repl-component id="n12menua0kfi0k7" download="true"></repl-component>
+```html:parent-component.html
+<html>
+  <h2>Parent</h2>
+  <child-component></child-component>
+  <br>
+  <button onclick="methods.talkToChild()">Talk to child</button>
+</html>
 
-## Child to Grandparent Communication
-
-```js
-// You can chain parent properties to reach any ancestor (e.g., parent.parent.parent).
-var grandParent = component.parent.parent;
-grandParent.data.message = "This was changed by a grandchild.";
-grandParent.methods.saySomething();
-```
-
-<repl-component id="v5owc8geudzz349" download="true"></repl-component>
-
-## Child to Sibling Communication
-
-```js
-// Communicate directly with sibling components.
-var sibling = component.parent.dom.querySelector("sibling-component");
-sibling.data.message = "This was changed by a sibling.";
-sibling.methods.saySomething();
-```
-
-<repl-component id="fgtv259ejp0bguh" download="true"></repl-component>
-
-## Props
-
-```html
-<child-component message="This is a message from parent"></child-component>
-```
-
-You can then access it in the template section of the child component as follows:
-
-```html
-<template> {props.message} </template>
-```
-
-You can assign any type of value to attributes, including `Object`, `Array`, `String`, `Boolean`, `Number`, and even `Function`. In Simply.js, attributes are synchronized with properties (props). Therefore, if you define an attribute value, the corresponding prop will also be defined.
-
-!> Do not change attributes directly using `setAttribute`, as this can disrupt the DOM's morphing algorithm.
-
-Alternatively, you can access your predefined attributes as props from anywhere within the script section of the component, as shown below:
-
-```html
 <script>
-  class {
-    lifecycle = {
-      afterFirstRender() {
-        alert("The message from parent is " + props.message);
+  class simply {
+    methods = {
+      talkToChild: function () {
+        // Read a variable from child's data
+        var child = component.querySelector("child-component");
+        console.log(child.data.name); // => "Child"
+
+        // Change a variable in child's data (triggers reactivity)
+        child.data.name = "New name";
+
+        // Call a method from the child
+        child.methods.sayHello();
+
+        // Access the grandchild through the child
+        var grandChild = child.querySelector("grand-child");
+        grandChild.data.name = "New name";
+        grandChild.methods.sayHello();
       }
     }
   }
 </script>
 ```
 
-## Detailed Explanation of Props
+```html:child-component.html
+<html>
+  <h3>Child: {{data.name}}</h3>
+</html>
 
-There are four primary ways to define properties (props):
-
-1.  **Within a component class:**
-    `class { props = {"myProp": "myValue"} }`
-2.  **As an inline attribute directly in HTML:**
-    `<my-app myProp='{a: "b"}'>`
-    If you need to store objects, arrays, or similar complex data types using this method, you may need to stringify the value and wrap it with single quotes. After stringifying, you might also need to replace single quotes within the string, like this:
-
-   ```js
-   objToPropString: function (obj) {
-        return JSON.stringify(obj).replace(/'/g, "&apos;");
-   }
-   ```
-
-3.  **Within the component's logic (e.g., methods, lifecycle hooks):**
-    `props.myProp = "myValue"`
-4.  **Using inline components:**
-    Refer to [Inline Components](docs/inline-components) for details.
-
-```js
-    <my-app>
-			<script type="props/json" lang="text/javascript">
-				{
-					"myProp": "myValue",
-					"anArray": [1,2,3, {
-						'hey': {
-							'b': 'c',
-							'd': [1,2,3, {
-								'r': [2,3,4]
-							}]
-						}
-					}]
-				}
-			</script>
-    </my-app>
+<script>
+  class simply {
+    data = {
+      name: "Child"
+    }
+    methods = {
+      sayHello: function () {
+        console.log("Hello from the child");
+      }
+    }
+  }
+</script>
 ```
 
-#### Property Precedence: `component.props` > Props Template > Inline Props
+```html:grand-child.html
+<html>
+  <h3>Grand Child: {{data.name}}</h3>
+</html>
 
-This section describes the order of precedence for overriding properties. The properties defined within the `props` block (1) of your component class take ultimate precedence, overriding both inline attributes (2) and properties defined in the props template (3). Keep this in mind if you accidentally define properties with the same name in multiple locations.
+<script>
+  class simply {
+    data = {
+      name: "Grand Child"
+    }
+    methods = {
+      sayHello: function () {
+        console.log("Hello from the grand child");
+      }
+    }
+  }
+</script>
+```
 
-Props from Template
-<repl-component id="mz6b2i2zj96fm8q" download="true"></repl-component>
+## Props
+
+Another way to pass data from a parent to a child is through **props** — attributes on the component tag. The child accesses them via `props` in its template, script or style.
+
+```html
+<child-component message="This is a message from parent"></child-component>
+```
+
+```html:child-component.html
+<html>
+  <p>{{props.message}}</p>
+</html>
+```
+
+Props are reactive — when the parent changes the attribute, the child re-renders. For details on defining, passing and overriding props, see [Props](docs/props.md).
+
+## Child to Parent
+
+It is possible to communicate directly with parent components using `component.parent`. The same scope as parent-to-child applies — you can read the parent's data, call its methods, or change its data to trigger reactivity in the parent.
+
+```js
+// Read a variable from parent's data
+component.parent.data.name;
+
+// Change a variable in parent's data (triggers reactivity in the parent)
+component.parent.data.name = "Changed by a child component";
+
+// Call a method in parent's methods
+component.parent.methods.functionName();
+```
+
+<details>
+  <summary><ins>Live demo</ins></summary>
+  <repl-component id="h0568vj6qo1sj0o"/>
+</details>
+
+```html:index.html
+<html>
+  <head>
+    <title>simply.js - Child to Parent Communication</title>
+  </head>
+  <body>
+    <parent-component></parent-component>
+    <script src="https://simply.js.org/simply.min.js"></script>
+    <script>
+      get(["parent-component.html", "child-component.html"]);
+    </script>
+  </body>
+</html>
+```
+
+```html:parent-component.html
+<html>
+  <h2>Parent: {{data.name}}</h2>
+  <child-component></child-component>
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "Parent"
+    }
+    methods = {
+      sayHello: function () {
+        console.log("Hello from the parent");
+      }
+    }
+  }
+</script>
+```
+
+```html:child-component.html
+<html>
+  <h3>Child: {{data.name}}</h3>
+  <button onclick="methods.talkToParent()">Talk to parent</button>
+</html>
+
+<script>
+  class simply {
+    data = {
+      name: "Child"
+    }
+    methods = {
+      talkToParent: function () {
+        // Read a variable from parent's data
+        console.log(component.parent.data.name); // => "Parent"
+
+        // Change a variable in parent's data (triggers reactivity)
+        component.parent.data.name = "Changed by child";
+
+        // Call a method in parent's methods
+        component.parent.methods.sayHello();
+      }
+    }
+  }
+</script>
+```
+
+?> You can chain component.parent to reach any ancestor like `component.parent.parent`. Also you can reach siblings with `component.parent.querySelector("sibling-component")`

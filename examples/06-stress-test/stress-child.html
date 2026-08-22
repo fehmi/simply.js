@@ -1,0 +1,123 @@
+<html>
+<div class="child">
+  <h3>Child — <code>stress-child</code></h3>
+  <p class="muted small">Reads ancestor via <code>parent.data.*</code> / <code>parent.state.*</code>. Mutations from here propagate up and re-render the root under load.</p>
+
+  <div class="grid">
+    <div class="field">
+      <span class="label">parent.data.name</span>
+      <strong>{{parent.data.name}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.state.color</span>
+      <span class="badge" style="background: {{parent.state.color}}">{{parent.state.color}}</span>
+    </div>
+    <div class="field">
+      <span class="label">parent.state.deg</span>
+      <strong>{{Math.round(parent.state.deg)}}°</strong>
+    </div>
+    <div class="field">
+      <span class="label">parent.data.asd</span>
+      <strong>{{parent.data.asd}}</strong>
+    </div>
+    <div class="field">
+      <span class="label">own state.mood</span>
+      <strong>{{state.mood}}</strong>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="parent.data.name = 'Child → ' + Date.now().toString().slice(-4)">Mutate parent name</button>
+    <button onclick="parent.data.asd = parent.data.asd === 10 ? 11 : 10">Toggle parent asd</button>
+    <button onclick="parent.data.counter++">Parent counter ++</button>
+    <button onclick="state.mood = state.mood === 'Calm' ? 'Excited' : 'Calm'">Toggle own mood</button>
+  </div>
+
+  <p class="muted small tip">This child stays in sync even while the root ticks <code>state.deg</code> and <code>state.color</code> every frame.</p>
+</div>
+</html>
+
+<style>
+  stress-child {
+    display: block;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .child {
+    border: 2px dashed #10b981;
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #fff;
+    margin-top: 14px;
+  }
+  h3 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    color: #0f172a;
+  }
+  .muted {
+    color: #64748b;
+  }
+  .small {
+    font-size: 12px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .field {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 2px;
+  }
+  strong {
+    font-size: 13px;
+    color: #0f172a;
+  }
+  .badge {
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 8px 0;
+  }
+  button {
+    background: #0f172a;
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button:hover { background: #1e293b; }
+  .tip { margin-top: 8px; }
+  code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+
+<script>
+  class simply {
+    state = { mood: "Calm" }
+  }
+</script>

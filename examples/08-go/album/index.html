@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Album — simply.go</title>
+  <base href="/simply/examples/08-go/album/">
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div class="shell">
+    <nav class="crumb">
+      <a href="../">« Examples</a> <span>Album</span>
+    </nav>
+    <h1>Album</h1>
+    <p class="intro">
+      Paginated <code>:page</code> param via <code>simply.go.setup()</code> — Simply components + <code>&lt;route&gt;</code>.
+    </p>
+    <route></route>
+  </div>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .shell {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: #3b82f6;
+    }
+    .intro {
+      color: #64748b;
+      margin: 0 0 24px;
+    }
+    .crumb {
+      font-size: 13px;
+      margin-bottom: 12px;
+      color: #64748b;
+    }
+    .crumb a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .crumb span {
+      margin-left: 8px;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  </style>
+
+  <script src="../../../simply.js"></script>
+  <script>
+    get("album-page.html");
+    get("album-notfound.html");
+
+    simply.go.setup(
+      { redirects: [{ from: "/", to: "/photos/0" }] },
+      [
+        { path: "/photos/:page", component: "album-page", title: "Album — Photos" },
+        { path: "*", component: "album-notfound", title: "Album — Not Found" }
+      ]
+    );
+  </script>
+</body>
+</html>

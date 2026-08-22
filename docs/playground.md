@@ -9,6 +9,8 @@
     max-height: unset;
     top: unset;
     bottom: 0px;
+    border: none;
+    border: none;
   }
   </style>
 

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simply — Chrome</title>
+  <!--
+    This page is declared in manifest.json under "sandbox.pages", so it is
+    served with a separate, lenient CSP that allows 'unsafe-eval' — which
+    simply.js needs for eval/new Function. It cannot access chrome.* APIs;
+    talk to popup.html via postMessage if you need them.
+
+    <base> pointing at sandbox.html is the same trick as the Electron example:
+    simply.js reads this tag and sets the router base to it, so every route
+    resolves against sandbox.html on the chrome-extension:// protocol.
+    With this base, links must start with "/" (e.g. href="/about").
+  -->
+  <base href="sandbox.html">
+</head>
+<body>
+  <div class="shell">
+    <h1>Simply in Chrome</h1>
+    <p class="intro">Basic navigation + <code>hashbang: true</code> — routes live after <code>#!</code>, so routing works on the <code>chrome-extension://</code> protocol without a server.</p>
+
+    <div class="panel">
+      <h2>Navigate</h2>
+      <div class="links">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/contact/kim">Contact Kim</a>
+        <a href="/counter">Counter</a>
+        <a href="/nope">Missing (→ *)</a>
+      </div>
+      <p class="muted small" style="margin:8px 0 0">URLs become <code>sandbox.html#!/about</code>, <code>sandbox.html#!/contact/kim</code> etc.</p>
+    </div>
+
+    <route></route>
+  </div>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .shell {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0 0 8px;
+      color: #3b82f6;
+    }
+    .intro {
+      color: #64748b;
+      margin: 0 0 20px;
+      font-size: 14px;
+    }
+    h2 {
+      font-size: 16px;
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #3b82f6;
+      color: #0f172a;
+    }
+    .panel {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      margin: 16px 0;
+    }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .links a {
+      color: #0f172a;
+    }
+    .links a[go-active] {
+      color: #3b82f6;
+      font-weight: 600;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .muted { color: #64748b; }
+    .small { font-size: 12px; }
+  </style>
+
+  <!-- simply.js is bundled inside the extension (see README) -->
+  <script src="simply.js"></script>
+  <script src="bridge.js"></script>
+  <script src="sandbox.js"></script>
+</body>
+</html>

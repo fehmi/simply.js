@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Simply — Chrome</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    iframe {
+      width: 640px;
+      height: 500px;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!--
+    MV3 extension pages cannot use 'unsafe-eval', but simply.js needs
+    eval/new Function to render templates. So the app runs inside a
+    sandboxed page (sandbox.html) embedded here — sandboxed pages get a
+    separate, lenient CSP that allows 'unsafe-eval'.
+
+    The sandbox cannot access chrome.* APIs, so this page acts as a bridge:
+    it receives postMessage requests from the sandbox and calls chrome.storage
+    on its behalf, sending the result back.
+  -->
+  <iframe src="sandbox.html"></iframe>
+
+  <!-- MV3 blocks inline scripts on extension pages, so the bridge lives in popup.js -->
+  <script src="popup.js"></script>
+</body>
+</html>

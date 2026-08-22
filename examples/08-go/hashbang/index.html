@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hashbang — simply.go</title>
+  <base href="/simply/examples/08-go/hashbang/">
+  <meta charset="UTF-8">
+</head>
+<body>
+  <div class="shell">
+    <nav class="crumb"><a href="../">« Examples</a> <span>Hashbang</span></nav>
+    <h1>Hashbang</h1>
+    <p class="intro">Routes live after <code>#!</code> in the URL (<code>/hashbang/#!/about</code>) — no server rewrites needed. Enable with <code>hashbang: true</code> in <code>setup()</code> settings.</p>
+
+    <div class="panel">
+      <h2>Navigate</h2>
+      <div class="links">
+        <a href="./">/</a>
+        <a href="./about">/about</a>
+        <a href="./contact">/contact</a>
+        <a href="./contact/me">/contact/me (param)</a>
+        <a href="./not-found?foo=bar">/not-found?foo=bar (→ *)</a>
+      </div>
+      <p class="muted small" style="margin:8px 0 0">Watch the URL — paths become <code>#!/about</code>, <code>#!/contact/me</code> etc.</p>
+    </div>
+
+    <route></route>
+  </div>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .shell {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      color: #3b82f6;
+    }
+    .intro {
+      color: #64748b;
+      margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #3b82f6;
+      color: #0f172a;
+    }
+    .crumb {
+      font-size: 13px;
+      margin-bottom: 12px;
+      color: #64748b;
+    }
+    .crumb a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    .crumb span {
+      margin-left: 8px;
+    }
+    .panel {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f8fafc;
+      margin: 16px 0;
+    }
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .links a {
+      color: #0f172a;
+    }
+    .links a[go-active] {
+      color: #3b82f6;
+      font-weight: 600;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .muted { color: #64748b; }
+    .small { font-size: 12px; }
+  </style>
+
+  <script src="../../../simply.js"></script>
+  <script>
+    get("hashbang-index.html");
+    get("hashbang-about.html");
+    get("hashbang-contact.html");
+    get("hashbang-notfound.html");
+
+    simply.go.setup(
+      {
+        hashbang: true
+      },
+      [
+        { path: "/", component: "hashbang-index", title: "Hashbang" },
+        { path: "/about", component: "hashbang-about", title: "Hashbang — About" },
+        { path: "/contact", component: "hashbang-contact", title: "Hashbang — Contact" },
+        { path: "/contact/:contactName", component: "hashbang-contact", title: "Hashbang — Contact" },
+        { path: "*", component: "hashbang-notfound", title: "Hashbang — Not Found" }
+      ]
+    );
+  </script>
+</body>
+</html>
