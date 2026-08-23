@@ -1,0 +1,52 @@
+<html>
+  <div
+    class="s-separator"
+    role="{{props.decorative === false ? 'separator' : 'none'}}"
+    data-orientation="{{props.orientation || 'horizontal'}}"
+  ></div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls */
+  :host,
+  s-separator {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-separator {
+    flex-shrink: 0;
+    background-color: var(--color-border);
+  }
+
+  .s-separator[data-orientation="horizontal"] {
+    height: 1px;
+    width: 100%;
+  }
+
+  /* self-stretch (not h-full) so it fills a flex container's height */
+  .s-separator[data-orientation="vertical"] {
+    width: 1px;
+    align-self: stretch;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-separator",
+        description: "Visually or semantically separates content.",
+        props: {
+          orientation: {
+            default: "horizontal",
+            options: ["horizontal", "vertical"]
+          },
+          decorative: {
+            default: true
+          }
+        }
+      }
+    }
+  }
+</script>

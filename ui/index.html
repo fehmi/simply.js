@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simply UI — Button &amp; Badge</title>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="themes/nova.css">
+  <link rel="stylesheet" href="themes/maia.css">
+  <link rel="stylesheet" href="themes/lyra.css">
+  <link rel="stylesheet" href="themes/mira.css">
+  <link rel="stylesheet" href="themes/luma.css">
+  <link rel="stylesheet" href="themes/sera.css">
+  <link rel="stylesheet" href="themes/rhea.css">
+  <style>
+    body {
+      background-color: var(--color-background);
+      color: var(--color-foreground);
+      font-family: var(--font-sans);
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      transition: background-color var(--default-transition-duration)
+        var(--default-transition-timing-function);
+    }
+
+    h1 {
+      font-size: var(--text-3xl);
+      font-weight: var(--font-weight-bold);
+      letter-spacing: var(--tracking-tight);
+      margin-bottom: 0.5rem;
+    }
+
+    .intro {
+      color: var(--color-muted-foreground);
+      font-size: var(--text-sm);
+      margin-bottom: 2rem;
+    }
+
+    .section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section h2 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: calc(var(--spacing) * 3);
+      margin-bottom: 1rem;
+    }
+
+    .row-label {
+      width: 100px;
+      color: var(--color-muted-foreground);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing) * 2);
+    }
+
+    .s-input {
+      height: calc(var(--spacing) * 9);
+      padding-inline: calc(var(--spacing) * 3);
+      border: 1px solid var(--color-input);
+      border-radius: var(--radius-md);
+      background-color: transparent;
+      color: var(--color-foreground);
+      font-size: var(--text-sm);
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+    }
+
+    .theme-switcher {
+      position: fixed;
+      top: 3.5rem;
+      right: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.5rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background-color: var(--color-background);
+      box-shadow: var(--shadow-md);
+    }
+
+    .theme-switcher button {
+      border: none;
+      background: transparent;
+      color: var(--color-foreground);
+      font-size: var(--text-xs);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .theme-switcher button:hover {
+      background-color: var(--color-muted);
+    }
+
+    .theme-switcher button[data-active="true"] {
+      background-color: var(--color-primary);
+      color: var(--color-primary-foreground);
+    }
+  </style>
+</head>
+
+<body>
+  <button class="theme-toggle" onclick="document.documentElement.classList.toggle('dark')">Toggle theme</button>
+  <div class="theme-switcher" id="theme-switcher">
+    <button data-theme="vega" data-active="true">Vega</button>
+    <button data-theme="nova">Nova</button>
+    <button data-theme="maia">Maia</button>
+    <button data-theme="lyra">Lyra</button>
+    <button data-theme="mira">Mira</button>
+    <button data-theme="luma">Luma</button>
+    <button data-theme="sera">Sera</button>
+    <button data-theme="rhea">Rhea</button>
+  </div>
+
+  <h1>Simply UI — Button &amp; Badge</h1>
+  <p class="intro">shadcn-based, native CSS component system for simply.js. Components: <code>s-button</code>, <code>s-badge</code>, <code>s-label</code>.</p>
+
+  <div class="section">
+    <h2>Variants</h2>
+    <div class="row">
+      <span class="row-label">default</span>
+      <s-button isolated variant="default"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">secondary</span>
+      <s-button isolated variant="secondary"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">outline</span>
+      <s-button isolated variant="outline"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">ghost</span>
+      <s-button isolated variant="ghost"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">destructive</span>
+      <s-button isolated variant="destructive"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">link</span>
+      <s-button isolated variant="link"></s-button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Sizes</h2>
+    <div class="row">
+      <span class="row-label">xs</span>
+      <s-button isolated size="xs"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">sm</span>
+      <s-button isolated size="sm"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">default</span>
+      <s-button isolated size="default"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">lg</span>
+      <s-button isolated size="lg"></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">icon</span>
+      <s-button isolated size="icon">★</s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">icon-xs</span>
+      <s-button isolated size="icon-xs">★</s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">icon-sm</span>
+      <s-button isolated size="icon-sm">★</s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">icon-lg</span>
+      <s-button isolated size="icon-lg">★</s-button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>States</h2>
+    <div class="row">
+      <span class="row-label">disabled</span>
+      <s-button isolated disabled></s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">with icon</span>
+      <s-button isolated>★ Save</s-button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Badge — Variants</h2>
+    <div class="row">
+      <span class="row-label">default</span>
+      <s-badge isolated variant="default"></s-badge>
+    </div>
+    <div class="row">
+      <span class="row-label">secondary</span>
+      <s-badge isolated variant="secondary"></s-badge>
+    </div>
+    <div class="row">
+      <span class="row-label">outline</span>
+      <s-badge isolated variant="outline"></s-badge>
+    </div>
+    <div class="row">
+      <span class="row-label">destructive</span>
+      <s-badge isolated variant="destructive"></s-badge>
+    </div>
+    <div class="row">
+      <span class="row-label">ghost</span>
+      <s-badge isolated variant="ghost"></s-badge>
+    </div>
+    <div class="row">
+      <span class="row-label">link</span>
+      <s-badge isolated variant="link"></s-badge>
+    </div>
+    <div class="row">
+      <span class="row-label">as link</span>
+      <a href="#"><s-badge isolated variant="outline">Link Badge</s-badge></a>
+    </div>
+    <div class="row">
+      <span class="row-label">with icon</span>
+      <s-badge isolated variant="secondary">★ New</s-badge>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Label</h2>
+    <div class="row">
+      <span class="row-label">default</span>
+      <s-label isolated for="email">Email</s-label>
+    </div>
+    <div class="row">
+      <span class="row-label">disabled</span>
+      <s-label isolated disabled>Disabled</s-label>
+    </div>
+    <div class="row">
+      <span class="row-label">with input</span>
+      <div class="field">
+        <s-label isolated for="name">Name</s-label>
+        <input id="name" class="s-input" placeholder="Enter your name">
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Separator</h2>
+    <div class="row">
+      <span class="row-label">horizontal</span>
+      <div style="width: 100%">
+        <s-separator></s-separator>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">vertical</span>
+      <div style="display: flex; align-items: center; gap: 1rem; height: 40px">
+        <span>Blog</span>
+        <s-separator orientation="vertical"></s-separator>
+        <span>Docs</span>
+        <s-separator orientation="vertical"></s-separator>
+        <span>Source</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Skeleton</h2>
+    <div class="row">
+      <span class="row-label">default</span>
+      <div style="width: 100%">
+        <s-skeleton></s-skeleton>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">avatar</span>
+      <div style="display: flex; align-items: center; gap: 1rem; width: 100%">
+        <s-skeleton style="width: 3rem; height: 3rem; border-radius: 9999px"></s-skeleton>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1">
+          <s-skeleton style="width: 60%; height: 1rem"></s-skeleton>
+          <s-skeleton style="width: 40%; height: 1rem"></s-skeleton>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">text</span>
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%">
+        <s-skeleton></s-skeleton>
+        <s-skeleton></s-skeleton>
+        <s-skeleton style="width: 75%"></s-skeleton>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Component Viewer</h2>
+    <s-component-viewer isolated component="s-button"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer isolated component="s-badge"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer isolated component="s-label"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer isolated component="s-separator"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer isolated component="s-skeleton"></s-component-viewer>
+  </div>
+
+  <script src="../simply.js"></script>
+  <script>
+    get("s-button.html");
+    get("s-badge.html");
+    get("s-label.html");
+    get("s-separator.html");
+    get("s-skeleton.html");
+    get("s-component-viewer.html");
+
+    // Theme switcher
+    document.getElementById("theme-switcher").addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-theme]");
+      if (!btn) return;
+      var theme = btn.getAttribute("data-theme");
+      if (theme === "vega") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", theme);
+      }
+      document.querySelectorAll(".theme-switcher button").forEach(function (b) {
+        b.setAttribute("data-active", b === btn ? "true" : "false");
+      });
+    });
+  </script>
+</body>
+
+</html>

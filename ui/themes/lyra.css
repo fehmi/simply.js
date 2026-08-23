@@ -1,0 +1,32 @@
+/* ============================================================
+   ui/themes/lyra.css — Lyra theme
+   Source: shadcn preset (baseColor: neutral, font: JetBrains Mono)
+   Colors inherit from the neutral default in :root.
+   Only the font is overridden.
+   ============================================================ */
+
+[data-theme="lyra"] {
+  --font-sans: "JetBrains Mono", monospace;
+
+  /* Button — Lyra (rounded-none, more compact) */
+  --button-radius: 0;
+  --button-radius-xs: 0;
+  --button-radius-sm: 0;
+  --button-height-sm: calc(var(--spacing) * 7);
+  --button-height-default: calc(var(--spacing) * 8);
+  --button-height-lg: calc(var(--spacing) * 9);
+  --button-size-icon: calc(var(--spacing) * 8);
+  --button-size-icon-sm: calc(var(--spacing) * 7);
+  --button-size-icon-lg: calc(var(--spacing) * 9);
+  --button-font-size-xs: var(--text-xs);
+  --button-font-size-sm: var(--text-xs);
+  --button-font-size-default: var(--text-xs);
+  --button-font-size-lg: var(--text-xs);
+
+  /* Badge — Lyra (rounded-none) */
+  --badge-radius: 0;
+
+  /* Label — Lyra (text-xs, normal weight) */
+  --label-font-size: var(--text-xs);
+  --label-font-weight: var(--font-weight-normal);
+}

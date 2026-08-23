@@ -1,0 +1,26 @@
+/* ============================================================
+   ui/themes/rhea.css — Rhea theme
+   Source: shadcn preset (baseColor: neutral, font: Inter)
+   Same font + colors as Vega. Colors inherit from :root.
+   ============================================================ */
+
+[data-theme="rhea"] {
+  --font-sans: "Inter", sans-serif;
+
+  /* Button — Rhea (rounded-2xl, more compact) */
+  --button-radius: var(--radius-2xl);
+  --button-radius-xs: var(--radius-2xl);
+  --button-radius-sm: var(--radius-2xl);
+  --button-height-sm: calc(var(--spacing) * 7);
+  --button-height-default: calc(var(--spacing) * 8);
+  --button-height-lg: calc(var(--spacing) * 9);
+  --button-size-icon: calc(var(--spacing) * 8);
+  --button-size-icon-sm: calc(var(--spacing) * 7);
+  --button-size-icon-lg: calc(var(--spacing) * 9);
+  --button-padding-sm: calc(var(--spacing) * 3);
+  --button-padding-default: calc(var(--spacing) * 3);
+  --button-padding-lg: calc(var(--spacing) * 4);
+
+  /* Badge — Rhea (rounded-2xl) */
+  --badge-radius: var(--radius-2xl);
+}

@@ -1,0 +1,19 @@
+/* ============================================================
+   ui/themes/maia.css — Maia theme
+   Source: shadcn preset (baseColor: neutral, font: Figtree)
+   Colors inherit from the neutral default in :root.
+   Only the font is overridden.
+   ============================================================ */
+
+[data-theme="maia"] {
+  --font-sans: "Figtree", sans-serif;
+
+  /* Button — Maia (rounded-4xl, wider padding) */
+  --button-radius: var(--radius-4xl);
+  --button-radius-xs: var(--radius-4xl);
+  --button-radius-sm: var(--radius-4xl);
+  --button-padding-xs: calc(var(--spacing) * 2.5);
+  --button-padding-sm: calc(var(--spacing) * 3);
+  --button-padding-default: calc(var(--spacing) * 3);
+  --button-padding-lg: calc(var(--spacing) * 4);
+}

@@ -1,0 +1,191 @@
+<html>
+  <span
+    class="s-badge"
+    data-variant="{{props.variant || 'default'}}"
+  >
+    <slot>Badge</slot>
+  </span>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner span controls */
+  :host {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4 vega style) ---- */
+  .s-badge {
+    display: inline-flex;
+    width: fit-content;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing) * 1);
+    overflow: hidden;
+    height: calc(var(--spacing) * 5);
+    padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 2);
+    border: 1px solid transparent;
+    border-radius: var(--badge-radius);
+    font-size: var(--badge-font-size);
+    line-height: var(--text-xs--line-height);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    transition: all var(--default-transition-duration)
+      var(--default-transition-timing-function);
+    color: inherit;
+    background-color: transparent;
+  }
+
+  /* Focus */
+  .s-badge:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  /* Invalid */
+  .s-badge[aria-invalid="true"] {
+    border-color: var(--color-destructive);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  :host-context(.dark) .s-badge[aria-invalid="true"] {
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 40%, transparent);
+  }
+
+  /* Icon */
+  .s-badge > svg {
+    pointer-events: none;
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+  }
+
+  /* Icon positioning */
+  .s-badge:has([data-icon="inline-end"]) {
+    padding-right: calc(var(--spacing) * 1.5);
+  }
+
+  .s-badge:has([data-icon="inline-start"]) {
+    padding-left: calc(var(--spacing) * 1.5);
+  }
+
+  /* ---- Variants ---- */
+  .s-badge[data-variant="default"] {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+
+  :host-context(a) .s-badge[data-variant="default"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-primary) 80%,
+      transparent
+    );
+  }
+
+  .s-badge[data-variant="secondary"] {
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-foreground);
+  }
+
+  :host-context(a) .s-badge[data-variant="secondary"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-secondary) 80%,
+      transparent
+    );
+  }
+
+  .s-badge[data-variant="outline"] {
+    border-color: var(--color-border);
+    color: var(--color-foreground);
+  }
+
+  :host-context(a) .s-badge[data-variant="outline"]:hover {
+    background-color: var(--color-muted);
+    color: var(--color-muted-foreground);
+  }
+
+  .s-badge[data-variant="destructive"] {
+    background-color: color-mix(
+      in oklab,
+      var(--color-destructive) 10%,
+      transparent
+    );
+    color: var(--color-destructive);
+  }
+
+  :host-context(a) .s-badge[data-variant="destructive"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-destructive) 20%,
+      transparent
+    );
+  }
+
+  .s-badge[data-variant="destructive"]:focus-visible {
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  :host-context(.dark) .s-badge[data-variant="destructive"] {
+    background-color: color-mix(
+      in oklab,
+      var(--color-destructive) 20%,
+      transparent
+    );
+  }
+
+  :host-context(.dark) .s-badge[data-variant="destructive"]:focus-visible {
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 40%, transparent);
+  }
+
+  .s-badge[data-variant="ghost"] {
+    background-color: transparent;
+  }
+
+  .s-badge[data-variant="ghost"]:hover {
+    background-color: var(--color-muted);
+    color: var(--color-muted-foreground);
+  }
+
+  :host-context(.dark) .s-badge[data-variant="ghost"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-muted) 50%,
+      transparent
+    );
+  }
+
+  .s-badge[data-variant="link"] {
+    color: var(--color-primary);
+    text-underline-offset: 4px;
+  }
+
+  .s-badge[data-variant="link"]:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-badge",
+        description: "Displays a badge or a component that looks like a badge.",
+        props: {
+          variant: {
+            options: ["default", "secondary", "outline", "destructive", "ghost", "link"],
+            default: "default"
+          },
+          slot: {
+            default: "Badge"
+          }
+        }
+      }
+    }
+  }
+</script>

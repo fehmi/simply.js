@@ -33,7 +33,13 @@
 - [Agents & AI](#agents-agents)  <!-- Agents -->
 - [AI Docs](#agents-ai-docs)  <!-- Agents -->
 - [REPL API](#agents-repl-api)  <!-- Agents -->
-- [Icon](#components-s-icon)  <!-- Components -->
+- [Introduction](#ui-index)  <!-- Simply UI -->
+- [Button](#ui-button)  <!-- Simply UI -->
+- [Badge](#ui-badge)  <!-- Simply UI -->
+- [Label](#ui-label)  <!-- Simply UI -->
+- [Separator](#ui-separator)  <!-- Simply UI -->
+- [Skeleton](#ui-skeleton)  <!-- Simply UI -->
+- [Component Viewer](#ui-component-viewer)  <!-- Simply UI -->
 
 ---
 
@@ -3805,29 +3811,30 @@ That completes the setup!
 
 ## Agents & AI
 
-> This section explains how AI agents — LLMs, coding assistants, and agentic browser tools — can interact with Simply.js. All content here is a work in progress; endpoints and URLs marked as `TBD` are placeholders to be filled in as the backend is developed.
+> This section explains how AI agents — LLMs, coding assistants, and agentic browser tools — can interact with Simply.js.
 
 Simply.js exposes two main surfaces for AI agents:
 
-## 1. Documentation Access
+## 1. Documentation Access — live
 
-AIs can pull the full documentation as machine-friendly input instead of crawling the site.
+AIs can pull the full documentation as machine-friendly Markdown instead of crawling the site.
 
-- [AI Docs](ai-docs.md) — the documentation access URL and the planned single, complete Markdown version of the entire documentation for AI consumption.
+- [AI Docs](ai-docs.md) — how to fetch `llms.txt` (index) and `llms-full.txt` (single complete Markdown file), and how individual pages are also directly fetchable.
 
-## 2. REPL API
+## 2. REPL API — planned (TBD)
 
-Programmatic access to the REPL's saved examples — listing, searching, saving, and reading them by id.
+Programmatic access to the REPL's saved examples — listing, searching, saving, and reading them by id. Backend not implemented yet.
 
 - [REPL API](repl-api.md) — endpoints for listing (with pagination), searching by keyword, saving new examples, and reading an example by id.
 
 ---
 
-## Planned Capabilities
+## Capabilities
 
 | Capability | Status |
 | --- | --- |
-| Single complete Markdown doc for AIs | TBD |
+| Single complete Markdown doc for AIs (`llms-full.txt`) | ✅ Live |
+| Docs index for AIs (`llms.txt`) | ✅ Live |
 | List saved examples (pagination) | TBD |
 | Search saved examples by keyword | TBD |
 | Save a new example | TBD |
@@ -3838,11 +3845,11 @@ Programmatic access to the REPL's saved examples — listing, searching, saving,
 ## Design Goals (for AI consumers)
 
 - **`curl`-friendly** — every endpoint should be callable with a plain `curl` from the terminal, no auth required (unless rate-limiting requires a key).
-- **JSON everywhere** — consistent JSON request/response bodies, UTF-8 encoded.
-- **Browser-ready URLs** — responses for saved examples include a URL an agentic browser tool can open directly.
-- **No scraping needed** — the single Markdown doc is designed so an LLM can ingest the entire library in one fetch.
+- **JSON everywhere** — consistent JSON request/response bodies, UTF-8 encoded, for the REPL API once it lands.
+- **Browser-ready URLs** — responses for saved examples will include a URL an agentic browser tool can open directly.
+- **No scraping needed** — `llms-full.txt` is designed so an LLM can ingest the entire library in one fetch; `llms.txt` lets it fetch only what's relevant.
 
-> **Note:** Everything on this page is a placeholder until the backend work lands. When endpoints are finalized, the `TBD` values below will be replaced with concrete URLs, parameters, and examples.
+> **Note:** The REPL API section is still a placeholder until that backend work lands. The documentation-access section above is live today.
 
 ---
 
@@ -3850,62 +3857,64 @@ Programmatic access to the REPL's saved examples — listing, searching, saving,
 
 ## AI Docs Access
 
-> Placeholder — the single complete Markdown version is planned but not yet generated.
+This page describes how AI agents can access the Simply.js documentation. There are three ways to do it, depending on what you need.
 
-This page describes how AI agents can access the Simply.js documentation. The goal is a **single, complete Markdown file** covering the entire library, so an LLM can ingest everything in one request instead of crawling dozens of pages.
+## 1. Single, complete Markdown file (recommended for one-shot ingestion)
 
-## Current Documentation Site
-
-The interactive docs (for humans) live at:
+Fetch the entire library documentation — every doc page, concatenated and cleaned up for plain-text reading — in one request:
 
 ```
-https://simply.js.org/
+https://simply.js.org/llms-full.txt
 ```
 
-- Human-readable, multi-page, docsify-based.
-- Suitable for browsing, not ideal for LLM ingestion (many pages, navigation, embedded demos).
+- Format: single Markdown file, UTF-8.
+- Content: About, Getting Started, Component/Template/Script/Style syntax, Router, Framer/Electron/Chrome integrations, and this Agents section — in the same order as the site's sidebar.
+- Interactive live-demo widgets embedded in the human docs are replaced with a short note (they can't be represented as plain text); everything else is kept.
+- Stable and cacheable — content only changes when the docs change.
 
-## Single Markdown Version (Planned)
-
-> TBD — URL not finalized yet.
-
-Once generated, AIs will fetch the entire documentation from one URL:
-
-```
-https://simply.js.org/docs/ai/simply.md   <!-- TBD -->
+```bash
+curl https://simply.js.org/llms-full.txt
 ```
 
-**Planned characteristics:**
+## 2. Index file (recommended if you only need part of the docs)
 
-| Field | Value |
-| --- | --- |
-| URL | `TBD` |
-| Format | Single Markdown file (`.md`) |
-| Content | All doc pages concatenated: component syntax, template, style, script, lifecycle, reactivity, state, router, REPL API, etc. |
-| Encoding | UTF-8 |
-| Caching | Stable — content changes infrequently, safe for AIs to cache |
+```
+https://simply.js.org/llms.txt
+```
 
-**Planned table of contents (sections that will be included):**
+Follows the [llms.txt](https://llmstxt.org) convention: a short project summary plus a categorized list of links to every doc page, each with a one-line description, so you can fetch only the section(s) relevant to the task instead of the whole file.
 
-1. Getting Started
-2. Component Syntax (Structure, Template, Style, Script)
-3. Template Syntax (Variables, Conditionals, Loops, DOM Events, Nested Components, Slot)
-4. Script Syntax (Load Components, Communication, Lifecycle, Reactivity, State)
-5. Style (Variables, Conditions, Scope & Encapsulation)
-6. Router
-7. Integrations (Framer, Electron)
-8. REPL API (see [REPL API](repl-api.md))
+```bash
+curl https://simply.js.org/llms.txt
+```
+
+## 3. Individual pages
+
+The docs site is fully static (docsify + GitHub Pages), so every page is also fetchable directly as raw Markdown, no JavaScript execution needed:
+
+```
+https://simply.js.org/docs/<page>.md
+```
+
+e.g. `https://simply.js.org/docs/router.md`, `https://simply.js.org/docs/component-structure.md`. Useful when you already know exactly which page you need and don't want the rest.
+
+## Current Documentation Site (for humans)
+
+The interactive docs live at `https://simply.js.org/` — human-readable, multi-page, docsify-based, with live in-browser demos. Good for browsing; the three options above are better suited for LLM ingestion.
 
 ## Suggested Usage for AI Agents
 
 ```bash
-# Fetch the entire library documentation in one shot (TBD)
-curl https://simply.js.org/docs/ai/simply.md   <!-- TBD -->
+# Get an index first, then fetch what you need
+curl https://simply.js.org/llms.txt
+
+# Or just pull everything in one shot
+curl https://simply.js.org/llms-full.txt
 ```
 
-Then feed the response directly into the model context as a reference.
+Feed the response directly into the model context as reference material before writing simply.js code.
 
-> TODO: Generate the single Markdown file from the docs source and publish it. The URL above is a placeholder.
+> Source: both `llms.txt` and `llms-full.txt` are generated from the same docs source with `scripts/build-llms.mjs` in the [repo](https://github.com/fehmi/simply.js) — see that script if a page looks stale.
 
 ---
 
@@ -4159,28 +4168,458 @@ These are extra capabilities that would make the API even more useful for AI age
 
 ---
 
-<a id="components-s-icon"></a>
+<a id="ui-index"></a>
 
-## Iconify
+## Simply UI
 
-The icon component is a wrapper around beautiful [Iconify](https://docs.iconify.design/iconify-icon/#attributes) web-component. The purpose of the wrapper is to be able to use custom styles in the future and make curation with selected icons for a brend new UI kit and design system.
+A shadcn-based UI component system for simply.js, built with **native CSS**. Zero-dependency, no build, no Tailwind.
 
-You can use all official attributes of Iconify component in the icon component like this:
+This section documents the component system developed in the `ui/` folder. Components are single `.html` files loaded with simply.js.
 
-> _Interactive component demo on the docs site (not reproduced in this text export)._
+> **Note:** **Golden rule**: We build new features as needed. To stay sustainable, each component teaches the patterns needed by the next one.
 
+## Architecture — 3 Layers
 
+| Layer | File | Content |
+|---|---|---|
+| **1. Raw tokens** | `ui/tokens.css` | OKLCH color palette (full Tailwind v4 palette), `--spacing`, typography, radius, shadow + semantic aliases |
+| **2. Semantic theme** | `ui/theme.css` | `:root` + `.dark` semantic tokens + base reset + **component tokens** (vega defaults) |
+| **3. Component styles** | each `.html`'s `<style>` block | variant/size/state styles, consuming tokens |
 
-> _Interactive live demo on the docs site (not reproduced in this text export)._
+## Theme System
 
-- mode, string sets icon rendering mode. Seee rendering modes. (svg, style, bg, mask)
-- inline, boolean changes vertical alignment. See vertical alignment. (style="vertical-align: -0.125em" or inline attribute)
-- width, string | number icon width. See icon dimensions.
-- height, string | number icon height. See icon dimensions.
-- flip, string flip icon. See icon transformations.
-- rotate, number | string rotates icon. See icon transformations.
+8 shadcn themes are supported: **Vega** (default), **Nova**, **Maia**, **Lyra**, **Mira**, **Luma**, **Sera**, **Rhea**.
 
-## Icon Browsers
+- `ui/theme.css` — default theme (Vega = neutral colors + Inter font)
+- `ui/themes/*.css` — additional themes, overriding via `[data-theme="..."]`
+- Theme selection: `<html data-theme="nova">` (remove attribute → vega)
+- Dark mode: `.dark` class
 
-[Iconify](https://icon-sets.iconify.design/)
-[Icones](https://icones.js.org/)
+Themes change not only colors/fonts but also **component sizes and radii** (via the component token architecture).
+
+## Components
+
+- [Button](#ui-button) — button with variants and sizes
+- [Badge](#ui-badge) — badge / pill
+- [Label](#ui-label) — form label
+- [Separator](#ui-separator) — horizontal / vertical rule
+- [Skeleton](#ui-skeleton) — loading placeholder
+- [Component Viewer](#ui-component-viewer) — live preview tool
+
+> **Note:** Each component page includes a live **component viewer** (parameter editing, dark/light toggle, theme switching).
+
+## Usage
+
+```html
+<html>
+  <head>
+    <link rel="stylesheet" href="ui/tokens.css">
+    <link rel="stylesheet" href="ui/theme.css">
+    <!-- optional theme: <link rel="stylesheet" href="ui/themes/nova.css"> -->
+  </head>
+  <body>
+    <s-label isolated for="email">Email</s-label>
+    <script src="simply.js"></script>
+    <script>
+      get("ui/s-label.html");
+    </script>
+  </body>
+</html>
+```
+
+## Development Notes
+
+- Components use `isolated` (shadow DOM) + native `<slot>`
+- `{{...}}` double braces are required
+- Dark mode selectors use `:host-context(.dark)`
+- Detailed guide: `ui/README.md`
+
+---
+
+<a id="ui-button"></a>
+
+## Button
+
+Displays a button or a component that looks like a button. The base component of the system — it establishes the core pattern (isolated + native slot, variant/size via `data-*` attributes, theme tokens).
+
+## Usage
+
+```html
+<s-button isolated variant="default">Click me</s-button>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `variant` | string | `"default"` | `default` \| `destructive` \| `outline` \| `secondary` \| `ghost` \| `link` |
+| `size` | string | `"default"` | `xs` \| `sm` \| `default` \| `lg` \| `icon` \| `icon-xs` \| `icon-sm` \| `icon-lg` |
+| `disabled` | boolean | `false` | Disables the button (opacity 0.5, no pointer events) |
+
+## Variants
+
+```html
+<s-button isolated variant="default">Default</s-button>
+<s-button isolated variant="secondary">Secondary</s-button>
+<s-button isolated variant="outline">Outline</s-button>
+<s-button isolated variant="ghost">Ghost</s-button>
+<s-button isolated variant="destructive">Destructive</s-button>
+<s-button isolated variant="link">Link</s-button>
+```
+
+## Sizes
+
+```html
+<s-button isolated size="xs">Extra Small</s-button>
+<s-button isolated size="sm">Small</s-button>
+<s-button isolated size="default">Default</s-button>
+<s-button isolated size="lg">Large</s-button>
+<s-button isolated size="icon">★</s-button>
+```
+
+## With Icon
+
+```html
+<s-button isolated>★ Save</s-button>
+```
+
+## Disabled
+
+```html
+<s-button isolated disabled>Disabled</s-button>
+```
+
+## Theming
+
+The button uses theme-dependent tokens for sizes and radii:
+
+| Theme | default h | radius | font |
+|---|---|---|---|
+| Vega (default) | h-9 (36px) | rounded-md (8px) | 14px |
+| Nova | h-8 (32px) | rounded-lg (10px) | 14px |
+| Maia | h-9 (36px) | rounded-4xl (32px) | 14px |
+| Lyra | h-8 (32px) | rounded-none (0) | 12px |
+| Mira | h-7 (28px) | rounded-md (8px) | 12px |
+| Luma | h-9 (36px) | rounded-4xl (32px) | 14px |
+| Sera | h-10 (40px) | rounded-none (0) | 12px |
+| Rhea | h-8 (32px) | rounded-2xl (16px) | 14px |
+
+Tokens: `--button-radius`, `--button-height-*`, `--button-size-icon-*`, `--button-font-size-*`, `--button-padding-*`, `--button-gap-*`.
+
+## Live Demo
+
+<s-component-viewer isolated component="ui/s-button"></s-component-viewer>
+
+---
+
+<a id="ui-badge"></a>
+
+## Badge
+
+Displays a badge or a component that looks like a badge. A small pill used for labels, counts, or statuses.
+
+## Usage
+
+```html
+<s-badge isolated variant="default">Badge</s-badge>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `variant` | string | `"default"` | `default` \| `secondary` \| `outline` \| `destructive` \| `ghost` \| `link` |
+
+## Variants
+
+```html
+<s-badge isolated variant="default">Default</s-badge>
+<s-badge isolated variant="secondary">Secondary</s-badge>
+<s-badge isolated variant="outline">Outline</s-badge>
+<s-badge isolated variant="destructive">Destructive</s-badge>
+<s-badge isolated variant="ghost">Ghost</s-badge>
+<s-badge isolated variant="link">Link</s-badge>
+```
+
+## As a Link
+
+```html
+<a href="#"><s-badge isolated variant="outline">Link Badge</s-badge></a>
+```
+
+When wrapped in an anchor, the badge gets hover styles via `:host-context(a)`.
+
+## With Icon
+
+```html
+<s-badge isolated variant="secondary">★ New</s-badge>
+```
+
+## Theming
+
+The badge uses theme-dependent tokens:
+
+| Theme | radius | font-size |
+|---|---|---|
+| Vega (default) | rounded-4xl (32px) | text-xs (12px) |
+| Lyra | rounded-none (0) | text-xs (12px) |
+| Mira | rounded-full | 0.625rem |
+| Luma | rounded-3xl | text-xs (12px) |
+| Sera | rounded-none (0) | 0.625rem |
+| Rhea | rounded-2xl (16px) | text-xs (12px) |
+
+Tokens: `--badge-radius`, `--badge-font-size`.
+
+## Live Demo
+
+<s-component-viewer isolated component="ui/s-badge"></s-component-viewer>
+
+---
+
+<a id="ui-label"></a>
+
+## Label
+
+A label associated with a form control. Links to an input via the `for` attribute.
+
+## Usage
+
+```html
+<s-label isolated for="email">Email</s-label>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `for` | string | `""` | The `id` of the associated form control |
+| `disabled` | boolean | `false` | Fades the label (opacity 0.5) |
+
+## Example
+
+```html
+<div class="field">
+  <s-label isolated for="name">Name</s-label>
+  <input id="name" placeholder="Enter your name">
+</div>
+```
+
+## Disabled
+
+```html
+<s-label isolated disabled>Disabled</s-label>
+```
+
+The `disabled` attribute fades the label. The label also fades automatically when a parent element has `data-disabled="true"`.
+
+> **Note:** **Note**: shadcn's `peer-disabled` pattern (auto-fading when a sibling input with class `peer` is disabled) is not directly supported because sibling selectors don't cross the shadow DOM boundary. Use the `disabled` prop instead.
+
+## Theming
+
+The label uses theme-dependent tokens:
+
+| Theme | font-size | font-weight | transform |
+|---|---|---|---|
+| Vega (default) | text-sm (14px) | medium (500) | none |
+| Lyra | text-xs (12px) | normal (400) | none |
+| Mira | text-xs (12px) | medium (500) | none |
+| Sera | text-xs (12px) | semibold (600) | uppercase |
+
+Tokens: `--label-font-size`, `--label-font-weight`, `--label-line-height`, `--label-text-transform`, `--label-letter-spacing`, `--label-gap`.
+
+## Live Demo
+
+<s-component-viewer isolated component="ui/s-label"></s-component-viewer>
+
+---
+
+<a id="ui-separator"></a>
+
+## Separator
+
+Visually or semantically separates content. A thin rule that can be horizontal or vertical.
+
+## Usage
+
+```html
+<s-separator></s-separator>
+```
+
+> **Note:** The separator has **no slot**, so `isolated` is **optional** — it works in both light DOM and shadow DOM. Use `isolated` only if you want the component's styles scoped to a shadow root.
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `orientation` | string | `"horizontal"` | `horizontal` \| `vertical` |
+| `decorative` | boolean | `true` | When `true`, renders `role="none"` (purely visual). Set `decorative="false"` for a semantic `role="separator"` |
+
+## Horizontal
+
+```html
+<s-separator></s-separator>
+```
+
+A 1px rule spanning the full width of its container.
+
+## Vertical
+
+```html
+<div style="display: flex; align-items: center; gap: 1rem; height: 40px">
+  <span>Blog</span>
+  <s-separator orientation="vertical"></s-separator>
+  <span>Docs</span>
+  <s-separator orientation="vertical"></s-separator>
+  <span>Source</span>
+</div>
+```
+
+A 1px vertical rule. Uses `align-self: stretch` so it fills the height of a flex container.
+
+## Semantic Separator
+
+```html
+<s-separator decorative="false"></s-separator>
+```
+
+By default the separator is decorative (`role="none"`). Set `decorative="false"` to expose it to assistive technology as `role="separator"`.
+
+## Theming
+
+The separator uses the theme's border color:
+
+| Token | Value |
+|---|---|
+| `--color-border` | theme-dependent border color |
+
+## Live Demo
+
+<s-component-viewer isolated component="ui/s-separator"></s-component-viewer>
+
+---
+
+<a id="ui-skeleton"></a>
+
+## Skeleton
+
+Use to show a placeholder while content is loading. A pulsing block that mimics the shape of the eventual content.
+
+## Usage
+
+```html
+<s-skeleton></s-skeleton>
+```
+
+The skeleton has a default size (`width: 100%; height: 1rem`). Size it via inline styles on the tag:
+
+```html
+<s-skeleton style="width: 3rem; height: 3rem; border-radius: 9999px"></s-skeleton>
+```
+
+> **Note:** The skeleton has **no slot**, so `isolated` is **optional** — it works in both light DOM and shadow DOM. The host is the sizeable box; the inner div fills it and inherits the radius.
+
+## Props
+
+The skeleton has no props — it's a styled placeholder div.
+
+## Avatar
+
+```html
+<div style="display: flex; align-items: center; gap: 1rem">
+  <s-skeleton style="width: 3rem; height: 3rem; border-radius: 9999px"></s-skeleton>
+  <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1">
+    <s-skeleton style="width: 60%; height: 1rem"></s-skeleton>
+    <s-skeleton style="width: 40%; height: 1rem"></s-skeleton>
+  </div>
+</div>
+```
+
+## Text
+
+```html
+<div style="display: flex; flex-direction: column; gap: 0.5rem">
+  <s-skeleton></s-skeleton>
+  <s-skeleton></s-skeleton>
+  <s-skeleton style="width: 75%"></s-skeleton>
+</div>
+```
+
+## Theming
+
+The skeleton uses the theme's accent color and radius:
+
+| Token | Value |
+|---|---|
+| `--color-accent` | theme-dependent accent color |
+| `--radius-md` | theme-dependent radius |
+
+## Live Demo
+
+<s-component-viewer isolated component="ui/s-skeleton"></s-component-viewer>
+
+---
+
+<a id="ui-component-viewer"></a>
+
+## Component Viewer
+
+A live preview tool for Simply UI components. Lets you change every supported component parameter and see the result instantly, with dark mode and theme switching.
+
+## Usage
+
+```html
+<s-component-viewer isolated component="s-button"></s-component-viewer>
+```
+
+The `component` prop is the path to the component file (without `.html`). It accepts **full or relative URLs** — the last path segment is used as the tag name:
+
+| `component` value | Loads | Tag |
+|---|---|---|
+| `"s-button"` | `s-button.html` (relative to current page) | `s-button` |
+| `"ui/s-button"` | `ui/s-button.html` (relative to current page) | `s-button` |
+| `"https://example.com/ui/s-button"` | full URL | `s-button` |
+
+The viewer loads the component itself via `get()`.
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `component` | string | `""` | Path to the component to preview (e.g. `"ui/s-button"`) |
+| `radioThreshold` | number | `4` | Max options before switching from radio group to select |
+
+## Features
+
+- **Parameter editing** — every prop from the component's `data.doc.props` metadata gets a control
+- **Slot editing** — the slot content is editable via a textarea (updates the preview's children)
+- **Dark mode toggle** — toggles `.dark` on the document. The viewer opens in **dark mode by default**; the viewer's own UI stays dark regardless, only the **preview area** follows the light/dark theme. The toggle label reflects the current mode ("Light" in dark, "Dark" in light)
+- **Theme switcher** — switches between all 8 themes (Vega, Nova, Maia, Lyra, Mira, Luma, Sera, Rhea)
+- **Multiple viewers stay in sync** — dark/light and theme are page-global; changing them in one viewer updates all viewers on the page (via a `MutationObserver` on `<html>`'s `class`/`data-theme`)
+
+## Control Types
+
+The viewer infers the control type from each prop's metadata:
+
+| Prop metadata | Control |
+|---|---|
+| `options` array | **Radio group** if `options.length <= radioThreshold`, else **select** |
+| boolean default | **Checkbox** |
+| `slot` key | **Textarea** |
+| otherwise | **Text input** |
+
+## How It Works
+
+1. The viewer reads the target component's `data.doc.props` metadata
+2. It builds a control list from the props
+3. It creates a preview instance of the component and applies the initial prop values
+4. When a control changes, it updates the preview component's prop (or children for slot)
+
+## Example
+
+```html
+<s-component-viewer isolated component="ui/s-button"></s-component-viewer>
+```
+
+## Live Demo
+
+<s-component-viewer isolated component="ui/s-button"></s-component-viewer>

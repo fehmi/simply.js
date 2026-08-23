@@ -1,0 +1,22 @@
+/* ============================================================
+   ui/themes/nova.css — Nova theme
+   Source: shadcn preset (baseColor: neutral, font: Geist)
+   Colors inherit from the neutral default in :root.
+   Only the font is overridden.
+   ============================================================ */
+
+[data-theme="nova"] {
+  --font-sans: "Geist", sans-serif;
+
+  /* Button — Nova (more compact) */
+  --button-radius: var(--radius-lg);
+  --button-radius-xs: min(var(--radius-md), 10px);
+  --button-radius-sm: min(var(--radius-md), 12px);
+  --button-height-sm: calc(var(--spacing) * 7);
+  --button-height-default: calc(var(--spacing) * 8);
+  --button-height-lg: calc(var(--spacing) * 9);
+  --button-size-icon: calc(var(--spacing) * 8);
+  --button-size-icon-sm: calc(var(--spacing) * 7);
+  --button-size-icon-lg: calc(var(--spacing) * 9);
+  --button-font-size-sm: 0.8rem;
+}

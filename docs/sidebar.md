@@ -49,3 +49,13 @@
   - [Agents & AI](docs/agents/agents.md)
   - [AI Docs](docs/agents/ai-docs.md)
   - [REPL API](docs/agents/repl-api.md)
+
+- <br>Simply UI
+
+  - [Introduction](docs/ui/index.md)
+  - [Button](docs/ui/button.md)
+  - [Badge](docs/ui/badge.md)
+  - [Label](docs/ui/label.md)
+  - [Separator](docs/ui/separator.md)
+  - [Skeleton](docs/ui/skeleton.md)
+  - [Component Viewer](docs/ui/component-viewer.md)

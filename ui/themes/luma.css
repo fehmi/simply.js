@@ -1,0 +1,21 @@
+/* ============================================================
+   ui/themes/luma.css — Luma theme
+   Source: shadcn preset (baseColor: neutral, font: Inter)
+   Same font + colors as Vega. Colors inherit from :root.
+   ============================================================ */
+
+[data-theme="luma"] {
+  --font-sans: "Inter", sans-serif;
+
+  /* Button — Luma (rounded-4xl, wider padding) */
+  --button-radius: var(--radius-4xl);
+  --button-radius-xs: var(--radius-4xl);
+  --button-radius-sm: var(--radius-4xl);
+  --button-padding-xs: calc(var(--spacing) * 2.5);
+  --button-padding-sm: calc(var(--spacing) * 3);
+  --button-padding-default: calc(var(--spacing) * 3);
+  --button-padding-lg: calc(var(--spacing) * 4);
+
+  /* Badge — Luma (rounded-3xl) */
+  --badge-radius: var(--radius-3xl);
+}

@@ -1,0 +1,48 @@
+<html>
+  <div class="s-skeleton" data-slot="skeleton"></div>
+</html>
+
+<style>
+  /* Host is the sizeable box (user sets width/height/border-radius via
+     inline styles on the tag). The inner div fills it and inherits the
+     radius. s-skeleton { ... } handles the LIGHT DOM case (no isolated)
+     since :host only matches in shadow DOM. */
+  :host,
+  s-skeleton {
+    display: block;
+    width: 100%;
+    height: 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-skeleton {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-accent);
+    border-radius: inherit;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-skeleton",
+        description: "Use to show a placeholder while content is loading.",
+        props: {}
+      }
+    }
+  }
+</script>

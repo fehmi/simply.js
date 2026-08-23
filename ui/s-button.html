@@ -1,0 +1,352 @@
+<html>
+  <button
+    class="s-button"
+    data-variant="{{props.variant || 'default'}}"
+    data-size="{{props.size || 'default'}}"
+    ?disabled="{{props.disabled === '' || props.disabled}}"
+  >
+    <slot>Button</slot>
+  </button>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner button controls */
+  :host {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4 vega style) ---- */
+  .s-button {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    color: inherit;
+    background-color: transparent;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    transition: all var(--default-transition-duration)
+      var(--default-transition-timing-function);
+    outline: none;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  /* Focus */
+  .s-button:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  /* Active */
+  .s-button:active:not([aria-haspopup]) {
+    translate: 0 1px;
+  }
+
+  /* Disabled */
+  .s-button:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* Invalid */
+  .s-button[aria-invalid="true"] {
+    border-color: var(--color-destructive);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  :host-context(.dark) .s-button[aria-invalid="true"] {
+    border-color: color-mix(
+      in oklab,
+      var(--color-destructive) 50%,
+      transparent
+    );
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 40%, transparent);
+  }
+
+  /* Icon */
+  .s-button > svg {
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  /* ---- Variants ---- */
+  .s-button[data-variant="default"] {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+
+  .s-button[data-variant="default"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-primary) 80%,
+      transparent
+    );
+  }
+
+  .s-button[data-variant="outline"] {
+    border-color: var(--color-border);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .s-button[data-variant="outline"]:hover {
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+  }
+
+  :host-context(.dark) .s-button[data-variant="outline"] {
+    border-color: var(--color-input);
+    background-color: color-mix(
+      in oklab,
+      var(--color-input) 30%,
+      transparent
+    );
+  }
+
+  :host-context(.dark) .s-button[data-variant="outline"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-input) 50%,
+      transparent
+    );
+  }
+
+  .s-button[data-variant="secondary"] {
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-foreground);
+  }
+
+  .s-button[data-variant="secondary"]:hover {
+    background-color: color-mix(
+      in oklch,
+      var(--secondary),
+      var(--foreground) 5%
+    );
+  }
+
+  .s-button[data-variant="ghost"] {
+    background-color: transparent;
+  }
+
+  .s-button[data-variant="ghost"]:hover {
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+  }
+
+  :host-context(.dark) .s-button[data-variant="ghost"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-muted) 50%,
+      transparent
+    );
+  }
+
+  .s-button[data-variant="destructive"] {
+    background-color: color-mix(
+      in oklab,
+      var(--color-destructive) 10%,
+      transparent
+    );
+    color: var(--color-destructive);
+  }
+
+  .s-button[data-variant="destructive"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-destructive) 20%,
+      transparent
+    );
+  }
+
+  .s-button[data-variant="destructive"]:focus-visible {
+    border-color: color-mix(
+      in oklab,
+      var(--color-destructive) 40%,
+      transparent
+    );
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  :host-context(.dark) .s-button[data-variant="destructive"] {
+    background-color: color-mix(
+      in oklab,
+      var(--color-destructive) 20%,
+      transparent
+    );
+  }
+
+  :host-context(.dark) .s-button[data-variant="destructive"]:hover {
+    background-color: color-mix(
+      in oklab,
+      var(--color-destructive) 30%,
+      transparent
+    );
+  }
+
+  :host-context(.dark) .s-button[data-variant="destructive"]:focus-visible {
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 40%, transparent);
+  }
+
+  .s-button[data-variant="link"] {
+    color: var(--color-primary);
+    text-underline-offset: 4px;
+  }
+
+  .s-button[data-variant="link"]:hover {
+    text-decoration: underline;
+  }
+
+  /* ---- Sizes ---- */
+  .s-button[data-size="xs"] {
+    height: var(--button-height-xs);
+    gap: var(--button-gap-xs);
+    border-radius: var(--button-radius-xs);
+    padding-inline: var(--button-padding-xs);
+    font-size: var(--button-font-size-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .s-button[data-size="xs"] > svg {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+  }
+
+  .s-button[data-size="sm"] {
+    height: var(--button-height-sm);
+    gap: var(--button-gap-sm);
+    border-radius: var(--button-radius-sm);
+    padding-inline: var(--button-padding-sm);
+    font-size: var(--button-font-size-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  .s-button[data-size="sm"] > svg {
+    width: calc(var(--spacing) * 3.5);
+    height: calc(var(--spacing) * 3.5);
+  }
+
+  .s-button[data-size="default"] {
+    height: var(--button-height-default);
+    gap: var(--button-gap-default);
+    border-radius: var(--button-radius);
+    padding-inline: var(--button-padding-default);
+    font-size: var(--button-font-size-default);
+    line-height: var(--text-sm--line-height);
+  }
+
+  .s-button[data-size="default"] > svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  .s-button[data-size="lg"] {
+    height: var(--button-height-lg);
+    gap: var(--button-gap-lg);
+    border-radius: var(--button-radius);
+    padding-inline: var(--button-padding-lg);
+    font-size: var(--button-font-size-lg);
+    line-height: var(--text-sm--line-height);
+  }
+
+  .s-button[data-size="lg"] > svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+  }
+
+  .s-button[data-size="icon-xs"] {
+    width: var(--button-size-icon-xs);
+    height: var(--button-size-icon-xs);
+    border-radius: var(--button-radius-xs);
+  }
+
+  .s-button[data-size="icon-xs"] > svg {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+  }
+
+  .s-button[data-size="icon-sm"] {
+    width: var(--button-size-icon-sm);
+    height: var(--button-size-icon-sm);
+    border-radius: var(--button-radius-sm);
+  }
+
+  .s-button[data-size="icon"] {
+    width: var(--button-size-icon);
+    height: var(--button-size-icon);
+    border-radius: var(--button-radius);
+  }
+
+  .s-button[data-size="icon-lg"] {
+    width: var(--button-size-icon-lg);
+    height: var(--button-size-icon-lg);
+    border-radius: var(--button-radius);
+  }
+
+  /* ---- Icon positioning (has-data-[icon=inline-*]) ---- */
+  .s-button:has([data-icon="inline-end"]) {
+    padding-right: calc(var(--spacing) * 2);
+  }
+
+  .s-button:has([data-icon="inline-start"]) {
+    padding-left: calc(var(--spacing) * 2);
+  }
+
+  .s-button[data-size="xs"]:has([data-icon="inline-end"]) {
+    padding-right: calc(var(--spacing) * 1.5);
+  }
+
+  .s-button[data-size="xs"]:has([data-icon="inline-start"]) {
+    padding-left: calc(var(--spacing) * 1.5);
+  }
+
+  .s-button[data-size="sm"]:has([data-icon="inline-end"]) {
+    padding-right: calc(var(--spacing) * 1.5);
+  }
+
+  .s-button[data-size="sm"]:has([data-icon="inline-start"]) {
+    padding-left: calc(var(--spacing) * 1.5);
+  }
+
+  /* ---- Button group (in-data-[slot=button-group]) ---- */
+  [data-slot="button-group"] .s-button[data-size="xs"],
+  [data-slot="button-group"] .s-button[data-size="sm"] {
+    border-radius: var(--radius-md);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-button",
+        description: "Displays a button or a component that looks like a button.",
+        props: {
+          variant: {
+            options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+            default: "default"
+          },
+          size: {
+            options: ["xs", "sm", "default", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
+            default: "default"
+          },
+          disabled: {
+            default: false
+          },
+          slot: {
+            default: "Button"
+          }
+        }
+      }
+    }
+  }
+</script>

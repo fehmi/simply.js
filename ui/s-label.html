@@ -1,0 +1,61 @@
+<html>
+  <label
+    class="s-label"
+    for="{{props.for}}"
+    ?data-disabled="{{props.disabled === '' || props.disabled}}"
+  >
+    <slot>Label</slot>
+  </label>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner label controls */
+  :host {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4 vega style) ---- */
+  .s-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--label-gap);
+    font-size: var(--label-font-size);
+    line-height: var(--label-line-height);
+    font-weight: var(--label-font-weight);
+    text-transform: var(--label-text-transform);
+    letter-spacing: var(--label-letter-spacing);
+    color: inherit;
+  }
+
+  /* Disabled (via prop) */
+  .s-label[data-disabled] {
+    opacity: 0.5;
+  }
+
+  /* Disabled (parent group data-disabled="true") */
+  :host-context([data-disabled="true"]) .s-label {
+    opacity: 0.5;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-label",
+        description: "Renders a label associated with a form control.",
+        props: {
+          for: {
+            default: ""
+          },
+          disabled: {
+            default: false
+          },
+          slot: {
+            default: "Label"
+          }
+        }
+      }
+    }
+  }
+</script>

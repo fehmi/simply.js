@@ -1,0 +1,37 @@
+/* ============================================================
+   ui/themes/mira.css — Mira theme
+   Source: shadcn preset (baseColor: neutral, font: Inter)
+   Same font + colors as Vega. Difference: Hugeicons icon library
+   (doesn't affect CSS tokens). Colors inherit from :root.
+   ============================================================ */
+
+[data-theme="mira"] {
+  --font-sans: "Inter", sans-serif;
+
+  /* Button — Mira (very compact, text-xs) */
+  --button-radius-xs: var(--radius-sm);
+  --button-height-xs: calc(var(--spacing) * 5);
+  --button-height-sm: calc(var(--spacing) * 6);
+  --button-height-default: calc(var(--spacing) * 7);
+  --button-height-lg: calc(var(--spacing) * 8);
+  --button-size-icon: calc(var(--spacing) * 7);
+  --button-size-icon-xs: calc(var(--spacing) * 5);
+  --button-size-icon-sm: calc(var(--spacing) * 6);
+  --button-size-icon-lg: calc(var(--spacing) * 8);
+  --button-font-size-xs: 0.625rem;
+  --button-font-size-sm: var(--text-xs);
+  --button-font-size-default: var(--text-xs);
+  --button-font-size-lg: var(--text-xs);
+  --button-padding-xs: calc(var(--spacing) * 2);
+  --button-padding-sm: calc(var(--spacing) * 2);
+  --button-padding-default: calc(var(--spacing) * 2);
+  --button-padding-lg: calc(var(--spacing) * 2.5);
+
+  /* Badge — Mira (rounded-full, smaller text) */
+  --badge-radius: var(--radius-rounded);
+  --badge-font-size: 0.625rem;
+
+  /* Label — Mira (text-xs, relaxed line-height) */
+  --label-font-size: var(--text-xs);
+  --label-line-height: var(--leading-relaxed);
+}

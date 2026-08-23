@@ -1,0 +1,108 @@
+/* ============================================================
+   ui/theme-vars.css — Theme variables ONLY (no base reset)
+   Extracted from ui/theme.css so docs pages can load the tokens
+   without the aggressive reset (`* { margin:0; padding:0 }`,
+   `a { color: inherit }`, `ul,ol { list-style: none }`) that
+   would break docsify's styling.
+
+   Load order on docs pages:
+     ui/tokens.css → ui/theme-vars.css → ui/themes/*.css
+
+   Keep in sync with the `:root` / `.dark` blocks in ui/theme.css.
+   ============================================================ */
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(100% 0 0deg);
+  --foreground: oklch(14.5% 0 0deg);
+  --card: oklch(100% 0 0deg);
+  --card-foreground: oklch(14.5% 0 0deg);
+  --popover: oklch(100% 0 0deg);
+  --popover-foreground: oklch(14.5% 0 0deg);
+  --primary: oklch(20.5% 0 0deg);
+  --primary-foreground: oklch(98.5% 0 0deg);
+  --secondary: oklch(97% 0 0deg);
+  --secondary-foreground: oklch(20.5% 0 0deg);
+  --muted: oklch(97% 0 0deg);
+  --muted-foreground: oklch(55.6% 0 0deg);
+  --accent: oklch(97% 0 0deg);
+  --accent-foreground: oklch(20.5% 0 0deg);
+  --destructive: oklch(57.7% 0.245 27.325deg);
+  --border: oklch(92.2% 0 0deg);
+  --input: oklch(92.2% 0 0deg);
+  --ring: oklch(70.8% 0 0deg);
+  --surface: oklch(98% 0 0deg);
+  --surface-foreground: var(--foreground);
+  --code: var(--surface);
+  --code-foreground: var(--surface-foreground);
+  --code-highlight: oklch(96% 0 0deg);
+  --code-number: oklch(56% 0 0deg);
+
+  /* ---- Component tokens (vega defaults) ----
+     Each theme overrides these in `themes/*.css`.
+     CSS custom properties cross the shadow boundary. */
+
+  /* Button */
+  --button-radius: var(--radius-md);
+  --button-radius-xs: min(var(--radius-md), 8px);
+  --button-radius-sm: min(var(--radius-md), 10px);
+  --button-height-xs: calc(var(--spacing) * 6);
+  --button-height-sm: calc(var(--spacing) * 8);
+  --button-height-default: calc(var(--spacing) * 9);
+  --button-height-lg: calc(var(--spacing) * 10);
+  --button-size-icon: calc(var(--spacing) * 9);
+  --button-size-icon-xs: calc(var(--spacing) * 6);
+  --button-size-icon-sm: calc(var(--spacing) * 8);
+  --button-size-icon-lg: calc(var(--spacing) * 10);
+  --button-font-size-xs: var(--text-xs);
+  --button-font-size-sm: var(--text-sm);
+  --button-font-size-default: var(--text-sm);
+  --button-font-size-lg: var(--text-sm);
+  --button-padding-xs: calc(var(--spacing) * 2);
+  --button-padding-sm: calc(var(--spacing) * 2.5);
+  --button-padding-default: calc(var(--spacing) * 2.5);
+  --button-padding-lg: calc(var(--spacing) * 2.5);
+  --button-gap-xs: calc(var(--spacing) * 1);
+  --button-gap-sm: calc(var(--spacing) * 1);
+  --button-gap-default: calc(var(--spacing) * 1.5);
+  --button-gap-lg: calc(var(--spacing) * 1.5);
+
+  /* Badge */
+  --badge-radius: var(--radius-4xl);
+  --badge-font-size: var(--text-xs);
+
+  /* Label */
+  --label-gap: calc(var(--spacing) * 2);
+  --label-font-size: var(--text-sm);
+  --label-line-height: 1;
+  --label-font-weight: var(--font-weight-medium);
+  --label-text-transform: none;
+  --label-letter-spacing: normal;
+}
+
+.dark {
+  --background: oklch(14.5% 0 0deg);
+  --foreground: oklch(98.5% 0 0deg);
+  --card: oklch(20.5% 0 0deg);
+  --card-foreground: oklch(98.5% 0 0deg);
+  --popover: oklch(26.9% 0 0deg);
+  --popover-foreground: oklch(98.5% 0 0deg);
+  --primary: oklch(92.2% 0 0deg);
+  --primary-foreground: oklch(20.5% 0 0deg);
+  --secondary: oklch(26.9% 0 0deg);
+  --secondary-foreground: oklch(98.5% 0 0deg);
+  --muted: oklch(26.9% 0 0deg);
+  --muted-foreground: oklch(70.8% 0 0deg);
+  --accent: oklch(37.1% 0 0deg);
+  --accent-foreground: oklch(98.5% 0 0deg);
+  --destructive: oklch(70.4% 0.191 22.216deg);
+  --border: oklch(100% 0 0deg / 10%);
+  --input: oklch(100% 0 0deg / 15%);
+  --ring: oklch(55.6% 0 0deg);
+  --surface: oklch(20% 0 0deg);
+  --surface-foreground: oklch(70.8% 0 0deg);
+  --code: var(--surface);
+  --code-foreground: var(--surface-foreground);
+  --code-highlight: oklch(27% 0 0deg);
+  --code-number: oklch(72% 0 0deg);
+}

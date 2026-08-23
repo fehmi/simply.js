@@ -1464,8 +1464,6 @@ simply = {
 							props[prop] = this[prop];
 						});
 
-					console.log(props);
-
 					const EXCLUDED_KEYS = new Set(['routerSettings', 'ctx']);
 
 					for (const key in this) {
@@ -3664,6 +3662,10 @@ simply = {
 
 			if (prev) {
 				var to = simply.go.getRouteByPath(go.current);
+				if (!to) {
+					nextEnter();
+					return;
+				}
 				var toTree = to.value && to.value.tree && to.value.path ? [...to.value.tree] : [];
 				var contextUpdateFlag = false;
 
@@ -3921,6 +3923,7 @@ simply = {
 			}
 			return function onpopstate(e) {
 				if (!loaded) return;
+				if (!simply.routes) return;
 				var go = this;
 				if (e.state) {
 					var path = e.state.path;
@@ -3929,6 +3932,7 @@ simply = {
 				}
 				else if (isLocation) {
 					var loc = go._window.location;
+
 					try {
 						go.show(loc.pathname + loc.search + loc.hash, undefined, undefined, false);
 					}
@@ -4106,6 +4110,7 @@ simply = {
 			}
 
 			goFn.getCurrentRoute = function () {
+				if (!simply.routes) return false;
 				var current = this.current;
 
 				for (const [key, value] of Object.entries(simply.routes)) {
@@ -4118,6 +4123,7 @@ simply = {
 			}
 
 			goFn.getRouteByPath = function (path) {
+				if (!simply.routes) return false;
 				var found = false
 				for (const [key, value] of Object.entries(simply.routes)) {
 					if (path.match(value.regexp) && key !== "(.*)") {
@@ -4142,6 +4148,7 @@ simply = {
 			}
 
 			goFn.getParentRouteByPath = function (path) {
+				if (!simply.routes) return false;
 				var found = false
 				for (const [key, value] of Object.entries(simply.routes)) {
 					if (path.match(value.regexp) && key !== "(.*)") {

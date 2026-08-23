@@ -1,0 +1,80 @@
+/* ============================================================
+   ui/themes/sera.css — Sera theme
+   Source: shadcn preset (baseColor: taupe, font: Noto Sans + Playfair Display)
+   The ONLY theme using a taupe base color — colors fully overridden.
+   ============================================================ */
+
+[data-theme="sera"] {
+  --font-sans: "Noto Sans", sans-serif;
+  --font-heading: "Playfair Display", serif;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.147 0.004 49.3);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.147 0.004 49.3);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.147 0.004 49.3);
+  --primary: oklch(0.214 0.009 43.1);
+  --primary-foreground: oklch(0.986 0.002 67.8);
+  --secondary: oklch(0.96 0.002 17.2);
+  --secondary-foreground: oklch(0.214 0.009 43.1);
+  --muted: oklch(0.96 0.002 17.2);
+  --muted-foreground: oklch(0.547 0.021 43.1);
+  --accent: oklch(0.96 0.002 17.2);
+  --accent-foreground: oklch(0.214 0.009 43.1);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0.005 34.3);
+  --input: oklch(0.922 0.005 34.3);
+  --ring: oklch(0.714 0.014 41.2);
+
+  /* Button — Sera (rounded-none, larger, uppercase) */
+  --button-radius: 0;
+  --button-radius-xs: 0;
+  --button-radius-sm: 0;
+  --button-height-xs: calc(var(--spacing) * 7);
+  --button-height-sm: calc(var(--spacing) * 9);
+  --button-height-default: calc(var(--spacing) * 10);
+  --button-height-lg: calc(var(--spacing) * 11);
+  --button-size-icon: calc(var(--spacing) * 10);
+  --button-size-icon-xs: calc(var(--spacing) * 7);
+  --button-size-icon-sm: calc(var(--spacing) * 9);
+  --button-size-icon-lg: calc(var(--spacing) * 11);
+  --button-font-size-xs: var(--text-xs);
+  --button-font-size-sm: var(--text-xs);
+  --button-font-size-default: var(--text-xs);
+  --button-font-size-lg: var(--text-xs);
+  --button-padding-xs: calc(var(--spacing) * 3);
+  --button-padding-sm: calc(var(--spacing) * 4);
+  --button-padding-default: calc(var(--spacing) * 6);
+  --button-padding-lg: calc(var(--spacing) * 8);
+
+  /* Badge — Sera (rounded-none, uppercase, small) */
+  --badge-radius: 0;
+  --badge-font-size: 0.625rem;
+
+  /* Label — Sera (uppercase, tracking-wide, semibold) */
+  --label-font-size: var(--text-xs);
+  --label-font-weight: var(--font-weight-semibold);
+  --label-text-transform: uppercase;
+  --label-letter-spacing: var(--tracking-wide);
+}
+
+[data-theme="sera"].dark {
+  --background: oklch(0.147 0.004 49.3);
+  --foreground: oklch(0.986 0.002 67.8);
+  --card: oklch(0.214 0.009 43.1);
+  --card-foreground: oklch(0.986 0.002 67.8);
+  --popover: oklch(0.214 0.009 43.1);
+  --popover-foreground: oklch(0.986 0.002 67.8);
+  --primary: oklch(0.922 0.005 34.3);
+  --primary-foreground: oklch(0.214 0.009 43.1);
+  --secondary: oklch(0.268 0.011 36.5);
+  --secondary-foreground: oklch(0.986 0.002 67.8);
+  --muted: oklch(0.268 0.011 36.5);
+  --muted-foreground: oklch(0.714 0.014 41.2);
+  --accent: oklch(0.268 0.011 36.5);
+  --accent-foreground: oklch(0.986 0.002 67.8);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.547 0.021 43.1);
+}

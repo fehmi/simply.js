@@ -48,8 +48,14 @@ Use this file to decide which page(s) to fetch. Every link is a plain Markdown f
 - [AI Docs](https://simply.js.org/docs/agents/ai-docs.md): Where to fetch machine-readable docs (this file's own index).
 - [REPL API](https://simply.js.org/docs/agents/repl-api.md): Planned REPL API for programmatic example access (TBD, not live yet).
 
-## Components
-- [Icon](https://simply.js.org/docs/components/s-icon.md): The built-in `<s-icon>` component (Iconify wrapper).
+## Simply UI
+- [Introduction](https://simply.js.org/docs/ui/index.md)
+- [Button](https://simply.js.org/docs/ui/button.md)
+- [Badge](https://simply.js.org/docs/ui/badge.md)
+- [Label](https://simply.js.org/docs/ui/label.md)
+- [Separator](https://simply.js.org/docs/ui/separator.md)
+- [Skeleton](https://simply.js.org/docs/ui/skeleton.md)
+- [Component Viewer](https://simply.js.org/docs/ui/component-viewer.md)
 
 ## Optional
 
