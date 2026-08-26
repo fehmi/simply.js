@@ -5,15 +5,21 @@
 <img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release">
 <img src="https://img.shields.io/badge/License-MIT-green">
 <img src="https://img.shields.io/badge/Gzipped-20KB-green">
+=======
+<p style="transform: scale(.85); transform-origin: center left">
+<img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release&style=for-the-badge">
+<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
+<img src="https://img.shields.io/badge/Gzipped-20KB-green?style=for-the-badge">
+>>>>>>> Stashed changes
 </p>
 
 # About
 
 ## What is simply.js
 
-Simply JS is a simple web-component library for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
+simply.js is a simple web-component library for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
 
-It has a built-in super-fast declarative template engine that coded from scratch. Some parts of Simply JS are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router. So, simply.js is the name of its template engine and the bridge between the adopted tools.
+It has a built-in super-fast declarative template engine that coded from scratch. Some parts of simply.js are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router. So, simply.js is the name of its template engine and the bridge between the adopted tools.
 
 Development on simply.js began in 2021. Over the years, it has been put through rigorous battle-testing by building numerous plugins and web applications. This hands-on process allowed identifying gaps, fixing bugs, and continuously refining the architecture. The library is now approaching maturity with very few features left to add. Moving forward, the focus shifts to integrating AI into the development loop, concentrating on ongoing improvement, maintenance, and producing reusable components.
 
@@ -40,9 +46,9 @@ Whether you write it yourself or prompt an AI, simply.js still runs entirely in 
 
 ## Playground
 
-The REPL of Simply JS is at the [Playground](playground) section. This is the fastest way to get started using Simply JS. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
+The REPL of simply.js is at the [Playground](playground) section. This is the fastest way to get started using simply.js. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
 
-## Simply JS in the wild
+## simply.js in the wild
 
 - [Edit Image](https://editimage.studio)
 - [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager)
