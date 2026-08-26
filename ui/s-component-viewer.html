@@ -1,9 +1,9 @@
 <html>
   <div class="cv">
     <header class="cv-header">
-      <div class="cv-title">
-        <h5>&lt;{{data.tagName}}&gt;</h5>
-        <p>{{data.doc?.description}}</p>
+      <div class="cv-title" ?hide-title="{{props.title === false || props.title === 'false'}}" ?hide-desc="{{props.description === false || props.description === 'false'}}">
+        <h5><if cond="props.title && props.title !== false && props.title !== 'false'">{{props.title}}</if><else>&lt;{{data.tagName}}&gt;</else></h5>
+        <p><if cond="props.description && props.description !== false && props.description !== 'false'">{{props.description}}</if><else>{{data.doc?.description}}</else></p>
       </div>
       <div class="cv-toolbar">
         <button class="cv-dark" onclick="methods.toggleDark()">{{data.dark ? 'Light' : 'Dark'}}</button>
@@ -24,7 +24,7 @@
       <static>
         <div class="cv-preview" id="cv-preview"></div>
       </static>
-      <div class="cv-config">
+      <div class="cv-config {{data.controls.length && !data.multiple ? '' : 'cv-config-empty'}}" ?hide-config="{{props.config === false || props.config === 'false'}}">
         <if cond="data.controls.length">
           <each of="data.controls" as="control" key="key">
             <div class="cv-control">
@@ -55,13 +55,9 @@
                   <span>{{methods.title(control.key)}}</span>
                 </label>
               </elsif>
-              <elsif cond="control.type === 'slot'">
-                <label class="cv-label" for="cv-{{control.key}}">{{methods.title(control.key)}}</label>
-                <textarea id="cv-{{control.key}}" oninput="methods.changeProp('{{control.key}}', this.value)">{{control.value}}</textarea>
-              </elsif>
               <else>
                 <label class="cv-label" for="cv-{{control.key}}">{{methods.title(control.key)}}</label>
-                <input id="cv-{{control.key}}" value="{{control.value}}" oninput="methods.changeProp('{{control.key}}', this.value)">
+                <input type="text" id="cv-{{control.key}}" value="{{control.value}}" oninput="methods.changeProp('{{control.key}}', this.value)">
               </else>
             </div>
           </each>
@@ -82,7 +78,7 @@
   .cv {
     --cv-bg: oklch(20.5% 0 0deg);
     --cv-fg: oklch(98.5% 0 0deg);
-    --cv-border: oklch(100% 0 0deg / 10%);
+    --cv-border: oklch(100% 0 0deg / 14%);
     --cv-muted-fg: oklch(70.8% 0 0deg);
     --cv-input-bg: oklch(14.5% 0 0deg);
     --cv-input-border: oklch(100% 0 0deg / 15%);
@@ -113,7 +109,7 @@
   }
 
   .cv-title p {
-    margin: calc(var(--spacing) * 1) 0 0;
+    margin: 0;
     color: var(--cv-muted-fg);
     font-size: var(--text-sm);
   }
@@ -138,11 +134,19 @@
   .cv-theme {
     height: calc(var(--spacing) * 8);
     padding-inline: calc(var(--spacing) * 2);
+    padding-right: calc(var(--spacing) * 8);
     border: 1px solid var(--cv-border);
     border-radius: 0;
     background-color: var(--cv-input-bg);
     color: var(--cv-fg);
     font-size: var(--text-sm);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4b4b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    cursor: pointer;
   }
 
   .cv-body {
@@ -156,6 +160,9 @@
     align-items: center;
     justify-content: center;
     min-height: 200px;
+    gap: calc(var(--spacing) * 4);
+
+    box-sizing: border-box; /* max-width includes the padding */
     padding: calc(var(--spacing) * 6);
     background-color: var(--color-background);
     /* reset inherited color so preview content (e.g. label with color: inherit)
@@ -165,6 +172,10 @@
       linear-gradient(var(--color-muted) 0.5px, transparent 0.5px),
       linear-gradient(to right, var(--color-muted) 0.5px, transparent 0.5px);
     background-size: 80px 80px;
+  }
+
+  .cv-preview > * {
+    max-width: 450px;
   }
 
   .cv-config {
@@ -192,13 +203,13 @@
   .cv-radios {
     display: flex;
     flex-wrap: wrap;
-    gap: calc(var(--spacing) * 2);
+    gap: calc(var(--spacing) * 3.6);
   }
 
   .cv-radio {
     display: inline-flex;
     align-items: center;
-    gap: calc(var(--spacing) * 1);
+    gap: calc(var(--spacing) * 2);
     cursor: pointer;
   }
 
@@ -209,10 +220,70 @@
     cursor: pointer;
   }
 
+  /* Custom checkbox + radio — match the viewer's dark chrome instead of
+     native browser styling. Vertically centered with the label text via
+     the flex labels above (align-items: center). */
+  .cv-config input[type="checkbox"],
+  .cv-config input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin: 0;
+    border: 1px solid #3d3838;
+    background-color: var(--cv-input-bg);
+    cursor: pointer;
+    display: inline-grid;
+    place-content: center;
+    transition: border-color 150ms, background-color 150ms;
+  }
+
+  .cv-config input[type="checkbox"] {
+    border-radius: 3px;
+  }
+
+  .cv-config input[type="radio"] {
+    border-radius: 999px;
+  }
+
+  .cv-config input[type="checkbox"]:hover,
+  .cv-config input[type="radio"]:hover {
+    border-color: var(--cv-muted-fg);
+  }
+
+  .cv-config input[type="checkbox"]:checked,
+  .cv-config input[type="radio"]:checked {
+    border-color: var(--cv-fg);
+    background-color: var(--cv-fg);
+  }
+
+  /* Checkmark (checkbox) / dot (radio) */
+  .cv-config input[type="checkbox"]::after,
+  .cv-config input[type="radio"]::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    transform: scale(0);
+    transition: transform 150ms;
+  }
+
+  .cv-config input[type="checkbox"]:checked::after {
+    transform: scale(1);
+    background-color: var(--cv-bg);
+    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+  }
+
+  .cv-config input[type="radio"]:checked::after {
+    transform: scale(1);
+    background-color: var(--cv-bg);
+    border-radius: 999px;
+  }
+
   .cv-config select,
-  .cv-config input[type="text"],
-  .cv-config textarea {
+  .cv-config input[type="text"] {
     width: 100%;
+    box-sizing: border-box;
     padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
     border: 1px solid var(--cv-input-border);
     border-radius: 0;
@@ -222,9 +293,36 @@
     font-family: inherit;
   }
 
-  .cv-config textarea {
-    min-height: calc(var(--spacing) * 12);
-    resize: vertical;
+  .cv-config select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: calc(var(--spacing) * 6);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4b4b4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    cursor: pointer;
+  }
+
+  /* No props → hide the config panel entirely (preview takes full width) */
+  .cv-config-empty {
+    display: none;
+  }
+
+  /* config="false" hides the config panel */
+  .cv-config[hide-config] {
+    display: none;
+  }
+
+  /* title="false" / description="false" hide the respective inner text.
+     We hide the <h5>/<p> (not the whole .cv-title) so the toolbar stays
+     anchored to the right instead of sliding left when the title is gone. */
+  .cv-title[hide-title] h5 {
+    display: none;
+  }
+
+  .cv-title[hide-desc] p {
+    display: none;
   }
 
   @media (min-width: 768px) {
@@ -259,6 +357,10 @@
           .replace(/([A-Z])/g, " $1")
           .replace(/^./, function (s) { return s.toUpperCase(); });
       },
+      // camelCase prop key → kebab-case attribute name (ariaInvalid → aria-invalid)
+      kebab: function (key) {
+        return key.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+      },
       toggleDark: function () {
         document.documentElement.classList.toggle("dark");
         data.dark = document.documentElement.classList.contains("dark");
@@ -273,39 +375,117 @@
         data.theme = document.documentElement.getAttribute("data-theme") || "vega";
       },
       changeProp: function (key, value) {
-        var comp = methods.comp;
-        if (!comp) return;
         // keep the control value in sync so it's a real data variable (usable with {{}})
         data.controls.forEach(function (c) {
           if (c.key === key) c.value = value;
         });
-        if (key === "slot") {
-          comp.innerHTML = "";
-          comp.appendChild(simply.unsafeHTML(value));
-        } else {
-          comp.props[key] = value;
-        }
+        // Update the example markup + re-render the preview (syncPre re-renders)
+        methods.syncPre(key, value);
       },
-      createPreview: function () {
-        var comp = document.createElement(data.tagName);
-        comp.setAttribute("isolated", "");
-        dom.querySelector("#cv-preview").appendChild(comp);
-        // store on methods (plain per-instance object) — data is an ObservableSlim proxy
-        // and wrapping a DOM element in it breaks method calls (Illegal invocation)
-        methods.comp = comp;
-        data.controls.forEach(function (c) {
-          if (c.type === "slot") {
-            comp.innerHTML = "";
-            comp.appendChild(simply.unsafeHTML(c.value));
+      // Regenerate the example markup from the parsed root element,
+      // preserving the original self-closing form. Boolean attributes
+      // (empty value) are written bare: `disabled` not `disabled=""`.
+      // Children are serialized recursively so nested components keep
+      // their bare boolean attributes too (e.g. `light` not `light=""`).
+      serializeNode: function (el) {
+        if (!el) return "";
+        if (el.nodeType !== 1) return el.textContent || "";
+        var attrs = "";
+        for (var i = 0; i < el.attributes.length; i++) {
+          var a = el.attributes[i];
+          if (a.value === "") {
+            attrs += " " + a.name;
           } else {
-            comp.props[c.key] = c.value;
+            attrs += " " + a.name + '="' + a.value + '"';
+          }
+        }
+        var tag = el.tagName.toLowerCase();
+        var inner = Array.from(el.childNodes).map(function (n) {
+          return methods.serializeNode(n);
+        }).join("");
+        return "<" + tag + attrs + ">" + inner + "</" + tag + ">";
+      },
+      serializePre: function () {
+        var el = methods.preRootEl;
+        if (!el) return "";
+        if (methods.preSelfClosing) {
+          var attrs = "";
+          for (var i = 0; i < el.attributes.length; i++) {
+            var a = el.attributes[i];
+            attrs += a.value === "" ? " " + a.name : " " + a.name + '="' + a.value + '"';
+          }
+          return "<" + el.tagName.toLowerCase() + attrs + "/>";
+        }
+        return methods.serializeNode(el);
+      },
+      // Update the docs example <pre> markup and re-highlight with Prism.
+      // shadcn convention: props at their default value are omitted from the
+      // example (e.g. size="default", decorative=true). Non-default booleans
+      // are written bare when true (disabled) or ="false" when false.
+      // Updates EVERY tag in the example that matches the target component.
+      syncPre: function (key, value) {
+        var attrName = methods.kebab(key);
+        var prop = data.doc.props[key];
+        // All tags in the parsed example matching the target component
+        var targets = [];
+        if (methods.preRootEl) {
+          if (methods.preRootEl.tagName.toLowerCase() === data.tagName) {
+            targets.push(methods.preRootEl);
+          }
+          targets = targets.concat(Array.from(methods.preRootEl.querySelectorAll(data.tagName)));
+        }
+        targets.forEach(function (el) {
+          if (prop && value === prop.default) {
+            el.removeAttribute(attrName);
+          } else if (value === true) {
+            el.setAttribute(attrName, "");
+          } else if (value === false) {
+            el.setAttribute(attrName, "false");
+          } else if (value === null || value === undefined || value === "") {
+            el.removeAttribute(attrName);
+          } else {
+            el.setAttribute(attrName, value);
           }
         });
+        var html = methods.serializePre();
+        // If there's no following code block (standalone viewer), don't try
+        // to update a <pre> that doesn't exist.
+        if (methods.preCode) {
+          methods.preCode.textContent = html;
+          if (window.Prism) {
+            Prism.highlightElement(methods.preCode);
+          }
+        }
+        // Apply the change to the already-rendered matching components
+        // (no full re-render — just the relevant prop/attribute updates).
+        methods.matchEls.forEach(function (comp) {
+          comp.props[key] = value;
+        });
+      },
+      renderPreview: function (html) {
+        var preview = dom.querySelector("#cv-preview");
+        preview.innerHTML = "";
+        // Render the example HTML as-is so the viewer can run any code
+        // (nested components, multiple components, plain HTML).
+        if (html) {
+          preview.appendChild(simply.unsafeHTML(html));
+        }
+        // Re-query the tags matching the target component in the preview
+        methods.matchEls = Array.from(preview.querySelectorAll(data.tagName));
+      },
+      collectCustomTags: function (root, set) {
+        if (!root || root.nodeType !== 1) return;
+        var tag = root.tagName.toLowerCase();
+        // Only custom elements (tag contains "-"); skip natives (div, slot, input…)
+        if (tag.indexOf("-") > -1) set.add(tag);
+        for (var i = 0; i < root.children.length; i++) {
+          methods.collectCustomTags(root.children[i], set);
+        }
       }
     }
     lifecycle = {
-      afterConstruct: async function () {
-        if (!props.component) return;
+      afterConstruct: function () {
+        if (!props.subject) return;
         // Viewer opens in dark mode by default
         data.dark = true;
         document.documentElement.classList.add("dark");
@@ -320,22 +500,63 @@
           attributes: true,
           attributeFilter: ["class", "data-theme"]
         });
-        data.tagName = props.component.split("/").pop();
-        await get(props.component + ".html");
+        // `subject` is the presented component's tag name (e.g. "s-button").
+        // The viewer renders the following example code as-is and auto-loads
+        // any custom elements (tags with "-") used in it that aren't defined yet.
+        data.subject = props.subject;
+        data.tagName = props.subject;
+      },
+      afterFirstRender: async function () {
+        // Find the HTML code block that follows the viewer.
+        var root = dom.getRootNode().host || dom;
+        var nextEl = root.parentNode.nextElementSibling;
+        var html = "";
+        if (nextEl && nextEl.getAttribute && nextEl.getAttribute("data-lang") === "html") {
+          var code = nextEl.querySelector("code") || nextEl;
+          html = code.textContent.trim();
+          var temp = document.createElement("div");
+          temp.innerHTML = html;
+          methods.preEl = nextEl;
+          methods.preCode = code;
+          methods.preRootEl = temp.firstElementChild;
+          methods.preContainer = temp;
+          methods.preSelfClosing = /\/>$/.test(html);
+        } else {
+          methods.preRootEl = null;
+          methods.preContainer = null;
+        }
+
+        // Auto-load custom elements (tags with "-") used in the example that
+        // aren't defined yet, plus the subject itself. Natives (div, slot,
+        // input…) need no get(). Use the container so ALL sibling custom
+        // elements are discovered (not just the first).
+        var customTags = new Set();
+        if (methods.preContainer) {
+          methods.collectCustomTags(methods.preContainer, customTags);
+        }
+        customTags.add(data.tagName);
+        for (var tag of customTags) {
+          if (!customElements.get(tag)) {
+            await get("ui/" + tag + ".html");
+          }
+        }
         await customElements.whenDefined(data.tagName);
-        // Read data.doc by temporarily connecting an element (data is set on connect)
+
+        // Read the subject's data.doc by temporarily connecting an element
+        // (data is set on connect).
         var el = document.createElement(data.tagName);
         document.body.appendChild(el);
         // Copy to a plain object (data.doc is an ObservableSlim proxy — iterating it causes infinite recursion)
         data.doc = JSON.parse(JSON.stringify(el.data.doc));
         el.remove();
+        // Build controls from props (slot + light are excluded — the docs
+        // example code shows the slot markup, and `light` is a viewer concern).
         data.controls = [];
         for (var key in data.doc.props) {
+          if (key === "slot" || key === "light") continue;
           var prop = data.doc.props[key];
           var control = { key: key, value: prop.default };
-          if (key === "slot") {
-            control.type = "slot";
-          } else if (prop.options) {
+          if (prop.options) {
             control.type = "options";
             control.options = prop.options;
           } else if (typeof prop.default === "boolean") {
@@ -345,7 +566,52 @@
           }
           data.controls.push(control);
         }
-        methods.createPreview();
+
+        // Render the example as-is so the viewer can run any code.
+        if (html) {
+          methods.renderPreview(html);
+          // Hide the config panel when the subject appears more than once in the
+          // example (editing one instance would be ambiguous).
+          data.multiple = methods.matchEls.length > 1;
+          // Sync config panel values from the first matching tag in the example.
+          if (methods.matchEls.length) {
+            var compEl = methods.matchEls[0];
+            data.controls.forEach(function (c) {
+              var attr = compEl.getAttribute(c.key) || compEl.getAttribute(methods.kebab(c.key));
+              if (attr !== null) {
+                // boolean: bare/"" or "true" → true, "false" → false
+                c.value = c.type === "boolean" ? (attr === "false" ? false : true) : attr;
+              }
+            });
+            // Drop attributes equal to the prop's default (shadcn omits defaults).
+            data.controls.forEach(function (c) {
+              var prop = data.doc.props[c.key];
+              var attrName = methods.kebab(c.key);
+              var attrVal = compEl.getAttribute(attrName);
+              if (prop && attrVal !== null) {
+                var atDefault = typeof prop.default === "boolean"
+                  ? (attrVal === "" || attrVal === "true") === prop.default
+                  : attrVal === prop.default;
+                if (atDefault) {
+                  compEl.removeAttribute(attrName);
+                }
+              }
+            });
+            // Only rewrite the code block when there's a single match — with
+            // multiple matches we leave the source as-is (config is hidden).
+            if (!data.multiple) {
+              methods.preCode.textContent = methods.serializePre();
+              if (window.Prism) {
+                Prism.highlightElement(methods.preCode);
+              }
+            }
+          }
+        }
+        else {
+          // No code block follows — render an empty subject component.
+          methods.renderPreview("<" + data.tagName + "></" + data.tagName + ">");
+          data.multiple = methods.matchEls.length > 1;
+        }
       }
     }
   }

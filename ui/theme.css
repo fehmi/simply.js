@@ -8,7 +8,12 @@
    aggressive reset that would break docsify's styling.
    ============================================================ */
 
-@import url("theme-vars.css");
+@import url("theme-vars.css?v=2");
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
 
 /* ---- Base reset ---- */
 
@@ -63,7 +68,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* ---- Simply.js helpers ---- */
+/* ---- simply.js helpers ---- */
 
 /* Form elements inherit body styles (Tailwind preflight-like) */
 button,

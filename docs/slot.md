@@ -1,6 +1,6 @@
 # Slot
 
-You can pass content to a component by placing it directly inside the component's tag. Simply.js uses the **native Web Components slot** mechanism, so slots only work on components that are mounted with a Shadow Root — i.e. components marked with the `isolated` attribute.
+You can pass content to a component by placing it directly inside the component's tag. simply.js uses the **native Web Components slot** mechanism, so slots work on components that are mounted with a Shadow Root — which is the default. Add `light` to a component only when you need it in the light DOM (e.g. form controls); slots won't project there.
 
 <details>
   <summary><ins>Live demo</ins></summary>
@@ -25,7 +25,7 @@ You can pass content to a component by placing it directly inside the component'
 
 ```html:page-component.html
 <html>
-  <card-component isolated>
+  <card-component>
     <h2 slot="title">{{data.title}}</h2>
     <p>{{data.message}}</p>
   </card-component>
@@ -60,8 +60,8 @@ You can pass content to a component by placing it directly inside the component'
 
 ## How It Works
 
-- **`isolated` is required**<br>
-  Only components with the `isolated` attribute (Shadow DOM) support slots. Without it, the component renders in the light DOM and `<slot>` has no effect.
+- **Shadow DOM is the default**<br>
+  Components mount with a Shadow Root by default, so `<slot>` projects content. Add `light` to opt into the light DOM — there `<slot>` has no effect.
 
 - **Native behavior**<br>
   Usage is identical to native Web Components: define `<slot>` in the component's template and place the content inside the component's tag.

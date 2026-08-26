@@ -1,0 +1,176 @@
+<html>
+  <div class="s-native-select-wrapper" data-slot="native-select-wrapper">
+    <select
+      class="s-native-select"
+      data-slot="native-select"
+      data-size="{{props.size || 'default'}}"
+      ?disabled="{{props.disabled === '' || props.disabled}}"
+      ?aria-invalid="{{props.ariaInvalid === '' || props.ariaInvalid || props['aria-invalid'] === '' || props['aria-invalid']}}"
+      onchange="methods.onChange(event)"
+    ></select>
+    <!-- Native <select> can't render a <slot> as options, so the lifecycle
+         moves the slotted <option>/<optgroup> elements into the select. -->
+    <slot class="s-native-select-slot"></slot>
+    <svg
+      class="s-native-select-icon"
+      data-slot="native-select-icon"
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </div>
+</html>
+
+<style>
+  /* Host is an inline-block box; the wrapper div controls layout.
+     s-native-select { ... } handles the LIGHT DOM case (light attribute). */
+  :host,
+  s-native-select {
+    display: inline-block;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-native-select-wrapper {
+    position: relative;
+    width: fit-content;
+  }
+
+  /* The slot only captures the slotted options; it's not rendered. */
+  .s-native-select-slot {
+    display: none;
+  }
+
+  .s-native-select {
+    height: var(--input-height);
+    width: 100%;
+    min-width: 0;
+    appearance: none;
+    box-sizing: border-box;
+    border-radius: var(--input-radius);
+    border: 1px solid var(--color-input);
+    background-color: transparent;
+    padding: var(--native-select-padding-y) var(--native-select-padding-x);
+    padding-right: var(--native-select-padding-right);
+    font-family: inherit;
+    font-size: var(--input-font-size);
+    box-shadow: var(--shadow-xs);
+    transition:
+      color var(--default-transition-duration)
+        var(--default-transition-timing-function),
+      box-shadow var(--default-transition-duration)
+        var(--default-transition-timing-function);
+    outline: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .s-native-select[data-size="sm"] {
+    height: var(--input-height-sm);
+    padding-block: calc(var(--spacing) * 0.5);
+  }
+
+  .s-native-select::selection {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+
+  .s-native-select:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  .s-native-select[aria-invalid] {
+    border-color: var(--color-destructive);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  .s-native-select:disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .s-native-select-icon {
+    position: absolute;
+    top: 50%;
+    right: var(--native-select-icon-right);
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-muted-foreground);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  :host-context(.dark) .s-native-select {
+    background-color: color-mix(in oklab, var(--color-input) 30%, transparent);
+  }
+
+  :host-context(.dark) .s-native-select:hover {
+    background-color: color-mix(in oklab, var(--color-input) 50%, transparent);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-native-select",
+        description: "A styled native select element.",
+        props: {
+          size: {
+            default: "default",
+            options: ["default", "sm"]
+          },
+          disabled: {
+            default: false
+          },
+          ariaInvalid: {
+            default: false
+          },
+          slot: {
+            default: `<option value="1">Option 1</option>
+<option value="2">Option 2</option>`
+          }
+        }
+      }
+    }
+    methods = {
+      onChange: function (event) {
+        data.value = event.target.value;
+        component.dispatchEvent(new CustomEvent("change", { detail: { value: data.value } }));
+      }
+    }
+    lifecycle = {
+      afterRender: function () {
+        // A native <select> can't render a <slot> as options, so clone the
+        // slotted <option>/<optgroup> elements into the select. Runs on every
+        // render (afterFirstRender only runs once — on a prop change the
+        // select is recreated empty, so re-clone). Cloning (not moving) keeps
+        // the light-DOM options intact so the slot always has assigned nodes.
+        var slot = dom.querySelector("slot");
+        var select = dom.querySelector("select");
+        if (!slot || !select) return;
+        var prevValue = data.value || select.value;
+        while (select.firstChild) {
+          select.removeChild(select.firstChild);
+        }
+        var nodes = slot.assignedNodes();
+        nodes.forEach(function (n) {
+          if (n.nodeType === 1 && (n.tagName === "OPTION" || n.tagName === "OPTGROUP")) {
+            select.appendChild(n.cloneNode(true));
+          }
+        });
+        if (prevValue) {
+          select.value = prevValue;
+        }
+      }
+    }
+  }
+</script>

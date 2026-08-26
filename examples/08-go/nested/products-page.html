@@ -10,8 +10,8 @@
 </html>
 
 <style>
-	/* root selector = component tag name — this component is not shadow-isolated */
-	products-page {
+	/* root selector = :host (shadow DOM default) + tag name (light DOM) */
+	:host, products-page {
 		display: block;
 		font-family: system-ui, sans-serif;
 		color: #1e293b;
@@ -19,7 +19,7 @@
 	}
 
 	/* progress line — level 1 hue: violet → pink → amber */
-	products-page > line {
+	:host > line, products-page > line {
 		display: block;
 		height: 4px;
 		border-radius: 999px;
@@ -30,7 +30,7 @@
 		width: 0;
 		transition: width 400ms ease-in-out;
 	}
-	products-page[enter] > line {
+	:host([enter]) > line, products-page[enter] > line {
 		width: 100%;
 		transition: width 800ms cubic-bezier(.22, 1, .36, 1);
 	}
@@ -40,36 +40,36 @@
 	   - exit total (250ms, no delay) stays under the line's 400ms exit
 	   - enter totals (delay + 450ms) stay under the line's 800ms enter
 	     d1 120+450=570 · d2 220+450=670 · d3 320+450=770 */
-	products-page > .fx {
+	:host > .fx, products-page > .fx {
 		opacity: 0;
 		transform: translateY(8px);
 		transition: opacity .25s ease, transform .25s ease;
 	}
-	products-page[enter] > .fx {
+	:host([enter]) > .fx, products-page[enter] > .fx {
 		opacity: 1;
 		transform: none;
 		transition: opacity .45s ease, transform .45s cubic-bezier(.22, 1, .36, 1);
 	}
-	products-page[enter] > .fx.d1 { transition-delay: .12s; }
-	products-page[enter] > .fx.d2 { transition-delay: .22s; }
-	products-page[enter] > .fx.d3 { transition-delay: .32s; }
+	:host([enter]) > .fx.d1, products-page[enter] > .fx.d1 { transition-delay: .12s; }
+	:host([enter]) > .fx.d2, products-page[enter] > .fx.d2 { transition-delay: .22s; }
+	:host([enter]) > .fx.d3, products-page[enter] > .fx.d3 { transition-delay: .32s; }
 
-	products-page h2 {
+	:host h2, products-page h2 {
 		margin: 0 0 4px;
 		font-size: 18px;
 		color: #0f172a;
 	}
-	products-page .tagline {
+	:host .tagline, products-page .tagline {
 		margin: 0 0 14px;
 		color: #64748b;
 		font-size: 13px;
 	}
-	products-page .links {
+	:host .links, products-page .links {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
 	}
-	products-page .links a {
+	:host .links a, products-page .links a {
 		padding: 6px 12px;
 		border: 1px solid #e2e8f0;
 		border-radius: 999px;
@@ -78,11 +78,11 @@
 		text-decoration: none;
 		font-size: 13px;
 	}
-	products-page .links a:hover {
+	:host .links a:hover, products-page .links a:hover {
 		border-color: #8b5cf6;
 		color: #8b5cf6;
 	}
-	products-page .links a[go-active] {
+	:host .links a[go-active], products-page .links a[go-active] {
 		color: #8b5cf6;
 		border-color: #8b5cf6;
 		background: #fff;
@@ -90,7 +90,7 @@
 	}
 
 	/* nested outlet — this box holds everything nested under /company/products */
-	products-page route {
+	:host route, products-page route {
 		display: block;
 		margin-top: 12px;
 		padding: 10px 12px;

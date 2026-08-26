@@ -1,0 +1,104 @@
+<html>
+  <span class="s-icon"></span>
+</html>
+
+<style>
+  /* Host is an inline-flex box sized by --s-icon-size (default 1rem = 16px).
+     The lazy-loaded lucide SVG fills the box, so the icon reserves space and
+     causes no layout shift while the UMD bundle loads. */
+  :host,
+  s-icon {
+    display: inline-flex;
+    width: var(--s-icon-size, 1rem);
+    height: var(--s-icon-size, 1rem);
+    flex-shrink: 0;
+    color: inherit;
+    vertical-align: middle;
+  }
+
+  /* The span is a transparent wrapper; the injected SVG acts as a direct
+     child of the host's inline-flex box. */
+  .s-icon {
+    display: contents;
+  }
+
+  .s-icon svg,
+  :host svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    stroke: currentColor;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-icon",
+        description: "A lucide icon. The lucide UMD bundle is lazy-loaded once on first use, then every icon renders instantly from memory. Reserves space so there's no layout shift.",
+        props: {
+          name: { default: "" },
+          "data-icon": { default: "" }
+        }
+      }
+    }
+    methods = {
+      // Load the lucide UMD bundle ONCE and cache the promise on window so
+      // every <s-icon> instance shares it. Nothing is fetched until first use.
+      loadLucide: function () {
+        if (window.__sIconLucidePromise) return window.__sIconLucidePromise;
+        window.__sIconLucidePromise = new Promise(function (resolve, reject) {
+          var script = document.createElement("script");
+          script.src = "https://unpkg.com/lucide@latest/dist/umd/lucide.min.js";
+          script.onload = function () { resolve(window.lucide); };
+          script.onerror = function () { reject(new Error("lucide failed to load")); };
+          document.head.appendChild(script);
+        });
+        return window.__sIconLucidePromise;
+      },
+      // "badge-check" -> "BadgeCheck"
+      pascal: function (name) {
+        return name
+          .replace(/-([a-z])/g, function (m, c) { return c.toUpperCase(); })
+          .replace(/^./, function (c) { return c.toUpperCase(); });
+      },
+      render: async function () {
+        var name = props.name;
+        if (!name) return;
+        var target = dom.querySelector(".s-icon");
+        if (!target) return;
+        try {
+          var lucide = await methods.loadLucide();
+          var icon = lucide && lucide.icons && lucide.icons[methods.pascal(name)];
+          if (!icon) {
+            target.innerHTML = "";
+            return;
+          }
+          var svg = lucide.createElement(icon);
+          // Pass through data-icon so a parent badge/button can match
+          // :has([data-icon="inline-start"]) for padding/spacing.
+          var dataIcon = props["data-icon"];
+          if (dataIcon && svg.setAttribute) {
+            svg.setAttribute("data-icon", dataIcon);
+          }
+          target.innerHTML = "";
+          target.appendChild(svg);
+        } catch (e) {
+          // Keep the reserved box; don't throw on a network failure.
+          target.innerHTML = "";
+        }
+      }
+    }
+    lifecycle = {
+      afterFirstRender: async function () {
+        await methods.render();
+      },
+      whenPropChange: function (name, current, next) {
+        if (name === "name" || name === "data-icon") {
+          methods.render();
+        }
+      }
+    }
+  }
+</script>

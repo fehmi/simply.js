@@ -1,0 +1,84 @@
+<html>
+  <label
+    class="s-field-label"
+    data-slot="field-label"
+    for="{{props.for}}"
+    ?data-disabled="{{props.disabled === '' || props.disabled}}"
+    onclick="methods.focusControl()"
+  >
+    <slot>Label</slot>
+  </label>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner label controls.
+     s-field-label { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-label {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-label {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    gap: calc(var(--spacing) * 2);
+    line-height: 1.375;
+    font-size: var(--label-font-size);
+    font-weight: var(--label-font-weight);
+    text-transform: var(--label-text-transform);
+    letter-spacing: var(--label-letter-spacing);
+    color: inherit;
+  }
+
+  /* Disabled (via prop) */
+  .s-field-label[data-disabled] {
+    opacity: 0.5;
+  }
+
+  /* Disabled (parent Field data-disabled="true") */
+  :host-context([data-disabled="true"]) .s-field-label {
+    opacity: 0.5;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field-label",
+        description: "A label for a form field, associated with a control via the for attribute.",
+        props: {
+          for: {
+            default: ""
+          },
+          disabled: {
+            default: false
+          },
+          slot: {
+            default: "Label"
+          }
+        }
+      }
+    }
+    methods = {
+      // `for` doesn't cross the shadow boundary for simply.js controls (e.g.
+      // s-checkbox renders a <button role="checkbox"> in shadow DOM), so a
+      // native <label for> can't activate them. Find the control by id in the
+      // same root tree (document OR shadow root), then toggle it (checkbox/
+      // switch) or focus it (input/other).
+      focusControl: function () {
+        if (!props.for) return;
+        var root = component.getRootNode();
+        var control = root && root.getElementById ? root.getElementById(props.for) : null;
+        if (!control) return;
+        if (control.methods && typeof control.methods.toggle === "function") {
+          control.methods.toggle();
+        } else if (typeof control.focus === "function") {
+          control.focus();
+        }
+      }
+    }
+  }
+</script>

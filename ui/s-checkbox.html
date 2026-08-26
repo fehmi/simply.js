@@ -1,0 +1,127 @@
+<html>
+  <button
+    class="s-checkbox"
+    data-slot="checkbox"
+    role="checkbox"
+    id="{{props.id || ''}}"
+    aria-checked="{{data.checked ? 'true' : 'false'}}"
+    ?disabled="{{props.disabled === '' || props.disabled}}"
+    ?aria-invalid="{{props.ariaInvalid === '' || props.ariaInvalid || props['aria-invalid'] === '' || props['aria-invalid']}}"
+    onclick="methods.toggle()"
+  >
+    <span class="s-checkbox-indicator {{data.checked ? '' : 's-hidden'}}">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>
+    </span>
+  </button>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner button controls.
+     s-checkbox { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-checkbox {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-checkbox {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 1px solid var(--color-input);
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow var(--default-transition-duration) var(--default-transition-timing-function);
+    outline: none;
+    background-color: transparent;
+    color: inherit;
+    font-family: inherit;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .s-checkbox:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  .s-checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .s-checkbox[aria-invalid] {
+    border-color: var(--color-destructive);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  .s-checkbox[aria-checked="true"] {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+
+  :host-context(.dark) .s-checkbox {
+    background-color: color-mix(in oklab, var(--color-input) 30%, transparent);
+  }
+
+  :host-context(.dark) .s-checkbox[aria-checked="true"] {
+    background-color: var(--color-primary);
+  }
+
+  .s-checkbox-indicator {
+    display: grid;
+    place-content: center;
+    color: currentColor;
+  }
+
+  .s-hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      checked: false,
+      doc: {
+        name: "s-checkbox",
+        description: "A checkbox control with a checked state.",
+        props: {
+          id: {
+            default: ""
+          },
+          defaultChecked: {
+            default: false
+          },
+          disabled: {
+            default: false
+          }
+        }
+      }
+    }
+    methods = {
+      toggle: function () {
+        if (props.disabled === "" || props.disabled) return;
+        data.checked = !data.checked;
+      }
+    }
+    lifecycle = {
+      afterConstruct: function () {
+        // defaultChecked attribute arrives as "" (empty string); the browser
+        // lowercases camelCase attrs (defaultchecked) and kebab-case is
+        // default-checked.
+        data.checked =
+          props.defaultChecked === "" ||
+          props.defaultChecked === true ||
+          props["defaultchecked"] === "" ||
+          props["default-checked"] === "";
+      }
+    }
+  }
+</script>

@@ -16,4 +16,41 @@
   --button-padding-sm: calc(var(--spacing) * 3);
   --button-padding-default: calc(var(--spacing) * 3);
   --button-padding-lg: calc(var(--spacing) * 4);
+
+  /* Input — Maia (rounded-4xl, h-9) */
+  --input-radius: var(--radius-4xl);
+  --input-height: calc(var(--spacing) * 9);
+
+  /* Textarea — Maia (rounded-xl) */
+  --textarea-radius: var(--radius-xl);
+
+  /* Skeleton — Maia (rounded-xl) */
+  --skeleton-radius: var(--radius-xl);
+
+  /* Kbd — Maia (rounded-4xl, h-5) */
+  --kbd-radius: var(--radius-4xl);
+  --kbd-height: calc(var(--spacing) * 5);
+  /* Switch — Maia (same as vega) */
+  --switch-radius: var(--radius-rounded);
+  --switch-width-default: calc(var(--spacing) * 8);
+  --switch-height-default: 18.4px;
+  --switch-width-sm: calc(var(--spacing) * 6);
+  --switch-height-sm: calc(var(--spacing) * 3.5);
+  --switch-thumb-width-default: calc(var(--spacing) * 4);
+  --switch-thumb-height-default: calc(var(--spacing) * 4);
+  --switch-thumb-width-sm: calc(var(--spacing) * 3);
+  --switch-thumb-height-sm: calc(var(--spacing) * 3);
+  --switch-border-width: 1px;
+  --switch-thumb-translate: calc(100% - 2px);
+
+  /* Native Select — Maia (pl-3, icon right-3.5) */
+  --native-select-padding-x: calc(var(--spacing) * 3);
+  --native-select-padding-right: calc(var(--spacing) * 8);
+  --native-select-padding-y: calc(var(--spacing) * 1);
+  --native-select-icon-right: calc(var(--spacing) * 3.5);
+  /* Field family — Maia (same as vega) */
+  --field-set-gap: calc(var(--spacing) * 6);
+  --field-group-gap: calc(var(--spacing) * 7);
+  --field-gap: calc(var(--spacing) * 3);
+  --field-content-gap: calc(var(--spacing) * 1);
 }

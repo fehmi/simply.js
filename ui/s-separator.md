@@ -4,11 +4,12 @@ Visually or semantically separates content. A thin rule that can be horizontal o
 
 ## Usage
 
+<s-component-viewer subject="s-separator"></s-component-viewer>
 ```html
 <s-separator></s-separator>
 ```
 
-?> The separator has **no slot**, so `isolated` is **optional** — it works in both light DOM and shadow DOM. Use `isolated` only if you want the component's styles scoped to a shadow root.
+?> The separator has **no slot**, so it works in both light DOM and shadow DOM. It renders in shadow DOM by default; add `light` if you want the component's styles in the light DOM.
 
 ## Props
 
@@ -54,7 +55,3 @@ The separator uses the theme's border color:
 | Token | Value |
 |---|---|
 | `--color-border` | theme-dependent border color |
-
-## Live Demo
-
-<s-component-viewer isolated component="ui/s-separator"></s-component-viewer>

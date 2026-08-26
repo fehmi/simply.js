@@ -1,0 +1,49 @@
+<html>
+  <p class="s-field-description" data-slot="field-description">
+    <slot>Description</slot>
+  </p>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner p controls.
+     s-field-description { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-description {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-description {
+    margin: 0; /* base reset removes p default margin; spacing via field wrapper */
+    font-size: var(--font-size-sm);
+    line-height: normal;
+    font-weight: var(--font-weight-normal);
+    color: var(--color-muted-foreground);
+  }
+
+  /* Links inside the description */
+  .s-field-description a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .s-field-description a:hover {
+    color: var(--color-primary);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field-description",
+        description: "A description for a form field.",
+        props: {
+          slot: {
+            default: "Description"
+          }
+        }
+      }
+    }
+  }
+</script>

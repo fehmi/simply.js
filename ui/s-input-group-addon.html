@@ -1,0 +1,94 @@
+<html>
+  <div
+    class="s-input-group-addon"
+    data-slot="input-group-addon"
+    data-align="{{props.align || 'inline-start'}}"
+    onclick="methods.focusInput(event)"
+  >
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-input-group-addon { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-input-group-addon {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-input-group-addon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing) * 2);
+    padding-block: calc(var(--spacing) * 1.5);
+    box-sizing: border-box; /* width:100% + padding shouldn't overflow the group */
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-muted-foreground);
+    user-select: none;
+    cursor: text; /* clicking the addon focuses the input */
+  }
+
+  .s-input-group-addon[data-align="inline-start"] {
+    order: -1;
+    padding-left: calc(var(--spacing) * 3);
+  }
+
+  .s-input-group-addon[data-align="inline-end"] {
+    order: 1;
+    padding-right: calc(var(--spacing) * 3);
+  }
+
+  .s-input-group-addon[data-align="block-start"] {
+    order: -1;
+    width: 100%;
+    justify-content: flex-start;
+    /* original: px-3 pt-3 (no bottom padding — the control's pb-3 spaces it) */
+    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 3) 0;
+  }
+
+  .s-input-group-addon[data-align="block-end"] {
+    order: 1;
+    width: 100%;
+    justify-content: flex-start;
+    /* original: px-3 pb-3 (no top padding — the control's pt-3 spaces it) */
+    padding: 0 calc(var(--spacing) * 3) calc(var(--spacing) * 3);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-input-group-addon",
+        description: "An addon (icon, text, or button) inside an input group.",
+        props: {
+          align: {
+            default: "inline-start",
+            options: ["inline-start", "inline-end", "block-start", "block-end"]
+          },
+          slot: {
+            default: "🔍"
+          }
+        }
+      }
+    }
+    methods = {
+      // Clicking the addon focuses the group's input (unless an interactive
+      // element like a button was clicked).
+      focusInput: function (event) {
+        var target = event.target;
+        // Skip interactive elements. The button's event target is its host
+        // (s-input-group-button) since the real <button> is in a shadow root.
+        if (target.closest && target.closest("button, a, input, select, textarea, s-input-group-button, [data-slot='input-group-button']")) return;
+        var group = component.parent;
+        if (group && group.methods && group.methods.control) {
+          group.methods.control.focus();
+        }
+      }
+    }
+  }
+</script>

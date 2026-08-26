@@ -1,0 +1,71 @@
+<html>
+  <div class="s-field-separator" data-slot="field-separator">
+    <div class="s-field-separator-line"></div>
+    <span class="s-field-separator-content {{data.hasContent ? '' : 's-hidden'}}">
+      <slot>Or continue with</slot>
+    </span>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-field-separator { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-separator {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-separator {
+    position: relative;
+    height: calc(var(--spacing) * 5);
+    margin-block: calc(var(--spacing) * -2);
+    font-size: var(--text-sm);
+  }
+
+  .s-field-separator-line {
+    position: absolute;
+    inset: 0;
+    top: 50%;
+    height: 1px;
+    background-color: var(--color-border);
+  }
+
+  .s-field-separator-content {
+    position: relative;
+    display: block;
+    width: fit-content;
+    margin-inline: auto;
+    padding-inline: calc(var(--spacing) * 2);
+    background-color: var(--color-background);
+    color: var(--color-muted-foreground);
+  }
+
+  .s-hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      hasContent: false,
+      doc: {
+        name: "s-field-separator",
+        description: "Visual divider to separate sections inside a field group.",
+        props: {
+          slot: {
+            default: "Or continue with"
+          }
+        }
+      }
+    }
+    lifecycle = {
+      // Hide the centered content span when there are no slotted children
+      afterFirstRender: function () {
+        var slot = dom.querySelector("slot");
+        data.hasContent = slot && slot.assignedNodes().length > 0;
+      }
+    }
+  }
+</script>

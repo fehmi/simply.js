@@ -27,12 +27,19 @@ Themes change not only colors/fonts but also **component sizes and radii** (via 
 
 ## Components
 
-- [Button](docs/ui/button.md) — button with variants and sizes
-- [Badge](docs/ui/badge.md) — badge / pill
-- [Label](docs/ui/label.md) — form label
-- [Separator](docs/ui/separator.md) — horizontal / vertical rule
-- [Skeleton](docs/ui/skeleton.md) — loading placeholder
-- [Component Viewer](docs/ui/component-viewer.md) — live preview tool
+- [Button](ui/s-button.md) — button with variants and sizes
+- [Badge](ui/s-badge.md) — badge / pill
+- [Label](ui/s-label.md) — form label
+- [Separator](ui/s-separator.md) — horizontal / vertical rule
+- [Skeleton](ui/s-skeleton.md) — loading placeholder
+- [Kbd](ui/s-kbd.md) — keyboard key
+- [Input](ui/s-input.md) — text input for forms
+- [Textarea](ui/s-textarea.md) — multi-line text input
+- [Field](ui/s-field.md) — form field (label + description + group)
+- [Spinner](ui/s-spinner.md) — loading indicator
+- [Native Select](ui/s-native-select.md) — styled native select
+- [Switch](ui/s-switch.md) — toggle switch
+- [Component Viewer](ui/s-component-viewer.md) — live preview tool
 
 ?> Each component page includes a live **component viewer** (parameter editing, dark/light toggle, theme switching).
 
@@ -46,7 +53,7 @@ Themes change not only colors/fonts but also **component sizes and radii** (via 
     <!-- optional theme: <link rel="stylesheet" href="ui/themes/nova.css"> -->
   </head>
   <body>
-    <s-label isolated for="email">Email</s-label>
+    <s-label for="email">Email</s-label>
     <script src="simply.js"></script>
     <script>
       get("ui/s-label.html");
@@ -57,7 +64,7 @@ Themes change not only colors/fonts but also **component sizes and radii** (via 
 
 ## Development Notes
 
-- Components use `isolated` (shadow DOM) + native `<slot>`
+- Components use shadow DOM (default) + native `<slot>`
 - `{{...}}` double braces are required
 - Dark mode selectors use `:host-context(.dark)`
 - Detailed guide: `ui/README.md`

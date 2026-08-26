@@ -1,0 +1,40 @@
+<html>
+  <div class="s-field-content" data-slot="field-content">
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-field-content { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-content {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--field-content-gap, calc(var(--spacing) * 1.5));
+    line-height: 1.375; /* leading-snug */
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field-content",
+        description: "Groups a label and description when the label sits beside the control.",
+        props: {
+          slot: {
+            default: `<s-field-label for="notifications">Notifications</s-field-label>
+<s-field-description>Email, SMS, and push options.</s-field-description>`
+          }
+        }
+      }
+    }
+  }
+</script>

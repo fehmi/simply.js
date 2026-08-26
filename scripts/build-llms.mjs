@@ -54,12 +54,13 @@ function resolveHref(href) {
   if (href === "docs/") {
     return { file: path.join(ROOT, "README.md"), slug: "about", relPath: "docs/" };
   }
-  const rel = href.replace(/^docs\//, ""); // e.g. "agents/agents.md"
-  const withExt = rel.endsWith(".md") ? rel : `${rel}.md`;
+  // Sidebar hrefs are relative to the repo root: "docs/getting-started.md"
+  // or "ui/s-button.md". Resolve to the on-disk file + a stable slug.
+  const withExt = href.endsWith(".md") ? href : `${href}.md`;
   return {
-    file: path.join(DOCS, withExt),
+    file: path.join(ROOT, withExt),
     slug: withExt.replace(/\.md$/, "").replace(/\//g, "-"),
-    relPath: `docs/${withExt}`,
+    relPath: withExt,
   };
 }
 
@@ -67,6 +68,36 @@ function resolveHref(href) {
 // 3. Content cleanup: strip docsify/site-only constructs that make no sense
 //    (or actively mislead) outside the interactive docsify site.
 // ---------------------------------------------------------------------------
+// Remove <s-component-viewer ...> live-widget tags, but ONLY outside fenced
+// code blocks. The Component Viewer page documents the tag inside its own
+// fenced examples, which must survive for LLMs. A viewer tag on its own line
+// (the rendered widget) is stripped, leaving any code block that follows it.
+function stripViewerOutsideFences(text) {
+  const fence = /^\s*```/; // a line starting a (or closing a) fence
+  let inFence = false;
+  const lines = text.split("\n");
+  const out = [];
+  for (const line of lines) {
+    if (fence.test(line)) {
+      inFence = !inFence;
+      out.push(line);
+      continue;
+    }
+    if (!inFence) {
+      // Strip the viewer tag pair / self-closing form on this line.
+      out.push(
+        line.replace(
+          /<s-component-viewer[^>]*\/?>\s*<\/s-component-viewer>|<s-component-viewer[^>]*\/?>/gi,
+          ""
+        )
+      );
+    } else {
+      out.push(line);
+    }
+  }
+  return out.join("\n");
+}
+
 function cleanContent(text, { slugByRelPath }) {
   let out = text;
 
@@ -86,17 +117,23 @@ function cleanContent(text, { slugByRelPath }) {
   out = out.replace(/<s-component-api[^>]*>(\s*<\/s-component-api>)?/gi,
     "> _Interactive component demo on the docs site (not reproduced in this text export)._");
 
+  // <s-component-viewer ...> is a live preview widget (meaningless in text).
+  // Strip it only OUTSIDE fenced code blocks — the Component Viewer doc page
+  // legitimately shows the tag inside its own example code blocks, which we
+  // keep. The example code block that follows a stripped viewer is preserved.
+  out = stripViewerOutsideFences(out);
+
   // /#/playground -> absolute URL
   out = out.replace(/\]\(\/#\/playground\)/g, `](${SITE}/#/playground)`);
 
-  // internal doc links: docs/xxx(.md)(#anchor) or docs/xxx (no ext) -> local anchor if known, else absolute URL
-  out = out.replace(/\]\((docs\/[^)#]+)(#[^)]*)?\)/g, (m, target, anchor) => {
+  // internal doc links: docs/xxx(.md)(#anchor) or ui/s-xxx(.md)(#anchor)
+  // -> local anchor if known, else absolute URL
+  out = out.replace(/\]\(((?:docs|ui)\/[^)#]+)(#[^)]*)?\)/g, (m, target, anchor) => {
     const norm = target.endsWith(".md") ? target : `${target}.md`;
-    const key = `docs/${norm.replace(/^docs\//, "")}`;
-    if (slugByRelPath.has(key)) {
-      return `](#${slugByRelPath.get(key)})`;
+    if (slugByRelPath.has(norm)) {
+      return `](#${slugByRelPath.get(norm)})`;
     }
-    return `](${SITE}/${norm.replace(/^docs\//, "docs/")})`;
+    return `](${SITE}/${norm})`;
   });
 
   return out.trim();
@@ -130,7 +167,7 @@ function buildLlmsFull(items) {
       return `<a id="${r.slug}"></a>\n\n${demoted}`;
     });
 
-  const header = `# Simply.js — Full Documentation (LLM-ready, single file)
+  const header = `# simply.js — Full Documentation (LLM-ready, single file)
 
 > Generated from https://github.com/fehmi/simply.js/tree/main/docs — do not edit by hand, edit the source .md files and re-run \`node scripts/build-llms.mjs\`.
 > Canonical human docs: ${SITE} — Source: ${SITE}/llms.txt
@@ -187,7 +224,7 @@ function buildLlmsTxt(items) {
     "docs/agents/repl-api.md": "Planned REPL API for programmatic example access (TBD, not live yet).",
   };
 
-  let out = `# Simply.js
+  let out = `# simply.js
 
 > Zero-dependency web-component library for building interactive UIs with plain HTML, CSS and JavaScript. Single-file components (\`<html>\`/\`<style>\`/\`<script>\` in one \`.html\` file), a reactive template engine, router and state management. No compiler, bundler, or build step — everything runs directly in the browser.
 
@@ -199,7 +236,7 @@ Use this file to decide which page(s) to fetch. Every link is a plain Markdown f
     out += `## ${section}\n`;
     for (const it of list) {
       const url =
-        it.href === "docs/" ? `${SITE}/docs/` : `${SITE}/${it.href.replace(/^docs\//, "docs/")}`;
+        it.href === "docs/" ? `${SITE}/docs/` : `${SITE}/${it.href}`;
       const desc = descriptions[it.href] ? `: ${descriptions[it.href]}` : "";
       out += `- [${it.label}](${url})${desc}\n`;
     }

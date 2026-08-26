@@ -1,0 +1,53 @@
+<html>
+  <div
+    class="s-field-error {{data.hasContent ? '' : 's-hidden'}}"
+    data-slot="field-error"
+    role="alert"
+  >
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-field-error { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-error {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-error {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-destructive);
+  }
+
+  .s-hidden {
+    display: none;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      hasContent: false,
+      doc: {
+        name: "s-field-error",
+        description: "Accessible error container for validation messages.",
+        props: {
+          slot: {
+            default: "Choose another username."
+          }
+        }
+      }
+    }
+    lifecycle = {
+      // Hide when there are no slotted children (original returns null)
+      afterFirstRender: function () {
+        var slot = dom.querySelector("slot");
+        data.hasContent = slot && slot.assignedNodes().length > 0;
+      }
+    }
+  }
+</script>

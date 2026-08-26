@@ -1,0 +1,39 @@
+<html>
+  <span class="s-input-group-text" data-slot="input-group-text">
+    <slot></slot>
+  </span>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner span controls.
+     s-input-group-text { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-input-group-text {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-input-group-text {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    font-size: var(--font-size-sm);
+    color: var(--color-muted-foreground);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-input-group-text",
+        description: "Text inside an input group addon.",
+        props: {
+          slot: {
+            default: "https://"
+          }
+        }
+      }
+    }
+  }
+</script>

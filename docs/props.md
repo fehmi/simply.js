@@ -1,6 +1,6 @@
 # Props
 
-Props are reactive values passed as attributes on the component tag. In Simply.js, attributes are synchronized with properties (props) — if you define an attribute value, the corresponding prop will also be defined.
+Props are reactive values passed as attributes on the component tag. In simply.js, attributes are synchronized with properties (props) — if you define an attribute value, the corresponding prop will also be defined.
 
 ```html
 <child-component message="This is a message from parent"/>

@@ -18,4 +18,43 @@
 
   /* Badge — Luma (rounded-3xl) */
   --badge-radius: var(--radius-3xl);
+
+  /* Input — Luma (rounded-3xl, h-9) */
+  --input-radius: var(--radius-3xl);
+  --input-height: calc(var(--spacing) * 9);
+
+  /* Textarea — Luma (rounded-2xl) */
+  --textarea-radius: var(--radius-2xl);
+
+  /* Skeleton — Luma (rounded-2xl) */
+  --skeleton-radius: var(--radius-2xl);
+
+  /* Kbd — Luma (rounded-lg, h-5.5) */
+  --kbd-radius: var(--radius-lg);
+  --kbd-height: calc(var(--spacing) * 5.5);
+
+  /* Switch — Luma (large: 44x20, rectangular thumb 24x16) */
+  --switch-radius: var(--radius-rounded);
+  --switch-width-default: calc(var(--spacing) * 11);
+  --switch-height-default: calc(var(--spacing) * 5);
+  --switch-width-sm: calc(var(--spacing) * 7);
+  --switch-height-sm: calc(var(--spacing) * 4);
+  --switch-thumb-width-default: calc(var(--spacing) * 6);
+  --switch-thumb-height-default: calc(var(--spacing) * 4);
+  --switch-thumb-width-sm: calc(var(--spacing) * 4);
+  --switch-thumb-height-sm: calc(var(--spacing) * 3);
+  --switch-border-width: 2px;
+  --switch-thumb-translate: calc(100% - 8px);
+
+  /* Native Select — Luma (pl-3) */
+  --native-select-padding-x: calc(var(--spacing) * 3);
+  --native-select-padding-right: calc(var(--spacing) * 8);
+  --native-select-padding-y: calc(var(--spacing) * 1);
+  --native-select-icon-right: calc(var(--spacing) * 2.5);
+
+  /* Field family — Luma (same as vega) */
+  --field-set-gap: calc(var(--spacing) * 6);
+  --field-group-gap: calc(var(--spacing) * 7);
+  --field-gap: calc(var(--spacing) * 3);
+  --field-content-gap: calc(var(--spacing) * 1);
 }

@@ -78,6 +78,58 @@
   --label-font-weight: var(--font-weight-medium);
   --label-text-transform: none;
   --label-letter-spacing: normal;
+
+  /* Small text size — Lyra/Mira use text-xs (12px), others text-sm (14px).
+     Used by field descriptions/errors/titles, input-group text/addons, etc. */
+  --font-size-sm: var(--text-sm);
+
+  /* Field legend (legend variant) — Lyra/Mira use text-sm, others text-base */
+  --field-legend-font-size: var(--text-base);
+
+  /* Input */
+  --input-radius: var(--radius-md);
+  --input-height: calc(var(--spacing) * 9);
+  --input-height-xs: calc(var(--spacing) * 6);
+  --input-height-sm: calc(var(--spacing) * 8);
+  --input-height-default: calc(var(--spacing) * 9);
+  --input-height-lg: calc(var(--spacing) * 10);
+  --input-font-size: var(--font-size-sm);
+
+  /* Textarea */
+  --textarea-radius: var(--radius-md);
+  --textarea-font-size: var(--font-size-sm);
+
+  /* Skeleton */
+  --skeleton-radius: var(--radius-md);
+
+  /* Kbd */
+  --kbd-radius: var(--radius-sm);
+  --kbd-height: calc(var(--spacing) * 5);
+
+  /* Switch (sizes/radius/border vary per theme — vega defaults) */
+  --switch-radius: var(--radius-rounded);
+  --switch-width-default: calc(var(--spacing) * 8);
+  --switch-height-default: 18.4px;
+  --switch-width-sm: calc(var(--spacing) * 6);
+  --switch-height-sm: calc(var(--spacing) * 3.5);
+  --switch-thumb-width-default: calc(var(--spacing) * 4);
+  --switch-thumb-height-default: calc(var(--spacing) * 4);
+  --switch-thumb-width-sm: calc(var(--spacing) * 3);
+  --switch-thumb-height-sm: calc(var(--spacing) * 3);
+  --switch-border-width: 1px;
+  --switch-thumb-translate: calc(100% - 2px);
+
+  /* Native Select (padding/chevron vary per theme — vega defaults) */
+  --native-select-padding-x: calc(var(--spacing) * 2.5);
+  --native-select-padding-right: calc(var(--spacing) * 8);
+  --native-select-padding-y: calc(var(--spacing) * 1);
+  --native-select-icon-right: calc(var(--spacing) * 2.5);
+
+  /* Field family (gaps vary per theme — vega defaults) */
+  --field-set-gap: calc(var(--spacing) * 6);
+  --field-group-gap: calc(var(--spacing) * 7);
+  --field-gap: calc(var(--spacing) * 3);
+  --field-content-gap: calc(var(--spacing) * 1);
 }
 
 .dark {

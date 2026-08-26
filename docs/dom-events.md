@@ -1,6 +1,6 @@
 # DOM Events
 
-There is nothing unique about writing DOM events in Simply.js compared to Vanilla JavaScript. You can use any native event attribute (`onclick`, `onmouseover`, ...) and pass values from `data`, `props` or `state` directly to your methods.
+There is nothing unique about writing DOM events in simply.js compared to Vanilla JavaScript. You can use any native event attribute (`onclick`, `onmouseover`, ...) and pass values from `data`, `props` or `state` directly to your methods.
 
 ?> Inside event attributes, variables are written **without** curly braces — `methods.alert(data.message)`, not `methods.alert({{data.message}})`. Curly braces (`{{ }}`) are only used in the template body and attribute values.
 

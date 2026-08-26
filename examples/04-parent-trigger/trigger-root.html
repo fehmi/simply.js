@@ -16,7 +16,7 @@
 
 <h2>Props → Parent</h2>
 <p class="muted small">Root sends <code>.label</code> and <code>.count</code> to the parent as props. They can also be mutated from inside the parent.</p>
-<trigger-parent .label="{{data.name}}" .count="{{data.counter}}" isolated>
+<trigger-parent .label="{{data.name}}" .count="{{data.counter}}">
   <span class="slot-hint">Slot content — projected into the parent's <code>&lt;slot&gt;</code></span>
 </trigger-parent>
 
@@ -25,7 +25,7 @@
   <li><code>parent.data.name</code> — reads the parent component's data</li>
   <li><code>parent.parent.data.name</code> — reads data two levels up</li>
   <li><code>parent.data.name = '...'</code> — writes to the ancestor's data, the whole tree re-renders</li>
-  <li><code>props.label</code> — prop received from the parent, isolated scope via <code>isolated</code></li>
+  <li><code>props.label</code> — prop received from the parent, scoped via shadow DOM</li>
 </ul>
 </html>
 

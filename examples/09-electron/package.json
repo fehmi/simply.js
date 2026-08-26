@@ -1,7 +1,7 @@
 {
   "name": "simply-electron-example",
   "version": "1.0.0",
-  "description": "Simply.js router example running inside Electron",
+  "description": "simply.js router example running inside Electron",
   "main": "main.js",
   "scripts": {
     "start": "electron ."

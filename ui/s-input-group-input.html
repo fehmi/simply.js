@@ -1,0 +1,102 @@
+<html>
+  <input
+    class="s-input-group-input"
+    data-slot="input-group-control"
+    type="{{props.type || 'text'}}"
+    id="{{props.id || ''}}"
+    name="{{props.name || ''}}"
+    value="{{props.value || ''}}"
+    placeholder="{{props.placeholder || ''}}"
+    ?disabled="{{props.disabled === '' || props.disabled}}"
+    ?required="{{props.required === '' || props.required}}"
+    ?aria-invalid="{{props.ariaInvalid === '' || props.ariaInvalid || props['aria-invalid'] === '' || props['aria-invalid']}}"
+  >
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner input controls.
+     The input is a form control — use WITH light (light DOM)
+     so the native <input> participates in forms. */
+  :host,
+  s-input-group-input {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-input-group-input {
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+    box-sizing: border-box;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    outline: none;
+    /* The group tightens these to 8px (pl-2/pr-2) when an addon sits beside
+       the control, matching the original's has-[>[data-align=...]]:[&>input]:pl-2.
+       Block addons pad the vertical edge facing the addon (pb-3/pt-3). */
+    padding-top: var(--input-group-input-pt, calc(var(--spacing) * 1));
+    padding-bottom: var(--input-group-input-pb, calc(var(--spacing) * 1));
+    padding-left: var(--input-group-input-pl, calc(var(--spacing) * 3));
+    padding-right: var(--input-group-input-pr, calc(var(--spacing) * 3));
+    font-family: inherit;
+    font-size: var(--text-base);
+    color: inherit;
+  }
+
+  @media (min-width: 768px) {
+    .s-input-group-input {
+      font-size: var(--input-font-size);
+    }
+  }
+
+  .s-input-group-input::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  .s-input-group-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-input-group-input",
+        description: "A borderless input for use inside an input group.",
+        props: {
+          light: {
+            default: true
+          },
+          type: {
+            default: "text",
+            options: ["text", "email", "password", "number", "tel", "url", "search", "file", "date"]
+          },
+          placeholder: {
+            default: ""
+          },
+          disabled: {
+            default: false
+          },
+          ariaInvalid: {
+            default: false
+          }
+        }
+      }
+    }
+    lifecycle = {
+      // Announce to a parent input-group that the control is rendered.
+      // composed:true lets the event cross this component's shadow boundary
+      // (when in shadow DOM) so the group can attach focus/invalid listeners
+      // deterministically instead of polling.
+      afterFirstRender: function () {
+        component.dispatchEvent(new CustomEvent("control-ready", {
+          bubbles: true,
+          composed: true
+        }));
+      }
+    }
+  }
+</script>

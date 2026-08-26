@@ -1,0 +1,232 @@
+<html>
+  <div
+    class="s-input-group"
+    data-slot="input-group"
+    role="group"
+    ?focus="{{data.focus}}"
+    ?invalid="{{data.invalid}}"
+    ?textarea="{{data.textarea}}"
+    ?block-start="{{data.blockStart}}"
+    ?block-end="{{data.blockEnd}}"
+  >
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-input-group { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-input-group {
+    display: contents;
+  }
+
+  /* Focus/error states — :has() can't cross the shadow boundary, so the
+     lifecycle tracks focus/invalid in reactive data and binds it to the
+     inner div (?focus/?invalid). State lives on the inner div, not the
+     host, so both light-DOM and shadow-DOM renders work. */
+  .s-input-group[focus] {
+    --input-group-border: var(--color-ring);
+    --input-group-ring: 0 0 0 3px color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  .s-input-group[invalid] {
+    --input-group-border: var(--color-destructive);
+    --input-group-ring: 0 0 0 3px color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  /* Textarea control → auto height (original has-[>textarea]:h-auto) */
+  .s-input-group[textarea] {
+    --input-group-height: auto;
+  }
+
+  /* Block addons (block-start/block-end) → column layout (original
+     has-[>[data-align=block-start]]:flex-col / block-end:flex-col) so the
+     addon becomes a full-width row and the control takes the rest. */
+  .s-input-group[block-start],
+  .s-input-group[block-end] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .s-input-group[block-start],
+  .s-input-group[block-end] {
+    --input-group-height: auto;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-input-group {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    min-width: 0;
+    height: var(--input-group-height, var(--input-height));
+    box-sizing: border-box;
+    border: 1px solid var(--input-group-border, var(--color-input));
+    border-radius: var(--input-radius);
+    box-shadow: var(--input-group-ring, var(--shadow-xs));
+    background-color: transparent;
+    transition: box-shadow var(--default-transition-duration) var(--default-transition-timing-function);
+    outline: none;
+  }
+
+  :host-context(.dark) .s-input-group {
+    background-color: color-mix(in oklab, var(--color-input) 30%, transparent);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      focus: false,
+      invalid: false,
+      textarea: false,
+      blockStart: false,
+      blockEnd: false,
+      doc: {
+        name: "s-input-group",
+        description: "Compound input with addons, buttons, or text inside.",
+        props: {
+          slot: {
+            default: `<s-input-group-input light placeholder="Search..."></s-input-group-input><s-input-group-addon>🔍</s-input-group-addon>`
+          }
+        }
+      }
+    }
+    methods = {
+      // Match the original's has-[>[data-align=inline-start]]:[&>input]:pl-2
+      // and has-[>[data-align=inline-end]]:[&>input]:pr-2: when an addon sits
+      // beside the control, tighten the control's inline padding so the addon
+      // text doesn't look spaced out from the input text. Block addons
+      // (block-start/block-end) flip the group to a column layout and pad the
+      // control's vertical edge facing the addon (pb-3 / pt-3).
+      updateAddonPadding: function () {
+        var slot = dom.querySelector("slot");
+        var nodes = slot ? slot.assignedNodes() : [];
+        var hasInlineStart = false;
+        var hasInlineEnd = false;
+        var hasBlockStart = false;
+        var hasBlockEnd = false;
+        nodes.forEach(function (n) {
+          if (n.nodeType !== 1 || n.tagName !== "S-INPUT-GROUP-ADDON") return;
+          var align = n.getAttribute ? n.getAttribute("align") : null;
+          if (align === "inline-end") {
+            hasInlineEnd = true;
+          } else if (align === "block-start") {
+            hasBlockStart = true;
+          } else if (align === "block-end") {
+            hasBlockEnd = true;
+          } else {
+            hasInlineStart = true;
+          }
+        });
+        if (hasInlineStart) {
+          component.style.setProperty("--input-group-input-pl", "calc(var(--spacing) * 2)");
+        } else {
+          component.style.removeProperty("--input-group-input-pl");
+        }
+        if (hasInlineEnd) {
+          component.style.setProperty("--input-group-input-pr", "calc(var(--spacing) * 2)");
+        } else {
+          component.style.removeProperty("--input-group-input-pr");
+        }
+        if (hasBlockStart) {
+          data.blockStart = true;
+          component.style.setProperty("--input-group-input-pb", "calc(var(--spacing) * 3)");
+        } else {
+          data.blockStart = false;
+          component.style.removeProperty("--input-group-input-pb");
+        }
+        if (hasBlockEnd) {
+          data.blockEnd = true;
+          component.style.setProperty("--input-group-input-pt", "calc(var(--spacing) * 3)");
+        } else {
+          data.blockEnd = false;
+          component.style.removeProperty("--input-group-input-pt");
+        }
+      },
+      // Find the slotted control (the input/textarea) and attach focus/blur +
+      // aria-invalid listeners so the group can reflect those states.
+      attachControl: function () {
+        if (component.control) return;
+        var slot = dom.querySelector("slot");
+        var nodes = slot ? slot.assignedNodes() : [];
+        var control = null;
+        nodes.forEach(function (n) {
+          if (n.nodeType !== 1 || control) return;
+          // light DOM control (light attribute)
+          var el = n.querySelector ? n.querySelector('[data-slot="input-group-control"]') : null;
+          // shadow DOM control (default)
+          if (!el && n.shadowRoot) {
+            el = n.shadowRoot.querySelector('[data-slot="input-group-control"]');
+          }
+          if (el) control = el;
+        });
+        if (!control) {
+          // A shadow-DOM control renders ASYNC in its own shadow root. The
+          // control component announces itself via the "control-ready"
+          // composed event (see below), so if we haven't found it yet we just
+          // wait for that event — no polling needed.
+          return;
+        }
+        component.control = control;
+        // Textarea control → auto height
+        if (control.tagName === "TEXTAREA") {
+          data.textarea = true;
+        }
+        methods.onControlFocus = function () {
+          data.focus = true;
+        };
+        methods.onControlBlur = function () {
+          data.focus = false;
+        };
+        control.addEventListener("focus", methods.onControlFocus);
+        control.addEventListener("blur", methods.onControlBlur);
+        if (control.getAttribute("aria-invalid") !== null) {
+          data.invalid = true;
+        }
+        // Watch aria-invalid changes
+        methods.invalidObserver = new MutationObserver(function () {
+          if (component.control && component.control.getAttribute("aria-invalid") !== null) {
+            data.invalid = true;
+          } else {
+            data.invalid = false;
+          }
+        });
+        methods.invalidObserver.observe(control, {
+          attributes: true,
+          attributeFilter: ["aria-invalid"]
+        });
+      },
+      // Tear down listeners/observers when the group is removed from the DOM.
+      detachControl: function () {
+        if (component.control) {
+          component.control.removeEventListener("focus", methods.onControlFocus);
+          component.control.removeEventListener("blur", methods.onControlBlur);
+        }
+        if (methods.invalidObserver) {
+          methods.invalidObserver.disconnect();
+          methods.invalidObserver = null;
+        }
+        component.control = null;
+      }
+    }
+    lifecycle = {
+      afterFirstRender: function () {
+        methods.updateAddonPadding();
+        methods.attachControl();
+        // Control components announce themselves when their shadow content
+        // renders ("control-ready" bubbles + crosses the shadow boundary).
+        // This is the deterministic signal — no MutationObserver needed.
+        component.addEventListener("control-ready", function () {
+          component.control = null; // allow re-attach to the freshly rendered control
+          methods.attachControl();
+          methods.updateAddonPadding();
+        });
+      },
+      disconnected: function () {
+        methods.detachControl();
+      }
+    }
+  }
+</script>

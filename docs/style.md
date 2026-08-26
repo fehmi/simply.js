@@ -1,13 +1,13 @@
 # Style
 
-The `<style>` tag of a component is processed by Simply.js' own style engine, which extends plain CSS with reactive values and conditions:
+The `<style>` tag of a component is processed by simply.js' own style engine, which extends plain CSS with reactive values and conditions:
 
 - **Dynamic variables** — inject reactive values with `var(data.color)`, `var(state.deg)` or any expression.
 - **Conditions** — toggle rule blocks with `&cond:[if="..." ]`, `&cond:[elsif="..." ]` and `&cond:[else]`.
 
 Everything else behaves like standard CSS, including native custom properties such as `var(--my-token)`.
 
-?> By default components render **without** Shadow DOM, so `:host` only works when the `isolated` attribute is present. See [Scope & Encapsulation](docs/style-scope.md).
+?> By default components render **with** Shadow DOM, so `:host` works out of the box. Add `light` to render in the light DOM. See [Scope & Encapsulation](docs/style-scope.md).
 
 ## A Simple Example
 
@@ -69,4 +69,4 @@ Styles defined inside a component's `<style>` tag style the template rendered by
 
 - [Style Variables](docs/style-variables.md) — reactive `var(...)` expressions
 - [Style Conditions](docs/style-conditions.md) — `&cond:[...]` blocks
-- [Scope & Encapsulation](docs/style-scope.md) — `isolated`, `:host`, linking CSS files
+- [Scope & Encapsulation](docs/style-scope.md) — `light`, `:host`, linking CSS files

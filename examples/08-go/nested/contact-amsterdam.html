@@ -7,8 +7,8 @@
 </html>
 
 <style>
-	/* root selector = component tag name — this component is not shadow-isolated */
-	contact-amsterdam {
+	/* root selector = :host (shadow DOM default) + tag name (light DOM) */
+	:host, contact-amsterdam {
 		display: block;
 		font-family: system-ui, sans-serif;
 		color: #1e293b;
@@ -16,7 +16,7 @@
 	}
 
 	/* progress line — level 2 hue: pink → amber → blue */
-	contact-amsterdam > line {
+	:host > line, contact-amsterdam > line {
 		display: block;
 		height: 4px;
 		border-radius: 999px;
@@ -27,7 +27,7 @@
 		width: 0;
 		transition: width 400ms ease-in-out;
 	}
-	contact-amsterdam[enter] > line {
+	:host([enter]) > line, contact-amsterdam[enter] > line {
 		width: 100%;
 		transition: width 800ms cubic-bezier(.22, 1, .36, 1);
 	}
@@ -37,36 +37,36 @@
 	   - exit total (250ms, no delay) stays under the line's 400ms exit
 	   - enter totals (delay + 450ms) stay under the line's 800ms enter
 	     d1 120+450=570 · d2 220+450=670 · d3 320+450=770 */
-	contact-amsterdam > .fx {
+	:host > .fx, contact-amsterdam > .fx {
 		opacity: 0;
 		transform: translateY(8px);
 		transition: opacity .25s ease, transform .25s ease;
 	}
-	contact-amsterdam[enter] > .fx {
+	:host([enter]) > .fx, contact-amsterdam[enter] > .fx {
 		opacity: 1;
 		transform: none;
 		transition: opacity .45s ease, transform .45s cubic-bezier(.22, 1, .36, 1);
 	}
-	contact-amsterdam[enter] > .fx.d1 { transition-delay: .12s; }
-	contact-amsterdam[enter] > .fx.d2 { transition-delay: .22s; }
-	contact-amsterdam[enter] > .fx.d3 { transition-delay: .32s; }
+	:host([enter]) > .fx.d1, contact-amsterdam[enter] > .fx.d1 { transition-delay: .12s; }
+	:host([enter]) > .fx.d2, contact-amsterdam[enter] > .fx.d2 { transition-delay: .22s; }
+	:host([enter]) > .fx.d3, contact-amsterdam[enter] > .fx.d3 { transition-delay: .32s; }
 
-	contact-amsterdam h2 {
+	:host h2, contact-amsterdam h2 {
 		margin: 0 0 4px;
 		font-size: 18px;
 		color: #0f172a;
 	}
-	contact-amsterdam .tagline {
+	:host .tagline, contact-amsterdam .tagline {
 		margin: 0 0 14px;
 		color: #64748b;
 		font-size: 13px;
 	}
-	contact-amsterdam .links {
+	:host .links, contact-amsterdam .links {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
 	}
-	contact-amsterdam .links a {
+	:host .links a, contact-amsterdam .links a {
 		padding: 6px 12px;
 		border: 1px solid #e2e8f0;
 		border-radius: 999px;
@@ -75,11 +75,11 @@
 		text-decoration: none;
 		font-size: 13px;
 	}
-	contact-amsterdam .links a:hover {
+	:host .links a:hover, contact-amsterdam .links a:hover {
 		border-color: #ec4899;
 		color: #ec4899;
 	}
-	contact-amsterdam .links a[go-active] {
+	:host .links a[go-active], contact-amsterdam .links a[go-active] {
 		color: #ec4899;
 		border-color: #ec4899;
 		background: #fff;

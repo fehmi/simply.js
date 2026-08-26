@@ -3,6 +3,7 @@
     class="s-label"
     for="{{props.for}}"
     ?data-disabled="{{props.disabled === '' || props.disabled}}"
+    onclick="methods.activateControl()"
   >
     <slot>Label</slot>
   </label>
@@ -54,6 +55,24 @@
           slot: {
             default: "Label"
           }
+        }
+      }
+    }
+    methods = {
+      // `for` doesn't cross the shadow boundary for simply.js controls (e.g.
+      // s-checkbox renders a <button role="checkbox"> in shadow DOM), so a
+      // native <label for> can't activate them. Find the control by id in the
+      // same root tree (document OR shadow root — `component.getRootNode()`
+      // covers both), then toggle it (checkbox/switch) or focus it (input).
+      activateControl: function () {
+        if (!props.for) return;
+        var root = component.getRootNode();
+        var control = root && root.getElementById ? root.getElementById(props.for) : null;
+        if (!control) return;
+        if (control.methods && typeof control.methods.toggle === "function") {
+          control.methods.toggle();
+        } else if (typeof control.focus === "function") {
+          control.focus();
         }
       }
     }

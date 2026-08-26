@@ -1,0 +1,96 @@
+<html>
+  <textarea
+    class="s-input-group-textarea"
+    data-slot="input-group-control"
+    id="{{props.id || ''}}"
+    name="{{props.name || ''}}"
+    placeholder="{{props.placeholder || ''}}"
+    ?disabled="{{props.disabled === '' || props.disabled}}"
+    ?required="{{props.required === '' || props.required}}"
+    ?aria-invalid="{{props.ariaInvalid === '' || props.ariaInvalid || props['aria-invalid'] === '' || props['aria-invalid']}}"
+  ></textarea>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner textarea controls.
+     The textarea is a form control — use WITH light (light DOM)
+     so the native <textarea> participates in forms. */
+  :host,
+  s-input-group-textarea {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-input-group-textarea {
+    flex: 1;
+    min-width: 0;
+    min-height: calc(var(--spacing) * 16);
+    box-sizing: border-box;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    outline: none;
+    /* The group tightens the inline padding to 8px (pl-2/pr-2) when an addon
+       sits beside the control, matching the original's [&>input]:pl-2/pr-2. */
+    padding-top: calc(var(--spacing) * 2);
+    padding-bottom: calc(var(--spacing) * 2);
+    padding-left: var(--input-group-input-pl, calc(var(--spacing) * 3));
+    padding-right: var(--input-group-input-pr, calc(var(--spacing) * 3));
+    font-family: inherit;
+    font-size: var(--text-base);
+    color: inherit;
+    resize: vertical;
+  }
+
+  @media (min-width: 768px) {
+    .s-input-group-textarea {
+      font-size: var(--textarea-font-size);
+    }
+  }
+
+  .s-input-group-textarea::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  .s-input-group-textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-input-group-textarea",
+        description: "A borderless textarea for use inside an input group.",
+        props: {
+          light: {
+            default: true
+          },
+          placeholder: {
+            default: ""
+          },
+          disabled: {
+            default: false
+          },
+          ariaInvalid: {
+            default: false
+          }
+        }
+      }
+    }
+    lifecycle = {
+      // Announce to a parent input-group that the control is rendered.
+      // composed:true lets the event cross this component's shadow boundary
+      // (when in shadow DOM) so the group can attach focus/invalid listeners
+      // deterministically instead of polling.
+      afterFirstRender: function () {
+        component.dispatchEvent(new CustomEvent("control-ready", {
+          bubbles: true,
+          composed: true
+        }));
+      }
+    }
+  }
+</script>

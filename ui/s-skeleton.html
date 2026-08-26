@@ -5,14 +5,14 @@
 <style>
   /* Host is the sizeable box (user sets width/height/border-radius via
      inline styles on the tag). The inner div fills it and inherits the
-     radius. s-skeleton { ... } handles the LIGHT DOM case (no isolated)
+     radius. s-skeleton { ... } handles the LIGHT DOM case (light attribute)
      since :host only matches in shadow DOM. */
   :host,
   s-skeleton {
     display: block;
     width: 100%;
     height: 1rem;
-    border-radius: var(--radius-md);
+    border-radius: var(--skeleton-radius);
   }
 
   /* ---- Base (original shadcn v4) ---- */

@@ -38,7 +38,7 @@ The following example logs every lifecycle event to a `data.log` array and rende
     <title>simply.js</title>
   </head>
   <body style="margin: 0">
-    <lifecycle-log count="0" isolated/>
+    <lifecycle-log count="0"/>
     <script src="https://simply.js.org/simply.min.js"></script>
     <script>
       get("lifecycle-log.html");

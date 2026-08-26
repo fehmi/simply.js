@@ -1,0 +1,80 @@
+<html>
+  <div
+    class="s-button-group"
+    role="group"
+    data-slot="button-group"
+    data-orientation="{{props.orientation || 'horizontal'}}"
+  >
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  /* The host generates a box (inline-flex) so nested button-groups are real
+     flex items — otherwise display: contents has no box, so the gap margin
+     between nested groups collapses to 0. */
+  :host,
+  s-button-group {
+    display: inline-flex;
+  }
+
+  .s-button-group {
+    display: flex;
+    width: fit-content;
+    align-items: stretch;
+  }
+
+  .s-button-group[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
+  /* Nested button-groups get a gap between them. The original uses
+     has-[>[data-slot=button-group]]:gap-2 = gap: calc(var(--spacing)*2), a
+     CONSTANT (Tailwind --spacing, not theme-dependent). Use a margin on the
+     nested group hosts. !important beats the theme.css universal
+     * { margin: 0 } reset (the docs load theme-vars.css, which has no reset). */
+  ::slotted(s-button-group:not(:first-child)) {
+    margin-left: calc(var(--spacing) * 2) !important;
+  }
+
+  /* Positional CSS vars for the slotted buttons. ::slotted() must be a
+     top-level selector (not prefixed with .s-button-group) to be valid. The
+     vars inherit into each button's shadow root, where the button's
+     :host-context([data-slot=button-group]) rules apply them. */
+  ::slotted(s-button:first-child) {
+    --_group-rl: var(--button-radius);
+  }
+
+  ::slotted(s-button:not(:first-child)) {
+    --_group-rl: 0;
+    --_group-bl: 0;
+  }
+
+  ::slotted(s-button:not(:last-child)) {
+    --_group-rr: 0;
+  }
+
+  ::slotted(s-button:last-child) {
+    --_group-rr: var(--button-radius);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-button-group",
+        description: "Groups buttons together, joining them with shared borders and rounded outer corners.",
+        props: {
+          orientation: {
+            options: ["horizontal", "vertical"],
+            default: "horizontal"
+          },
+          slot: {
+            default: "<s-button variant=\"outline\">Button</s-button>"
+          }
+        }
+      }
+    }
+  }
+</script>

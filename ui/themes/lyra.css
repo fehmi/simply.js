@@ -29,4 +29,50 @@
   /* Label — Lyra (text-xs, normal weight) */
   --label-font-size: var(--text-xs);
   --label-font-weight: var(--font-weight-normal);
+
+  /* Small text — Lyra (text-xs) */
+  --font-size-sm: var(--text-xs);
+  --field-legend-font-size: var(--text-sm);
+
+  /* Input — Lyra (rounded-none, h-8, text-xs) */
+  --input-radius: 0;
+  --input-height: calc(var(--spacing) * 8);
+  --input-height-sm: calc(var(--spacing) * 7);
+  --input-height-default: calc(var(--spacing) * 8);
+  --input-height-lg: calc(var(--spacing) * 9);
+
+  /* Textarea — Lyra (rounded-none, text-xs) */
+  --textarea-radius: 0;
+
+  /* Skeleton — Lyra (rounded-none) */
+  --skeleton-radius: 0;
+
+  /* Kbd — Lyra (rounded-none, h-5) */
+  --kbd-radius: 0;
+  --kbd-height: calc(var(--spacing) * 5);
+
+  /* Switch — Lyra (same as vega) */
+  --switch-radius: var(--radius-rounded);
+  --switch-width-default: calc(var(--spacing) * 8);
+  --switch-height-default: 18.4px;
+  --switch-width-sm: calc(var(--spacing) * 6);
+  --switch-height-sm: calc(var(--spacing) * 3.5);
+  --switch-thumb-width-default: calc(var(--spacing) * 4);
+  --switch-thumb-height-default: calc(var(--spacing) * 4);
+  --switch-thumb-width-sm: calc(var(--spacing) * 3);
+  --switch-thumb-height-sm: calc(var(--spacing) * 3);
+  --switch-border-width: 1px;
+  --switch-thumb-translate: calc(100% - 2px);
+
+  /* Native Select — Lyra (same as vega) */
+  --native-select-padding-x: calc(var(--spacing) * 2.5);
+  --native-select-padding-right: calc(var(--spacing) * 8);
+  --native-select-padding-y: calc(var(--spacing) * 1);
+  --native-select-icon-right: calc(var(--spacing) * 2.5);
+
+  /* Field family — Lyra (compact gaps) */
+  --field-set-gap: calc(var(--spacing) * 4);
+  --field-group-gap: calc(var(--spacing) * 5);
+  --field-gap: calc(var(--spacing) * 2);
+  --field-content-gap: calc(var(--spacing) * 0.5);
 }

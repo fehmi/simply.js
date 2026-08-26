@@ -1087,9 +1087,10 @@ simply = {
 	},
 	classCache: {},
 	getDomParentAndShadow(component) {
-		var shadow = false;
-		if (component.getAttribute("isolated") !== null && component.getAttribute("isolated") !== "false") {
-			shadow = true;
+		// Shadow DOM is the default. Opt into light DOM with the `light` attribute.
+		var shadow = true;
+		if (component.getAttribute("light") !== null && component.getAttribute("light") !== "false") {
+			shadow = false;
 		}
 
 		var dom, parent;
@@ -1701,6 +1702,16 @@ simply = {
 								sheets.push(this.sheet);
 							}
 
+							// If this light-DOM component lives inside another component's
+							// shadow tree (e.g. a `light` child slotted into a
+							// shadow parent), document sheets do NOT apply there.
+							// Adopt the sheet into the containing shadow root as well.
+							// Each mount handles its own root — no ancestor walk needed.
+							var rootNode = this.component && this.component.getRootNode ? this.component.getRootNode() : null;
+							if (rootNode && rootNode !== document && rootNode.adoptedStyleSheets && !rootNode.adoptedStyleSheets.includes(this.sheet)) {
+								rootNode.adoptedStyleSheets = [...rootNode.adoptedStyleSheets, this.sheet];
+							}
+
 							var end = performance.now();
 							//console.log(`Adopting sheet to document for ${name} took ${end - start} ms`);
 						}
@@ -1774,7 +1785,9 @@ simply = {
 								ObservableSlim.pause(p);
 
 								// hack: stop transition to initial values on first render
-								this.dom.style.transition = "none";
+								// Use comp (host element) — this.dom is a ShadowRoot in shadow DOM
+								// and has no .style property.
+								comp.style.transition = "none";
 
 								setTimeout(() => {
 									comp.style.transition = ""; // extension of the hack
@@ -3566,6 +3579,30 @@ simply = {
 				return result;
 			}
 
+			// Collect every <route> element in the document, including those
+			// nested inside shadow roots (shadow DOM is the default now).
+			function collectAllRoutes(root) {
+				const routes = [];
+				(function walk(node) {
+					if (!node) return;
+					// Document (9) and ShadowRoot/DocumentFragment (11) have no
+					// tagName; walk their element children.
+					if (node.nodeType === 9 || node.nodeType === 11) {
+						for (const child of node.children || []) walk(child);
+						return;
+					}
+					if (node.nodeType !== 1) return;
+					if (node.tagName && node.tagName.toLowerCase() === 'route') {
+						routes.push(node);
+					}
+					// light DOM children
+					for (const child of node.children || []) walk(child);
+					// shadow DOM children
+					if (node.shadowRoot) walk(node.shadowRoot);
+				})(root);
+				return routes;
+			}
+
 			function handleTransition(comp, type, updateContext, delay) {
 				// render() tarafından oluştuluyor
 				clearTimeout(comp.fallbackTimeout);
@@ -3672,7 +3709,7 @@ simply = {
 				if (toTree.length == 0) toTree.push(to.value.path);
 				toTree.reverse();
 
-				const currentRoutes = Array.from(document.querySelectorAll('route'))
+				const currentRoutes = collectAllRoutes(document)
 					.map(r => r.firstElementChild)
 					.filter(Boolean).reverse();
 
@@ -4376,7 +4413,7 @@ simply = {
 							// son çocuk/target-route değilse/parent'sa ve router > component şeklinde render edilmemişse
 							if (i !== tree.length - 1 && !directChild) {
 								let attrs = [];
-								if (targetParentRoute.settings.isolated == true) attrs.push('shadow');
+								if (targetParentRoute.settings.light == true) attrs.push('light');
 								if (targetParentRoute.settings.cache) attrs.push('cache');
 
 
@@ -4449,7 +4486,7 @@ simply = {
 					else {
 						// console.warn("INNERHTML")
 						let attrs = [];
-						if (settings.isolated == true) attrs.push('shadow');
+						if (settings.light == true) attrs.push('light');
 						if (settings.cache) attrs.push('cache');
 
 

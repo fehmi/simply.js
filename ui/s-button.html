@@ -25,6 +25,7 @@
     background-clip: padding-box;
     color: inherit;
     background-color: transparent;
+    font-family: inherit;
     font-size: var(--text-sm);
     line-height: var(--text-sm--line-height);
     font-weight: var(--font-weight-medium);
@@ -75,6 +76,42 @@
   .s-button > svg {
     pointer-events: none;
     flex-shrink: 0;
+  }
+
+  /* s-icon (lucide). The size prop is reflected to the host as data-size, and
+     --s-icon-size set on the host inherits into the slotted <s-icon>'s shadow
+     DOM. Icon size derives from the theme-aware button tokens so it scales with
+     the theme's font-size/button box (not just the size variant). */
+  :host([data-size="xs"]) {
+    --s-icon-size: calc(var(--button-font-size-xs) * 1.2);
+  }
+
+  :host([data-size="sm"]) {
+    --s-icon-size: calc(var(--button-font-size-sm) * 1.2);
+  }
+
+  :host([data-size="default"]) {
+    --s-icon-size: calc(var(--button-font-size-default) * 1.2);
+  }
+
+  :host([data-size="lg"]) {
+    --s-icon-size: calc(var(--button-font-size-lg) * 1.2);
+  }
+
+  :host([data-size="icon-xs"]) {
+    --s-icon-size: calc(var(--button-size-icon-xs) * 0.5);
+  }
+
+  :host([data-size="icon-sm"]) {
+    --s-icon-size: calc(var(--button-size-icon-sm) * 0.5);
+  }
+
+  :host([data-size="icon"]) {
+    --s-icon-size: calc(var(--button-size-icon) * 0.5);
+  }
+
+  :host([data-size="icon-lg"]) {
+    --s-icon-size: calc(var(--button-size-icon-lg) * 0.5);
   }
 
   /* ---- Variants ---- */
@@ -318,9 +355,29 @@
   }
 
   /* ---- Button group (in-data-[slot=button-group]) ---- */
-  [data-slot="button-group"] .s-button[data-size="xs"],
-  [data-slot="button-group"] .s-button[data-size="sm"] {
-    border-radius: var(--radius-md);
+  /* The group (s-button-group) uses ::slotted() to set per-position vars
+     (--_group-rl/rr/bl) on each slotted button host; those inherit into this
+     shadow root. They join the buttons: non-first lose the left border +
+     left radius, non-last lose the right radius. Defaults keep the theme
+     radius on the end buttons. */
+  :host-context([data-slot="button-group"]) .s-button {
+    border-radius: var(--_group-rl, var(--button-radius))
+      var(--_group-rr, var(--button-radius))
+      var(--_group-rr, var(--button-radius))
+      var(--_group-rl, var(--button-radius));
+    border-left-width: var(--_group-bl, 1px);
+  }
+
+  /* Vertical: join on top/bottom instead. first (Top) gets rounded top
+     corners, last (Bottom) gets rounded bottom corners, non-first lose the
+     top border (reuse --_group-bl). */
+  :host-context([data-slot="button-group"][data-orientation="vertical"]) .s-button {
+    border-radius: var(--_group-rl, var(--button-radius))
+      var(--_group-rl, var(--button-radius))
+      var(--_group-rr, var(--button-radius))
+      var(--_group-rr, var(--button-radius));
+    border-left-width: 1px;
+    border-top-width: var(--_group-bl, 1px);
   }
 </style>
 
@@ -345,6 +402,18 @@
           slot: {
             default: "Button"
           }
+        }
+      }
+    }
+    lifecycle = {
+      // Reflect size to the host (data-size) so slotted <s-icon> children can be
+      // sized via :host([data-size]) { --s-icon-size }.
+      afterFirstRender: function () {
+        component.setAttribute("data-size", props.size || "default");
+      },
+      whenPropChange: function (name, current, next) {
+        if (name === "size") {
+          component.setAttribute("data-size", next || "default");
         }
       }
     }

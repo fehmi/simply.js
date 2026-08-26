@@ -1,0 +1,151 @@
+<html>
+  <button
+    class="s-switch"
+    data-slot="switch"
+    data-size="{{props.size || 'default'}}"
+    data-state="{{data.checked ? 'checked' : 'unchecked'}}"
+    role="switch"
+    aria-checked="{{data.checked ? 'true' : 'false'}}"
+    ?disabled="{{props.disabled === '' || props.disabled}}"
+    onclick="methods.toggle()"
+  >
+    <span class="s-switch-thumb" data-slot="switch-thumb"></span>
+  </button>
+</html>
+
+<style>
+  /* Host is an inline-flex box; the button fills it. s-switch { ... } handles
+     the LIGHT DOM case (light attribute) since :host only matches in shadow DOM. */
+  :host,
+  s-switch {
+    display: inline-flex;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-switch {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    border-radius: var(--switch-radius);
+    border: var(--switch-border-width) solid transparent;
+    box-shadow: var(--shadow-xs);
+    transition: all var(--default-transition-duration) var(--default-transition-timing-function);
+    outline: none;
+    cursor: pointer;
+    padding: 0;
+    background-color: transparent;
+    color: inherit;
+    font-family: inherit;
+  }
+
+  .s-switch[data-size="default"] {
+    width: var(--switch-width-default);
+    height: var(--switch-height-default);
+  }
+
+  .s-switch[data-size="sm"] {
+    width: var(--switch-width-sm);
+    height: var(--switch-height-sm);
+  }
+
+  .s-switch[data-state="checked"] {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .s-switch[data-state="unchecked"] {
+    background-color: var(--color-input);
+  }
+
+  :host-context(.dark) .s-switch[data-state="unchecked"] {
+    background-color: color-mix(in oklab, var(--color-input) 80%, transparent);
+  }
+
+  .s-switch:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  .s-switch:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .s-switch-thumb {
+    display: block;
+    pointer-events: none;
+    border-radius: var(--switch-radius);
+    background-color: var(--color-background);
+    transition: transform var(--default-transition-duration) var(--default-transition-timing-function);
+  }
+
+  .s-switch[data-size="default"] .s-switch-thumb {
+    width: var(--switch-thumb-width-default);
+    height: var(--switch-thumb-height-default);
+  }
+
+  .s-switch[data-size="sm"] .s-switch-thumb {
+    width: var(--switch-thumb-width-sm);
+    height: var(--switch-thumb-height-sm);
+  }
+
+  .s-switch[data-state="checked"] .s-switch-thumb {
+    transform: translateX(var(--switch-thumb-translate));
+  }
+
+  .s-switch[data-state="unchecked"] .s-switch-thumb {
+    transform: translateX(0);
+  }
+
+  :host-context(.dark) .s-switch[data-state="checked"] .s-switch-thumb {
+    background-color: var(--color-primary-foreground);
+  }
+
+  :host-context(.dark) .s-switch[data-state="unchecked"] .s-switch-thumb {
+    background-color: var(--color-foreground);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      checked: false,
+      doc: {
+        name: "s-switch",
+        description: "A toggle switch control.",
+        props: {
+          size: {
+            default: "default",
+            options: ["default", "sm"]
+          },
+          defaultChecked: {
+            default: false
+          },
+          disabled: {
+            default: false
+          }
+        }
+      }
+    }
+    lifecycle = {
+      afterConstruct: function () {
+        // defaultChecked attribute arrives as "" (empty string); the browser
+        // lowercases camelCase attrs (defaultchecked) and kebab-case is
+        // default-checked.
+        data.checked =
+          props.defaultChecked === "" ||
+          props.defaultChecked === true ||
+          props["defaultchecked"] === "" ||
+          props["default-checked"] === "";
+      }
+    }
+    methods = {
+      toggle: function () {
+        if (props.disabled === "" || props.disabled) return;
+        data.checked = !data.checked;
+        component.dispatchEvent(new CustomEvent("change", { detail: { checked: data.checked } }));
+      }
+    }
+  }
+</script>

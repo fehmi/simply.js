@@ -4,8 +4,9 @@ A label associated with a form control. Links to an input via the `for` attribut
 
 ## Usage
 
+<s-component-viewer subject="s-label"></s-component-viewer>
 ```html
-<s-label isolated for="email">Email</s-label>
+<s-label for="email">Email</s-label>
 ```
 
 ## Props
@@ -17,17 +18,22 @@ A label associated with a form control. Links to an input via the `for` attribut
 
 ## Example
 
+<s-component-viewer subject="s-label" title="false" description="false"></s-component-viewer>
 ```html
-<div class="field">
-  <s-label isolated for="name">Name</s-label>
-  <input id="name" placeholder="Enter your name">
+<div class="field" style="display: flex; flex-direction: column; gap: 0.5rem">
+  <s-label for="name">Name</s-label>
+  <s-input light id="name" placeholder="Enter your name"></s-input>
+</div>
+<div class="field" style="display: flex; align-items: center; gap: 0.5rem">
+  <s-checkbox id="push"></s-checkbox>
+  <s-label for="push">Push notifications</s-label>
 </div>
 ```
 
 ## Disabled
 
 ```html
-<s-label isolated disabled>Disabled</s-label>
+<s-label disabled>Disabled</s-label>
 ```
 
 The `disabled` attribute fades the label. The label also fades automatically when a parent element has `data-disabled="true"`.
@@ -46,7 +52,3 @@ The label uses theme-dependent tokens:
 | Sera | text-xs (12px) | semibold (600) | uppercase |
 
 Tokens: `--label-font-size`, `--label-font-weight`, `--label-line-height`, `--label-text-transform`, `--label-letter-spacing`, `--label-gap`.
-
-## Live Demo
-
-<s-component-viewer isolated component="ui/s-label"></s-component-viewer>

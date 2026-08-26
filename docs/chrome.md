@@ -13,11 +13,11 @@ The popup is declared via `action.default_popup`. The simply.js app lives in `sa
 ```json
 {
   "manifest_version": 3,
-  "name": "Simply.js Popup",
+  "name": "simply.js Popup",
   "version": "1.0.0",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Simply.js"
+    "default_title": "simply.js"
   },
   "sandbox": {
     "pages": ["sandbox.html"]

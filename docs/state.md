@@ -1,6 +1,6 @@
 # State Management
 
-State management is straightforward in Simply.js. When you define a `state` in a component, all child components share that same state and can retrieve or modify it. Any manipulation of the state — no matter where it happens in the component tree — affects every component sharing that state, causing them all to react to the new value.
+State management is straightforward in simply.js. When you define a `state` in a component, all child components share that same state and can retrieve or modify it. Any manipulation of the state — no matter where it happens in the component tree — affects every component sharing that state, causing them all to react to the new value.
 
 ?> The key difference between `data`/`props` and `state` is that changes to `data` or `props` affect the current component and its children, but not its parents. Changes to `state` affect every component in the tree — both children and parents.
 

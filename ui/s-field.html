@@ -1,0 +1,63 @@
+<html>
+  <div
+    class="s-field"
+    data-slot="field"
+    role="group"
+    data-orientation="{{props.orientation || 'vertical'}}"
+  >
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-field { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field {
+    display: flex;
+    width: 100%;
+    gap: var(--field-gap, calc(var(--spacing) * 3));
+  }
+
+  /* Vertical: stack children, full width */
+  .s-field[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
+  /* Horizontal: label + control side by side */
+  .s-field[data-orientation="horizontal"] {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .s-field[data-orientation="horizontal"]::slotted(s-field-label) {
+    flex: auto;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field",
+        description: "A single control with label, helper text, and validation.",
+        props: {
+          orientation: {
+            default: "vertical",
+            options: ["vertical", "horizontal"]
+          },
+          slot: {
+            default: `<s-field-label for="username">Username</s-field-label>
+<s-input light id="username" type="text" placeholder="Max Leiter"></s-input>
+<s-field-description>Choose a unique username for your account.</s-field-description>`
+          }
+        }
+      }
+    }
+  }
+</script>

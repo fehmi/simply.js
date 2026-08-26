@@ -1,18 +1,18 @@
 # Scope & Encapsulation
 
-## Light DOM
+## Shadow DOM (default)
 
-Custom elements render **without** a Shadow DOM by default. In this mode the component's style sheet is adopted by the whole document, so a plain selector like `h1 { }` can affect matching elements anywhere on the page — not just inside the component. They are also affected by any stylesheet added to the main document, as long as they are not inside a shadow root.
-
-## Shadow DOM
-
-Adding the `isolated` attribute mounts the component with a Shadow Root instead. The style sheet is then scoped to that shadow root: the component's styles no longer leak to the page.
+Custom elements mount **with** a Shadow Root by default. The component's style sheet is scoped to that shadow root: the component's styles don't leak to the page, and page styles don't affect the component's internals.
 
 ?> Inherited styles from the document (for example `color` or `font` on `body`) still cascade into the component. Encapsulation only stops the component's own styles from leaking out.
 
+## Light DOM
+
+Adding the `light` attribute mounts the component **without** a Shadow Root. In this mode the component's style sheet is adopted by the whole document, so a plain selector like `h1 { }` can affect matching elements anywhere on the page — not just inside the component. They are also affected by any stylesheet added to the main document. Use `light` for form controls (e.g. `<input>`) that need to participate in the parent form.
+
 ## Host
 
-The `:host` selector targets the component's own element. It is only available when the component is rendered with a Shadow Root, i.e. when its tag has the `isolated` attribute. Without `isolated` there is no Shadow Root, so a bare `:host { }` rule matches nothing.
+The `:host` selector targets the component's own element. It is only available when the component is rendered with a Shadow Root, which is the default. With `light` there is no Shadow Root, so a bare `:host { }` rule matches nothing.
 
 <details>
   <summary><ins>Live demo</ins></summary>
@@ -25,7 +25,7 @@ The `:host` selector targets the component's own element. It is only available w
     <title>simply.js</title>
   </head>
   <body>
-    <host-demo isolated></host-demo>
+    <host-demo></host-demo>
     <script src="https://simply.js.org/simply.min.js"></script>
     <script>
       get("host-demo.html");
@@ -40,7 +40,7 @@ The `:host` selector targets the component's own element. It is only available w
 </html>
 
 <style>
-  /* Only applies when the component has the isolated attribute */
+  /* Only applies when the component is in shadow DOM (default) */
   :host {
     display: block;
     padding: 16px;
@@ -48,7 +48,7 @@ The `:host` selector targets the component's own element. It is only available w
     background: #dfe6e9;
   }
 
-  /* Covers both modes: :host (isolated) + host-demo (light DOM) */
+  /* Covers both modes: :host (shadow) + host-demo (light DOM) */
   :host, host-demo {
     border: 2px solid #6c5ce7;
   }
@@ -67,14 +67,14 @@ To write a rule that works in **both** modes, repeat the selector with the compo
 }
 ```
 
-- When `isolated` is present, `:host` matches the component element inside the shadow root.
-- When it is not, the `host-demo` selector matches the element in the light DOM.
+- When the component is in shadow DOM (default), `:host` matches the component element inside the shadow root.
+- When it has `light`, the `host-demo` selector matches the element in the light DOM.
 
 ## Linking a CSS File
 
 You can link an external stylesheet from inside the component's template tag, or via `@import` at the beginning of the `<style>` tag. This is a clean way to share design tokens across components.
 
-Since Shadow DOM is off by default, a `:host {}` block inside the linked file only takes effect when the component uses the `isolated` attribute — otherwise define the tokens on `:root` (or on the component's tag name) so they apply in the light DOM.
+Since Shadow DOM is on by default, a `:host {}` block inside the linked file takes effect immediately. If the component uses `light`, define the tokens on `:root` (or on the component's tag name) so they apply in the light DOM.
 
 <details>
   <summary><ins>Live demo</ins></summary>
@@ -87,7 +87,7 @@ Since Shadow DOM is off by default, a `:host {}` block inside the linked file on
     <title>simply.js</title>
   </head>
   <body>
-    <styled-comp isolated></styled-comp>
+    <styled-comp></styled-comp>
     <script src="https://simply.js.org/simply.min.js"></script>
     <script>
       get("styled-comp.html");

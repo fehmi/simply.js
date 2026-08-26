@@ -1,0 +1,41 @@
+<html>
+  <div class="s-field-title" data-slot="field-label">
+    <slot>Title</slot>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-field-title { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-title {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-title {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    font-size: var(--font-size-sm);
+    line-height: 1.375; /* leading-snug */
+    font-weight: var(--font-weight-medium);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field-title",
+        description: "Renders a title with label styling inside a field content.",
+        props: {
+          slot: {
+            default: "Enable Touch ID"
+          }
+        }
+      }
+    }
+  }
+</script>

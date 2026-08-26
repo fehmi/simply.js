@@ -1,8 +1,8 @@
 # Agents & AI
 
-> This section explains how AI agents — LLMs, coding assistants, and agentic browser tools — can interact with Simply.js.
+> This section explains how AI agents — LLMs, coding assistants, and agentic browser tools — can interact with simply.js.
 
-Simply.js exposes two main surfaces for AI agents:
+simply.js exposes two main surfaces for AI agents:
 
 ## 1. Documentation Access — live
 

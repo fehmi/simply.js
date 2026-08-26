@@ -1,0 +1,52 @@
+<html>
+  <div class="s-field-group" data-slot="{{props['data-slot'] || props.dataSlot || 'field-group'}}">
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner div controls.
+     s-field-group { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-group {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--field-group-gap, calc(var(--spacing) * 7));
+    width: 100%;
+  }
+
+  /* Tighter spacing for checkbox/radio groups */
+  .s-field-group[data-slot="checkbox-group"],
+  .s-field-group[data-slot="radio-group"] {
+    gap: calc(var(--spacing) * 3);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field-group",
+        description: "Groups related form fields.",
+        props: {
+          slot: {
+            default: `<s-field>
+  <s-field-label for="name">Name</s-field-label>
+  <s-input light id="name" placeholder="Jordan Lee"></s-input>
+</s-field>
+<s-field>
+  <s-field-label for="email">Email</s-field-label>
+  <s-input light id="email" type="email" placeholder="name@example.com"></s-input>
+  <s-field-description>We'll send updates to this address.</s-field-description>
+</s-field>`
+          }
+        }
+      }
+    }
+  }
+</script>

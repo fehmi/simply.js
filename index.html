@@ -422,20 +422,12 @@
 		}
 
 		.markdown-section table {
-			/*
-			width: 90% !important;
-			margin-left: calc(5% - 5px) !important;
-			max-width: calc(100%) !important;
-			*/
-			display: block!important;
+			display: table;
+			width: 100%;
 		}
 
 		code {
 			white-space: pre-wrap;
-		}
-
-		.markdown-section table {
-			display: inline-table;
 		}
 
 		.search .matching-post {
@@ -470,7 +462,7 @@
     align-content: center;
     align-items: center;
     background: none;
-    border: 1px solid #555962;
+    border: 1px solid #3d3838;
     border-right: none;
     border-top: none;
 	}		
@@ -542,6 +534,7 @@
 
 			.page_toc div[class^="lv"] a {
 					color: #b8b2b2;
+					line-height: 1.6em!important;
 			}		
 			
 			.page_toc div[class^="lv"] a:hover span {
@@ -604,11 +597,11 @@
 			}
 
 			.markdown-section code, .markdown-section pre {
-				background-color: #1a1718;
+				background-color: #171717;
 			}
 
 			.markdown-section pre {
-				border: 1px solid #555962;
+				border: 1px solid #3d3838;
 			}
 
 .markdown-section pre>code,
@@ -986,6 +979,10 @@ aside.toc-nav {
   max-height: -webkit-fill-available;
 }
 
+p:has(s-component-viewer) + pre[data-lang] {
+    margin-top: -22px;
+}
+
 	</style>
 </head>
 
@@ -1241,6 +1238,11 @@ document.addEventListener('keydown', (e) => {
 		loadJS("simply.js", function () {
 			get("repl/repl-component.html");
 			get("ui/s-component-viewer.html");
+			// Load all UI components globally so the viewer's slot editor can
+			// inject nested components (e.g. a FieldGroup with Fields/Inputs)
+			// on any docs page. Markdown pages can't run <script>, so this is
+			// the single place that registers them for the whole docs site.
+
 		});
 
 		function scrollIntoView(path, id) {

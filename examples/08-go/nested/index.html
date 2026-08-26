@@ -140,7 +140,7 @@
 				{
 					path: "/",
 					component: "home-page",
-					isolated: false,
+					
 					cache: true,
 					root: document.querySelector("route"),
 					same_page_refresh: false,
@@ -149,7 +149,7 @@
 				{
 					path: "/project/:id",
 					component: "project-page",
-					isolated: false,
+					
 					cache: false,
 					root: document.querySelector("route"),
 					title: "Project",
@@ -157,7 +157,7 @@
 				{
 					path: "/agency",
 					component: "agency-page",
-					isolated: false,
+					
 					cache: true,
 					title: "Agency",
 					children: [
@@ -169,7 +169,7 @@
 						{
 							path: "/contact",
 							component: "contact-page",
-							isolated: false,
+							
 							title: "Agency > Contact",
 							children: [
 								{
@@ -190,7 +190,7 @@
 				{
 					path: "/company",
 					component: "company-page",
-					isolated: false,
+					
 					cache: true,
 					same_page_refresh: false,
 					title: "Company",
@@ -203,7 +203,7 @@
 						{
 							path: "/products",
 							component: "products-page",
-							isolated: false,
+							
 							title: "Company > Products",
 							children: [
 								{
@@ -224,7 +224,7 @@
 				{
 					path: "*",
 					component: "not-found",
-					isolated: false,
+					
 					root: document.querySelector("route"),
 					title: "404 Not Found",
 				},

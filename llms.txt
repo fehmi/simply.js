@@ -1,4 +1,4 @@
-# Simply.js
+# simply.js
 
 > Zero-dependency web-component library for building interactive UIs with plain HTML, CSS and JavaScript. Single-file components (`<html>`/`<style>`/`<script>` in one `.html` file), a reactive template engine, router and state management. No compiler, bundler, or build step — everything runs directly in the browser.
 
@@ -49,13 +49,22 @@ Use this file to decide which page(s) to fetch. Every link is a plain Markdown f
 - [REPL API](https://simply.js.org/docs/agents/repl-api.md): Planned REPL API for programmatic example access (TBD, not live yet).
 
 ## Simply UI
-- [Introduction](https://simply.js.org/docs/ui/index.md)
-- [Button](https://simply.js.org/docs/ui/button.md)
-- [Badge](https://simply.js.org/docs/ui/badge.md)
-- [Label](https://simply.js.org/docs/ui/label.md)
-- [Separator](https://simply.js.org/docs/ui/separator.md)
-- [Skeleton](https://simply.js.org/docs/ui/skeleton.md)
-- [Component Viewer](https://simply.js.org/docs/ui/component-viewer.md)
+- [Introduction](https://simply.js.org/ui/index.md)
+- [Button](https://simply.js.org/ui/s-button.md)
+- [Button Group](https://simply.js.org/ui/s-button-group.md)
+- [Badge](https://simply.js.org/ui/s-badge.md)
+- [Label](https://simply.js.org/ui/s-label.md)
+- [Separator](https://simply.js.org/ui/s-separator.md)
+- [Skeleton](https://simply.js.org/ui/s-skeleton.md)
+- [Kbd](https://simply.js.org/ui/s-kbd.md)
+- [Input](https://simply.js.org/ui/s-input.md)
+- [Textarea](https://simply.js.org/ui/s-textarea.md)
+- [Field](https://simply.js.org/ui/s-field.md)
+- [Spinner](https://simply.js.org/ui/s-spinner.md)
+- [Icon](https://simply.js.org/ui/s-icon.md)
+- [Native Select](https://simply.js.org/ui/s-native-select.md)
+- [Switch](https://simply.js.org/ui/s-switch.md)
+- [Component Viewer](https://simply.js.org/ui/s-component-viewer.md)
 
 ## Optional
 

@@ -7,8 +7,8 @@
 </html>
 
 <style>
-	/* root selector = component tag name — this component is not shadow-isolated */
-	contact-istanbul {
+	/* root selector = :host (shadow DOM default) + tag name (light DOM) */
+	:host, contact-istanbul {
 		display: block;
 		font-family: system-ui, sans-serif;
 		color: #1e293b;
@@ -16,7 +16,7 @@
 	}
 
 	/* progress line — level 2 hue: pink → amber → blue */
-	contact-istanbul > line {
+	:host > line, contact-istanbul > line {
 		display: block;
 		height: 4px;
 		border-radius: 999px;
@@ -27,7 +27,7 @@
 		width: 0;
 		transition: width 400ms ease-in-out;
 	}
-	contact-istanbul[enter] > line {
+	:host([enter]) > line, contact-istanbul[enter] > line {
 		width: 100%;
 		transition: width 800ms cubic-bezier(.22, 1, .36, 1);
 	}
@@ -37,36 +37,36 @@
 	   - exit total (250ms, no delay) stays under the line's 400ms exit
 	   - enter totals (delay + 450ms) stay under the line's 800ms enter
 	     d1 120+450=570 · d2 220+450=670 · d3 320+450=770 */
-	contact-istanbul > .fx {
+	:host > .fx, contact-istanbul > .fx {
 		opacity: 0;
 		transform: translateY(8px);
 		transition: opacity .25s ease, transform .25s ease;
 	}
-	contact-istanbul[enter] > .fx {
+	:host([enter]) > .fx, contact-istanbul[enter] > .fx {
 		opacity: 1;
 		transform: none;
 		transition: opacity .45s ease, transform .45s cubic-bezier(.22, 1, .36, 1);
 	}
-	contact-istanbul[enter] > .fx.d1 { transition-delay: .12s; }
-	contact-istanbul[enter] > .fx.d2 { transition-delay: .22s; }
-	contact-istanbul[enter] > .fx.d3 { transition-delay: .32s; }
+	:host([enter]) > .fx.d1, contact-istanbul[enter] > .fx.d1 { transition-delay: .12s; }
+	:host([enter]) > .fx.d2, contact-istanbul[enter] > .fx.d2 { transition-delay: .22s; }
+	:host([enter]) > .fx.d3, contact-istanbul[enter] > .fx.d3 { transition-delay: .32s; }
 
-	contact-istanbul h2 {
+	:host h2, contact-istanbul h2 {
 		margin: 0 0 4px;
 		font-size: 16px;
 		color: #0f172a;
 	}
-	contact-istanbul .tagline {
+	:host .tagline, contact-istanbul .tagline {
 		margin: 0 0 14px;
 		color: #64748b;
 		font-size: 13px;
 	}
-	contact-istanbul .links {
+	:host .links, contact-istanbul .links {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
 	}
-	contact-istanbul .links a {
+	:host .links a, contact-istanbul .links a {
 		padding: 6px 12px;
 		border: 1px solid #e2e8f0;
 		border-radius: 999px;
@@ -75,11 +75,11 @@
 		text-decoration: none;
 		font-size: 13px;
 	}
-	contact-istanbul .links a:hover {
+	:host .links a:hover, contact-istanbul .links a:hover {
 		border-color: #ec4899;
 		color: #ec4899;
 	}
-	contact-istanbul .links a[go-active] {
+	:host .links a[go-active], contact-istanbul .links a[go-active] {
 		color: #ec4899;
 		border-color: #ec4899;
 		background: #fff;

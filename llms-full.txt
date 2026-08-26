@@ -1,4 +1,4 @@
-# Simply.js — Full Documentation (LLM-ready, single file)
+# simply.js — Full Documentation (LLM-ready, single file)
 
 > Generated from https://github.com/fehmi/simply.js/tree/main/docs — do not edit by hand, edit the source .md files and re-run `node scripts/build-llms.mjs`.
 > Canonical human docs: https://simply.js.org — Source: https://simply.js.org/llms.txt
@@ -6,58 +6,67 @@
 ## Contents
 
 - [About](#about)  <!-- Introduction -->
-- [Getting Started](#getting-started)  <!-- Introduction -->
-- [Structure](#component-structure)  <!-- Component Syntax -->
-- [Template](#template)  <!-- Component Syntax -->
-- [Style](#style)  <!-- Component Syntax -->
-- [Script](#script)  <!-- Component Syntax -->
-- [Variables](#variables)  <!-- Template Syntax -->
-- [Conditionals](#conditionals)  <!-- Template Syntax -->
-- [Each Loops](#loops)  <!-- Template Syntax -->
-- [DOM Events](#dom-events)  <!-- Template Syntax -->
-- [Nested Components](#nested-components)  <!-- Template Syntax -->
-- [Slot](#slot)  <!-- Template Syntax -->
-- [Load Components](#loadcomponent)  <!-- Script Syntax -->
-- [Component Communication](#component-communication)  <!-- Script Syntax -->
-- [Props](#props)  <!-- Script Syntax -->
-- [Lifecycle](#lifecycle)  <!-- Script Syntax -->
-- [Reactivity](#reactivity)  <!-- Script Syntax -->
-- [State Management](#state)  <!-- Script Syntax -->
-- [Variables](#style-variables)  <!-- Style -->
-- [Conditions](#style-conditions)  <!-- Style -->
-- [Scope & Encapsulation](#style-scope)  <!-- Style -->
-- [Go (Router)](#router)  <!-- Router -->
-- [Framer](#framer)  <!-- Integrations -->
-- [Electron](#electron)  <!-- Integrations -->
-- [Chrome](#chrome)  <!-- Integrations -->
-- [Agents & AI](#agents-agents)  <!-- Agents -->
-- [AI Docs](#agents-ai-docs)  <!-- Agents -->
-- [REPL API](#agents-repl-api)  <!-- Agents -->
+- [Getting Started](#docs-getting-started)  <!-- Introduction -->
+- [Structure](#docs-component-structure)  <!-- Component Syntax -->
+- [Template](#docs-template)  <!-- Component Syntax -->
+- [Style](#docs-style)  <!-- Component Syntax -->
+- [Script](#docs-script)  <!-- Component Syntax -->
+- [Variables](#docs-variables)  <!-- Template Syntax -->
+- [Conditionals](#docs-conditionals)  <!-- Template Syntax -->
+- [Each Loops](#docs-loops)  <!-- Template Syntax -->
+- [DOM Events](#docs-dom-events)  <!-- Template Syntax -->
+- [Nested Components](#docs-nested-components)  <!-- Template Syntax -->
+- [Slot](#docs-slot)  <!-- Template Syntax -->
+- [Load Components](#docs-loadcomponent)  <!-- Script Syntax -->
+- [Component Communication](#docs-component-communication)  <!-- Script Syntax -->
+- [Props](#docs-props)  <!-- Script Syntax -->
+- [Lifecycle](#docs-lifecycle)  <!-- Script Syntax -->
+- [Reactivity](#docs-reactivity)  <!-- Script Syntax -->
+- [State Management](#docs-state)  <!-- Script Syntax -->
+- [Variables](#docs-style-variables)  <!-- Style -->
+- [Conditions](#docs-style-conditions)  <!-- Style -->
+- [Scope & Encapsulation](#docs-style-scope)  <!-- Style -->
+- [Go (Router)](#docs-router)  <!-- Router -->
+- [Framer](#docs-framer)  <!-- Integrations -->
+- [Electron](#docs-electron)  <!-- Integrations -->
+- [Chrome](#docs-chrome)  <!-- Integrations -->
+- [Agents & AI](#docs-agents-agents)  <!-- Agents -->
+- [AI Docs](#docs-agents-ai-docs)  <!-- Agents -->
+- [REPL API](#docs-agents-repl-api)  <!-- Agents -->
 - [Introduction](#ui-index)  <!-- Simply UI -->
-- [Button](#ui-button)  <!-- Simply UI -->
-- [Badge](#ui-badge)  <!-- Simply UI -->
-- [Label](#ui-label)  <!-- Simply UI -->
-- [Separator](#ui-separator)  <!-- Simply UI -->
-- [Skeleton](#ui-skeleton)  <!-- Simply UI -->
-- [Component Viewer](#ui-component-viewer)  <!-- Simply UI -->
+- [Button](#ui-s-button)  <!-- Simply UI -->
+- [Button Group](#ui-s-button-group)  <!-- Simply UI -->
+- [Badge](#ui-s-badge)  <!-- Simply UI -->
+- [Label](#ui-s-label)  <!-- Simply UI -->
+- [Separator](#ui-s-separator)  <!-- Simply UI -->
+- [Skeleton](#ui-s-skeleton)  <!-- Simply UI -->
+- [Kbd](#ui-s-kbd)  <!-- Simply UI -->
+- [Input](#ui-s-input)  <!-- Simply UI -->
+- [Textarea](#ui-s-textarea)  <!-- Simply UI -->
+- [Field](#ui-s-field)  <!-- Simply UI -->
+- [Spinner](#ui-s-spinner)  <!-- Simply UI -->
+- [Icon](#ui-s-icon)  <!-- Simply UI -->
+- [Native Select](#ui-s-native-select)  <!-- Simply UI -->
+- [Switch](#ui-s-switch)  <!-- Simply UI -->
+- [Component Viewer](#ui-s-component-viewer)  <!-- Simply UI -->
 
 ---
 
 <a id="about"></a>
 
-<p>
-<img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release">
-<img src="https://img.shields.io/badge/License-MIT-green">
-<img src="https://img.shields.io/badge/Gzipped-20KB-green">
+<p style="transform: scale(.85); transform-origin: center left">
+<img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release&style=for-the-badge">
+<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
+<img src="https://img.shields.io/badge/Gzipped-20KB-green?style=for-the-badge">
 </p>
 
 ## About
 
 ## What is simply.js
 
-Simply JS is a simple web-component library for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
+simply.js is a simple web-component library for developing interactive user interfaces. It is created by a designer to make it easy to develop atomic design system components and compositions. It uses native [Custom Elements API](https://developers.google.com/web/fundamentals/web-components/customelements) of the [Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) standard and provides a single file component concept which helps to write HTML, CSS and JavaScript codes in one encapsulated single file per component.
 
-It has a built-in super-fast declarative template engine that coded from scratch. Some parts of Simply JS are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router. So, simply.js is the name of its template engine and the bridge between the adopted tools.
+It has a built-in super-fast declarative template engine that coded from scratch. Some parts of simply.js are respectfully forked from other beautiful projects. For example; [lit-html](https://github.com/lit/lit/tree/main/packages/lit-html) for DOM diffing/patching, [Observable Slim](https://github.com/ElliotNB/observable-slim) for reactive variables and [Page.js](https://github.com/visionmedia/page.js) for router. So, simply.js is the name of its template engine and the bridge between the adopted tools.
 
 Development on simply.js began in 2021. Over the years, it has been put through rigorous battle-testing by building numerous plugins and web applications. This hands-on process allowed identifying gaps, fixing bugs, and continuously refining the architecture. The library is now approaching maturity with very few features left to add. Moving forward, the focus shifts to integrating AI into the development loop, concentrating on ongoing improvement, maintenance, and producing reusable components.
 
@@ -84,9 +93,9 @@ Whether you write it yourself or prompt an AI, simply.js still runs entirely in 
 
 ## Playground
 
-The REPL of Simply JS is at the [Playground](playground) section. This is the fastest way to get started using Simply JS. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
+The REPL of simply.js is at the [Playground](playground) section. This is the fastest way to get started using simply.js. It opens with a "hello world" application and you can freely edit the app anyhow you want. Then you can download the app to continue developing on your local machine.
 
-## Simply JS in the wild
+## simply.js in the wild
 
 - [Edit Image](https://editimage.studio)
 - [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager)
@@ -95,14 +104,14 @@ The REPL of Simply JS is at the [Playground](playground) section. This is the fa
 
 ---
 
-<a id="getting-started"></a>
+<a id="docs-getting-started"></a>
 
 ## Getting Started
 
 
 ## Add it to your app
 
-You can integrate Simply.js into your application by adding a `<script>` tag. Ensure it is placed just before the closing `</body>` tag.
+You can integrate simply.js into your application by adding a `<script>` tag. Ensure it is placed just before the closing `</body>` tag.
 
 ```html
 <script src="https://simply.js.org/simply.min.js"></script>
@@ -110,7 +119,7 @@ You can integrate Simply.js into your application by adding a `<script>` tag. En
 
 ## Create a Component
 
-Your page is now ready to interact with Simply.js components. Simply.js components are structured into three main sections: `template`, `style`, and `script`. While more details are available in the [component structure](#component-structure) section, let's quickly get started. Create a `hello-world.html` file with the content below and save it to the same folder as the application where you initially added Simply.js.
+Your page is now ready to interact with simply.js components. simply.js components are structured into three main sections: `template`, `style`, and `script`. While more details are available in the [component structure](#docs-component-structure) section, let's quickly get started. Create a `hello-world.html` file with the content below and save it to the same folder as the application where you initially added simply.js.
 
 ```html
 <html>
@@ -136,7 +145,7 @@ Your page is now ready to interact with Simply.js components. Simply.js componen
 
 ## Use the Component
 
-You can use Simply.js's `get()` function to load your component anywhere in your application or page, as shown below.
+You can use simply.js's `get()` function to load your component anywhere in your application or page, as shown below.
 
 ```js
 get("hello-world.html");
@@ -181,11 +190,11 @@ http-server [path] [options]
 
 ---
 
-<a id="component-structure"></a>
+<a id="docs-component-structure"></a>
 
 ## Component Syntax
 
-The component concept is central to Simply.js, with all other functionalities built around it. Simply.js facilitates communication and orchestration between components. A component is a simple HTML file comprising three parts: `html`, `style`, and `script`. Let's examine what a component looks like.
+The component concept is central to simply.js, with all other functionalities built around it. simply.js facilitates communication and orchestration between components. A component is a simple HTML file comprising three parts: `html`, `style`, and `script`. Let's examine what a component looks like.
 
 > **Note:** All three of these tags are optional. For instance, your component can contain only a `<script>` tag, only an `<html>` tag, or only a `<style>` tag.
 
@@ -283,24 +292,26 @@ A component doesn't have to contain all three parts. This one consists of only a
 
 You can customize how a component is mounted by adding attributes to its tag:
 
-- **`isolated`** — creates a Shadow Root and keeps the component's styles encapsulated, isolating it from parent styles.
-- **`cache`** — keeps the component's `data` and `props` across route navigation. See [Router Cache](#router).
+- **`light`** — renders the component in the light DOM instead of the default Shadow Root. Use this for form controls (e.g. `<input>`) that need to participate in the parent form.
+- **`cache`** — keeps the component's `data` and `props` across route navigation. See [Router Cache](#docs-router).
 
 ```html
-<my-component isolated cache></my-component>
+<my-component light cache></my-component>
 ```
 
-> **Note:** By default, custom elements don't use Shadow DOM, so they inherit parent styles and remain accessible via JavaScript from anywhere. This also makes it easy to create custom form element components and serialize them before sending data to the backend.
+> **Note:** By default, custom elements mount with a Shadow Root, so their styles are encapsulated and don't leak to the page. Add `light` when you want the component to inherit parent styles, remain accessible via JavaScript from anywhere, or create custom form element components that serialize before sending data to the backend.
+
+> **`light` is a reserved keyword.** It is consumed by the library at mount time to decide between shadow DOM (default) and light DOM — it is **not** a user-facing prop. Like every other attribute, it is still copied into the component's `props` object as `props.light` (value `""` when present), so avoid using `light` as a real prop name in your component's template or script.
 
 ---
 
-<a id="template"></a>
+<a id="docs-template"></a>
 
 ## Template
 
 This section describes the rendering portion of a component. Elements within the `<html>` tag are mounted to the DOM after being processed by the template syntax. While most components include an `<html>` tag, it is not mandatory; some components may only contain a `<script>` tag with their logic.
 
-The Simply.js template syntax operates within the `<html>` tag, functioning as a superset of HTML. This syntax supports [conditionals](#conditionals), [each loops](#loops), [reactive variables](#variables), [DOM events](#dom-events), [slots](#slot), and [nested components](#nested-components).
+The simply.js template syntax operates within the `<html>` tag, functioning as a superset of HTML. This syntax supports [conditionals](#docs-conditionals), [each loops](#docs-loops), [reactive variables](#docs-variables), [DOM events](#docs-dom-events), [slots](#docs-slot), and [nested components](#docs-nested-components).
 
 > **Note:** Reactive variables are written with double curly braces, like `{{data.name}}`. You can reach all of `{{data}}`, `{{props}}`, `{{state}}`, `{{parent}}`, `{{dom}}`, `{{methods}}`, `{{component}}`, `{{lifecycle}}` and `{{name}}` defined in the script tag.
 
@@ -352,22 +363,22 @@ Content wrapped inside a `<static>` tag is rendered only once. Even if a reactiv
 </html>
 ```
 
-You can learn more about the syntax in the [template syntax](#variables) section.
+You can learn more about the syntax in the [template syntax](#docs-variables) section.
 
 ---
 
-<a id="style"></a>
+<a id="docs-style"></a>
 
 ## Style
 
-The `<style>` tag of a component is processed by Simply.js' own style engine, which extends plain CSS with reactive values and conditions:
+The `<style>` tag of a component is processed by simply.js' own style engine, which extends plain CSS with reactive values and conditions:
 
 - **Dynamic variables** — inject reactive values with `var(data.color)`, `var(state.deg)` or any expression.
 - **Conditions** — toggle rule blocks with `&cond:[if="..." ]`, `&cond:[elsif="..." ]` and `&cond:[else]`.
 
 Everything else behaves like standard CSS, including native custom properties such as `var(--my-token)`.
 
-> **Note:** By default components render **without** Shadow DOM, so `:host` only works when the `isolated` attribute is present. See [Scope & Encapsulation](#style-scope).
+> **Note:** By default components render **with** Shadow DOM, so `:host` works out of the box. Add `light` to render in the light DOM. See [Scope & Encapsulation](#docs-style-scope).
 
 ## A Simple Example
 
@@ -424,13 +435,13 @@ Styles defined inside a component's `<style>` tag style the template rendered by
 
 ## Learn More
 
-- [Style Variables](#style-variables) — reactive `var(...)` expressions
-- [Style Conditions](#style-conditions) — `&cond:[...]` blocks
-- [Scope & Encapsulation](#style-scope) — `isolated`, `:host`, linking CSS files
+- [Style Variables](#docs-style-variables) — reactive `var(...)` expressions
+- [Style Conditions](#docs-style-conditions) — `&cond:[...]` blocks
+- [Scope & Encapsulation](#docs-style-scope) — `light`, `:host`, linking CSS files
 
 ---
 
-<a id="script"></a>
+<a id="docs-script"></a>
 
 ## Script
 
@@ -538,15 +549,15 @@ class simply {
 
 ## Learn More
 
-- [Load Components](#loadcomponent)
-- [Component Communication](#component-communication)
-- [Lifecycle](#lifecycle)
-- [Reactivity](#reactivity)
-- [State Management](#state)
+- [Load Components](#docs-loadcomponent)
+- [Component Communication](#docs-component-communication)
+- [Lifecycle](#docs-lifecycle)
+- [Reactivity](#docs-reactivity)
+- [State Management](#docs-state)
 
 ---
 
-<a id="variables"></a>
+<a id="docs-variables"></a>
 
 ## Variables
 
@@ -561,7 +572,7 @@ You can define your variables within the `data` section of your component, as sh
 - `window` — any global is reachable, e.g. `{{window.innerWidth}}` or `{{Math.round(data.x)}}`.
 - `component` — anything on the element instance, e.g. `{{component.someProp}}`.
 
-> **Note:** Only `data`, `props` and `state` are reactive. `methods` return values, globals and `component` properties are read at render time but do not trigger a re-render on their own. See [Reactivity](#reactivity) for details.
+> **Note:** Only `data`, `props` and `state` are reactive. `methods` return values, globals and `component` properties are read at render time but do not trigger a re-render on their own. See [Reactivity](#docs-reactivity) for details.
 
 > **Warning:** Never assign a value inside the template, such as `{{data.name = "x"}}`. Assignments cause an infinite render loop. Change variables from `methods` or lifecycle hooks instead.
 
@@ -681,15 +692,15 @@ Content inside a `<static>` tag is rendered only once. Even if a reactive variab
 
 ## Learn More
 
-- [Template](#template)
-- [Style](#style) — in the style tag use `var(data.color)`, not `{{...}}`
-- [Each Loops](#loops) — inside an `each` loop you access items directly
-- [Reactivity](#reactivity)
-- [DOM Events](#dom-events)
+- [Template](#docs-template)
+- [Style](#docs-style) — in the style tag use `var(data.color)`, not `{{...}}`
+- [Each Loops](#docs-loops) — inside an `each` loop you access items directly
+- [Reactivity](#docs-reactivity)
+- [DOM Events](#docs-dom-events)
 
 ---
 
-<a id="conditionals"></a>
+<a id="docs-conditionals"></a>
 
 ## Conditionals
 
@@ -881,7 +892,7 @@ Conditionals can be nested inside one another to express more complex logic.
 
 ---
 
-<a id="loops"></a>
+<a id="docs-loops"></a>
 
 ## Each Loops
 
@@ -1016,11 +1027,11 @@ You can nest as many loops as needed.
 
 ---
 
-<a id="dom-events"></a>
+<a id="docs-dom-events"></a>
 
 ## DOM Events
 
-There is nothing unique about writing DOM events in Simply.js compared to Vanilla JavaScript. You can use any native event attribute (`onclick`, `onmouseover`, ...) and pass values from `data`, `props` or `state` directly to your methods.
+There is nothing unique about writing DOM events in simply.js compared to Vanilla JavaScript. You can use any native event attribute (`onclick`, `onmouseover`, ...) and pass values from `data`, `props` or `state` directly to your methods.
 
 > **Note:** Inside event attributes, variables are written **without** curly braces — `methods.alert(data.message)`, not `methods.alert({{data.message}})`. Curly braces (`{{ }}`) are only used in the template body and attribute values.
 
@@ -1068,7 +1079,7 @@ There is nothing unique about writing DOM events in Simply.js compared to Vanill
 
 ---
 
-<a id="nested-components"></a>
+<a id="docs-nested-components"></a>
 
 ## Nested Components
 
@@ -1107,15 +1118,15 @@ You can embed other components within your components. Load the nested component
 ```
 
 
-> **Note:** For details on how nested components communicate with each other, see [Component Communication](#component-communication).
+> **Note:** For details on how nested components communicate with each other, see [Component Communication](#docs-component-communication).
 
 ---
 
-<a id="slot"></a>
+<a id="docs-slot"></a>
 
 ## Slot
 
-You can pass content to a component by placing it directly inside the component's tag. Simply.js uses the **native Web Components slot** mechanism, so slots only work on components that are mounted with a Shadow Root — i.e. components marked with the `isolated` attribute.
+You can pass content to a component by placing it directly inside the component's tag. simply.js uses the **native Web Components slot** mechanism, so slots work on components that are mounted with a Shadow Root — which is the default. Add `light` to a component only when you need it in the light DOM (e.g. form controls); slots won't project there.
 
 > _Interactive live demo on the docs site (not reproduced in this text export)._
 
@@ -1137,7 +1148,7 @@ You can pass content to a component by placing it directly inside the component'
 
 ```html:page-component.html
 <html>
-  <card-component isolated>
+  <card-component>
     <h2 slot="title">{{data.title}}</h2>
     <p>{{data.message}}</p>
   </card-component>
@@ -1172,8 +1183,8 @@ You can pass content to a component by placing it directly inside the component'
 
 ## How It Works
 
-- **`isolated` is required**<br>
-  Only components with the `isolated` attribute (Shadow DOM) support slots. Without it, the component renders in the light DOM and `<slot>` has no effect.
+- **Shadow DOM is the default**<br>
+  Components mount with a Shadow Root by default, so `<slot>` projects content. Add `light` to opt into the light DOM — there `<slot>` has no effect.
 
 - **Native behavior**<br>
   Usage is identical to native Web Components: define `<slot>` in the component's template and place the content inside the component's tag.
@@ -1193,7 +1204,7 @@ Slot content is part of the **parent's** template, so it can use the parent's `d
 
 ---
 
-<a id="loadcomponent"></a>
+<a id="docs-loadcomponent"></a>
 
 ## Load Components
 
@@ -1315,7 +1326,7 @@ You can specify a custom tag name as the second argument of `get()`. The compone
 
 ---
 
-<a id="component-communication"></a>
+<a id="docs-component-communication"></a>
 
 ## Parent to Child
 
@@ -1438,7 +1449,7 @@ Another way to pass data from a parent to a child is through **props** — attri
 </html>
 ```
 
-Props are reactive — when the parent changes the attribute, the child re-renders. For details on defining, passing and overriding props, see [Props](#props).
+Props are reactive — when the parent changes the attribute, the child re-renders. For details on defining, passing and overriding props, see [Props](#docs-props).
 
 ## Child to Parent
 
@@ -1523,11 +1534,11 @@ component.parent.methods.functionName();
 
 ---
 
-<a id="props"></a>
+<a id="docs-props"></a>
 
 ## Props
 
-Props are reactive values passed as attributes on the component tag. In Simply.js, attributes are synchronized with properties (props) — if you define an attribute value, the corresponding prop will also be defined.
+Props are reactive values passed as attributes on the component tag. In simply.js, attributes are synchronized with properties (props) — if you define an attribute value, the corresponding prop will also be defined.
 
 ```html
 <child-component message="This is a message from parent"/>
@@ -1674,13 +1685,13 @@ Everything above in a single example — props passed as inline attributes (incl
 
 ## Learn More
 
-- [Script](#script)
-- [Component Communication](#component-communication)
-- [Variables](#variables)
+- [Script](#docs-script)
+- [Component Communication](#docs-component-communication)
+- [Variables](#docs-variables)
 
 ---
 
-<a id="lifecycle"></a>
+<a id="docs-lifecycle"></a>
 
 ## Lifecycle Events
 
@@ -1719,7 +1730,7 @@ The following example logs every lifecycle event to a `data.log` array and rende
     <title>simply.js</title>
   </head>
   <body style="margin: 0">
-    <lifecycle-log count="0" isolated/>
+    <lifecycle-log count="0"/>
     <script src="https://simply.js.org/simply.min.js"></script>
     <script>
       get("lifecycle-log.html");
@@ -1845,13 +1856,13 @@ The following example logs every lifecycle event to a `data.log` array and rende
 
 ---
 
-<a id="reactivity"></a>
+<a id="docs-reactivity"></a>
 
 ## Reactivity
 
 All variables defined in the `data` section of your component are automatically reactive — and so are `props` and `state`. Anytime you change a variable, your template is re-rendered if necessary.
 
-Reactivity flows top-down for `data` and `props`. Children that read `parent.data` or `parent.props` stay up to date when those change. This includes grandchildren and deeper. The reverse is not true. If a parent reads a child's value directly (e.g. `component.querySelector("child-component").data.something`) and that value changes, the parent is not notified. In that case use [state management](#state) instead. `state` is reactive across the entire component tree.
+Reactivity flows top-down for `data` and `props`. Children that read `parent.data` or `parent.props` stay up to date when those change. This includes grandchildren and deeper. The reverse is not true. If a parent reads a child's value directly (e.g. `component.querySelector("child-component").data.something`) and that value changes, the parent is not notified. In that case use [state management](#docs-state) instead. `state` is reactive across the entire component tree.
 
 ## The `<static>` Tag
 
@@ -1953,11 +1964,11 @@ This ensures that the assignment doesn't recursively trigger reactive updates be
 
 ---
 
-<a id="state"></a>
+<a id="docs-state"></a>
 
 ## State Management
 
-State management is straightforward in Simply.js. When you define a `state` in a component, all child components share that same state and can retrieve or modify it. Any manipulation of the state — no matter where it happens in the component tree — affects every component sharing that state, causing them all to react to the new value.
+State management is straightforward in simply.js. When you define a `state` in a component, all child components share that same state and can retrieve or modify it. Any manipulation of the state — no matter where it happens in the component tree — affects every component sharing that state, causing them all to react to the new value.
 
 > **Note:** The key difference between `data`/`props` and `state` is that changes to `data` or `props` affect the current component and its children, but not its parents. Changes to `state` affect every component in the tree — both children and parents.
 
@@ -2096,13 +2107,13 @@ This example has a parent and two children sharing a single state. Click the par
 
 ## Learn More
 
-- [Variables](#variables)
-- [Reactivity](#reactivity)
-- [Component Communication](#component-communication)
+- [Variables](#docs-variables)
+- [Reactivity](#docs-reactivity)
+- [Component Communication](#docs-component-communication)
 
 ---
 
-<a id="style-variables"></a>
+<a id="docs-style-variables"></a>
 
 ## Style Variables
 
@@ -2167,11 +2178,11 @@ width: var(data.asd == 1 && (data.asd == 1 || data.asd == 2) ? "100px" : "200px"
 </script>
 ```
 
-See [Style](#style) for an overview of component styling.
+See [Style](#docs-style) for an overview of component styling.
 
 ---
 
-<a id="style-conditions"></a>
+<a id="docs-style-conditions"></a>
 
 ## Style Conditions
 
@@ -2251,27 +2262,27 @@ Conditions can also be nested, and combined with dynamic variables:
 }
 ```
 
-See [Style](#style) for an overview of component styling.
+See [Style](#docs-style) for an overview of component styling.
 
 ---
 
-<a id="style-scope"></a>
+<a id="docs-style-scope"></a>
 
 ## Scope & Encapsulation
 
-## Light DOM
+## Shadow DOM (default)
 
-Custom elements render **without** a Shadow DOM by default. In this mode the component's style sheet is adopted by the whole document, so a plain selector like `h1 { }` can affect matching elements anywhere on the page — not just inside the component. They are also affected by any stylesheet added to the main document, as long as they are not inside a shadow root.
-
-## Shadow DOM
-
-Adding the `isolated` attribute mounts the component with a Shadow Root instead. The style sheet is then scoped to that shadow root: the component's styles no longer leak to the page.
+Custom elements mount **with** a Shadow Root by default. The component's style sheet is scoped to that shadow root: the component's styles don't leak to the page, and page styles don't affect the component's internals.
 
 > **Note:** Inherited styles from the document (for example `color` or `font` on `body`) still cascade into the component. Encapsulation only stops the component's own styles from leaking out.
 
+## Light DOM
+
+Adding the `light` attribute mounts the component **without** a Shadow Root. In this mode the component's style sheet is adopted by the whole document, so a plain selector like `h1 { }` can affect matching elements anywhere on the page — not just inside the component. They are also affected by any stylesheet added to the main document. Use `light` for form controls (e.g. `<input>`) that need to participate in the parent form.
+
 ## Host
 
-The `:host` selector targets the component's own element. It is only available when the component is rendered with a Shadow Root, i.e. when its tag has the `isolated` attribute. Without `isolated` there is no Shadow Root, so a bare `:host { }` rule matches nothing.
+The `:host` selector targets the component's own element. It is only available when the component is rendered with a Shadow Root, which is the default. With `light` there is no Shadow Root, so a bare `:host { }` rule matches nothing.
 
 > _Interactive live demo on the docs site (not reproduced in this text export)._
 
@@ -2281,7 +2292,7 @@ The `:host` selector targets the component's own element. It is only available w
     <title>simply.js</title>
   </head>
   <body>
-    <host-demo isolated></host-demo>
+    <host-demo></host-demo>
     <script src="https://simply.js.org/simply.min.js"></script>
     <script>
       get("host-demo.html");
@@ -2296,7 +2307,7 @@ The `:host` selector targets the component's own element. It is only available w
 </html>
 
 <style>
-  /* Only applies when the component has the isolated attribute */
+  /* Only applies when the component is in shadow DOM (default) */
   :host {
     display: block;
     padding: 16px;
@@ -2304,7 +2315,7 @@ The `:host` selector targets the component's own element. It is only available w
     background: #dfe6e9;
   }
 
-  /* Covers both modes: :host (isolated) + host-demo (light DOM) */
+  /* Covers both modes: :host (shadow) + host-demo (light DOM) */
   :host, host-demo {
     border: 2px solid #6c5ce7;
   }
@@ -2323,14 +2334,14 @@ To write a rule that works in **both** modes, repeat the selector with the compo
 }
 ```
 
-- When `isolated` is present, `:host` matches the component element inside the shadow root.
-- When it is not, the `host-demo` selector matches the element in the light DOM.
+- When the component is in shadow DOM (default), `:host` matches the component element inside the shadow root.
+- When it has `light`, the `host-demo` selector matches the element in the light DOM.
 
 ## Linking a CSS File
 
 You can link an external stylesheet from inside the component's template tag, or via `@import` at the beginning of the `<style>` tag. This is a clean way to share design tokens across components.
 
-Since Shadow DOM is off by default, a `:host {}` block inside the linked file only takes effect when the component uses the `isolated` attribute — otherwise define the tokens on `:root` (or on the component's tag name) so they apply in the light DOM.
+Since Shadow DOM is on by default, a `:host {}` block inside the linked file takes effect immediately. If the component uses `light`, define the tokens on `:root` (or on the component's tag name) so they apply in the light DOM.
 
 > _Interactive live demo on the docs site (not reproduced in this text export)._
 
@@ -2340,7 +2351,7 @@ Since Shadow DOM is off by default, a `:host {}` block inside the linked file on
     <title>simply.js</title>
   </head>
   <body>
-    <styled-comp isolated></styled-comp>
+    <styled-comp></styled-comp>
     <script src="https://simply.js.org/simply.min.js"></script>
     <script>
       get("styled-comp.html");
@@ -2413,15 +2424,15 @@ Because custom properties follow normal CSS inheritance, the tokens defined on t
 }
 ```
 
-See [Style](#style) for an overview of component styling.
+See [Style](#docs-style) for an overview of component styling.
 
 ---
 
-<a id="router"></a>
+<a id="docs-router"></a>
 
 ## Go
 
-**Go** is the full-featured SPA router of Simply JS, forked from **Page.js**. It’s tightly integrated with the template syntax and reactivity system.
+**Go** is the full-featured SPA router of simply.js, forked from **Page.js**. It’s tightly integrated with the template syntax and reactivity system.
 
 In addition to the default Page.js features, it supports **nested routes**, **dynamic route creation**, **enter/exit transitions**, auto **web component integration**. 
 
@@ -2460,7 +2471,7 @@ simply.go.setup(
 		{
 			path: "/", // The path of the route
 			component: "home-page", // The component's tag name
-			isolated: true, // Default: false — use shadow DOM
+			light: true, // Default: false — render in light DOM (shadow DOM is default)
 			cache: true, // Default: false — keep data/props in memory, restore on revisit
 			same_page_refresh: true, // Default: false — re-render on same-route navigation
 			title: "Home Page" // Sets the document title after routing
@@ -2553,7 +2564,7 @@ See `examples/08-go/cache/` for a live demo: initial visit fetches, second visit
 
 ## Nested Routes
 
-You can define child routes inside a `children` array. Nesting can be as deep as you want. Simply.js will look for a `<route></route>` tag inside the parent component to render the nested component. All properties available for top-level routes can also be applied to children.
+You can define child routes inside a `children` array. Nesting can be as deep as you want. simply.js will look for a `<route></route>` tag inside the parent component to render the nested component. All properties available for top-level routes can also be applied to children.
 
 ```js
 simply.go.setup([
@@ -2735,7 +2746,7 @@ class simply {
 }
 ```
 
-> **Note:** Use `behavior: 'instant'` if the target may re-render right after (smooth scroll can be interrupted). If your anchor is inside an `isolated` child, query its shadow root via `component.querySelector('child').shadowRoot.querySelector('#hash')`.
+> **Note:** Use `behavior: 'instant'` if the target may re-render right after (smooth scroll can be interrupted). If your anchor is inside a shadow-DOM child, query its shadow root via `component.querySelector('child').shadowRoot.querySelector('#hash')`.
 
 Live demo: `examples/08-go/hash/` — shell anchors (`#a`/`#b`) use native scroll; `section?name=tana#subsection` navigates and scrolls via `routerEnter`.
 
@@ -2842,7 +2853,7 @@ You can fade/rise the content pieces together with the line by giving them a cla
 /* 
  * IMPORTANT: We must prevent transitions defined within a component 
  * from leaking to parent or child components. If the component is 
- * not isolated, we can achieve this by strictly using the child 
+ * in light DOM, we can achieve this by strictly using the child 
  * combinator (>) to select the relevant elements. 
  */
 company-page > .fx {
@@ -2896,16 +2907,16 @@ This adds a small delay (in milliseconds) between transitions of nested routes, 
 
 ---
 
-<a id="framer"></a>
+<a id="docs-framer"></a>
 
-## Framer Integration with Simply.js
+## Framer Integration with simply.js
 
 ## Contents
 
 - [Code Components](#code-components)
   - [First Code Component](#your-first-code-component)
   - [Supported Properties](#supported-property-types)
-  - [Writing Simply.js Components](#writing-a-simplyjs-component)
+  - [Writing simply.js Components](#writing-a-simplyjs-component)
   - [Using Props](#accessing-props)
   - [Prevent Flicker (FOUC)](#prevent-flicker-fouc)
   - [Mount Framer Components](#mount-framer-components-inside-simplyjs)
@@ -2920,11 +2931,11 @@ This adds a small delay (in milliseconds) between transitions of nested routes, 
   - [Limitations](#limitations)
 - [Plugins](#plugins)
 
-You can use Simply.js to build Framer plugins and code components. This guide explains how to integrate Simply.js components within Framer and develop plugins using Simply.js.
+You can use simply.js to build Framer plugins and code components. This guide explains how to integrate simply.js components within Framer and develop plugins using simply.js.
 
 ## Code Components
 
-To enable this integration, I developed a package called **Simply Loader**. This package loads Simply.js components within Framer code components inside an encapsulated environment. It also passes all properties, including component instances and collections, from Framer to your Simply.js component.
+To enable this integration, I developed a package called **Simply Loader**. This package loads simply.js components within Framer code components inside an encapsulated environment. It also passes all properties, including component instances and collections, from Framer to your simply.js component.
 
 ### Your First Code Component
 
@@ -2943,7 +2954,7 @@ addPropertyControls(Testcomponent, {
     // Mandatory
     type: ControlType.String,
     displayTextArea: true,
-    description: "Simply.js component URL.",
+    description: "simply.js component URL.",
   },
   scripts: {
     // Optional
@@ -2956,10 +2967,10 @@ addPropertyControls(Testcomponent, {
 });
 ```
 
-- **`simply`** is required and should point to the URL of your Simply.js component.
+- **`simply`** is required and should point to the URL of your simply.js component.
 - **`scripts`** is optional and allows you to inject additional scripts.
 
-All Framer property types are supported and accessible inside your Simply.js component via the `props` variable.
+All Framer property types are supported and accessible inside your simply.js component via the `props` variable.
 
 ### Supported Property Types
 
@@ -2988,7 +2999,7 @@ All Framer property types are supported and accessible inside your Simply.js com
 
 For details, refer to [Framer’s official property controls docs](https://www.framer.com/developers/property-controls).
 
-### Writing a Simply.js Component
+### Writing a simply.js Component
 
 Example:
 
@@ -3000,15 +3011,15 @@ Example:
 
 Save this on a public server and set its URL in the `simply` property in Framer.
 
-> **Note:** If a CORS error occurs, Simply.js will attempt to fetch the file using a proxy. A random parameter is also added to the URL to prevent caching and always fetch the latest version.
+> **Note:** If a CORS error occurs, simply.js will attempt to fetch the file using a proxy. A random parameter is also added to the URL to prevent caching and always fetch the latest version.
 
-The value of the message property is passed to our Simply.js component.
+The value of the message property is passed to our simply.js component.
 
 <img src="docs/images/framer-hello-world.jpg">
 
 ### Accessing Props
 
-All properties defined in your Framer code component are accessible from within your Simply.js component. When any of these properties change in Framer, the corresponding values in your Simply.js component are automatically updated.
+All properties defined in your Framer code component are accessible from within your simply.js component. When any of these properties change in Framer, the corresponding values in your simply.js component are automatically updated.
 
 Additionally, you can monitor property changes by defining a special method named `framerPropsUpdated()` within your component. Here's how:
 
@@ -3065,9 +3076,9 @@ OR
 
 This prevents the user from experiencing flickering of pre-compiled content, including curly braces, during page loading.
 
-### Mount Framer Components inside Simply.js
+### Mount Framer Components inside simply.js
 
-When you bind a component instance (such as a component, collection, or frame) to a property in your Framer code component, you can mount that instance inside your Simply.js component.
+When you bind a component instance (such as a component, collection, or frame) to a property in your Framer code component, you can mount that instance inside your simply.js component.
 
 To achieve this, use a special tag in your HTML: `<framer-component path="props.component">`. The `path` attribute should point to the property where the component is assigned in Framer.
 
@@ -3085,7 +3096,7 @@ addPropertyControls(MountComponent, {
   simply: {
     type: ControlType.String,
     displayTextArea: true,
-    description: "Simply.js component URL",
+    description: "simply.js component URL",
   },
   component: {
     type: ControlType.ComponentInstance,
@@ -3095,7 +3106,7 @@ addPropertyControls(MountComponent, {
 
 <img src="docs/images/mount-component.jpg">
 
-You can then mount it in your Simply.js component using this code:
+You can then mount it in your simply.js component using this code:
 
 ```html
 <html>
@@ -3104,11 +3115,11 @@ You can then mount it in your Simply.js component using this code:
 </html>
 ```
 
-When this is done, Simply Loader will locate the React component and mount it inside the `<framer-component path="props.component">` tag. All styles, fonts, and even hover or overlay effects will be preserved. In preview mode, your Framer component will be fully rendered within the Simply.js environment.
+When this is done, Simply Loader will locate the React component and mount it inside the `<framer-component path="props.component">` tag. All styles, fonts, and even hover or overlay effects will be preserved. In preview mode, your Framer component will be fully rendered within the simply.js environment.
 
 <img src="docs/images/mount-component-preview.gif">
 
-> **Note:** 💡 The mounted component will not be affected by Simply.js’s reactive engine or re-renders.
+> **Note:** 💡 The mounted component will not be affected by simply.js’s reactive engine or re-renders.
 
 You can also access additional data about the component through the `props` object. It will look like this:
 
@@ -3128,7 +3139,7 @@ You can also access additional data about the component through the `props` obje
 }
 ```
 
-After each mount, Framer executes a function named `framerComponentMounted()` defined within the `lifecycle` of your Simply.js component. You can handle it as follows:
+After each mount, Framer executes a function named `framerComponentMounted()` defined within the `lifecycle` of your simply.js component. You can handle it as follows:
 
 ```html
 <html>
@@ -3181,9 +3192,9 @@ Variants and their interactions, such as `hover` and `click`, will function auto
 
 ### Collections
 
-You can also connect collections as component instances in Framer. These are special instances that include additional information, accessible through `props` in your Simply.js component.
+You can also connect collections as component instances in Framer. These are special instances that include additional information, accessible through `props` in your simply.js component.
 
-Mounting functions exactly as described above. All entries in the collection will be returned and mounted automatically. It is up to you to filter or display them as needed within your Simply.js component. You can use the `framerPropsUpdated()` hook to manage this.
+Mounting functions exactly as described above. All entries in the collection will be returned and mounted automatically. It is up to you to filter or display them as needed within your simply.js component. You can use the `framerPropsUpdated()` hook to manage this.
 
 <img src="docs/images/mount-collection.jpg">
 
@@ -3244,7 +3255,7 @@ You will also receive additional useful data when mounting a collection, which w
 }
 ```
 
-Simply.js will also insert all this data into the corresponding DOM elements as attributes, as illustrated below.
+simply.js will also insert all this data into the corresponding DOM elements as attributes, as illustrated below.
 
 <img src="docs/images/dom-attributes.png">
 
@@ -3272,13 +3283,13 @@ Since multiple collections are queried, the main data will now be available unde
 
 <img src="docs/images/multiple-queries.jpg">
 
-Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom Simply.js components, apply any desired filters, and create custom layouts for rendering.
+Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom simply.js components, apply any desired filters, and create custom layouts for rendering.
 
-> **Note:** Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom Simply.js components, apply any desired filters, and create custom layouts for rendering. ⚡ This setup also supports localization — all data is automatically filtered and provided based on the user's or site's current language preference within `props`.
+> **Note:** Accessing your entire collection with fully decoded data is highly beneficial. With this data, you can build custom simply.js components, apply any desired filters, and create custom layouts for rendering. ⚡ This setup also supports localization — all data is automatically filtered and provided based on the user's or site's current language preference within `props`.
 
 ### Run Custom Code In Framer
 
-Another powerful feature allows you to send custom JavaScript code from Simply.js to execute within the parent Framer component via Simply Loader. This is easily achieved using Simply.js's built-in `component.runInFramer(codeToRun)` function. Here's an example:
+Another powerful feature allows you to send custom JavaScript code from simply.js to execute within the parent Framer component via Simply Loader. This is easily achieved using simply.js's built-in `component.runInFramer(codeToRun)` function. Here's an example:
 
 ```html
 <html>
@@ -3321,7 +3332,7 @@ Another powerful feature allows you to send custom JavaScript code from Simply.j
 </script>
 ```
 
-The line `component.lifecycle.runInFramerResult(data);` within the `useEffect` hook passes the collected data back into your current Simply.js `component`. Here, `component` refers to your Simply.js component instance, and calling its method allows you to send data to any function defined within its `methods`.
+The line `component.lifecycle.runInFramerResult(data);` within the `useEffect` hook passes the collected data back into your current simply.js `component`. Here, `component` refers to your simply.js component instance, and calling its method allows you to send data to any function defined within its `methods`.
 
 > The following variables and hooks are available inside the Framer component’s runtime scope:
 >
@@ -3348,7 +3359,7 @@ The line `component.lifecycle.runInFramerResult(data);` within the `useEffect` h
 
 ### Listen Scroll Event
 
-To listen for scroll events from Framer within your Simply.js component, define a method named `framerOnScroll()` inside your component's `lifecycle` block.
+To listen for scroll events from Framer within your simply.js component, define a method named `framerOnScroll()` inside your component's `lifecycle` block.
 
 Here’s how to set it up:
 
@@ -3390,13 +3401,13 @@ The `data` object you receive will contain detailed scroll information, structur
 
 This data can be used to trigger actions based on scroll position, such as detecting when the user is near the bottom of the page.
 
-### Multiple Simply.js instances in a same Framer page
+### Multiple simply.js instances in a same Framer page
 
-The powerful features extend further. You can also create multiple Simply.js components on the same Framer page and enable them to communicate with each other.
+The powerful features extend further. You can also create multiple simply.js components on the same Framer page and enable them to communicate with each other.
 
 <img src="docs/images/multiple-simply-instances.gif">
 
-To send a message to other Simply.js instances, use the code below. This will broadcast the message to all Simply.js instances on the current page, excluding the sender.
+To send a message to other simply.js instances, use the code below. This will broadcast the message to all simply.js instances on the current page, excluding the sender.
 
 ```js
       sendMessage() {
@@ -3421,7 +3432,7 @@ window.addEventListener("message", function (e) {
 
 ### Links
 
-All links within mounted components or collections will function seamlessly. Simply.js intercepts click events and forwards them to Framer's internal router. You can also make any link in your Simply.js component trigger Framer navigation by adding the `route-framer` attribute, as shown:
+All links within mounted components or collections will function seamlessly. simply.js intercepts click events and forwards them to Framer's internal router. You can also make any link in your simply.js component trigger Framer navigation by adding the `route-framer` attribute, as shown:
 
 ```html
 <a href="./somepage" route-framer>Go!</a>
@@ -3458,7 +3469,7 @@ export default function Voltron(props) {
 
 ## Plugins
 
-You can easily develop Framer plugins using Simply.js. As a proof of concept, you can refer to my latest plugin: [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager/preview/).
+You can easily develop Framer plugins using simply.js. As a proof of concept, you can refer to my latest plugin: [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager/preview/).
 
 <img src="docs/images/framer-plugin.webp" alt="Image Alt Manager Preview" />
 
@@ -3466,7 +3477,7 @@ You can easily develop Framer plugins using Simply.js. As a proof of concept, yo
 
 ---
 
-<a id="electron"></a>
+<a id="docs-electron"></a>
 
 ## Electron Integration
 
@@ -3544,11 +3555,11 @@ That completes the setup!
 
 ---
 
-<a id="chrome"></a>
+<a id="docs-chrome"></a>
 
 ## Chrome Extension Integration
 
-Simply works inside a Chrome extension (Manifest V3). The key is the same **hashbang routing** (`hashbang: true`) used by the [Electron integration](#electron): routes live after `#!` in the URL, so everything works on the `chrome-extension://` protocol — no server, no rewrites.
+Simply works inside a Chrome extension (Manifest V3). The key is the same **hashbang routing** (`hashbang: true`) used by the [Electron integration](#docs-electron): routes live after `#!` in the URL, so everything works on the `chrome-extension://` protocol — no server, no rewrites.
 
 One extra step is required: MV3 extension pages **cannot** use `'unsafe-eval'`, but simply.js needs `eval`/`new Function` to render templates. The solution is to run the app inside a **sandboxed page** — sandboxed pages get a separate, lenient CSP that allows `'unsafe-eval'`.
 
@@ -3561,11 +3572,11 @@ The popup is declared via `action.default_popup`. The simply.js app lives in `sa
 ```json
 {
   "manifest_version": 3,
-  "name": "Simply.js Popup",
+  "name": "simply.js Popup",
   "version": "1.0.0",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Simply.js"
+    "default_title": "simply.js"
   },
   "sandbox": {
     "pages": ["sandbox.html"]
@@ -3625,7 +3636,7 @@ MV3 blocks **inline scripts** on extension pages, so the setup lives in an exter
 
 ### Router setup
 
-Load your components, then enable hashbang in `setup()` settings — exactly like the [Electron example](#electron):
+Load your components, then enable hashbang in `setup()` settings — exactly like the [Electron example](#docs-electron):
 
 ```js
 get("chrome-home.html");
@@ -3807,13 +3818,13 @@ That completes the setup!
 
 ---
 
-<a id="agents-agents"></a>
+<a id="docs-agents-agents"></a>
 
 ## Agents & AI
 
-> This section explains how AI agents — LLMs, coding assistants, and agentic browser tools — can interact with Simply.js.
+> This section explains how AI agents — LLMs, coding assistants, and agentic browser tools — can interact with simply.js.
 
-Simply.js exposes two main surfaces for AI agents:
+simply.js exposes two main surfaces for AI agents:
 
 ## 1. Documentation Access — live
 
@@ -3853,11 +3864,11 @@ Programmatic access to the REPL's saved examples — listing, searching, saving,
 
 ---
 
-<a id="agents-ai-docs"></a>
+<a id="docs-agents-ai-docs"></a>
 
 ## AI Docs Access
 
-This page describes how AI agents can access the Simply.js documentation. There are three ways to do it, depending on what you need.
+This page describes how AI agents can access the simply.js documentation. There are three ways to do it, depending on what you need.
 
 ## 1. Single, complete Markdown file (recommended for one-shot ingestion)
 
@@ -3918,7 +3929,7 @@ Feed the response directly into the model context as reference material before w
 
 ---
 
-<a id="agents-repl-api"></a>
+<a id="docs-agents-repl-api"></a>
 
 ## REPL API
 
@@ -4199,12 +4210,19 @@ Themes change not only colors/fonts but also **component sizes and radii** (via 
 
 ## Components
 
-- [Button](#ui-button) — button with variants and sizes
-- [Badge](#ui-badge) — badge / pill
-- [Label](#ui-label) — form label
-- [Separator](#ui-separator) — horizontal / vertical rule
-- [Skeleton](#ui-skeleton) — loading placeholder
-- [Component Viewer](#ui-component-viewer) — live preview tool
+- [Button](#ui-s-button) — button with variants and sizes
+- [Badge](#ui-s-badge) — badge / pill
+- [Label](#ui-s-label) — form label
+- [Separator](#ui-s-separator) — horizontal / vertical rule
+- [Skeleton](#ui-s-skeleton) — loading placeholder
+- [Kbd](#ui-s-kbd) — keyboard key
+- [Input](#ui-s-input) — text input for forms
+- [Textarea](#ui-s-textarea) — multi-line text input
+- [Field](#ui-s-field) — form field (label + description + group)
+- [Spinner](#ui-s-spinner) — loading indicator
+- [Native Select](#ui-s-native-select) — styled native select
+- [Switch](#ui-s-switch) — toggle switch
+- [Component Viewer](#ui-s-component-viewer) — live preview tool
 
 > **Note:** Each component page includes a live **component viewer** (parameter editing, dark/light toggle, theme switching).
 
@@ -4218,7 +4236,7 @@ Themes change not only colors/fonts but also **component sizes and radii** (via 
     <!-- optional theme: <link rel="stylesheet" href="ui/themes/nova.css"> -->
   </head>
   <body>
-    <s-label isolated for="email">Email</s-label>
+    <s-label for="email">Email</s-label>
     <script src="simply.js"></script>
     <script>
       get("ui/s-label.html");
@@ -4229,23 +4247,32 @@ Themes change not only colors/fonts but also **component sizes and radii** (via 
 
 ## Development Notes
 
-- Components use `isolated` (shadow DOM) + native `<slot>`
+- Components use shadow DOM (default) + native `<slot>`
 - `{{...}}` double braces are required
 - Dark mode selectors use `:host-context(.dark)`
 - Detailed guide: `ui/README.md`
 
 ---
 
-<a id="ui-button"></a>
+<a id="ui-s-button"></a>
 
 ## Button
 
-Displays a button or a component that looks like a button. The base component of the system — it establishes the core pattern (isolated + native slot, variant/size via `data-*` attributes, theme tokens).
+Displays a button or a component that looks like a button. The base component of the system — it establishes the core pattern (shadow DOM + native slot, variant/size via `data-*` attributes, theme tokens).
 
 ## Usage
 
+
 ```html
-<s-button isolated variant="default">Click me</s-button>
+<s-button variant="default">Click me</s-button>
+```
+
+
+```html
+<s-button variant="outline">Button</s-button>
+<s-button variant="outline" size="icon">
+  <s-icon name="arrow-up"></s-icon>
+</s-button>
 ```
 
 ## Props
@@ -4258,36 +4285,99 @@ Displays a button or a component that looks like a button. The base component of
 
 ## Variants
 
+
 ```html
-<s-button isolated variant="default">Default</s-button>
-<s-button isolated variant="secondary">Secondary</s-button>
-<s-button isolated variant="outline">Outline</s-button>
-<s-button isolated variant="ghost">Ghost</s-button>
-<s-button isolated variant="destructive">Destructive</s-button>
-<s-button isolated variant="link">Link</s-button>
+<s-button variant="default">Default</s-button>
+<s-button variant="secondary">Secondary</s-button>
+<s-button variant="outline">Outline</s-button>
+<s-button variant="ghost">Ghost</s-button>
+<s-button variant="destructive">Destructive</s-button>
+<s-button variant="link">Link</s-button>
 ```
 
 ## Sizes
 
+
 ```html
-<s-button isolated size="xs">Extra Small</s-button>
-<s-button isolated size="sm">Small</s-button>
-<s-button isolated size="default">Default</s-button>
-<s-button isolated size="lg">Large</s-button>
-<s-button isolated size="icon">★</s-button>
+<s-button size="xs">Extra Small</s-button>
+<s-button size="sm">Small</s-button>
+<s-button size="default">Default</s-button>
+<s-button size="lg">Large</s-button>
+<s-button size="icon"><s-icon name="star"></s-icon></s-button>
 ```
 
 ## With Icon
 
+
 ```html
-<s-button isolated>★ Save</s-button>
+<s-button><s-icon name="save" data-icon="inline-start"></s-icon> Save</s-button>
 ```
+
+## Icon & Theme
+
+The icon inherits the button's context: it scales with the button `size` and takes the button's color via `currentColor`. Change the `size`/`variant` in the config, or the theme (top-right), and watch the icon follow.
+
+
+```html
+<s-button size="default" variant="default">
+  <s-icon name="badge-check" data-icon="inline-start"></s-icon>
+  Save
+</s-button>
+<s-button size="icon" variant="secondary">
+  <s-icon name="heart"></s-icon>
+</s-button>
+<s-button size="lg" variant="outline">
+  <s-icon name="send" data-icon="inline-end"></s-icon>
+  Send
+</s-button>
+```
+
+## Spinner
+
+
+```html
+<s-button variant="outline">
+  <s-spinner></s-spinner>Downloading
+</s-button>
+<s-button variant="outline">
+  Downloading<s-spinner></s-spinner>
+</s-button>
+<s-button variant="outline" size="icon">
+  <s-spinner></s-spinner>
+</s-button>
+```
+
+## Button Group
+
+Group buttons together with `s-button-group`. Buttons inside a group are joined (shared borders, rounded outer corners). Nested groups get a gap between them.
+
+
+```html
+<s-button-group>
+  <s-button-group>
+    <s-button variant="outline" size="icon" aria-label="Go Back">
+      <s-icon name="arrow-left"></s-icon>
+    </s-button>
+  </s-button-group>
+  <s-button-group>
+    <s-button variant="outline">Archive</s-button>
+    <s-button variant="outline">Report</s-button>
+  </s-button-group>
+  <s-button-group>
+    <s-button variant="outline">Snooze</s-button>
+  </s-button-group>
+</s-button-group>
+```
+
+> **Note:** The original shadcn demo includes a Dropdown Menu ("More Options") in the last group. We'll add that example once the `s-dropdown-menu` component is built.
 
 ## Disabled
 
+
 ```html
-<s-button isolated disabled>Disabled</s-button>
+<s-button disabled>Disabled</s-button>
 ```
+
 
 ## Theming
 
@@ -4306,13 +4396,74 @@ The button uses theme-dependent tokens for sizes and radii:
 
 Tokens: `--button-radius`, `--button-height-*`, `--button-size-icon-*`, `--button-font-size-*`, `--button-padding-*`, `--button-gap-*`.
 
-## Live Demo
+---
 
-<s-component-viewer isolated component="ui/s-button"></s-component-viewer>
+<a id="ui-s-button-group"></a>
+
+## Button Group
+
+Groups buttons together, joining them with shared borders and rounded outer corners. Nested groups get a gap (`gap-2`, constant across themes) between them.
+
+## Usage
+
+
+```html
+<s-button-group>
+  <s-button variant="outline">Archive</s-button>
+  <s-button variant="outline">Report</s-button>
+</s-button-group>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `orientation` | string | `"horizontal"` | `horizontal` \| `vertical` |
+
+## Horizontal
+
+
+```html
+<s-button-group>
+  <s-button variant="outline">Button</s-button>
+  <s-button variant="outline">Button</s-button>
+  <s-button variant="outline">Button</s-button>
+</s-button-group>
+```
+
+## Vertical
+
+
+```html
+<s-button-group orientation="vertical">
+  <s-button variant="outline">Top</s-button>
+  <s-button variant="outline">Middle</s-button>
+  <s-button variant="outline">Bottom</s-button>
+</s-button-group>
+```
+
+## Nested
+
+Group nested button-groups to add a gap between them (e.g. a toolbar):
+
+
+```html
+<s-button-group>
+  <s-button-group>
+    <s-button variant="outline" size="icon" aria-label="Go Back">
+      <s-icon name="arrow-left"></s-icon>
+    </s-button>
+  </s-button-group>
+  <s-button-group>
+    <s-button variant="outline">Archive</s-button>
+    <s-button variant="outline">Report</s-button>
+  </s-button-group>
+</s-button-group>
+```
 
 ---
 
-<a id="ui-badge"></a>
+<a id="ui-s-badge"></a>
 
 ## Badge
 
@@ -4320,8 +4471,9 @@ Displays a badge or a component that looks like a badge. A small pill used for l
 
 ## Usage
 
+
 ```html
-<s-badge isolated variant="default">Badge</s-badge>
+<s-badge>Badge</s-badge>
 ```
 
 ## Props
@@ -4332,27 +4484,56 @@ Displays a badge or a component that looks like a badge. A small pill used for l
 
 ## Variants
 
+
+ 
 ```html
-<s-badge isolated variant="default">Default</s-badge>
-<s-badge isolated variant="secondary">Secondary</s-badge>
-<s-badge isolated variant="outline">Outline</s-badge>
-<s-badge isolated variant="destructive">Destructive</s-badge>
-<s-badge isolated variant="ghost">Ghost</s-badge>
-<s-badge isolated variant="link">Link</s-badge>
+<s-badge variant="default">Default</s-badge>
+<s-badge variant="secondary">Secondary</s-badge>
+<s-badge variant="outline">Outline</s-badge>
+<s-badge variant="destructive">Destructive</s-badge>
+<s-badge variant="ghost">Ghost</s-badge>
+<s-badge variant="link">Link</s-badge>
 ```
 
 ## As a Link
 
+ 
 ```html
-<a href="#"><s-badge isolated variant="outline">Link Badge</s-badge></a>
+<a href="#"><s-badge variant="outline">Link Badge</s-badge></a>
 ```
 
 When wrapped in an anchor, the badge gets hover styles via `:host-context(a)`.
 
-## With Icon
+## With Icons
+
+The icon scales to the badge's 12px icon and sits in a `gap-1` (4px) row with the text (matching shadcn `px-2` + `gap-1`). Place the icon before the text with `data-icon="inline-start"`, after with `data-icon="inline-end"`.
+
 
 ```html
-<s-badge isolated variant="secondary">★ New</s-badge>
+<s-badge>
+  <s-icon name="badge-check" data-icon="inline-start"></s-icon>
+  Verified
+</s-badge>
+<s-badge variant="secondary">
+  <s-icon name="badge-check" data-icon="inline-start"></s-icon>
+  Verified
+</s-badge>
+<s-badge variant="outline">
+  <s-icon name="bookmark" data-icon="inline-end"></s-icon>
+  Bookmark
+</s-badge>
+<s-badge variant="destructive">
+  <s-icon name="alert-circle" data-icon="inline-start"></s-icon>
+  Error
+</s-badge>
+<s-badge variant="ghost">
+  <s-icon name="star" data-icon="inline-end"></s-icon>
+  Ghost
+</s-badge>
+<s-badge variant="link">
+  <s-icon name="link" data-icon="inline-start"></s-icon>
+  Link
+</s-badge>
 ```
 
 ## Theming
@@ -4370,13 +4551,9 @@ The badge uses theme-dependent tokens:
 
 Tokens: `--badge-radius`, `--badge-font-size`.
 
-## Live Demo
-
-<s-component-viewer isolated component="ui/s-badge"></s-component-viewer>
-
 ---
 
-<a id="ui-label"></a>
+<a id="ui-s-label"></a>
 
 ## Label
 
@@ -4384,8 +4561,9 @@ A label associated with a form control. Links to an input via the `for` attribut
 
 ## Usage
 
+
 ```html
-<s-label isolated for="email">Email</s-label>
+<s-label for="email">Email</s-label>
 ```
 
 ## Props
@@ -4397,17 +4575,22 @@ A label associated with a form control. Links to an input via the `for` attribut
 
 ## Example
 
+
 ```html
-<div class="field">
-  <s-label isolated for="name">Name</s-label>
-  <input id="name" placeholder="Enter your name">
+<div class="field" style="display: flex; flex-direction: column; gap: 0.5rem">
+  <s-label for="name">Name</s-label>
+  <s-input light id="name" placeholder="Enter your name"></s-input>
+</div>
+<div class="field" style="display: flex; align-items: center; gap: 0.5rem">
+  <s-checkbox id="push"></s-checkbox>
+  <s-label for="push">Push notifications</s-label>
 </div>
 ```
 
 ## Disabled
 
 ```html
-<s-label isolated disabled>Disabled</s-label>
+<s-label disabled>Disabled</s-label>
 ```
 
 The `disabled` attribute fades the label. The label also fades automatically when a parent element has `data-disabled="true"`.
@@ -4427,13 +4610,9 @@ The label uses theme-dependent tokens:
 
 Tokens: `--label-font-size`, `--label-font-weight`, `--label-line-height`, `--label-text-transform`, `--label-letter-spacing`, `--label-gap`.
 
-## Live Demo
-
-<s-component-viewer isolated component="ui/s-label"></s-component-viewer>
-
 ---
 
-<a id="ui-separator"></a>
+<a id="ui-s-separator"></a>
 
 ## Separator
 
@@ -4441,11 +4620,12 @@ Visually or semantically separates content. A thin rule that can be horizontal o
 
 ## Usage
 
+
 ```html
 <s-separator></s-separator>
 ```
 
-> **Note:** The separator has **no slot**, so `isolated` is **optional** — it works in both light DOM and shadow DOM. Use `isolated` only if you want the component's styles scoped to a shadow root.
+> **Note:** The separator has **no slot**, so it works in both light DOM and shadow DOM. It renders in shadow DOM by default; add `light` if you want the component's styles in the light DOM.
 
 ## Props
 
@@ -4492,13 +4672,9 @@ The separator uses the theme's border color:
 |---|---|
 | `--color-border` | theme-dependent border color |
 
-## Live Demo
-
-<s-component-viewer isolated component="ui/s-separator"></s-component-viewer>
-
 ---
 
-<a id="ui-skeleton"></a>
+<a id="ui-s-skeleton"></a>
 
 ## Skeleton
 
@@ -4506,23 +4682,28 @@ Use to show a placeholder while content is loading. A pulsing block that mimics 
 
 ## Usage
 
+
+
+
 ```html
 <s-skeleton></s-skeleton>
 ```
 
 The skeleton has a default size (`width: 100%; height: 1rem`). Size it via inline styles on the tag:
 
+
 ```html
 <s-skeleton style="width: 3rem; height: 3rem; border-radius: 9999px"></s-skeleton>
 ```
 
-> **Note:** The skeleton has **no slot**, so `isolated` is **optional** — it works in both light DOM and shadow DOM. The host is the sizeable box; the inner div fills it and inherits the radius.
+> **Note:** The skeleton has **no slot**, so it works in both light DOM and shadow DOM. It renders in shadow DOM by default; add `light` if you want the component's styles in the light DOM. The host is the sizeable box; the inner div fills it and inherits the radius.
 
 ## Props
 
 The skeleton has no props — it's a styled placeholder div.
 
 ## Avatar
+
 
 ```html
 <div style="display: flex; align-items: center; gap: 1rem">
@@ -4553,23 +4734,756 @@ The skeleton uses the theme's accent color and radius:
 | `--color-accent` | theme-dependent accent color |
 | `--radius-md` | theme-dependent radius |
 
-## Live Demo
-
-<s-component-viewer isolated component="ui/s-skeleton"></s-component-viewer>
-
 ---
 
-<a id="ui-component-viewer"></a>
+<a id="ui-s-kbd"></a>
 
-## Component Viewer
+## Kbd
 
-A live preview tool for Simply UI components. Lets you change every supported component parameter and see the result instantly, with dark mode and theme switching.
+Used to display textual user input from keyboard. A small keycap-style element.
 
 ## Usage
 
 ```html
-<s-component-viewer isolated component="s-button"></s-component-viewer>
+<s-kbd>Ctrl</s-kbd>
 ```
+
+
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"⌘K"` | The key label (children) |
+
+## Basic
+
+```html
+<s-kbd>Ctrl</s-kbd>
+<s-kbd>⌘K</s-kbd>
+<s-kbd>Ctrl + B</s-kbd>
+```
+
+## Group
+
+Use `s-kbd-group` to group keyboard keys together:
+
+```html
+<s-kbd-group>
+  <s-kbd>⌘</s-kbd>
+  <s-kbd>⇧</s-kbd>
+  <s-kbd>⌥</s-kbd>
+  <s-kbd>⌃</s-kbd>
+</s-kbd-group>
+```
+
+## In a Button
+
+```html
+<s-button variant="outline" size="sm">Accept <s-kbd>⏎</s-kbd></s-button>
+```
+
+## Theming
+
+The Kbd uses theme-dependent tokens:
+
+| Token | Value |
+|---|---|
+| `--color-muted` | background |
+| `--color-muted-foreground` | text color |
+| `--radius-sm` | border radius |
+
+---
+
+<a id="ui-s-input"></a>
+
+## Input
+
+A text input component for forms and user data entry with built-in styling and accessibility features.
+
+## Usage
+
+```html
+<s-input light placeholder="Enter text"></s-input>
+```
+
+> **Note:** The input is a **form control** — use it **with `light`** (light DOM) so the native `<input>` participates in forms. It has no slot.
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | string | `"default"` | `xs` \| `sm` \| `default` \| `lg` — matches button heights per theme |
+| `type` | string | `"text"` | `text` \| `email` \| `password` \| `number` \| `tel` \| `url` \| `search` \| `file` \| `date` |
+| `placeholder` | string | `""` | Placeholder text |
+| `disabled` | boolean | `false` | Disables the input (opacity 0.5, no pointer events) |
+| `ariaInvalid` | boolean | `false` | Marks the input as invalid (destructive border + ring) |
+
+Other native attributes (`id`, `name`, `value`, `required`, `readonly`) pass through to the inner `<input>`.
+
+## Sizes
+
+```html
+<s-input light size="xs" placeholder="Extra Small"></s-input>
+<s-input light size="sm" placeholder="Small"></s-input>
+<s-input light placeholder="Default"></s-input>
+<s-input light size="lg" placeholder="Large"></s-input>
+```
+
+Input sizes match button sizes per theme, so `<s-input size="sm">` + `<s-button size="sm">` align perfectly.
+
+## Basic
+
+```html
+<s-input light placeholder="Enter text"></s-input>
+```
+
+## With Label
+
+```html
+<div class="field">
+  <s-label for="email">Email</s-label>
+  <s-input light id="email" type="email" placeholder="name@example.com"></s-input>
+</div>
+```
+
+## Disabled
+
+```html
+<s-input light placeholder="Cannot edit" disabled></s-input>
+```
+
+## Invalid
+
+```html
+<s-input light placeholder="This field has an error" aria-invalid></s-input>
+```
+
+## File
+
+```html
+<s-input light type="file"></s-input>
+```
+
+## Theming
+
+The input uses theme-dependent tokens:
+
+| Token | Value |
+|---|---|
+| `--color-input` | border color |
+| `--color-ring` | focus ring color |
+| `--color-destructive` | invalid border/ring color |
+| `--color-muted-foreground` | placeholder color |
+| `--color-primary` / `--color-primary-foreground` | selection colors |
+| `--radius-md` | border radius |
+
+
+```html
+<s-input light placeholder="test"/>
+```
+
+## s-input-group
+
+Compound input with addons, buttons, or text inside. The group provides the border; the inner control is borderless.
+
+
+
+> **Note:** The group is a flex container with a border and `h-9` height. The inner control (`s-input-group-input`) is **borderless** — use it **with `light`** (light DOM form control). The group highlights on focus and turns destructive when the control is `aria-invalid` (detected via lifecycle, since `:has()` can't cross the shadow boundary).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"<s-input-group-input>…<s-input-group-addon>…"` | The input + addons |
+
+
+```html
+<s-input-group>
+  <s-input-group-input placeholder="Search..." light></s-input-group-input>
+  <s-input-group-addon>🔍</s-input-group-addon>
+</s-input-group>
+```
+
+## s-input-group-input
+
+A borderless input for use inside an `s-input-group`.
+
+> **Note:** The input is a **form control** — use it **with `light`** (light DOM) so the native `<input>` participates in forms. It has `flex: 1` and no border (the group provides it).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `type` | string | `"text"` | `text` \| `email` \| `password` \| `number` \| `tel` \| `url` \| `search` \| `file` \| `date` |
+| `placeholder` | string | `""` | Placeholder text |
+| `disabled` | boolean | `false` | Disables the input |
+| `ariaInvalid` | boolean | `false` | Marks the input as invalid (group turns destructive) |
+
+
+```html
+<s-input-group>
+  <s-input-group-input light placeholder="Search..."></s-input-group-input>
+</s-input-group>
+```
+
+## s-input-group-addon
+
+An addon (icon, text, or button) inside an `s-input-group`.
+
+```html
+<s-input-group>
+  <s-input-group-input light placeholder="example.com"></s-input-group-input>
+  <s-input-group-addon align="inline-end">
+    <s-input-group-text>.com</s-input-group-text>
+  </s-input-group-addon>
+</s-input-group>
+```
+
+> **Note:** The addon is a flex container with `text-muted-foreground`. `align` controls placement: `inline-start` (left), `inline-end` (right), `block-start` (top), `block-end` (bottom).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `align` | `"inline-start" \| "inline-end" \| "block-start" \| "block-end"` | `"inline-start"` | Addon placement |
+| `slot` | string | `"🔍"` | The addon content (icon, text, button) |
+
+
+
+## s-input-group-text
+
+Text inside an `s-input-group-addon`.
+
+```html
+<s-input-group-addon>
+  <s-input-group-text>https://</s-input-group-text>
+</s-input-group-addon>
+```
+
+> **Note:** The text is a flex span with `text-sm` and `text-muted-foreground`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"https://"` | The text |
+
+
+
+## s-input-group-button
+
+A button for use inside an `s-input-group-addon`.
+
+```html
+<s-input-group>
+  <s-input-group-input light placeholder="Enter your username"></s-input-group-input>
+  <s-input-group-addon align="inline-end">
+    <s-input-group-button>Send</s-input-group-button>
+  </s-input-group-addon>
+</s-input-group>
+```
+
+> **Note:** A standalone button with `ghost` variant and `xs` size defaults. Clicking it does **not** focus the input (the addon's click-to-focus skips interactive elements).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | `"xs" \| "icon-xs" \| "sm" \| "icon-sm"` | `"xs"` | Button size |
+| `variant` | `"default" \| "destructive" \| "outline" \| "secondary" \| "ghost" \| "link"` | `"ghost"` | Button variant |
+| `disabled` | boolean | `false` | Disables the button |
+| `slot` | string | `"Button"` | The button text |
+
+
+
+## s-input-group-textarea
+
+A borderless textarea for use inside an `s-input-group`.
+
+```html
+<s-input-group>
+  <s-input-group-textarea light placeholder="Enter your message"></s-input-group-textarea>
+  <s-input-group-addon align="block-end">
+    <s-input-group-button>Send</s-input-group-button>
+  </s-input-group-addon>
+</s-input-group>
+```
+
+> **Note:** The textarea is a **form control** — use it **with `light`** (light DOM). The group auto-heights when it contains a textarea (detected via lifecycle → `data-textarea`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `placeholder` | string | `""` | Placeholder text |
+| `disabled` | boolean | `false` | Disables the textarea |
+| `ariaInvalid` | boolean | `false` | Marks the textarea as invalid (group turns destructive) |
+
+---
+
+<a id="ui-s-textarea"></a>
+
+## Textarea
+
+Displays a form textarea or a component that looks like a textarea. A multi-line input for longer text.
+
+## Usage
+
+
+```html
+<s-textarea light placeholder="Type your message here."></s-textarea>
+```
+
+> **Note:** The textarea is a **form control** — use it **with `light`** (light DOM) so the native `<textarea>` participates in forms. It has no slot.
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `placeholder` | string | `""` | Placeholder text |
+| `disabled` | boolean | `false` | Disables the textarea (opacity 0.5, no pointer events) |
+| `ariaInvalid` | boolean | `false` | Marks the textarea as invalid (destructive border + ring) |
+
+Other native attributes (`id`, `name`, `required`) pass through to the inner `<textarea>`.
+
+## Basic
+
+```html
+<s-textarea light placeholder="Type your message here."></s-textarea>
+```
+
+## With Label
+
+```html
+<div class="field">
+  <s-label for="message">Message</s-label>
+  <s-textarea light id="message" placeholder="Type your message here."></s-textarea>
+</div>
+```
+
+## Disabled
+
+```html
+<s-textarea light placeholder="Cannot edit" disabled></s-textarea>
+```
+
+## Invalid
+
+```html
+<s-textarea light placeholder="This field has an error" aria-invalid></s-textarea>
+```
+
+## Theming
+
+The textarea uses theme-dependent tokens:
+
+| Token | Value |
+|---|---|
+| `--textarea-radius` | theme-dependent border radius |
+| `--color-input` | border color |
+| `--color-ring` | focus ring color |
+| `--color-destructive` | invalid border/ring color |
+| `--color-muted-foreground` | placeholder color |
+
+---
+
+<a id="ui-s-field"></a>
+
+## Field
+
+Form field components: `s-field`, `s-field-label`, `s-field-description`, `s-field-group`, `s-field-set`, `s-field-separator`, `s-field-content`, `s-field-title`, `s-field-legend`, `s-field-error`, and `s-checkbox`. They work together to build accessible form fields.
+
+## s-field
+
+The core wrapper for a single field — combines a label, control, and helper text.
+
+```html
+<s-field>
+  <s-field-label for="name">Full name</s-field-label>
+  <s-input light id="name" placeholder="Evil Rabbit"></s-input>
+  <s-field-description>This appears on invoices and emails.</s-field-description>
+</s-field>
+```
+
+> **Note:** The field content is **slot content** — components render in shadow DOM by default, so the slot projects it. The wrapper is a flex container with a `gap` of `calc(var(--spacing) * 3)` (12px). Use `orientation="horizontal"` to place the label and control side by side.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | Stack children vertically or side by side |
+| `slot` | string | `"<s-field-label>…<s-input>…<s-field-description>…"` | The field children (label + control + description) |
+
+
+
+## s-field-content
+
+Flex column that groups a label and description when the label sits beside the control.
+
+```html
+<s-field orientation="horizontal">
+  <s-checkbox id="notifications"></s-checkbox>
+  <s-field-content>
+    <s-field-label for="notifications">Notifications</s-field-label>
+    <s-field-description>Email, SMS, and push options.</s-field-description>
+  </s-field-content>
+</s-field>
+```
+
+> **Note:** The content is **slot content** — components render in shadow DOM by default, so the slot projects it. It's a flex column with a `gap` of `calc(var(--spacing) * 1)` (4px, Vega) that varies per theme via the `--field-content-gap` token.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"<s-field-label>…<s-field-description>…"` | The label + description |
+
+
+
+## s-field-title
+
+Renders a title with label styling inside a `s-field-content`.
+
+```html
+<s-field-content>
+  <s-field-title>Enable Touch ID</s-field-title>
+  <s-field-description>Unlock your device faster.</s-field-description>
+</s-field-content>
+```
+
+> **Note:** The title text is **slot content** — components render in shadow DOM by default, so the slot projects it. It's a flex row with `w-fit`, `gap-2`, `text-sm`, and `font-medium`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"Enable Touch ID"` | The title text |
+
+
+
+## s-field-label
+
+A label for a form field, associated with a control via the `for` attribute.
+
+```html
+<s-field-label for="username">Username</s-field-label>
+<s-input light id="username" placeholder="Enter your username"></s-input>
+```
+
+> **Note:** The label text is **slot content** — components render in shadow DOM by default, so the slot projects it. Since `for` doesn't cross the shadow boundary, clicking the label focuses the control via a JS handler.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `for` | string | `""` | The `id` of the associated form control |
+| `disabled` | boolean | `false` | Fades the label (opacity 0.5) |
+| `slot` | string | `"Label"` | The label text |
+
+
+
+## s-field-description
+
+A description for a form field, rendered below the control.
+
+```html
+<s-field-label for="email">Email</s-field-label>
+<s-input light id="email" type="email" placeholder="name@example.com"></s-input>
+<s-field-description>We'll never share your email with anyone.</s-field-description>
+```
+
+> **Note:** The description text is **slot content** — components render in shadow DOM by default, so the slot projects it. Links inside the description are underlined and turn `primary` on hover.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"Description"` | The description text |
+
+
+
+## s-field-group
+
+Groups related form fields, stacking them vertically with a gap.
+
+```html
+<s-field-group>
+  <s-field>
+    <s-field-label for="name">Name</s-field-label>
+    <s-input light id="name" placeholder="Jordan Lee"></s-input>
+  </s-field>
+  <s-field>
+    <s-field-label for="email">Email</s-field-label>
+    <s-input light id="email" type="email" placeholder="name@example.com"></s-input>
+    <s-field-description>We'll send updates to this address.</s-field-description>
+  </s-field>
+</s-field-group>
+```
+
+> **Note:** The fields are **slot content** — components render in shadow DOM by default, so the slot projects them. The group is a flex column with a `gap` of `calc(var(--spacing) * 7)` (28px), matching the original `flex flex-col gap-7`. Add `data-slot="checkbox-group"` for the tighter 12px gap used with checkbox/radio rows.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `data-slot` | string | `"field-group"` | Override the slot name (e.g. `"checkbox-group"`) |
+| `slot` | string | `"<s-field>…<s-field>…"` | The grouped fields |
+
+
+
+## s-field-set
+
+Semantic grouping of fields with a legend, usually containing a `s-field-group`.
+
+```html
+<s-field-set>
+  <s-field-label>Responses</s-field-label>
+  <s-field-description>Get notified when ChatGPT responds to requests that take time.</s-field-description>
+  <s-field-group data-slot="checkbox-group">
+    <s-field orientation="horizontal">
+      <s-checkbox id="push" default-checked disabled></s-checkbox>
+      <s-field-label for="push">Push notifications</s-field-label>
+    </s-field>
+  </s-field-group>
+</s-field-set>
+```
+
+> **Note:** Renders a semantic `<fieldset>` with a flex column layout and a `gap` of `calc(var(--spacing) * 6)` (24px). When it contains a `data-slot="checkbox-group"` or `data-slot="radio-group"`, the gap tightens to 12px (detected via the lifecycle, since `:has()` can't cross the shadow boundary).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"<s-field-group>…"` | The set children (a field group) |
+
+
+
+## s-field-legend
+
+Legend element for a `s-field-set`. Switch to the `label` variant to align with label sizing.
+
+```html
+<s-field-set>
+  <s-field-legend>Address Information</s-field-legend>
+  <s-field-description>We need your address to deliver your order.</s-field-description>
+  <s-field-group>
+    <s-field>
+      <s-field-label for="street">Street Address</s-field-label>
+      <s-input light id="street" type="text" placeholder="123 Main St"></s-input>
+    </s-field>
+  </s-field-group>
+</s-field-set>
+```
+
+> **Note:** Renders a semantic `<legend>` with `mb-3 font-medium`. The `legend` variant uses `text-base`; the `label` variant uses `text-sm`.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `variant` | `"legend" \| "label"` | `"legend"` | `legend` = text-base, `label` = text-sm |
+| `slot` | string | `"Profile"` | The legend text |
+
+
+
+## s-field-separator
+
+Visual divider to separate sections inside a `s-field-group`. Accepts optional inline content.
+
+```html
+<s-field-group>
+  <s-field-set>...</s-field-set>
+  <s-field-separator></s-field-separator>
+  <s-field-set>...</s-field-set>
+</s-field-group>
+```
+
+> **Note:** The separator is a 1px `border` line centered in a 20px-tall container. If you pass children, they render as centered text on top of the line (with `background` covering it). Without children, only the line shows.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"Or continue with"` | Optional centered content |
+
+
+
+## s-checkbox
+
+A checkbox control with a checked state, used inside a horizontal `s-field`.
+
+```html
+<s-field orientation="horizontal">
+  <s-checkbox id="push" default-checked disabled></s-checkbox>
+  <s-field-label for="push">Push notifications</s-field-label>
+</s-field>
+```
+
+> **Note:** Renders a `<button role="checkbox">` with `aria-checked`. Clicking toggles the state. `default-checked` sets the initial checked state; `disabled` prevents toggling.
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `id` | string | `""` | The `id` of the checkbox |
+| `default-checked` | boolean | `false` | Initial checked state |
+| `disabled` | boolean | `false` | Disables the checkbox |
+
+
+
+## s-field-error
+
+Accessible error container for validation messages.
+
+```html
+<s-field data-invalid>
+  <s-field-label for="email">Email</s-field-label>
+  <s-input light id="email" type="email" aria-invalid></s-input>
+  <s-field-error>Enter a valid email address.</s-field-error>
+</s-field>
+```
+
+> **Note:** Renders a `<div role="alert">` with `text-sm font-normal text-destructive`. The error text is **slot content** — components render in shadow DOM by default, so the slot projects it. When there are no children, the element hides itself (like the original returning `null`).
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `slot` | string | `"Choose another username."` | The error message |
+
+---
+
+<a id="ui-s-spinner"></a>
+
+## Spinner
+
+A loading spinner indicator. No children, no slot.
+
+```html
+<s-spinner></s-spinner>
+```
+
+
+
+> **Note:** The spinner is a self-contained SVG icon. It renders in shadow DOM by default. Size defaults to 16px; override with the `--spinner-size` CSS variable or an inline `style="--spinner-size: 1.5rem"`.
+
+## In a Button
+
+```html
+<s-button disabled>
+  <s-spinner></s-spinner>
+  Loading
+</s-button>
+```
+
+The spinner inherits the button's text color via `currentColor`.
+
+---
+
+<a id="ui-s-icon"></a>
+
+## Icon
+
+A lucide icon. Renders a scalable vector icon by name. The lucide UMD bundle is lazy-loaded **once** on first use, then every icon renders instantly from memory. Space is reserved (so there's no layout shift while the bundle loads).
+
+## Usage
+
+
+```html
+<s-icon name="badge-check"></s-icon>
+<s-icon name="bird"></s-icon>
+<s-icon name="star"></s-icon>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `name` | string | `""` | The lucide icon name (`badge-check`, `bird`, …) |
+
+## Sizing
+
+The icon fills a `--s-icon-size` box (default `1rem`). Override per icon or per scope:
+
+```html
+<!-- 24px -->
+<s-icon name="camera" style="--s-icon-size: 1.5rem"></s-icon>
+```
+
+Color inherits from the surrounding text via `currentColor`.
+
+## Inside a badge / button
+
+Pass `data-icon="inline-start"` (or `"inline-end"`) so the badge/button applies its icon padding:
+
+```html
+<s-badge>
+  <s-icon name="badge-check" data-icon="inline-start"></s-icon>
+  Verified
+</s-badge>
+```
+
+---
+
+<a id="ui-s-native-select"></a>
+
+## Native Select
+
+A styled native `<select>` element. Options are passed as children.
+
+
+```html
+<s-native-select>
+  <option value="1">Option 1</option>
+  <option value="2">Option 2</option>
+  <option value="3">Option 3</option>
+</s-native-select>
+```
+
+> **Note:** The native select uses **shadow DOM** (default) so the `<option>` children can be slotted (a native `<select>` can't render a `<slot>` as options, so the lifecycle clones the slotted options into the select on every render — this keeps them intact when props like `size` change). The selected value is exposed via `data.value` and a `change` event fires with `{ value }`.
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | string | `"default"` | `default` \| `sm` — matches input heights per theme |
+| `disabled` | boolean | `false` | Disables the select |
+| `ariaInvalid` | boolean | `false` | Marks the select as invalid (destructive border + ring) |
+
+The select reuses the input theme tokens (`--input-radius`, `--input-height`, `--input-height-sm`, `--input-font-size`), so its radius/height/font match `<s-input>` per theme.
+
+## Sizes
+
+```html
+<s-native-select>
+  <option>Default</option>
+</s-native-select>
+<s-native-select size="sm">
+  <option>Small</option>
+</s-native-select>
+```
+
+---
+
+<a id="ui-s-switch"></a>
+
+## Switch
+
+A toggle switch control. No children, no slot.
+
+
+
+```html
+<s-switch></s-switch>
+<s-switch default-checked></s-switch>
+<s-switch size="sm" default-checked></s-switch>
+<s-switch disabled></s-switch>
+```
+
+> **Note:** The switch is a self-contained `<button role="switch">`. It renders in shadow DOM by default. `default-checked` sets the initial checked state; clicking toggles it and fires a `change` event with `{ checked }`.
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | string | `"default"` | `default` \| `sm` |
+| `default-checked` | boolean | `false` | Initial checked state |
+| `disabled` | boolean | `false` | Disables the switch |
+
+## Theme tokens
+
+The switch sizes/radius/border vary per theme via `--switch-*` tokens:
+
+| Theme | Track (default) | Thumb | Radius |
+|---|---|---|---|
+| Vega / Nova / Maia / Lyra | 32×18.4 | 16 | full |
+| Mira | 28×16.6 | 14 | full |
+| Luma | 44×20 | 24×16 | full |
+| Sera | 33×18 | 14 | 0 |
+| Rhea | 32×20 | 16 | 16px |
+
+---
+
+<a id="ui-s-component-viewer"></a>
+
+## Component Viewer
+
+A live preview tool for Simply UI components. Shows the component with its default props and slot content, with a config panel to edit props, dark mode, and theme switching.
+
+## Usage
+
+```html
+<s-component-viewer subject="s-button"></s-component-viewer>
+```
+
+
 
 The `component` prop is the path to the component file (without `.html`). It accepts **full or relative URLs** — the last path segment is used as the tag name:
 
@@ -4590,8 +5504,8 @@ The viewer loads the component itself via `get()`.
 
 ## Features
 
-- **Parameter editing** — every prop from the component's `data.doc.props` metadata gets a control
-- **Slot editing** — the slot content is editable via a textarea (updates the preview's children)
+- **Config panel** — every prop from the component's `data.doc.props` metadata gets a control (the `slot` prop is **excluded** — the docs example code shows the slot markup). The panel auto-hides when a component has no props
+- **Live preview** — renders the component with its default props and default slot content (from the docs example code or the component's slot default)
 - **Dark mode toggle** — toggles `.dark` on the document. The viewer opens in **dark mode by default**; the viewer's own UI stays dark regardless, only the **preview area** follows the light/dark theme. The toggle label reflects the current mode ("Light" in dark, "Dark" in light)
 - **Theme switcher** — switches between all 8 themes (Vega, Nova, Maia, Lyra, Mira, Luma, Sera, Rhea)
 - **Multiple viewers stay in sync** — dark/light and theme are page-global; changing them in one viewer updates all viewers on the page (via a `MutationObserver` on `<html>`'s `class`/`data-theme`)
@@ -4604,22 +5518,18 @@ The viewer infers the control type from each prop's metadata:
 |---|---|
 | `options` array | **Radio group** if `options.length <= radioThreshold`, else **select** |
 | boolean default | **Checkbox** |
-| `slot` key | **Textarea** |
 | otherwise | **Text input** |
 
 ## How It Works
 
 1. The viewer reads the target component's `data.doc.props` metadata
-2. It builds a control list from the props
-3. It creates a preview instance of the component and applies the initial prop values
-4. When a control changes, it updates the preview component's prop (or children for slot)
+2. It builds a control list from the props (skipping `slot`)
+3. It creates a preview instance of the component (shadow DOM by default) and applies the initial prop values
+4. It injects the slot content — from the docs example code block that follows the viewer (inner content only), or the component's `data.doc.props.slot.default`
+5. When a control changes, it updates the preview component's prop
 
 ## Example
 
 ```html
-<s-component-viewer isolated component="ui/s-button"></s-component-viewer>
+<s-component-viewer subject="s-button"></s-component-viewer>
 ```
-
-## Live Demo
-
-<s-component-viewer isolated component="ui/s-button"></s-component-viewer>

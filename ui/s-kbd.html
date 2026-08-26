@@ -1,0 +1,46 @@
+<html>
+  <kbd class="s-kbd" data-slot="kbd"><slot>⌘K</slot></kbd>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner kbd controls */
+  :host {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-kbd {
+    pointer-events: none;
+    display: inline-flex;
+    height: var(--kbd-height);
+    width: fit-content;
+    min-width: var(--kbd-height);
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing) * 1);
+    border-radius: var(--kbd-radius);
+    background-color: var(--color-muted);
+    padding-inline: calc(var(--spacing) * 1);
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-muted-foreground);
+    user-select: none;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-kbd",
+        description: "Used to display textual user input from keyboard.",
+        props: {
+          slot: {
+            default: "⌘K"
+          }
+        }
+      }
+    }
+  }
+</script>

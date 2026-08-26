@@ -1,0 +1,116 @@
+<html>
+  <textarea
+    class="s-textarea"
+    data-slot="textarea"
+    id="{{props.id || ''}}"
+    name="{{props.name || ''}}"
+    placeholder="{{props.placeholder || ''}}"
+    ?disabled="{{props.disabled === '' || props.disabled}}"
+    ?required="{{props.required === '' || props.required}}"
+    ?aria-invalid="{{props.ariaInvalid === '' || props.ariaInvalid || props['aria-invalid'] === '' || props['aria-invalid']}}"
+  ></textarea>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner textarea controls.
+     The textarea is a form control — use WITH light (light DOM)
+     so the native <textarea> participates in forms. s-textarea { display:
+     contents } handles the light-DOM host. */
+  :host,
+  s-textarea {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-textarea {
+    box-sizing: border-box; /* theme.css reset only works in light DOM */
+    display: flex;
+    field-sizing: content;
+    min-height: calc(var(--spacing) * 16);
+    width: 100%;
+    border-radius: var(--textarea-radius);
+    border: 1px solid var(--color-input);
+    background-color: transparent;
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+    font-family: inherit;
+    font-size: var(--text-base);
+    box-shadow: var(--shadow-xs);
+    transition:
+      color var(--default-transition-duration)
+        var(--default-transition-timing-function),
+      box-shadow var(--default-transition-duration)
+        var(--default-transition-timing-function);
+    outline: none;
+    color: inherit;
+  }
+
+  /* Placeholder */
+  .s-textarea::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  /* Disabled */
+  .s-textarea:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* Focus */
+  .s-textarea:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  /* Invalid */
+  .s-textarea[aria-invalid] {
+    border-color: var(--color-destructive);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  /* Dark mode (light DOM + shadow DOM) */
+  .dark .s-textarea,
+  :host-context(.dark) .s-textarea {
+    background-color: color-mix(in oklab, var(--color-input) 30%, transparent);
+  }
+
+  .dark .s-textarea[aria-invalid],
+  :host-context(.dark) .s-textarea[aria-invalid] {
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-destructive) 40%, transparent);
+  }
+
+  /* Responsive font */
+  @media (min-width: 768px) {
+    .s-textarea {
+      font-size: var(--textarea-font-size);
+    }
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-textarea",
+        description: "Displays a form textarea or a component that looks like a textarea.",
+        props: {
+          light: {
+            default: true
+          },
+          placeholder: {
+            default: ""
+          },
+          disabled: {
+            default: false
+          },
+          ariaInvalid: {
+            default: false
+          }
+        }
+      }
+    }
+  }
+</script>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 
 <head>
   <meta charset="UTF-8">
@@ -9,27 +9,29 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.1/dist/fonts/geist-sans/style.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="tokens.css">
-  <link rel="stylesheet" href="theme.css">
-  <link rel="stylesheet" href="themes/nova.css">
-  <link rel="stylesheet" href="themes/maia.css">
-  <link rel="stylesheet" href="themes/lyra.css">
-  <link rel="stylesheet" href="themes/mira.css">
-  <link rel="stylesheet" href="themes/luma.css">
-  <link rel="stylesheet" href="themes/sera.css">
-  <link rel="stylesheet" href="themes/rhea.css">
+  <link rel="stylesheet" href="theme.css?v=2">
+  <link rel="stylesheet" href="themes/nova.css?v=3">
+  <link rel="stylesheet" href="themes/maia.css?v=3">
+  <link rel="stylesheet" href="themes/lyra.css?v=3">
+  <link rel="stylesheet" href="themes/mira.css?v=3">
+  <link rel="stylesheet" href="themes/luma.css?v=3">
+  <link rel="stylesheet" href="themes/sera.css?v=3">
+  <link rel="stylesheet" href="themes/rhea.css?v=3">
   <style>
+    /* Demo page chrome is ALWAYS dark (fixed colors, like the viewer's own
+       chrome) so the viewer's dark/light toggle doesn't affect it. Only the
+       component demos + viewer previews follow the theme/dark state. */
     body {
-      background-color: var(--color-background);
-      color: var(--color-foreground);
+      background-color: oklch(20.5% 0 0deg);
+      color: oklch(98.5% 0 0deg);
       font-family: var(--font-sans);
       padding: 2rem;
       max-width: 900px;
       margin: 0 auto;
-      transition: background-color var(--default-transition-duration)
-        var(--default-transition-timing-function);
     }
 
     h1 {
+      color: oklch(98.5% 0 0deg);
       font-size: var(--text-3xl);
       font-weight: var(--font-weight-bold);
       letter-spacing: var(--tracking-tight);
@@ -37,7 +39,7 @@
     }
 
     .intro {
-      color: var(--color-muted-foreground);
+      color: oklch(70.8% 0 0deg);
       font-size: var(--text-sm);
       margin-bottom: 2rem;
     }
@@ -47,11 +49,12 @@
     }
 
     .section h2 {
+      color: oklch(98.5% 0 0deg);
       font-size: var(--text-lg);
       font-weight: var(--font-weight-semibold);
       margin-bottom: 1rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--color-border);
+      border-bottom: 1px solid oklch(100% 0 0deg / 10%);
     }
 
     .row {
@@ -86,30 +89,24 @@
       font-size: var(--text-sm);
     }
 
-    .theme-toggle {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-    }
-
     .theme-switcher {
       position: fixed;
-      top: 3.5rem;
+      top: 1rem;
       right: 1rem;
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
       padding: 0.5rem;
-      border: 1px solid var(--color-border);
+      border: 1px solid oklch(100% 0 0deg / 10%);
       border-radius: var(--radius-md);
-      background-color: var(--color-background);
+      background-color: oklch(14.5% 0 0deg);
       box-shadow: var(--shadow-md);
     }
 
     .theme-switcher button {
       border: none;
       background: transparent;
-      color: var(--color-foreground);
+      color: oklch(98.5% 0 0deg);
       font-size: var(--text-xs);
       padding: 0.25rem 0.5rem;
       border-radius: var(--radius-sm);
@@ -118,18 +115,17 @@
     }
 
     .theme-switcher button:hover {
-      background-color: var(--color-muted);
+      background-color: oklch(100% 0 0deg / 10%);
     }
 
     .theme-switcher button[data-active="true"] {
-      background-color: var(--color-primary);
-      color: var(--color-primary-foreground);
+      background-color: oklch(92.2% 0 0);
+      color: oklch(20.5% 0 0);
     }
   </style>
 </head>
 
 <body>
-  <button class="theme-toggle" onclick="document.documentElement.classList.toggle('dark')">Toggle theme</button>
   <div class="theme-switcher" id="theme-switcher">
     <button data-theme="vega" data-active="true">Vega</button>
     <button data-theme="nova">Nova</button>
@@ -148,27 +144,27 @@
     <h2>Variants</h2>
     <div class="row">
       <span class="row-label">default</span>
-      <s-button isolated variant="default"></s-button>
+      <s-button variant="default"></s-button>
     </div>
     <div class="row">
       <span class="row-label">secondary</span>
-      <s-button isolated variant="secondary"></s-button>
+      <s-button variant="secondary"></s-button>
     </div>
     <div class="row">
       <span class="row-label">outline</span>
-      <s-button isolated variant="outline"></s-button>
+      <s-button variant="outline"></s-button>
     </div>
     <div class="row">
       <span class="row-label">ghost</span>
-      <s-button isolated variant="ghost"></s-button>
+      <s-button variant="ghost"></s-button>
     </div>
     <div class="row">
       <span class="row-label">destructive</span>
-      <s-button isolated variant="destructive"></s-button>
+      <s-button variant="destructive"></s-button>
     </div>
     <div class="row">
       <span class="row-label">link</span>
-      <s-button isolated variant="link"></s-button>
+      <s-button variant="link"></s-button>
     </div>
   </div>
 
@@ -176,35 +172,35 @@
     <h2>Sizes</h2>
     <div class="row">
       <span class="row-label">xs</span>
-      <s-button isolated size="xs"></s-button>
+      <s-button size="xs"></s-button>
     </div>
     <div class="row">
       <span class="row-label">sm</span>
-      <s-button isolated size="sm"></s-button>
+      <s-button size="sm"></s-button>
     </div>
     <div class="row">
       <span class="row-label">default</span>
-      <s-button isolated size="default"></s-button>
+      <s-button size="default"></s-button>
     </div>
     <div class="row">
       <span class="row-label">lg</span>
-      <s-button isolated size="lg"></s-button>
+      <s-button size="lg"></s-button>
     </div>
     <div class="row">
       <span class="row-label">icon</span>
-      <s-button isolated size="icon">★</s-button>
+      <s-button size="icon">★</s-button>
     </div>
     <div class="row">
       <span class="row-label">icon-xs</span>
-      <s-button isolated size="icon-xs">★</s-button>
+      <s-button size="icon-xs">★</s-button>
     </div>
     <div class="row">
       <span class="row-label">icon-sm</span>
-      <s-button isolated size="icon-sm">★</s-button>
+      <s-button size="icon-sm">★</s-button>
     </div>
     <div class="row">
       <span class="row-label">icon-lg</span>
-      <s-button isolated size="icon-lg">★</s-button>
+      <s-button size="icon-lg">★</s-button>
     </div>
   </div>
 
@@ -212,11 +208,11 @@
     <h2>States</h2>
     <div class="row">
       <span class="row-label">disabled</span>
-      <s-button isolated disabled></s-button>
+      <s-button disabled></s-button>
     </div>
     <div class="row">
       <span class="row-label">with icon</span>
-      <s-button isolated>★ Save</s-button>
+      <s-button>★ Save</s-button>
     </div>
   </div>
 
@@ -224,35 +220,35 @@
     <h2>Badge — Variants</h2>
     <div class="row">
       <span class="row-label">default</span>
-      <s-badge isolated variant="default"></s-badge>
+      <s-badge variant="default"></s-badge>
     </div>
     <div class="row">
       <span class="row-label">secondary</span>
-      <s-badge isolated variant="secondary"></s-badge>
+      <s-badge variant="secondary"></s-badge>
     </div>
     <div class="row">
       <span class="row-label">outline</span>
-      <s-badge isolated variant="outline"></s-badge>
+      <s-badge variant="outline"></s-badge>
     </div>
     <div class="row">
       <span class="row-label">destructive</span>
-      <s-badge isolated variant="destructive"></s-badge>
+      <s-badge variant="destructive"></s-badge>
     </div>
     <div class="row">
       <span class="row-label">ghost</span>
-      <s-badge isolated variant="ghost"></s-badge>
+      <s-badge variant="ghost"></s-badge>
     </div>
     <div class="row">
       <span class="row-label">link</span>
-      <s-badge isolated variant="link"></s-badge>
+      <s-badge variant="link"></s-badge>
     </div>
     <div class="row">
       <span class="row-label">as link</span>
-      <a href="#"><s-badge isolated variant="outline">Link Badge</s-badge></a>
+      <a href="#"><s-badge variant="outline">Link Badge</s-badge></a>
     </div>
     <div class="row">
       <span class="row-label">with icon</span>
-      <s-badge isolated variant="secondary">★ New</s-badge>
+      <s-badge variant="secondary">★ New</s-badge>
     </div>
   </div>
 
@@ -260,16 +256,16 @@
     <h2>Label</h2>
     <div class="row">
       <span class="row-label">default</span>
-      <s-label isolated for="email">Email</s-label>
+      <s-label for="email">Email</s-label>
     </div>
     <div class="row">
       <span class="row-label">disabled</span>
-      <s-label isolated disabled>Disabled</s-label>
+      <s-label disabled>Disabled</s-label>
     </div>
     <div class="row">
       <span class="row-label">with input</span>
       <div class="field">
-        <s-label isolated for="name">Name</s-label>
+        <s-label for="name">Name</s-label>
         <input id="name" class="s-input" placeholder="Enter your name">
       </div>
     </div>
@@ -324,25 +320,338 @@
   </div>
 
   <div class="section">
+    <h2>Input</h2>
+    <div class="row">
+      <span class="row-label">default</span>
+      <div style="width: 100%">
+        <s-input light placeholder="Enter text"></s-input>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">with label</span>
+      <div class="field" style="width: 100%">
+        <s-label for="input-email">Email</s-label>
+        <s-input light id="input-email" type="email" placeholder="name@example.com"></s-input>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">disabled</span>
+      <div style="width: 100%">
+        <s-input light placeholder="Cannot edit" disabled></s-input>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">invalid</span>
+      <div style="width: 100%">
+        <s-input light placeholder="This field has an error" aria-invalid></s-input>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">file</span>
+      <div style="width: 100%">
+        <s-input light type="file"></s-input>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Kbd</h2>
+    <div class="row">
+      <span class="row-label">basic</span>
+      <div style="display: flex; align-items: center; gap: 0.5rem">
+        <s-kbd>Ctrl</s-kbd>
+        <s-kbd>⌘K</s-kbd>
+        <s-kbd>Ctrl + B</s-kbd>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">group</span>
+      <div style="display: flex; align-items: center; gap: 0.5rem">
+        <s-kbd-group>
+          <s-kbd>⌘</s-kbd>
+          <s-kbd>⇧</s-kbd>
+          <s-kbd>⌥</s-kbd>
+          <s-kbd>⌃</s-kbd>
+        </s-kbd-group>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">in button</span>
+      <div style="display: flex; align-items: center; gap: 0.5rem">
+        <s-button variant="outline" size="sm">Accept <s-kbd>⏎</s-kbd></s-button>
+        <s-button variant="outline" size="sm">Cancel <s-kbd>Esc</s-kbd></s-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Textarea</h2>
+    <div class="row">
+      <span class="row-label">default</span>
+      <div style="width: 100%">
+        <s-textarea light placeholder="Type your message here."></s-textarea>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">with label</span>
+      <div class="field" style="width: 100%">
+        <s-label for="textarea-message">Message</s-label>
+        <s-textarea light id="textarea-message" placeholder="Type your message here."></s-textarea>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">disabled</span>
+      <div style="width: 100%">
+        <s-textarea light placeholder="Cannot edit" disabled></s-textarea>
+      </div>
+    </div>
+    <div class="row">
+      <span class="row-label">invalid</span>
+      <div style="width: 100%">
+        <s-textarea light placeholder="This field has an error" aria-invalid></s-textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Field</h2>
+    <div class="row">
+      <span class="row-label">vertical</span>
+      <s-field style="width: 100%">
+        <s-field-label for="field-username">Username</s-field-label>
+        <s-input light id="field-username" placeholder="Enter your username"></s-input>
+      </s-field>
+    </div>
+    <div class="row">
+      <span class="row-label">disabled</span>
+      <s-field style="width: 100%">
+        <s-field-label for="field-disabled" disabled>Disabled</s-field-label>
+        <s-input light id="field-disabled" placeholder="Cannot edit" disabled></s-input>
+      </s-field>
+    </div>
+    <div class="row">
+      <span class="row-label">description</span>
+      <s-field style="width: 100%">
+        <s-field-label for="field-email">Email</s-field-label>
+        <s-input light id="field-email" type="email" placeholder="name@example.com"></s-input>
+        <s-field-description>We'll never share your email with anyone.</s-field-description>
+      </s-field>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Field Group</h2>
+    <div class="row">
+      <span class="row-label">group</span>
+      <s-field-group style="width: 100%; max-width: 320px">
+        <s-field-set>
+          <s-field-label>Responses</s-field-label>
+          <s-field-description>Get notified when ChatGPT responds to requests that take time, like research or image generation.</s-field-description>
+          <s-field-group data-slot="checkbox-group">
+            <s-field orientation="horizontal">
+              <s-checkbox id="push" default-checked disabled></s-checkbox>
+              <s-field-label for="push">Push notifications</s-field-label>
+            </s-field>
+          </s-field-group>
+        </s-field-set>
+        <s-field-separator></s-field-separator>
+        <s-field-set>
+          <s-field-label>Tasks</s-field-label>
+          <s-field-description>Get notified when tasks you've created have updates. <a href="#">Manage tasks</a></s-field-description>
+          <s-field-group data-slot="checkbox-group">
+            <s-field orientation="horizontal">
+              <s-checkbox id="push-tasks"></s-checkbox>
+              <s-field-label for="push-tasks">Push notifications</s-field-label>
+            </s-field>
+            <s-field orientation="horizontal">
+              <s-checkbox id="email-tasks"></s-checkbox>
+              <s-field-label for="email-tasks">Email notifications</s-field-label>
+            </s-field>
+          </s-field-group>
+        </s-field-set>
+      </s-field-group>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Input Group</h2>
+    <div class="row">
+      <span class="row-label">search</span>
+      <s-input-group style="width: 100%; max-width: 320px">
+        <s-input-group-input light placeholder="Search..."></s-input-group-input>
+        <s-input-group-addon>🔍</s-input-group-addon>
+      </s-input-group>
+    </div>
+    <div class="row">
+      <span class="row-label">text</span>
+      <s-input-group style="width: 100%; max-width: 320px">
+        <s-input-group-addon>
+          <s-input-group-text>https://</s-input-group-text>
+        </s-input-group-addon>
+        <s-input-group-input light placeholder="example.com"></s-input-group-input>
+        <s-input-group-addon align="inline-end">
+          <s-input-group-text>.com</s-input-group-text>
+        </s-input-group-addon>
+      </s-input-group>
+    </div>
+    <div class="row">
+      <span class="row-label">button</span>
+      <s-input-group style="width: 100%; max-width: 320px">
+        <s-input-group-input light placeholder="Enter your username"></s-input-group-input>
+        <s-input-group-addon align="inline-end">
+          <s-input-group-button>Send</s-input-group-button>
+        </s-input-group-addon>
+      </s-input-group>
+    </div>
+    <div class="row">
+      <span class="row-label">textarea</span>
+      <s-input-group style="width: 100%; max-width: 320px">
+        <s-input-group-textarea light placeholder="Enter your message"></s-input-group-textarea>
+        <s-input-group-addon align="block-end">
+          <s-input-group-button>Send</s-input-group-button>
+        </s-input-group-addon>
+      </s-input-group>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Primitives</h2>
+    <div class="row">
+      <span class="row-label">spinner</span>
+      <s-spinner></s-spinner>
+    </div>
+    <div class="row">
+      <span class="row-label">spinner in button</span>
+      <s-button disabled>
+        <s-spinner></s-spinner>
+        Loading
+      </s-button>
+    </div>
+    <div class="row">
+      <span class="row-label">native select</span>
+      <s-native-select>
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+        <option value="3">Option 3</option>
+      </s-native-select>
+    </div>
+    <div class="row">
+      <span class="row-label">native select sm</span>
+      <s-native-select size="sm">
+        <option value="1">Option 1</option>
+        <option value="2">Option 2</option>
+      </s-native-select>
+    </div>
+    <div class="row">
+      <span class="row-label">switch</span>
+      <s-switch></s-switch>
+    </div>
+    <div class="row">
+      <span class="row-label">switch checked</span>
+      <s-switch default-checked></s-switch>
+    </div>
+    <div class="row">
+      <span class="row-label">switch sm</span>
+      <s-switch size="sm" default-checked></s-switch>
+    </div>
+    <div class="row">
+      <span class="row-label">switch disabled</span>
+      <s-switch disabled></s-switch>
+    </div>
+  </div>
+
+  <div class="section">
     <h2>Component Viewer</h2>
-    <s-component-viewer isolated component="s-button"></s-component-viewer>
+    <s-component-viewer subject="s-button"></s-component-viewer>
     <div style="height: 2rem"></div>
-    <s-component-viewer isolated component="s-badge"></s-component-viewer>
+    <s-component-viewer subject="s-badge"></s-component-viewer>
     <div style="height: 2rem"></div>
-    <s-component-viewer isolated component="s-label"></s-component-viewer>
+    <s-component-viewer subject="s-label"></s-component-viewer>
     <div style="height: 2rem"></div>
-    <s-component-viewer isolated component="s-separator"></s-component-viewer>
+    <s-component-viewer subject="s-separator"></s-component-viewer>
     <div style="height: 2rem"></div>
-    <s-component-viewer isolated component="s-skeleton"></s-component-viewer>
+    <s-component-viewer subject="s-skeleton"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-input"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-kbd"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-textarea"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-label"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-description"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-group"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-set"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-separator"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-content"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-error"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-legend"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-field-title"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-checkbox"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-input-group"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-input-group-input"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-input-group-addon"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-input-group-text"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-input-group-textarea"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-input-group-button"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-spinner"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-native-select"></s-component-viewer>
+    <div style="height: 2rem"></div>
+    <s-component-viewer subject="s-switch"></s-component-viewer>
   </div>
 
   <script src="../simply.js"></script>
   <script>
     get("s-button.html");
+    get("s-button-group.html");
     get("s-badge.html");
     get("s-label.html");
     get("s-separator.html");
     get("s-skeleton.html");
+    get("s-input.html");
+    get("s-kbd.html");
+    get("s-kbd-group.html");
+    get("s-textarea.html");
+    get("s-field-label.html");
+    get("s-field-description.html");
+    get("s-field-group.html");
+    get("s-field-set.html");
+    get("s-field-separator.html");
+    get("s-field.html");
+    get("s-field-content.html");
+    get("s-field-error.html");
+    get("s-field-legend.html");
+    get("s-field-title.html");
+    get("s-checkbox.html");
+    get("s-input-group.html");
+    get("s-input-group-input.html");
+    get("s-input-group-addon.html");
+    get("s-input-group-text.html");
+    get("s-input-group-textarea.html");
+    get("s-input-group-button.html");
+    get("s-spinner.html");
+    get("s-native-select.html");
+    get("s-switch.html");
+    get("s-icon.html");
     get("s-component-viewer.html");
 
     // Theme switcher

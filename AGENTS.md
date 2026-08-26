@@ -18,7 +18,7 @@ These cover the component/template/script/style syntax, router, state management
 - `docs/agents/` — the AI/agents-facing docs (this area). Keep `agents.md` / `ai-docs.md` in sync with reality; don't leave stale `TBD`s once something ships.
 - `scripts/build-llms.mjs` — regenerates `llms.txt` and `llms-full.txt` from `docs/`. Run `node scripts/build-llms.mjs` from the repo root after any docs change, before deploying. Zero dependencies (Node core only).
 - `components/` — design-system component explorations (WIP, not all linked from the docs nav yet).
-- `ui/` — the shadcn-based UI component system (native CSS, no Tailwind). **Read `ui/README.md` before working here** — it documents the architecture, decisions, component-authoring conventions, and critical simply.js gotchas (isolated/shadow DOM + native `<slot>`, `:host-context(.dark)`, `{{...}}` syntax, etc.).
+- `ui/` — the shadcn-based UI component system (native CSS, no Tailwind). **Read `ui/README.md` before working here** — it documents the architecture, decisions, component-authoring conventions, and critical simply.js gotchas (shadow DOM default + `light` opt-out + native `<slot>`, `:host-context(.dark)`, `{{...}}` syntax, etc.).
 - `examples/` — numbered, runnable examples (plain static HTML/JS; open directly or serve with any static file server).
 - `repl/` — the `<repl-component>` playground/REPL widget embedded in the docs.
 - `vscode-ext/` — VS Code syntax highlighting extension for `.html` single-file components.

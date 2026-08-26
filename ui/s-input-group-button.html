@@ -1,0 +1,210 @@
+<html>
+  <button
+    class="s-input-group-button"
+    data-slot="input-group-button"
+    data-variant="{{props.variant || 'ghost'}}"
+    data-size="{{props.size || 'xs'}}"
+    ?disabled="{{props.disabled === '' || props.disabled}}"
+  >
+    <slot>Button</slot>
+  </button>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner button controls.
+     s-input-group-button { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-input-group-button {
+    display: contents;
+  }
+
+  /* ---- Base (mirrors s-button base) ---- */
+  .s-input-group-button {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    color: inherit;
+    background-color: transparent;
+    font-family: inherit;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    transition: all var(--default-transition-duration)
+      var(--default-transition-timing-function);
+    outline: none;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .s-input-group-button:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px
+      color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  .s-input-group-button:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .s-input-group-button > svg {
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  /* ---- Variants (mirror s-button) ---- */
+  .s-input-group-button[data-variant="default"] {
+    background-color: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+
+  .s-input-group-button[data-variant="default"]:hover {
+    background-color: color-mix(in oklab, var(--color-primary) 80%, transparent);
+  }
+
+  .s-input-group-button[data-variant="outline"] {
+    border-color: var(--color-border);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .s-input-group-button[data-variant="outline"]:hover {
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+  }
+
+  :host-context(.dark) .s-input-group-button[data-variant="outline"] {
+    border-color: var(--color-input);
+    background-color: color-mix(in oklab, var(--color-input) 30%, transparent);
+  }
+
+  :host-context(.dark) .s-input-group-button[data-variant="outline"]:hover {
+    background-color: color-mix(in oklab, var(--color-input) 50%, transparent);
+  }
+
+  .s-input-group-button[data-variant="secondary"] {
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-foreground);
+  }
+
+  .s-input-group-button[data-variant="secondary"]:hover {
+    background-color: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+  }
+
+  .s-input-group-button[data-variant="ghost"] {
+    background-color: transparent;
+  }
+
+  .s-input-group-button[data-variant="ghost"]:hover {
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+  }
+
+  :host-context(.dark) .s-input-group-button[data-variant="ghost"]:hover {
+    background-color: color-mix(in oklab, var(--color-muted) 50%, transparent);
+  }
+
+  .s-input-group-button[data-variant="destructive"] {
+    background-color: color-mix(in oklab, var(--color-destructive) 10%, transparent);
+    color: var(--color-destructive);
+  }
+
+  .s-input-group-button[data-variant="destructive"]:hover {
+    background-color: color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  :host-context(.dark) .s-input-group-button[data-variant="destructive"] {
+    background-color: color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  .s-input-group-button[data-variant="link"] {
+    color: var(--color-primary);
+    text-underline-offset: 4px;
+  }
+
+  .s-input-group-button[data-variant="link"]:hover {
+    text-decoration: underline;
+  }
+
+  /* ---- Sizes (input-group-button: xs, icon-xs, sm, icon-sm) ---- */
+  .s-input-group-button[data-size="xs"] {
+    height: var(--button-height-xs);
+    gap: var(--button-gap-xs);
+    border-radius: var(--button-radius-xs);
+    padding-inline: var(--button-padding-xs);
+    font-size: var(--button-font-size-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .s-input-group-button[data-size="xs"] > svg {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+  }
+
+  .s-input-group-button[data-size="sm"] {
+    height: var(--button-height-sm);
+    gap: var(--button-gap-sm);
+    border-radius: var(--button-radius-sm);
+    padding-inline: var(--button-padding-sm);
+    font-size: var(--button-font-size-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  .s-input-group-button[data-size="sm"] > svg {
+    width: calc(var(--spacing) * 3.5);
+    height: calc(var(--spacing) * 3.5);
+  }
+
+  .s-input-group-button[data-size="icon-xs"] {
+    width: var(--button-size-icon-xs);
+    height: var(--button-size-icon-xs);
+    border-radius: var(--button-radius-xs);
+  }
+
+  .s-input-group-button[data-size="icon-xs"] > svg {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
+  }
+
+  .s-input-group-button[data-size="icon-sm"] {
+    width: var(--button-size-icon-sm);
+    height: var(--button-size-icon-sm);
+    border-radius: var(--button-radius-sm);
+  }
+
+  .s-input-group-button[data-size="icon-sm"] > svg {
+    width: calc(var(--spacing) * 3.5);
+    height: calc(var(--spacing) * 3.5);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-input-group-button",
+        description: "A button for use inside an input group.",
+        props: {
+          size: {
+            default: "xs",
+            options: ["xs", "icon-xs", "sm", "icon-sm"]
+          },
+          variant: {
+            default: "ghost",
+            options: ["default", "destructive", "outline", "secondary", "ghost", "link"]
+          },
+          disabled: {
+            default: false
+          },
+          slot: {
+            default: "Button"
+          }
+        }
+      }
+    }
+  }
+</script>

@@ -1,0 +1,74 @@
+<html>
+  <fieldset class="s-field-set" data-slot="field-set">
+    <slot></slot>
+  </fieldset>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner fieldset controls.
+     s-field-set { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-set {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-set {
+    display: flex;
+    flex-direction: column;
+    gap: var(--field-set-gap, calc(var(--spacing) * 6));
+    /* reset <fieldset> UA defaults (theme.css reset only works in light DOM) */
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  /* Tighter spacing when the set contains a checkbox/radio group.
+     :has() can't cross the shadow boundary and :host:has() isn't applied
+     reliably, so the lifecycle sets data-checkbox-group on the host. */
+  :host([data-checkbox-group]),
+  :host([data-radio-group]) {
+    --field-set-gap: calc(var(--spacing) * 3);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field-set",
+        description: "Semantic grouping of fields with a legend.",
+        props: {
+          slot: {
+            default: `<s-field-group>
+  <s-field>
+    <s-field-label for="username">Username</s-field-label>
+    <s-input light id="username" type="text" placeholder="Max Leiter"></s-input>
+    <s-field-description>Choose a unique username for your account.</s-field-description>
+  </s-field>
+  <s-field>
+    <s-field-label for="password">Password</s-field-label>
+    <s-field-description>Must be at least 8 characters long.</s-field-description>
+    <s-input light id="password" type="password" placeholder="••••••••"></s-input>
+  </s-field>
+</s-field-group>`
+          }
+        }
+      }
+    }
+    lifecycle = {
+      afterFirstRender: function () {
+        var slot = dom.querySelector("slot");
+        var hasCheckboxGroup = slot && slot.assignedNodes().some(function (n) {
+          return n.nodeType === 1 && n.getAttribute && n.getAttribute("data-slot") === "checkbox-group";
+        });
+        var hasRadioGroup = slot && slot.assignedNodes().some(function (n) {
+          return n.nodeType === 1 && n.getAttribute && n.getAttribute("data-slot") === "radio-group";
+        });
+        if (hasCheckboxGroup) component.setAttribute("data-checkbox-group", "");
+        if (hasRadioGroup) component.setAttribute("data-radio-group", "");
+      }
+    }
+  }
+</script>

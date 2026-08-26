@@ -3,7 +3,7 @@
 
 ## Add it to your app
 
-You can integrate Simply.js into your application by adding a `<script>` tag. Ensure it is placed just before the closing `</body>` tag.
+You can integrate simply.js into your application by adding a `<script>` tag. Ensure it is placed just before the closing `</body>` tag.
 
 ```html
 <script src="https://simply.js.org/simply.min.js"></script>
@@ -11,7 +11,7 @@ You can integrate Simply.js into your application by adding a `<script>` tag. En
 
 ## Create a Component
 
-Your page is now ready to interact with Simply.js components. Simply.js components are structured into three main sections: `template`, `style`, and `script`. While more details are available in the [component structure](docs/component-structure) section, let's quickly get started. Create a `hello-world.html` file with the content below and save it to the same folder as the application where you initially added Simply.js.
+Your page is now ready to interact with simply.js components. simply.js components are structured into three main sections: `template`, `style`, and `script`. While more details are available in the [component structure](docs/component-structure) section, let's quickly get started. Create a `hello-world.html` file with the content below and save it to the same folder as the application where you initially added simply.js.
 
 ```html
 <html>
@@ -37,7 +37,7 @@ Your page is now ready to interact with Simply.js components. Simply.js componen
 
 ## Use the Component
 
-You can use Simply.js's `get()` function to load your component anywhere in your application or page, as shown below.
+You can use simply.js's `get()` function to load your component anywhere in your application or page, as shown below.
 
 ```js
 get("hello-world.html");

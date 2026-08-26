@@ -1,6 +1,6 @@
 # Go
 
-**Go** is the full-featured SPA router of Simply JS, forked from **Page.js**. It’s tightly integrated with the template syntax and reactivity system.
+**Go** is the full-featured SPA router of simply.js, forked from **Page.js**. It’s tightly integrated with the template syntax and reactivity system.
 
 In addition to the default Page.js features, it supports **nested routes**, **dynamic route creation**, **enter/exit transitions**, auto **web component integration**. 
 
@@ -39,7 +39,7 @@ simply.go.setup(
 		{
 			path: "/", // The path of the route
 			component: "home-page", // The component's tag name
-			isolated: true, // Default: false — use shadow DOM
+			light: true, // Default: false — render in light DOM (shadow DOM is default)
 			cache: true, // Default: false — keep data/props in memory, restore on revisit
 			same_page_refresh: true, // Default: false — re-render on same-route navigation
 			title: "Home Page" // Sets the document title after routing
@@ -135,7 +135,7 @@ See `examples/08-go/cache/` for a live demo: initial visit fetches, second visit
 
 ## Nested Routes
 
-You can define child routes inside a `children` array. Nesting can be as deep as you want. Simply.js will look for a `<route></route>` tag inside the parent component to render the nested component. All properties available for top-level routes can also be applied to children.
+You can define child routes inside a `children` array. Nesting can be as deep as you want. simply.js will look for a `<route></route>` tag inside the parent component to render the nested component. All properties available for top-level routes can also be applied to children.
 
 ```js
 simply.go.setup([
@@ -317,7 +317,7 @@ class simply {
 }
 ```
 
-> **Note:** Use `behavior: 'instant'` if the target may re-render right after (smooth scroll can be interrupted). If your anchor is inside an `isolated` child, query its shadow root via `component.querySelector('child').shadowRoot.querySelector('#hash')`.
+> **Note:** Use `behavior: 'instant'` if the target may re-render right after (smooth scroll can be interrupted). If your anchor is inside a shadow-DOM child, query its shadow root via `component.querySelector('child').shadowRoot.querySelector('#hash')`.
 
 Live demo: `examples/08-go/hash/` — shell anchors (`#a`/`#b`) use native scroll; `section?name=tana#subsection` navigates and scrolls via `routerEnter`.
 
@@ -424,7 +424,7 @@ You can fade/rise the content pieces together with the line by giving them a cla
 /* 
  * IMPORTANT: We must prevent transitions defined within a component 
  * from leaking to parent or child components. If the component is 
- * not isolated, we can achieve this by strictly using the child 
+ * in light DOM, we can achieve this by strictly using the child 
  * combinator (>) to select the relevant elements. 
  */
 company-page > .fx {

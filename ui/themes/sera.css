@@ -56,6 +56,47 @@
   --label-font-weight: var(--font-weight-semibold);
   --label-text-transform: uppercase;
   --label-letter-spacing: var(--tracking-wide);
+
+  /* Input — Sera (rounded-none, h-10, underline style) */
+  --input-radius: 0;
+  --input-height: calc(var(--spacing) * 10);
+  --input-height-xs: calc(var(--spacing) * 7);
+  --input-height-sm: calc(var(--spacing) * 9);
+  --input-height-default: calc(var(--spacing) * 10);
+  --input-height-lg: calc(var(--spacing) * 11);
+
+  /* Textarea — Sera (rounded-none) */
+  --textarea-radius: 0;
+
+  /* Skeleton — Sera (rounded-none) */
+  --skeleton-radius: 0;
+
+  /* Kbd — Sera (rounded-none, h-5.5) */
+  --kbd-radius: 0;
+  --kbd-height: calc(var(--spacing) * 5.5);
+  /* Switch — Sera (square: 33x18, thumb 14, rounded-none) */
+  --switch-radius: 0;
+  --switch-width-default: 33px;
+  --switch-height-default: 18px;
+  --switch-width-sm: 25px;
+  --switch-height-sm: 14px;
+  --switch-thumb-width-default: calc(var(--spacing) * 3.5);
+  --switch-thumb-height-default: calc(var(--spacing) * 3.5);
+  --switch-thumb-width-sm: calc(var(--spacing) * 2.5);
+  --switch-thumb-height-sm: calc(var(--spacing) * 2.5);
+  --switch-border-width: 1px;
+  --switch-thumb-translate: calc(100% + 2px);
+
+  /* Native Select — Sera (pl-0, py-2, icon right-0) */
+  --native-select-padding-x: 0;
+  --native-select-padding-right: calc(var(--spacing) * 8);
+  --native-select-padding-y: calc(var(--spacing) * 2);
+  --native-select-icon-right: 0;
+  /* Field family — Sera (large group gap) */
+  --field-set-gap: calc(var(--spacing) * 6);
+  --field-group-gap: calc(var(--spacing) * 10);
+  --field-gap: calc(var(--spacing) * 3);
+  --field-content-gap: calc(var(--spacing) * 1);
 }
 
 [data-theme="sera"].dark {

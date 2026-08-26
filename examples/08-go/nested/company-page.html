@@ -11,8 +11,8 @@
 </html>
 
 <style>
-	/* root selector = component tag name — this component is not shadow-isolated */
-	company-page {
+	/* root selector = :host (shadow DOM default) + tag name (light DOM) */
+	:host, company-page {
 		display: block;
 		font-family: system-ui, sans-serif;
 		color: #1e293b;
@@ -20,7 +20,7 @@
 	}
 
 	/* progress line — grows on enter, shrinks on exit */
-	company-page > line {
+	:host > line, company-page > line {
 		display: block;
 		height: 4px;
 		border-radius: 999px;
@@ -31,7 +31,7 @@
 		width: 0;
 		transition: width 400ms ease-in-out;
 	}
-	company-page[enter] > line {
+	:host([enter]) > line, company-page[enter] > line {
 		width: 100%;
 		transition: width 800ms cubic-bezier(.22, 1, .36, 1);
 	}
@@ -41,36 +41,36 @@
 	   - exit total (250ms, no delay) stays under the line's 400ms exit
 	   - enter totals (delay + 450ms) stay under the line's 800ms enter
 	     d1 120+450=570 · d2 220+450=670 · d3 320+450=770 */
-	company-page > .fx {
+	:host > .fx, company-page > .fx {
 		opacity: 0;
 		transform: translateY(8px);
 		transition: opacity .25s ease, transform .25s ease;
 	}
-	company-page[enter] > .fx {
+	:host([enter]) > .fx, company-page[enter] > .fx {
 		opacity: 1;
 		transform: none;
 		transition: opacity .45s ease, transform .45s cubic-bezier(.22, 1, .36, 1);
 	}
-	company-page[enter] > .fx.d1 { transition-delay: .12s; }
-	company-page[enter] > .fx.d2 { transition-delay: .22s; }
-	company-page[enter] > .fx.d3 { transition-delay: .32s; }
+	:host([enter]) > .fx.d1, company-page[enter] > .fx.d1 { transition-delay: .12s; }
+	:host([enter]) > .fx.d2, company-page[enter] > .fx.d2 { transition-delay: .22s; }
+	:host([enter]) > .fx.d3, company-page[enter] > .fx.d3 { transition-delay: .32s; }
 
-	company-page h2 {
+	:host h2, company-page h2 {
 		margin: 0 0 4px;
 		font-size: 20px;
 		color: #0f172a;
 	}
-	company-page .tagline {
+	:host .tagline, company-page .tagline {
 		margin: 0 0 14px;
 		color: #64748b;
 		font-size: 13px;
 	}
-	company-page .links {
+	:host .links, company-page .links {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
 	}
-	company-page .links a {
+	:host .links a, company-page .links a {
 		padding: 6px 12px;
 		border: 1px solid #e2e8f0;
 		border-radius: 999px;
@@ -79,11 +79,11 @@
 		text-decoration: none;
 		font-size: 13px;
 	}
-	company-page .links a:hover {
+	:host .links a:hover, company-page .links a:hover {
 		border-color: #3b82f6;
 		color: #3b82f6;
 	}
-	company-page .links a[go-active] {
+	:host .links a[go-active], company-page .links a[go-active] {
 		color: #3b82f6;
 		border-color: #3b82f6;
 		background: #fff;
@@ -91,7 +91,7 @@
 	}
 
 	/* nested outlet — this box holds everything nested under /company */
-	company-page route {
+	:host route, company-page route {
 		display: block;
 		margin-top: 14px;
 		padding: 12px 14px;

@@ -1,6 +1,6 @@
 # AI Docs Access
 
-This page describes how AI agents can access the Simply.js documentation. There are three ways to do it, depending on what you need.
+This page describes how AI agents can access the simply.js documentation. There are three ways to do it, depending on what you need.
 
 ## 1. Single, complete Markdown file (recommended for one-shot ingestion)
 

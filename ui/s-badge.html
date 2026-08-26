@@ -62,6 +62,12 @@
     height: calc(var(--spacing) * 3);
   }
 
+  /* s-icon (lucide): --s-icon-size set on the host inherits into slotted
+     <s-icon>'s shadow DOM, sizing it to the badge's 12px icon. */
+  :host {
+    --s-icon-size: calc(var(--spacing) * 3);
+  }
+
   /* Icon positioning */
   .s-badge:has([data-icon="inline-end"]) {
     padding-right: calc(var(--spacing) * 1.5);
@@ -145,6 +151,7 @@
 
   .s-badge[data-variant="ghost"] {
     background-color: transparent;
+    color: var(--color-foreground);
   }
 
   .s-badge[data-variant="ghost"]:hover {

@@ -2,7 +2,7 @@
 
 This section describes the rendering portion of a component. Elements within the `<html>` tag are mounted to the DOM after being processed by the template syntax. While most components include an `<html>` tag, it is not mandatory; some components may only contain a `<script>` tag with their logic.
 
-The Simply.js template syntax operates within the `<html>` tag, functioning as a superset of HTML. This syntax supports [conditionals](docs/conditionals.md), [each loops](docs/loops.md), [reactive variables](docs/variables.md), [DOM events](docs/dom-events.md), [slots](docs/slot.md), and [nested components](docs/nested-components.md).
+The simply.js template syntax operates within the `<html>` tag, functioning as a superset of HTML. This syntax supports [conditionals](docs/conditionals.md), [each loops](docs/loops.md), [reactive variables](docs/variables.md), [DOM events](docs/dom-events.md), [slots](docs/slot.md), and [nested components](docs/nested-components.md).
 
 ?> Reactive variables are written with double curly braces, like `{{data.name}}`. You can reach all of `{{data}}`, `{{props}}`, `{{state}}`, `{{parent}}`, `{{dom}}`, `{{methods}}`, `{{component}}`, `{{lifecycle}}` and `{{name}}` defined in the script tag.
 

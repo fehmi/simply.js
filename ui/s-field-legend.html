@@ -1,0 +1,52 @@
+<html>
+  <legend
+    class="s-field-legend"
+    data-slot="field-legend"
+    data-variant="{{props.variant || 'legend'}}"
+  >
+    <slot>Legend</slot>
+  </legend>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner legend controls.
+     s-field-legend { display: contents } handles the LIGHT DOM case. */
+  :host,
+  s-field-legend {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-field-legend {
+    margin-bottom: calc(var(--spacing) * 3);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .s-field-legend[data-variant="legend"] {
+    font-size: var(--field-legend-font-size);
+  }
+
+  .s-field-legend[data-variant="label"] {
+    font-size: var(--font-size-sm);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-field-legend",
+        description: "Legend element for a field set.",
+        props: {
+          variant: {
+            default: "legend",
+            options: ["legend", "label"]
+          },
+          slot: {
+            default: "Profile"
+          }
+        }
+      }
+    }
+  }
+</script>

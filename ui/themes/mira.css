@@ -34,4 +34,51 @@
   /* Label — Mira (text-xs, relaxed line-height) */
   --label-font-size: var(--text-xs);
   --label-line-height: var(--leading-relaxed);
+
+  /* Input — Mira (rounded-md, h-7, text-xs) */
+  --input-radius: var(--radius-md);
+  --input-height: calc(var(--spacing) * 7);
+  --input-height-xs: calc(var(--spacing) * 5);
+  --input-height-sm: calc(var(--spacing) * 6);
+  --input-height-default: calc(var(--spacing) * 7);
+  --input-height-lg: calc(var(--spacing) * 8);
+
+  /* Textarea — Mira (rounded-md, text-xs) */
+  --textarea-radius: var(--radius-md);
+
+  /* Small text — Mira (text-xs) */
+  --font-size-sm: var(--text-xs);
+  --field-legend-font-size: var(--text-sm);
+
+  /* Skeleton — Mira (rounded-md) */
+  --skeleton-radius: var(--radius-md);
+
+  /* Kbd — Mira (rounded-sm, h-5) */
+  --kbd-radius: var(--radius-sm);
+  --kbd-height: calc(var(--spacing) * 5);
+
+  /* Switch — Mira (smaller: 28x16.6, thumb 14) */
+  --switch-radius: var(--radius-rounded);
+  --switch-width-default: calc(var(--spacing) * 7);
+  --switch-height-default: 16.6px;
+  --switch-width-sm: calc(var(--spacing) * 6);
+  --switch-height-sm: calc(var(--spacing) * 3.5);
+  --switch-thumb-width-default: calc(var(--spacing) * 3.5);
+  --switch-thumb-height-default: calc(var(--spacing) * 3.5);
+  --switch-thumb-width-sm: calc(var(--spacing) * 3);
+  --switch-thumb-height-sm: calc(var(--spacing) * 3);
+  --switch-border-width: 1px;
+  --switch-thumb-translate: calc(100% - 2px);
+
+  /* Native Select — Mira (pl-2, pr-6, py-0.5, icon right-1.5) */
+  --native-select-padding-x: calc(var(--spacing) * 2);
+  --native-select-padding-right: calc(var(--spacing) * 6);
+  --native-select-padding-y: calc(var(--spacing) * 0.5);
+  --native-select-icon-right: calc(var(--spacing) * 1.5);
+
+  /* Field family — Mira (compact gaps) */
+  --field-set-gap: calc(var(--spacing) * 4);
+  --field-group-gap: calc(var(--spacing) * 4);
+  --field-gap: calc(var(--spacing) * 2);
+  --field-content-gap: calc(var(--spacing) * 0.5);
 }

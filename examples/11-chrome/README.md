@@ -1,4 +1,4 @@
-# Simply.js Chrome Extension Example
+# simply.js Chrome Extension Example
 
 A minimal Chrome extension (Manifest V3) whose popup is a simply.js app with hashbang routing — the same `<base>` + `hashbang: true` pattern used by the Electron example, working on the `chrome-extension://` protocol.
 

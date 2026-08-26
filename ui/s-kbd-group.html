@@ -1,0 +1,33 @@
+<html>
+  <kbd class="s-kbd-group" data-slot="kbd-group"><slot></slot></kbd>
+</html>
+
+<style>
+  /* Host: doesn't affect layout in shadow DOM; inner kbd controls */
+  :host {
+    display: contents;
+  }
+
+  /* ---- Base (original shadcn v4) ---- */
+  .s-kbd-group {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-kbd-group",
+        description: "Groups keyboard keys together.",
+        props: {
+          slot: {
+            default: ""
+          }
+        }
+      }
+    }
+  }
+</script>

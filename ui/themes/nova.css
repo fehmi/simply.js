@@ -19,4 +19,46 @@
   --button-size-icon-sm: calc(var(--spacing) * 7);
   --button-size-icon-lg: calc(var(--spacing) * 9);
   --button-font-size-sm: 0.8rem;
+
+  /* Input — Nova (rounded-lg, h-8) */
+  --input-radius: var(--radius-lg);
+  --input-height: calc(var(--spacing) * 8);
+  --input-height-sm: calc(var(--spacing) * 7);
+  --input-height-default: calc(var(--spacing) * 8);
+  --input-height-lg: calc(var(--spacing) * 9);
+
+  /* Textarea — Nova (rounded-lg) */
+  --textarea-radius: var(--radius-lg);
+
+  /* Skeleton — Nova (rounded-md) */
+  --skeleton-radius: var(--radius-md);
+
+  /* Kbd — Nova (rounded-sm, h-5) */
+  --kbd-radius: var(--radius-sm);
+  --kbd-height: calc(var(--spacing) * 5);
+
+  /* Switch — Nova (same as vega) */
+  --switch-radius: var(--radius-rounded);
+  --switch-width-default: calc(var(--spacing) * 8);
+  --switch-height-default: 18.4px;
+  --switch-width-sm: calc(var(--spacing) * 6);
+  --switch-height-sm: calc(var(--spacing) * 3.5);
+  --switch-thumb-width-default: calc(var(--spacing) * 4);
+  --switch-thumb-height-default: calc(var(--spacing) * 4);
+  --switch-thumb-width-sm: calc(var(--spacing) * 3);
+  --switch-thumb-height-sm: calc(var(--spacing) * 3);
+  --switch-border-width: 1px;
+  --switch-thumb-translate: calc(100% - 2px);
+
+  /* Native Select — Nova (same as vega) */
+  --native-select-padding-x: calc(var(--spacing) * 2.5);
+  --native-select-padding-right: calc(var(--spacing) * 8);
+  --native-select-padding-y: calc(var(--spacing) * 1);
+  --native-select-icon-right: calc(var(--spacing) * 2.5);
+
+  /* Field family — Nova (compact gaps) */
+  --field-set-gap: calc(var(--spacing) * 4);
+  --field-group-gap: calc(var(--spacing) * 5);
+  --field-gap: calc(var(--spacing) * 2);
+  --field-content-gap: calc(var(--spacing) * 0.5);
 }

@@ -1,6 +1,6 @@
 # Component Syntax
 
-The component concept is central to Simply.js, with all other functionalities built around it. Simply.js facilitates communication and orchestration between components. A component is a simple HTML file comprising three parts: `html`, `style`, and `script`. Let's examine what a component looks like.
+The component concept is central to simply.js, with all other functionalities built around it. simply.js facilitates communication and orchestration between components. A component is a simple HTML file comprising three parts: `html`, `style`, and `script`. Let's examine what a component looks like.
 
 ?> All three of these tags are optional. For instance, your component can contain only a `<script>` tag, only an `<html>` tag, or only a `<style>` tag.
 
@@ -104,11 +104,13 @@ A component doesn't have to contain all three parts. This one consists of only a
 
 You can customize how a component is mounted by adding attributes to its tag:
 
-- **`isolated`** — creates a Shadow Root and keeps the component's styles encapsulated, isolating it from parent styles.
+- **`light`** — renders the component in the light DOM instead of the default Shadow Root. Use this for form controls (e.g. `<input>`) that need to participate in the parent form.
 - **`cache`** — keeps the component's `data` and `props` across route navigation. See [Router Cache](docs/router.md).
 
 ```html
-<my-component isolated cache></my-component>
+<my-component light cache></my-component>
 ```
 
-?> By default, custom elements don't use Shadow DOM, so they inherit parent styles and remain accessible via JavaScript from anywhere. This also makes it easy to create custom form element components and serialize them before sending data to the backend.
+?> By default, custom elements mount with a Shadow Root, so their styles are encapsulated and don't leak to the page. Add `light` when you want the component to inherit parent styles, remain accessible via JavaScript from anywhere, or create custom form element components that serialize before sending data to the backend.
+
+> **`light` is a reserved keyword.** It is consumed by the library at mount time to decide between shadow DOM (default) and light DOM — it is **not** a user-facing prop. Like every other attribute, it is still copied into the component's `props` object as `props.light` (value `""` when present), so avoid using `light` as a real prop name in your component's template or script.
