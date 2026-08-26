@@ -1,3 +1,5 @@
+
+
 <p>
 <img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release">
 <img src="https://img.shields.io/badge/License-MIT-green">
@@ -24,7 +26,7 @@ Whether you write it yourself or prompt an AI, simply.js still runs entirely in 
 
 ## Features
 
-- Lighting fast template engine<br>
+- Lightning fast template engine<br>
 - Reactive DOM<br>
 - Single file components<br>
 - State management<br>
