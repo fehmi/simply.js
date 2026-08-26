@@ -1,16 +1,8 @@
-<<<<<<< Updated upstream
 
-
-<p>
-<img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release">
-<img src="https://img.shields.io/badge/License-MIT-green">
-<img src="https://img.shields.io/badge/Gzipped-20KB-green">
-=======
 <p style="transform: scale(.85); transform-origin: center left">
 <img src="https://img.shields.io/github/v/release/fehmi/simply.js?label=stable%20release&style=for-the-badge">
 <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
 <img src="https://img.shields.io/badge/Gzipped-20KB-green?style=for-the-badge">
->>>>>>> Stashed changes
 </p>
 
 # About
