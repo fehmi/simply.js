@@ -1,0 +1,29 @@
+<html>
+  <div class="s-select-group" data-slot="select-group">
+    <slot></slot>
+  </div>
+</html>
+
+<style>
+  :host,
+  s-select-group {
+    display: contents;
+  }
+
+  .s-select-group {
+    display: flex;
+    flex-direction: column;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-select-group",
+        description: "Groups a set of Select items together.",
+        props: {}
+      }
+    }
+  }
+</script>

@@ -1,0 +1,243 @@
+<html>
+  <!-- Coordinator: owns selection state (open, value) and wires up the
+       slotted s-select-trigger / s-select-value / s-select-content /
+       s-select-group / s-select-item children. -->
+  <slot></slot>
+</html>
+
+<style>
+  /* Host is a positioned inline-block box so the slotted <s-select-content>
+     (position: absolute) anchors below the trigger. */
+  :host,
+  s-select {
+    display: inline-block;
+    position: relative;
+  }
+
+  /* An open host keeps its box (so the absolute content stays anchored). */
+  :host([data-open]) {
+    z-index: 40;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      open: false,
+      value: "",
+      doc: {
+        name: "s-select",
+        description: "A custom dropdown select composed from a trigger, a value, and a list of options.",
+        props: {
+          disabled: {
+            default: false
+          },
+          slot: {
+            default: `<s-select-trigger><s-select-value placeholder=\"Select an option\"></s-select-value></s-select-trigger>
+<s-select-content>
+  <s-select-group>
+    <s-select-item value=\"1\">Option 1</s-select-item>
+    <s-select-item value=\"2\">Option 2</s-select-item>
+  </s-select-group>
+</s-select-content>`
+          }
+        }
+      }
+    }
+    methods = {
+      // --- DOM helpers. The trigger/value stay as light-DOM children; the
+      //     content is portaled to <body> while open (so it's not clipped by
+      //     the container — matches Radix). Track a ref on methods so it's
+      //     found even after being moved. ---
+      trigger: function () {
+        return component.querySelector("s-select-trigger");
+      },
+      content: function () {
+        return methods.contentEl || component.querySelector("s-select-content");
+      },
+      valueEl: function () {
+        return component.querySelector("s-select-value");
+      },
+      items: function () {
+        var root = methods.content() || component;
+        return Array.from(root.querySelectorAll("s-select-item"));
+      },
+      syncControls: function () {
+        // Set disabled on trigger/content/items when the select is disabled.
+        var disabled = props.disabled === "" || props.disabled;
+        [methods.trigger(), methods.content()].forEach(function (el) {
+          if (!el) return;
+          if (disabled) el.setAttribute("data-disabled", "");
+          else el.removeAttribute("data-disabled");
+        });
+      },
+      syncOpen: function () {
+        if (data.open) methods.openPortal();
+        else methods.closePortal();
+      },
+      // Position the content fixed at the trigger's viewport coords so it
+      // floats above everything (Radix-style) instead of being clipped by the
+      // select's container. We do NOT move the element (simply.js re-attaches
+      // shadow on reconnect and throws), so it stays a slotted child but is
+      // taken out of flow with position: fixed.
+      openPortal: function () {
+        var content = methods.content();
+        var trigger = methods.trigger();
+        if (!content || !trigger) return;
+        var btn = trigger.shadowRoot && trigger.shadowRoot.querySelector(".s-select-trigger");
+        if (!btn) return;
+        var rect = btn.getBoundingClientRect();
+        content.style.position = "fixed";
+        content.style.top = "0";
+        content.style.left = "0";
+        content.style.width = rect.width + "px";
+        content.style.zIndex = "9999";
+        content.style.willChange = "transform";
+        content.style.transform = "translate(" + rect.left + "px," + (rect.bottom + 4) + "px)";
+        content.setAttribute("data-open", "");
+        // Reposition on scroll, close on resize (Radix behavior). Use
+        // transform (GPU-composited) + rAF so the dropdown tracks the trigger
+        // smoothy and doesn't trigger layout/paint each frame (top/left lag
+        // with a touchpad).
+        if (!methods.boundViewport) {
+          methods.boundViewport = true;
+          methods.reposition = function () {
+            if (!data.open) return;
+            if (methods.rafId) return;
+            methods.rafId = window.requestAnimationFrame(function () {
+              methods.rafId = null;
+              if (!data.open) return;
+              var b = methods.trigger();
+              if (b && b.shadowRoot) {
+                var r = b.shadowRoot.querySelector(".s-select-trigger").getBoundingClientRect();
+                content.style.transform = "translate(" + r.left + "px," + (r.bottom + 4) + "px)";
+              }
+            });
+          };
+          methods.onResize = function () {
+            methods.close();
+          };
+          window.addEventListener("scroll", methods.reposition, true);
+          window.addEventListener("resize", methods.onResize);
+        }
+      },
+      closePortal: function () {
+        var content = methods.content();
+        if (!content) return;
+        content.removeAttribute("data-open");
+        content.style.position = "";
+        content.style.top = "";
+        content.style.left = "";
+        content.style.width = "";
+        content.style.zIndex = "";
+        content.style.transform = "";
+        content.style.willChange = "";
+      },
+      syncValue: function () {
+        var val = methods.valueEl();
+        if (!val) return;
+        if (data.value) {
+          var label = methods.labelFor(data.value);
+          val.textContent = label;
+          val.removeAttribute("data-placeholder");
+        } else {
+          var ph = val.getAttribute("placeholder") || "";
+          val.textContent = ph;
+          val.setAttribute("data-placeholder", "");
+        }
+        // Reflect selected state on items.
+        var selected = methods.items().filter(function (i) {
+          return i.getAttribute("value") === data.value;
+        });
+        methods.items().forEach(function (i) {
+          i.removeAttribute("data-selected");
+        });
+        selected.forEach(function (i) {
+          i.setAttribute("data-selected", "");
+        });
+      },
+      labelFor: function (value) {
+        var items = methods.items();
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].getAttribute("value") === value) {
+            return items[i].getAttribute("label") || items[i].textContent.trim();
+          }
+        }
+        return value;
+      },
+      toggle: function () {
+        if (props.disabled === "" || props.disabled) return;
+        data.open = !data.open;
+        methods.syncOpen();
+        if (data.open) methods.bindOutsideClick();
+      },
+      select: function (value) {
+        data.value = value;
+        data.open = false;
+        methods.syncOpen();
+        methods.syncValue();
+        component.dispatchEvent(
+          new CustomEvent("change", { detail: { value: value } })
+        );
+      },
+      close: function () {
+        if (!data.open) return;
+        data.open = false;
+        methods.syncOpen();
+      },
+      bindOutsideClick: function () {
+        document.removeEventListener("click", methods.docClick);
+        document.addEventListener("click", methods.docClick);
+      },
+      docClick: function (event) {
+        // Use the composed path — inside a component viewer (nested shadow
+        // roots) the event.target retargets to the outermost host at document
+        // level, so component.contains() fails. Check the full path instead.
+        var inSelect = event.composedPath().indexOf(component) !== -1;
+        if (!inSelect) {
+          methods.close();
+        }
+      },
+      setup: function () {
+        var content = component.querySelector("s-select-content");
+        if (content && content !== methods.contentEl) {
+          methods.contentEl = content;
+          if (!methods.contentParent) methods.contentParent = content.parentNode;
+        }
+        var trigger = methods.trigger();
+        if (trigger && !trigger.__sSelectBound) {
+          trigger.__sSelectBound = true;
+          trigger.addEventListener("click", function (event) {
+            event.preventDefault();
+            methods.toggle();
+          });
+        }
+        var items = methods.items();
+        items.forEach(function (item) {
+          if (!item.__sSelectBound) {
+            item.__sSelectBound = true;
+            item.addEventListener("click", function (event) {
+              event.stopPropagation();
+              methods.select(item.getAttribute("value"));
+            });
+          }
+        });
+        methods.syncControls();
+        methods.syncValue();
+        methods.syncOpen();
+      }
+    }
+    lifecycle = {
+      afterConstruct: function () {
+        data.value = props.value || "";
+        document.removeEventListener("click", methods.docClick);
+      },
+      afterFirstRender: function () {
+        methods.setup();
+      },
+      afterRender: function () {
+        methods.setup();
+      }
+    }
+  }
+</script>

@@ -4,6 +4,7 @@
     data-slot="field-label"
     for="{{props.for}}"
     ?data-disabled="{{props.disabled === '' || props.disabled}}"
+    ?data-font-normal="{{props.fontNormal === '' || props.fontNormal}}"
     onclick="methods.focusControl()"
   >
     <slot>Label</slot>
@@ -32,6 +33,11 @@
     color: inherit;
   }
 
+  /* font-normal (400) — matches the original FieldLabel font-normal utility. */
+  .s-field-label[data-font-normal] {
+    font-weight: 400;
+  }
+
   /* Disabled (via prop) */
   .s-field-label[data-disabled] {
     opacity: 0.5;
@@ -54,6 +60,9 @@
             default: ""
           },
           disabled: {
+            default: false
+          },
+          fontNormal: {
             default: false
           },
           slot: {

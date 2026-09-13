@@ -48,6 +48,16 @@
   --native-select-padding-right: calc(var(--spacing) * 8);
   --native-select-padding-y: calc(var(--spacing) * 1);
   --native-select-icon-right: calc(var(--spacing) * 3.5);
+
+  /* Select — Maia (rounded-4xl, px-3) */
+  --select-trigger-radius: var(--radius-4xl);
+  --select-trigger-height-default: calc(var(--spacing) * 9);
+  --select-trigger-height-sm: calc(var(--spacing) * 8);
+  --select-trigger-font-size: var(--text-sm);
+  --select-trigger-padding-x: calc(var(--spacing) * 3);
+  --select-trigger-padding-y: calc(var(--spacing) * 2);
+  --select-trigger-gap: calc(var(--spacing) * 1.5);
+  --select-icon-size: calc(var(--spacing) * 4);
   /* Field family — Maia (same as vega) */
   --field-set-gap: calc(var(--spacing) * 6);
   --field-group-gap: calc(var(--spacing) * 7);

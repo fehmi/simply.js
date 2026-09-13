@@ -1,0 +1,142 @@
+<html>
+  <div class="s-select-content" data-slot="select-content">
+    <button class="s-select-scroll" data-slot="scroll-up" aria-hidden="true" onclick="methods.scrollBy(-40)">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+    </button>
+    <div class="s-select-viewport">
+      <slot></slot>
+    </div>
+    <button class="s-select-scroll" data-slot="scroll-down" aria-hidden="true" onclick="methods.scrollBy(40)">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+    </button>
+  </div>
+</html>
+
+<style>
+  /* Content is positioned relative to the nearest positioned ancestor — the
+     s-select host (position: relative). Hidden by default, shown when open.
+     width: 100% matches the host, which is the trigger width (host is
+     inline-block sized by the trigger). */
+  :host,
+  s-select-content {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 50;
+    display: none;
+    width: 100%;
+  }
+
+  :host([data-open]),
+  s-select-content[data-open] {
+    display: block;
+  }
+
+  .s-select-content {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: var(--select-trigger-radius, var(--radius-md));
+    border: 1px solid var(--color-border);
+    background-color: var(--color-popover);
+    color: var(--color-popover-foreground);
+    box-shadow: var(--shadow-md);
+  }
+
+  .s-select-viewport {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    max-height: 20rem;
+    padding: calc(var(--spacing) * 1);
+  }
+
+  /* Scroll buttons (shown by the lifecycle when the content is scrollable).
+     The up button's chevron is flipped. */
+  .s-select-scroll {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: calc(var(--spacing) * 1);
+    border: 0;
+    background: transparent;
+    color: var(--color-muted-foreground);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .s-select-scroll[data-visible] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .s-select-scroll[data-visible]:hover {
+    color: var(--color-foreground);
+    background-color: var(--color-muted);
+  }
+
+  [data-slot="scroll-up"] svg {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-select-content",
+        description: "The dropdown panel of a Select, shown when the trigger is opened.",
+        props: {
+          slot: {
+            default: "<s-select-group>\n  <s-select-item value=\"1\">Option 1</s-select-item>\n</s-select-group>"
+          }
+        }
+      }
+    }
+    methods = {
+      scrollBy: function (amount) {
+        var viewport = dom.querySelector(".s-select-viewport");
+        if (viewport) viewport.scrollBy({ top: amount, behavior: "smooth" });
+      },
+      // Show/hide the scroll buttons based on whether there is content to
+      // scroll above/below the viewport.
+      updateScrollButtons: function () {
+        var viewport = dom.querySelector(".s-select-viewport");
+        var up = dom.querySelector('[data-slot="scroll-up"]');
+        var down = dom.querySelector('[data-slot="scroll-down"]');
+        if (!viewport || !up || !down) return;
+        var canUp = viewport.scrollTop > 0;
+        var canDown = viewport.scrollTop + viewport.clientHeight < viewport.scrollHeight;
+        if (canUp) up.setAttribute("data-visible", "");
+        else up.removeAttribute("data-visible");
+        if (canDown) down.setAttribute("data-visible", "");
+        else down.removeAttribute("data-visible");
+      }
+    }
+    lifecycle = {
+      afterConstruct: function () {
+        // When the select opens (host data-open is set by s-select), the
+        // content is still display:none at first render, so scrollHeight is 0
+        // and the buttons stay hidden. Re-check once it's visible.
+        methods.observer = new MutationObserver(function () {
+          if (component.hasAttribute("data-open")) {
+            setTimeout(methods.updateScrollButtons, 60);
+          }
+        });
+        methods.observer.observe(component, {
+          attributes: true,
+          attributeFilter: ["data-open"]
+        });
+      },
+      afterFirstRender: function () {
+        methods.updateScrollButtons();
+        var viewport = dom.querySelector(".s-select-viewport");
+        if (viewport) viewport.addEventListener("scroll", methods.updateScrollButtons);
+      },
+      afterRender: function () {
+        methods.updateScrollButtons();
+      }
+    }
+  }
+</script>

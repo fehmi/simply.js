@@ -125,6 +125,17 @@
   --native-select-padding-y: calc(var(--spacing) * 1);
   --native-select-icon-right: calc(var(--spacing) * 2.5);
 
+  /* Select (custom dropdown — sizes/radius/font/padding vary per theme,
+     vega defaults). Mirrors shadcn style-*.css .cn-select-trigger. */
+  --select-trigger-radius: var(--radius-md);
+  --select-trigger-height-default: calc(var(--spacing) * 9);
+  --select-trigger-height-sm: calc(var(--spacing) * 8);
+  --select-trigger-font-size: var(--text-sm);
+  --select-trigger-padding-x: calc(var(--spacing) * 2.5);
+  --select-trigger-padding-y: calc(var(--spacing) * 2);
+  --select-trigger-gap: calc(var(--spacing) * 1.5);
+  --select-icon-size: calc(var(--spacing) * 4);
+
   /* Field family (gaps vary per theme — vega defaults) */
   --field-set-gap: calc(var(--spacing) * 6);
   --field-group-gap: calc(var(--spacing) * 7);

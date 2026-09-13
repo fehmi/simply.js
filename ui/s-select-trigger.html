@@ -1,0 +1,138 @@
+<html>
+  <button
+    class="s-select-trigger"
+    data-slot="select-trigger"
+    data-size="{{props.size || 'default'}}"
+    type="button"
+    ?data-disabled="{{props.disabled === '' || props.disabled}}"
+    ?aria-invalid="{{props.ariaInvalid === '' || props.ariaInvalid || props['aria-invalid'] === '' || props['aria-invalid']}}"
+  >
+    <slot></slot>
+    <svg
+      class="s-select-trigger-icon"
+      data-slot="select-trigger-icon"
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="m6 9 6 6 6-6"></path>
+    </svg>
+  </button>
+</html>
+
+<style>
+  /* Host fills its parent (s-select). In a flex column field the s-select
+     host stretches, so width: 100% makes the trigger fill the field column.
+     Standalone it's fit-content (the s-select host is inline-block). */
+  :host,
+  s-select-trigger {
+    display: block;
+    width: 100%;
+  }
+
+  /* ---- Base (original shadcn v4 .cn-select-trigger) ---- */
+  .s-select-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--select-trigger-gap, calc(var(--spacing) * 1.5));
+    width: 100%;
+    box-sizing: border-box;
+    height: var(--select-trigger-height-default, calc(var(--spacing) * 9));
+    border-radius: var(--select-trigger-radius, var(--radius-md));
+    border: 1px solid var(--color-input);
+    background-color: transparent;
+    padding: var(--select-trigger-padding-y, calc(var(--spacing) * 2))
+      var(--select-trigger-padding-x, calc(var(--spacing) * 2.5));
+    font-family: inherit;
+    font-size: var(--select-trigger-font-size, var(--text-sm));
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: var(--shadow-xs);
+    transition:
+      color var(--default-transition-duration)
+        var(--default-transition-timing-function),
+      box-shadow var(--default-transition-duration)
+        var(--default-transition-timing-function);
+    outline: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .s-select-trigger[data-size="sm"] {
+    height: var(--select-trigger-height-sm, calc(var(--spacing) * 8));
+  }
+
+  .s-select-trigger:focus-visible {
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 50%, transparent);
+  }
+
+  .s-select-trigger[aria-invalid] {
+    border-color: var(--color-destructive);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-destructive) 20%, transparent);
+  }
+
+  .s-select-trigger[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* The slotted s-select-value keeps to one line. */
+  ::slotted(s-select-value) {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1.5);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Chevron */
+  .s-select-trigger-icon {
+    pointer-events: none;
+    flex-shrink: 0;
+    width: var(--select-icon-size, calc(var(--spacing) * 4));
+    height: var(--select-icon-size, calc(var(--spacing) * 4));
+    color: var(--color-muted-foreground);
+    opacity: 0.5;
+  }
+
+  :host-context(.dark) .s-select-trigger {
+    background-color: color-mix(in oklab, var(--color-input) 30%, transparent);
+  }
+
+  :host-context(.dark) .s-select-trigger:hover {
+    background-color: color-mix(in oklab, var(--color-input) 50%, transparent);
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-select-trigger",
+        description: "The button that opens a Select dropdown and shows the selected value.",
+        props: {
+          size: {
+            default: "default",
+            options: ["default", "sm"]
+          },
+          disabled: {
+            default: false
+          },
+          ariaInvalid: {
+            default: false
+          },
+          slot: {
+            default: "<s-select-value></s-select-value>"
+          }
+        }
+      }
+    }
+  }
+</script>

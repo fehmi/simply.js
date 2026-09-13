@@ -21,6 +21,13 @@
     color: var(--color-muted-foreground);
   }
 
+  /* When the description directly follows a legend (inside a field-set), the
+     tiny JS hook adds data-follows-legend, which tightens the gap (matches the
+     original FieldDescription -mt-1.5 that cancels the legend's mb-3). */
+  :host([data-follows-legend]) .s-field-description {
+    margin-top: calc(var(--spacing) * -1.5);
+  }
+
   /* Links inside the description */
   .s-field-description a {
     text-decoration: underline;
@@ -42,6 +49,18 @@
           slot: {
             default: "Description"
           }
+        }
+      }
+    }
+    lifecycle = {
+      afterFirstRender: function () {
+        // If the element directly follows an s-field-legend (inside a
+        // field-set), flag it so the CSS tightens the gap. `:has()` can't
+        // see slotted siblings across the shadow boundary, so a tiny hook
+        // checks the previous element sibling here.
+        var prev = component.previousElementSibling;
+        if (prev && prev.tagName === "S-FIELD-LEGEND") {
+          component.setAttribute("data-follows-legend", "");
         }
       }
     }

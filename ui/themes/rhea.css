@@ -60,6 +60,16 @@
   --native-select-padding-y: calc(var(--spacing) * 1);
   --native-select-icon-right: calc(var(--spacing) * 2.5);
 
+  /* Select — Rhea (rounded-2xl, h-8) */
+  --select-trigger-radius: var(--radius-2xl);
+  --select-trigger-height-default: calc(var(--spacing) * 8);
+  --select-trigger-height-sm: calc(var(--spacing) * 7);
+  --select-trigger-font-size: var(--text-sm);
+  --select-trigger-padding-x: calc(var(--spacing) * 3);
+  --select-trigger-padding-y: calc(var(--spacing) * 2);
+  --select-trigger-gap: calc(var(--spacing) * 1.5);
+  --select-icon-size: calc(var(--spacing) * 4);
+
   /* Field family — Rhea (medium group gap) */
   --field-set-gap: calc(var(--spacing) * 6);
   --field-group-gap: calc(var(--spacing) * 6);

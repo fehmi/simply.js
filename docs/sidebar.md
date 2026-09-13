@@ -36,7 +36,7 @@
 
 - <br>Router
 
-  - [Go (Router)](docs/router.md)
+  - [Go](docs/router.md)
 
 - <br>Integrations
 
@@ -66,5 +66,6 @@
   - [Spinner](ui/s-spinner.md)
   - [Icon](ui/s-icon.md)
   - [Native Select](ui/s-native-select.md)
+  - [Select](ui/s-select.md)
   - [Switch](ui/s-switch.md)
   - [Component Viewer](ui/s-component-viewer.md)

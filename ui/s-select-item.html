@@ -1,0 +1,95 @@
+<html>
+  <div
+    class="s-select-item"
+    data-slot="select-item"
+    data-value="{{props.value || ''}}"
+    ?data-selected="{{props.selected === '' || props.selected}}"
+  >
+    <span class="s-select-item-indicator" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>
+    </span>
+    <span class="s-select-item-text"><slot></slot></span>
+  </div>
+</html>
+
+<style>
+  :host,
+  s-select-item {
+    display: block;
+  }
+
+  /* ---- Base (original shadcn v4 .cn-select-item) ---- */
+  .s-select-item {
+    position: relative;
+    display: flex;
+    width: 100%;
+    cursor: default;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    box-sizing: border-box;
+    border-radius: calc(var(--select-trigger-radius, var(--radius-md)) / 2);
+    padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 2);
+    padding-right: calc(var(--spacing) * 8);
+    font-family: inherit;
+    font-size: var(--select-trigger-font-size, var(--text-sm));
+    line-height: 1;
+    user-select: none;
+    outline: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .s-select-item[data-selected] {
+    background-color: color-mix(in oklab, var(--color-accent) 60%, transparent);
+    color: var(--color-accent-foreground);
+  }
+
+  .s-select-item:hover {
+    background-color: var(--color-accent);
+    color: var(--color-accent-foreground);
+  }
+
+  /* The check indicator sits at the right, hidden unless selected. */
+  .s-select-item-indicator {
+    position: absolute;
+    right: calc(var(--spacing) * 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--spacing) * 3.5);
+    height: calc(var(--spacing) * 3.5);
+    opacity: 0;
+    color: inherit;
+  }
+
+  .s-select-item[data-selected] .s-select-item-indicator {
+    opacity: 1;
+  }
+
+  .s-select-item-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  class simply {
+    data = {
+      doc: {
+        name: "s-select-item",
+        description: "A selectable option inside a Select dropdown.",
+        props: {
+          value: {
+            default: ""
+          },
+          label: {
+            default: ""
+          }
+        }
+      }
+    }
+  }
+</script>

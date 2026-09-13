@@ -63,6 +63,7 @@ Use this file to decide which page(s) to fetch. Every link is a plain Markdown f
 - [Spinner](https://simply.js.org/ui/s-spinner.md)
 - [Icon](https://simply.js.org/ui/s-icon.md)
 - [Native Select](https://simply.js.org/ui/s-native-select.md)
+- [Select](https://simply.js.org/ui/s-select.md)
 - [Switch](https://simply.js.org/ui/s-switch.md)
 - [Component Viewer](https://simply.js.org/ui/s-component-viewer.md)
 

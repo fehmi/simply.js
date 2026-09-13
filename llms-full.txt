@@ -47,6 +47,7 @@
 - [Spinner](#ui-s-spinner)  <!-- Simply UI -->
 - [Icon](#ui-s-icon)  <!-- Simply UI -->
 - [Native Select](#ui-s-native-select)  <!-- Simply UI -->
+- [Select](#ui-s-select)  <!-- Simply UI -->
 - [Switch](#ui-s-switch)  <!-- Simply UI -->
 - [Component Viewer](#ui-s-component-viewer)  <!-- Simply UI -->
 
@@ -80,7 +81,7 @@ Whether you write it yourself or prompt an AI, simply.js still runs entirely in 
 
 ## Features
 
-- Lighting fast template engine<br>
+- Lightning fast template engine<br>
 - Reactive DOM<br>
 - Single file components<br>
 - State management<br>
@@ -4420,28 +4421,6 @@ Groups buttons together, joining them with shared borders and rounded outer corn
 |---|---|---|---|
 | `orientation` | string | `"horizontal"` | `horizontal` \| `vertical` |
 
-## Horizontal
-
-
-```html
-<s-button-group>
-  <s-button variant="outline">Button</s-button>
-  <s-button variant="outline">Button</s-button>
-  <s-button variant="outline">Button</s-button>
-</s-button-group>
-```
-
-## Vertical
-
-
-```html
-<s-button-group orientation="vertical">
-  <s-button variant="outline">Top</s-button>
-  <s-button variant="outline">Middle</s-button>
-  <s-button variant="outline">Bottom</s-button>
-</s-button-group>
-```
-
 ## Nested
 
 Group nested button-groups to add a gap between them (e.g. a toolbar):
@@ -4484,29 +4463,21 @@ Displays a badge or a component that looks like a badge. A small pill used for l
 
 ## Variants
 
+Use the `variant` prop to change the variant of the badge.
 
- 
+
 ```html
-<s-badge variant="default">Default</s-badge>
+<s-badge>Default</s-badge>
 <s-badge variant="secondary">Secondary</s-badge>
-<s-badge variant="outline">Outline</s-badge>
 <s-badge variant="destructive">Destructive</s-badge>
+<s-badge variant="outline">Outline</s-badge>
 <s-badge variant="ghost">Ghost</s-badge>
 <s-badge variant="link">Link</s-badge>
 ```
 
-## As a Link
+## With Icon
 
- 
-```html
-<a href="#"><s-badge variant="outline">Link Badge</s-badge></a>
-```
-
-When wrapped in an anchor, the badge gets hover styles via `:host-context(a)`.
-
-## With Icons
-
-The icon scales to the badge's 12px icon and sits in a `gap-1` (4px) row with the text (matching shadcn `px-2` + `gap-1`). Place the icon before the text with `data-icon="inline-start"`, after with `data-icon="inline-end"`.
+You can render an icon inside the badge. Use `data-icon="inline-start"` to render the icon on the left and `data-icon="inline-end"` to render the icon on the right.
 
 
 ```html
@@ -4514,31 +4485,62 @@ The icon scales to the badge's 12px icon and sits in a `gap-1` (4px) row with th
   <s-icon name="badge-check" data-icon="inline-start"></s-icon>
   Verified
 </s-badge>
-<s-badge variant="secondary">
-  <s-icon name="badge-check" data-icon="inline-start"></s-icon>
-  Verified
-</s-badge>
 <s-badge variant="outline">
   <s-icon name="bookmark" data-icon="inline-end"></s-icon>
   Bookmark
 </s-badge>
-<s-badge variant="destructive">
-  <s-icon name="alert-circle" data-icon="inline-start"></s-icon>
-  Error
+```
+
+With a custom icon size, the badge's icon scales using `--s-icon-size` on the host.
+
+## With Spinner
+
+You can render a spinner inside the badge. Remember to add the `data-icon="inline-start"` or `data-icon="inline-end"` prop to the spinner.
+
+
+```html
+<s-badge>
+  <s-spinner data-icon="inline-start"></s-spinner>
+  Deleting
 </s-badge>
-<s-badge variant="ghost">
-  <s-icon name="star" data-icon="inline-end"></s-icon>
-  Ghost
+<s-badge variant="secondary">
+  <s-spinner data-icon="inline-end"></s-spinner>
+  Generating
 </s-badge>
-<s-badge variant="link">
-  <s-icon name="link" data-icon="inline-start"></s-icon>
-  Link
-</s-badge>
+```
+
+## Link
+
+Wrap a badge in an anchor to render a link as a badge.
+
+
+```html
+<a href="#">
+  <s-badge variant="outline">
+    <s-icon name="arrow-up-right" data-icon="inline-end"></s-icon>
+    Open Link
+  </s-badge>
+</a>
+```
+
+When wrapped in an anchor, the badge gets hover styles via `:host-context(a)`.
+
+## Custom Colors
+
+Customize a badge's colors with the `--s-badge-bg`, `--s-badge-color`, and `--s-badge-border` CSS variables.
+
+
+```html
+<s-badge style="--s-badge-bg: var(--color-blue-100); --s-badge-color: var(--color-blue-800)">Blue</s-badge>
+<s-badge style="--s-badge-bg: var(--color-green-100); --s-badge-color: var(--color-green-800)">Green</s-badge>
+<s-badge style="--s-badge-bg: var(--color-sky-100); --s-badge-color: var(--color-sky-800)">Sky</s-badge>
+<s-badge style="--s-badge-bg: var(--color-purple-100); --s-badge-color: var(--color-purple-800)">Purple</s-badge>
+<s-badge style="--s-badge-bg: var(--color-red-100); --s-badge-color: var(--color-red-800)">Red</s-badge>
 ```
 
 ## Theming
 
-The badge uses theme-dependent tokens:
+The badge uses theme-dependent tokens for **radius** and **font-size** only. The **height is constant** across all themes (`--spacing × 5` = 20px, with `box-sizing: border-box`), matching shadcn — as in the original, the themes do not change the badge height.
 
 | Theme | radius | font-size |
 |---|---|---|
@@ -4557,14 +4559,26 @@ Tokens: `--badge-radius`, `--badge-font-size`.
 
 ## Label
 
-A label associated with a form control. Links to an input via the `for` attribute.
+Renders an accessible label associated with controls. Links to a control via the `for` attribute.
 
 ## Usage
 
 
 ```html
-<s-label for="email">Email</s-label>
+<s-label for="email">Your email address</s-label>
 ```
+
+## With a Checkbox
+
+
+```html
+<div style="display: flex; align-items: center; gap: calc(var(--spacing) * 2)">
+  <s-checkbox id="terms"></s-checkbox>
+  <s-label for="terms">Accept terms and conditions</s-label>
+</div>
+```
+
+The checkbox and label sit in a `gap-2` (8px) flex row, matching shadcn. Clicking the label toggles the associated checkbox via `for` (native `label[for]` can't reach a checkbox rendered in a shadow DOM, so the label activates the control programmatically).
 
 ## Props
 
@@ -4573,17 +4587,111 @@ A label associated with a form control. Links to an input via the `for` attribut
 | `for` | string | `""` | The `id` of the associated form control |
 | `disabled` | boolean | `false` | Fades the label (opacity 0.5) |
 
-## Example
+## Label in Field
+
+For form fields, use the `s-field` component which includes built-in `s-field-label`, `s-field-description`, and `s-field-error` components.
 
 
 ```html
-<div class="field" style="display: flex; flex-direction: column; gap: 0.5rem">
-  <s-label for="name">Name</s-label>
-  <s-input light id="name" placeholder="Enter your name"></s-input>
-</div>
-<div class="field" style="display: flex; align-items: center; gap: 0.5rem">
-  <s-checkbox id="push"></s-checkbox>
-  <s-label for="push">Push notifications</s-label>
+<s-field>
+  <s-field-label for="email">Your email address</s-field-label>
+  <s-input light id="email" type="email" placeholder="you@example.com"></s-input>
+</s-field>
+```
+
+A full form combines the field family with inputs, selects, textarea, checkbox, and buttons into a `s-field-group`:
+
+
+```html
+<div style="max-width: 28rem">
+<s-field-group>
+  <s-field-set>
+    <s-field-legend>Payment Method</s-field-legend>
+    <s-field-description>All transactions are secure and encrypted</s-field-description>
+    <s-field-group>
+      <s-field>
+        <s-field-label for="card-name">Name on Card</s-field-label>
+        <s-input light id="card-name" placeholder="Evil Rabbit" required></s-input>
+      </s-field>
+      <s-field>
+        <s-field-label for="card-number">Card Number</s-field-label>
+        <s-input light id="card-number" placeholder="1234 5678 9012 3456" required></s-input>
+        <s-field-description>Enter your 16-digit card number</s-field-description>
+      </s-field>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem">
+        <s-field>
+          <s-field-label for="exp-month">Month</s-field-label>
+          <s-select>
+            <s-select-trigger id="exp-month">
+              <s-select-value placeholder="MM"></s-select-value>
+            </s-select-trigger>
+            <s-select-content>
+              <s-select-group>
+                <s-select-item value="01">01</s-select-item>
+                <s-select-item value="02">02</s-select-item>
+                <s-select-item value="03">03</s-select-item>
+                <s-select-item value="04">04</s-select-item>
+                <s-select-item value="05">05</s-select-item>
+                <s-select-item value="06">06</s-select-item>
+                <s-select-item value="07">07</s-select-item>
+                <s-select-item value="08">08</s-select-item>
+                <s-select-item value="09">09</s-select-item>
+                <s-select-item value="10">10</s-select-item>
+                <s-select-item value="11">11</s-select-item>
+                <s-select-item value="12">12</s-select-item>
+              </s-select-group>
+            </s-select-content>
+          </s-select>
+        </s-field>
+        <s-field>
+          <s-field-label for="exp-year">Year</s-field-label>
+          <s-select>
+            <s-select-trigger id="exp-year">
+              <s-select-value placeholder="YYYY"></s-select-value>
+            </s-select-trigger>
+            <s-select-content>
+              <s-select-group>
+                <s-select-item value="2024">2024</s-select-item>
+                <s-select-item value="2025">2025</s-select-item>
+                <s-select-item value="2026">2026</s-select-item>
+                <s-select-item value="2027">2027</s-select-item>
+                <s-select-item value="2028">2028</s-select-item>
+                <s-select-item value="2029">2029</s-select-item>
+              </s-select-group>
+            </s-select-content>
+          </s-select>
+        </s-field>
+        <s-field>
+          <s-field-label for="cvv">CVV</s-field-label>
+          <s-input light id="cvv" placeholder="123" required></s-input>
+        </s-field>
+      </div>
+    </s-field-group>
+  </s-field-set>
+  <s-field-separator></s-field-separator>
+  <s-field-set>
+    <s-field-legend>Billing Address</s-field-legend>
+    <s-field-description>The billing address associated with your payment method</s-field-description>
+    <s-field-group>
+      <s-field orientation="horizontal">
+        <s-checkbox id="same-as-shipping" default-checked></s-checkbox>
+        <s-field-label for="same-as-shipping" font-normal>Same as shipping address</s-field-label>
+      </s-field>
+    </s-field-group>
+  </s-field-set>
+  <s-field-set>
+    <s-field-group>
+      <s-field>
+        <s-field-label for="comments">Comments</s-field-label>
+        <s-textarea light id="comments" placeholder="Add any additional comments"></s-textarea>
+      </s-field>
+    </s-field-group>
+  </s-field-set>
+  <s-field orientation="horizontal">
+    <s-button type="submit">Submit</s-button>
+    <s-button variant="outline">Cancel</s-button>
+  </s-field>
+</s-field-group>
 </div>
 ```
 
@@ -4599,14 +4707,20 @@ The `disabled` attribute fades the label. The label also fades automatically whe
 
 ## Theming
 
-The label uses theme-dependent tokens:
+The label uses theme-dependent tokens. **Vega, Nova, Maia, Rhea, and Luma all share the base values** (`text-sm` 14px, `font-medium` 500, `leading-none`) — matching shadcn, where the label typography is theme-independent (`text-sm font-medium` in every theme). Only a few themes override it:
 
 | Theme | font-size | font-weight | transform |
 |---|---|---|---|
 | Vega (default) | text-sm (14px) | medium (500) | none |
+| Nova | text-sm (14px) | medium (500) | none |
+| Maia | text-sm (14px) | medium (500) | none |
+| Luma | text-sm (14px) | medium (500) | none |
+| Rhea | text-sm (14px) | medium (500) | none |
 | Lyra | text-xs (12px) | normal (400) | none |
 | Mira | text-xs (12px) | medium (500) | none |
 | Sera | text-xs (12px) | semibold (600) | uppercase |
+
+> The `gap-2` (8px) used by the label is the same in every theme — it's a fixed token (`--label-gap`), like shadcn's `gap-2`.
 
 Tokens: `--label-font-size`, `--label-font-weight`, `--label-line-height`, `--label-text-transform`, `--label-letter-spacing`, `--label-gap`.
 
@@ -5429,6 +5543,191 @@ The select reuses the input theme tokens (`--input-radius`, `--input-height`, `-
   <option>Small</option>
 </s-native-select>
 ```
+
+---
+
+<a id="ui-s-select"></a>
+
+## Select
+
+A custom dropdown select. Unlike the native `<select>`, it's fully styled and composed from a trigger, a value, and a list of options. Use it when you need a styled picker (e.g. months, years) or a custom dropdown.
+
+
+```html
+<s-select>
+  <s-select-trigger>
+    <s-select-value placeholder="Select an option"></s-select-value>
+  </s-select-trigger>
+  <s-select-content>
+    <s-select-group>
+      <s-select-item value="1">Option 1</s-select-item>
+      <s-select-item value="2">Option 2</s-select-item>
+    </s-select-group>
+  </s-select-content>
+</s-select>
+```
+
+> **Note:** The selected value is exposed on the `s-select` root via `data.value` and a `change` event fires with `{ value }`. Clicking a `s-select-item` selects it and closes the dropdown. Clicking the trigger toggles the dropdown; clicking outside closes it.
+
+## Composition
+
+A Select is built from a trigger (with a value) and a content panel (with grouped items):
+
+```
+s-select
+├── s-select-trigger
+│   └── s-select-value
+└── s-select-content
+    ├── s-select-group
+    │   ├── s-select-label
+    │   ├── s-select-item
+    │   └── s-select-item
+    ├── s-select-separator
+    └── s-select-group
+        ├── s-select-label
+        ├── s-select-item
+        └── s-select-item
+```
+
+## Parts
+
+| Component | Purpose |
+|---|---|
+| `<s-select>` | Root — owns the open/selected state |
+| `<s-select-trigger>` | The button that opens the dropdown and shows the value |
+| `<s-select-value>` | Displays the selected value (or a `placeholder` when empty) |
+| `<s-select-content>` | The dropdown panel, shown when open; matches the trigger width and scrolls |
+| `<s-select-group>` | Groups a set of items |
+| `<s-select-item>` | A selectable option (`value`) |
+| `<s-select-label>` | A muted heading that titles a group |
+| `<s-select-separator>` | A horizontal divider between groups |
+
+## Props
+
+### `s-select-trigger`
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `size` | string | `"default"` | `default` \| `sm` |
+| `disabled` | boolean | `false` | Disables the trigger |
+| `ariaInvalid` | boolean | `false` | Marks the trigger as invalid |
+
+### `s-select-value`
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `placeholder` | string | `""` | Text shown when no value is selected |
+
+### `s-select-item`
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `value` | string | `""` | The value returned when this item is selected |
+| `label` | string | `""` | Optional label; defaults to the item's text |
+
+## Groups
+
+Use `s-select-group`, `s-select-label`, and `s-select-separator` to organize items.
+
+
+```html
+<s-select>
+  <s-select-trigger><s-select-value placeholder="Select a fruit"></s-select-value></s-select-trigger>
+  <s-select-content>
+    <s-select-group>
+      <s-select-label>Select a fruit</s-select-label>
+      <s-select-item value="apple">Apple</s-select-item>
+      <s-select-item value="banana">Banana</s-select-item>
+    </s-select-group>
+    <s-select-separator></s-select-separator>
+    <s-select-group>
+      <s-select-label>More</s-select-label>
+      <s-select-item value="cherry">Cherry</s-select-item>
+    </s-select-group>
+  </s-select-content>
+</s-select>
+```
+
+## Scrollable
+
+A select with many items scrolls. Scroll buttons appear at the top/bottom of the panel when there's content to scroll.
+
+
+```html
+<s-select>
+  <s-select-trigger><s-select-value placeholder="Pick a fruit"></s-select-value></s-select-trigger>
+  <s-select-content>
+    <s-select-group>
+      <s-select-item value="1">Apple</s-select-item>
+      <s-select-item value="2">Banana</s-select-item>
+      <s-select-item value="3">Blueberry</s-select-item>
+      <s-select-item value="4">Cherry</s-select-item>
+      <s-select-item value="5">Grapes</s-select-item>
+      <s-select-item value="6">Kiwi</s-select-item>
+      <s-select-item value="7">Mango</s-select-item>
+      <s-select-item value="8">Orange</s-select-item>
+      <s-select-item value="9">Peach</s-select-item>
+      <s-select-item value="10">Pear</s-select-item>
+      <s-select-item value="11">Pineapple</s-select-item>
+      <s-select-item value="12">Plum</s-select-item>
+    </s-select-group>
+  </s-select-content>
+</s-select>
+```
+
+## Disabled
+
+
+```html
+<s-select disabled>
+  <s-select-trigger><s-select-value placeholder="Disabled"></s-select-value></s-select-trigger>
+  <s-select-content>
+    <s-select-group>
+      <s-select-item value="1">Option 1</s-select-item>
+    </s-select-group>
+  </s-select-content>
+</s-select>
+```
+
+## Invalid
+
+Add `aria-invalid` to the `s-select-trigger` to show an error state.
+
+
+```html
+<s-select>
+  <s-select-trigger aria-invalid><s-select-value placeholder="Select a fruit"></s-select-value></s-select-trigger>
+  <s-select-content>
+    <s-select-group>
+      <s-select-item value="apple">Apple</s-select-item>
+    </s-select-group>
+  </s-select-content>
+</s-select>
+```
+
+## Sizes
+
+
+```html
+<s-select>
+  <s-select-trigger size="default"><s-select-value placeholder="Default"></s-select-value></s-select-trigger>
+  <s-select-content>
+    <s-select-item value="a">Default</s-select-item>
+  </s-select-content>
+</s-select>
+<s-select>
+  <s-select-trigger size="sm"><s-select-value placeholder="Small"></s-select-value></s-select-trigger>
+  <s-select-content>
+    <s-select-item value="a">Small</s-select-item>
+  </s-select-content>
+</s-select>
+```
+
+## Theming
+
+The select uses theme-dependent tokens (matching shadcn's `style-*.css` `.cn-select-trigger`). The **height, radius, font-size, and padding vary per theme** — e.g. Vega `rounded-md`/`h-9`, Nova `rounded-lg`/`h-8`, Maia `rounded-4xl`/`h-9`/`px-3`, Lyra `rounded-none`/`h-8`/`text-xs`, Mira `rounded-md`/`h-7`, Sera underline/`h-10`/`px-0`, Rhea `rounded-2xl`/`h-8`.
+
+Tokens: `--select-trigger-radius`, `--select-trigger-height-default`, `--select-trigger-height-sm`, `--select-trigger-font-size`, `--select-trigger-padding-x`, `--select-trigger-padding-y`, `--select-trigger-gap`, `--select-icon-size`.
 
 ---
 

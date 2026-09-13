@@ -4521,17 +4521,22 @@ simply = {
 
 					comp.selectLinks = function () {
 						if (simply.ctx) {
-							let aTags = [];
+							let aTags = new Set();
 							let current = comp;
 
-							// tüm linkleri topla
+							// Linkleri component'in kendi render rootundan topla. Shadow
+							// DOM kullanan parent componentlerin linkleri `current` hostunda
+							// değil `current.dom` ShadowRootunda bulunur.
 							while (current) {
 								if (typeof current.querySelectorAll === "function") {
-									aTags.push(...current.querySelectorAll("a"));
+									current.querySelectorAll("a").forEach(a => aTags.add(a));
 								}
-								current = current.parent || (current.getRootNode && current.getRootNode().host) || document;
+								if (current.dom && current.dom !== current && typeof current.dom.querySelectorAll === "function") {
+									current.dom.querySelectorAll("a").forEach(a => aTags.add(a));
+								}
+								current = current.parent || simply.findShadowRootOrCustomElement(current) || document;
 								if (current === document) {
-									aTags.push(...document.querySelectorAll("a"));
+									document.querySelectorAll("a").forEach(a => aTags.add(a));
 									break;
 								}
 							}
@@ -5572,6 +5577,5 @@ simply = {
 
 
 simply.init();
-
 
 

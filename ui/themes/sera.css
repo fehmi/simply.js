@@ -92,6 +92,16 @@
   --native-select-padding-right: calc(var(--spacing) * 8);
   --native-select-padding-y: calc(var(--spacing) * 2);
   --native-select-icon-right: 0;
+
+  /* Select — Sera (underline, h-10, px-0, icon 3.5) */
+  --select-trigger-radius: 0;
+  --select-trigger-height-default: calc(var(--spacing) * 10);
+  --select-trigger-height-sm: calc(var(--spacing) * 9);
+  --select-trigger-font-size: var(--text-sm);
+  --select-trigger-padding-x: 0;
+  --select-trigger-padding-y: calc(var(--spacing) * 2);
+  --select-trigger-gap: calc(var(--spacing) * 1.5);
+  --select-icon-size: calc(var(--spacing) * 3.5);
   /* Field family — Sera (large group gap) */
   --field-set-gap: calc(var(--spacing) * 6);
   --field-group-gap: calc(var(--spacing) * 10);

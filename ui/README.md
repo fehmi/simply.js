@@ -200,6 +200,7 @@ class simply {
 12. **Set preview props via `comp.props[key] = value`, not `setAttribute`** — attribute observation doesn't pick up all props (e.g. `disabled`). Direct prop assignment triggers re-render reliably.
 13. **Slot content via `simply.unsafeHTML(value)`** — returns a `DocumentFragment`; `comp.innerHTML = ""` then `comp.appendChild(simply.unsafeHTML(value))` sets slot children (supports HTML).
 14. **Native form elements keep UA fonts in shadow DOM** — `theme.css` reset `button,input,select,textarea { font-family: inherit }` only works in LIGHT DOM (can't cross the shadow boundary). In shadow DOM (default), `<button>`/`<input>` show `Arial`, `<textarea>` shows `monospace` (UA defaults). FIX: each component's `.s-*` base must explicitly set `font-family: inherit` (works in both light + shadow DOM). Verified: button/input/textarea inherit theme font in viewer preview, and font changes with theme.
+15. **NEVER use a backtick `` ` `` in a CSS comment** — simply.js's `parseStyle` embeds the component `<style>` in a JS template literal (`ht += \`...\``). A backtick anywhere in the CSS (e.g. in a comment like `` `-mt-1.5` ``) closes the template literal early → `SyntaxError` at `parseStyle`, so the component's `<style>` silently doesn't apply (shadow renders but unstyled/empty). FIX: plain text or single quotes in CSS comments, no backticks. (Backticks are fine in the `<script>` JS / JS template literals — only the `<style>` block is affected.)
 
 ---
 
