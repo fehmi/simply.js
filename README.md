@@ -45,5 +45,5 @@ The REPL of simply.js is at the [Playground](playground) section. This is the fa
 - [Radio Nest](https://radionest.net)
 - [Edit Image](https://editimage.studio)
 - [Image Alt Manager](https://www.framer.com/marketplace/plugins/image-alt-manager)
-- [Reframer](https://reframer.net)
+- [Word Radar](https://wordradar.net)
 - [Port FM](https://fehmi.ozuseven.com/port)
